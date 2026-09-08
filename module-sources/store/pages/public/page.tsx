@@ -1,13 +1,15 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Link } from "@/core/sdk/navigation";
+
 import { PageFrame } from "@/core/sdk/layout";
 import { Coins, Box, ChevronRight, Search, X } from "lucide-react";
 import { SkeletonServerModes, SkeletonProductGrid } from "../../components/skeletons/store-skeletons";
-import { AvailabilityNote, LowStockNote, type AvailabilityInfo } from "../../components/AvailabilityNote";
+import { type AvailabilityInfo } from "../../components/AvailabilityNote";
+import { ProductCard } from "../../components/ProductCard";
 import { useTranslations } from "next-intl";
-import { Badge, LoadFailed, NativeSelect, Pagination, RichContent, useSiteCurrency } from "@/core/sdk/ui";
+import { LoadFailed, NativeSelect, Pagination, RichContent } from "@/core/sdk/ui";
+
 interface Category {
     id: string;
     name: string;
@@ -56,7 +58,6 @@ export default function StorePage() {
     const commonT = useTranslations('common');
     const [failed, setFailed] = useState(false);
     const [reloadKey, setReloadKey] = useState(0);
-    const { format: formatPrice } = useSiteCurrency();
 
     // Fetch Categories
     useEffect(() => {
@@ -225,24 +226,7 @@ export default function StorePage() {
                     ) : !searching ? (
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                             {searchResults.map((product) => (
-                                <Link
-                                    key={product.id}
-                                    href={`/store/product/${product.number}/${product.slug}`}
-                                    className="bg-card rounded-lg border border-border overflow-hidden hover:shadow-md transition-all group"
-                                >
-                                    <div className="h-44 bg-muted flex items-center justify-center overflow-hidden">
-                                        {product.image ? (
-                                            <>{/* eslint-disable-next-line @next/next/no-img-element */}
-                                            <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" /></>
-                                        ) : (
-                                            <Box className="w-16 h-16 text-muted-foreground" />
-                                        )}
-                                    </div>
-                                    <div className="p-4">
-                                        <h3 className="font-semibold text-foreground mb-1 line-clamp-1">{product.name}</h3>
-                                        <div className="text-primary font-bold">{formatPrice(product.price)}</div>
-                                    </div>
-                                </Link>
+                                <ProductCard key={product.id} product={product} lowStockAt={lowStockAt} showCategory />
                             ))}
                         </div>
                     ) : null}
@@ -353,59 +337,7 @@ export default function StorePage() {
                     ) : (
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                             {products.map((product) => (
-                                <Link
-                                    key={product.id}
-                                    href={`/store/product/${product.number}/${product.slug}`}
-                                    className="bg-card rounded-lg border border-border overflow-hidden hover:shadow-md transition-all group"
-                                >
-                                    <div className={`h-44 bg-muted flex items-center justify-center overflow-hidden relative`}>
-                                        {product.isFeatured && (
-                                            // The badge used to be `bg-warning text-warning`: the
-                                            // label was the colour it was printed on, so the pill
-                                            // read as an empty orange smudge in every theme.
-                                            <Badge tone="warning" className="absolute top-2 right-2 z-10">
-                                                {t('featured')}
-                                            </Badge>
-                                        )}
-                                        {product.image ? (
-                                            <>
-                                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                                            <img
-                                                src={product.image}
-                                                alt={product.name}
-                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                                            />
-                                            </>
-                                        ) : (
-                                            <Box className="w-16 h-16 text-muted-foreground" />
-                                        )}
-                                    </div>
-                                    <div className="p-4">
-                                        <h3 className="font-semibold text-foreground mb-1 line-clamp-1">{product.name}</h3>
-                                        <div className="flex items-center gap-2 mb-3">
-                                            {/* `was` is what a scheduled sale
-                                                puts here; comparePrice is the
-                                                one an operator typed. */}
-                                            {(product.was ?? product.comparePrice) && (
-                                                <span className="line-through text-muted-foreground text-xs">
-                                                    {formatPrice(Number(product.was ?? product.comparePrice))}
-                                                </span>
-                                            )}
-                                            <div className="text-primary font-bold">{formatPrice(product.price)}</div>
-                                        </div>
-                                        {(product.availability || product.stock !== null) && (
-                                            <div className="mb-3 flex flex-wrap gap-2">
-                                                {product.availability && (
-                                                    <AvailabilityNote info={product.availability} compact />
-                                                )}
-                                                <LowStockNote stock={product.stock} at={lowStockAt} />
-                                            </div>
-                                        )}
-                                        <div className="text-sm text-muted-foreground group-hover:text-primary transition-colors">
-                                            {t('viewDetails')} →
-                                        </div>
-                                    </div>
-                                </Link>
+                                <ProductCard key={product.id} product={product} lowStockAt={lowStockAt} />
                             ))}
                         </div>
                     )}
