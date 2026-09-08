@@ -55,6 +55,9 @@ const SCHEDULES: Record<string, Record<string, unknown>> = {
     },
 };
 
+/** Products the seed leaves nearly gone, so the urgency badge has a subject. */
+const NEARLY_GONE = new Set(["Pet: baby dragon"]);
+
 const PRODUCTS: [string, string, number, number | null][] = [
     ["VIP", "Ranks", 9.99, null],
     ["VIP+", "Ranks", 19.99, 24.99],
@@ -77,6 +80,13 @@ const STATUSES = ["COMPLETED", "COMPLETED", "COMPLETED", "PENDING", "PROCESSING"
 
 export const seed: ModuleSeed = {
     run: async (ctx) => {
+        // The rank a rank-gated product asks for. A demo shop with one is how
+        // anybody sees what the badge looks like.
+        const vipRole = await ctx.prisma.role.findFirst({
+            where: { name: { in: ["vip", "moderator", "admin"] } },
+            orderBy: { priority: "desc" },
+            select: { id: true },
+        });
         const categories = new Map<string, { id: string }>();
         for (const [index, [name, description]] of CATEGORIES.entries()) {
             const slug = name.toLowerCase().replace(/\s+/g, "-");
@@ -109,16 +119,25 @@ export const seed: ModuleSeed = {
                     // Most digital goods are unlimited; a couple are limited,
                     // and one is out of stock on purpose - that is the state
                     // the buy button has to refuse.
-                    stock: limited ? (index === 4 ? 0 : ctx.int(1, 25)) : null,
+                    stock: NEARLY_GONE.has(name)
+                        ? 2
+                        : limited ? (index === 4 ? 0 : ctx.int(1, 25)) : null,
                     isFeatured: index < 3,
                     createdAt: ctx.daysAgo(365),
                     categoryId: categories.get(category)?.id ?? null,
                     ...(SCHEDULES[name] ?? {}),
+                    // One product for a rank, so the badge and the refusal
+                    // are both visible on a seeded shop.
+                    ...(name === "Hat collection" && vipRole ? { roleIds: [vipRole.id] } : {}),
                 },
             }));
             products.push({ id: row.id, price, name });
         }
 
+        // A rerun continues the numbering rather than colliding with it:
+        // `orderNumber` is unique, so writing DEMO-1000 twice is an error that
+        // takes the rest of the seed down with it.
+        const alreadyMade = await ctx.prisma.order.count({ where: { orderNumber: { startsWith: "DEMO-" } } });
         const howMany = 8 * ctx.scale;
         const sold = new Map<string, number>();
         for (let i = 0; i < howMany; i++) {
@@ -130,7 +149,7 @@ export const seed: ModuleSeed = {
 
             const order = await ctx.create("order", () => ctx.prisma.order.create({
                 data: {
-                    orderNumber: `DEMO-${String(1000 + i)}`,
+                    orderNumber: `DEMO-${String(1000 + alreadyMade + i)}`,
                     status,
                     subtotal,
                     total: subtotal,

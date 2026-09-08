@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { slugify } from "@/core/sdk";
-import { isAdmin, log, pageParams, prisma, readJsonBody, sanitizeHtml } from "@/core/sdk/server";
+import { isAdmin, log, moduleSettings, pageParams, prisma, readJsonBody, sanitizeHtml } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { productSchema } from "../../lib/validations";
 import { availabilityData } from "../../lib/availability-input";
@@ -74,13 +74,22 @@ export async function GET(request: NextRequest) {
         // gone from the list; one set to count down is still listed, with the
         // state that says so.
         const zone = await siteTimeZone();
+        const { lowStockAt } = await moduleSettings<{ lowStockAt: number }>("store");
         const onShelf = hideShut(products as unknown as ProductRow[], now, zone);
         const annotated = onShelf.map((row) => {
             const rules = rulesOf(row);
             // Nobody in particular: this answer is shared-cached, so it
-            // carries no per-person counting. The product page and the
-            // checkout do that, where the session is known.
-            const state = availabilityOf(rules, { boughtByPerson: 0, soldInPeriod: 0 }, now, zone);
+            // carries no per-person counting and no rank. Judging the rank
+            // here would tell a VIP their own product is not for them, since
+            // the same answer is served to everybody; `restricted` below says
+            // a rank is needed and the product page, which knows the reader,
+            // says whether it is theirs.
+            const state = availabilityOf(
+                { ...rules, roleIds: [] },
+                { boughtByPerson: 0, soldInPeriod: 0 },
+                now,
+                zone,
+            );
             return {
                 ...row,
                 availability: {
@@ -88,6 +97,10 @@ export async function GET(request: NextRequest) {
                     buyable: state.buyable,
                     opensAt: state.opensAt,
                     closesAt: state.closesAt,
+                    // Not who may buy it - this answer is shared - only that
+                    // somebody may not. The card wears a badge; the product
+                    // page, which knows the reader, says the rest.
+                    restricted: row.roleIds.length > 0,
                 },
                 ...effectivePrice(rules, now),
             };
@@ -95,6 +108,9 @@ export async function GET(request: NextRequest) {
 
         return NextResponse.json({
             products: annotated,
+            // What counts as "nearly gone" is the operator's, and the card
+            // has to know it to say so.
+            lowStockAt,
             pagination: {
                 page,
                 limit,

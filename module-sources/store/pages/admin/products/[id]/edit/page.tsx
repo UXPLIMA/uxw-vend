@@ -105,6 +105,7 @@ export default function EditProductPage(props: PageProps) {
                 // The columns hold instants; the form shows the wall clock the
                 // operator typed, in the site's zone.
                 setAvailability({
+                    roleId: p.roleIds?.[0] ?? "",
                     availableFrom: p.availableFrom ? instantToWallClock(new Date(p.availableFrom), where) : "",
                     availableUntil: p.availableUntil ? instantToWallClock(new Date(p.availableUntil), where) : "",
                     availableDays: p.availableDays ?? [],

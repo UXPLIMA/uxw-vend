@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle, Input, Label, NativeSelect } from "@/core/sdk/ui";
 
@@ -14,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle, Input, Label, NativeSelect } 
  */
 
 export interface AvailabilityValue {
+    roleId: string;
     availableFrom: string;
     availableUntil: string;
     availableDays: number[];
@@ -30,6 +32,7 @@ export interface AvailabilityValue {
 }
 
 export const EMPTY_AVAILABILITY: AvailabilityValue = {
+    roleId: "",
     availableFrom: "",
     availableUntil: "",
     availableDays: [],
@@ -61,6 +64,7 @@ export function timeFromMinutes(minutes: number | null | undefined): string {
 /** What the form sends. Empty means "no rule", never zero. */
 export function availabilityPayload(value: AvailabilityValue) {
     return {
+        roleId: value.roleId,
         availableFrom: value.availableFrom || null,
         availableUntil: value.availableUntil || null,
         availableDays: value.availableDays,
@@ -84,9 +88,23 @@ interface Props {
     timeZone: string;
 }
 
+interface Role {
+    id: string;
+    name: string;
+    displayName?: string | null;
+}
+
 export function AvailabilityFields({ value, onChange, timeZone }: Props) {
     const t = useTranslations("store");
     const set = (patch: Partial<AvailabilityValue>) => onChange({ ...value, ...patch });
+    const [roles, setRoles] = useState<Role[]>([]);
+
+    useEffect(() => {
+        fetch("/api/v1/roles")
+            .then((res) => { if (!res.ok) throw new Error("load failed"); return res.json(); })
+            .then((data) => setRoles(data.roles ?? []))
+            .catch(() => { /* no roles offered: the product is for everyone, which is the default */ });
+    }, []);
 
     const days = [0, 1, 2, 3, 4, 5, 6];
     const toggleDay = (day: number) =>
@@ -103,6 +121,22 @@ export function AvailabilityFields({ value, onChange, timeZone }: Props) {
                 <p className="text-sm text-muted-foreground">{t("adm_availabilityHint", { zone: timeZone })}</p>
             </CardHeader>
             <CardContent className="space-y-6">
+                <div>
+                    <Label htmlFor="roleId">{t("adm_whoMayBuy")}</Label>
+                    <NativeSelect
+                        id="roleId"
+                        className="mt-1"
+                        value={value.roleId}
+                        onChange={(e) => set({ roleId: e.target.value })}
+                    >
+                        <option value="">{t("adm_whoMayBuy_everyone")}</option>
+                        {roles.map((role) => (
+                            <option key={role.id} value={role.id}>{role.displayName || role.name}</option>
+                        ))}
+                    </NativeSelect>
+                    <p className="mt-1 text-xs text-muted-foreground">{t("adm_whoMayBuyHint")}</p>
+                </div>
+
                 <div className="grid gap-4 sm:grid-cols-2">
                     <div>
                         <Label htmlFor="availableFrom">{t("adm_availableFrom")}</Label>

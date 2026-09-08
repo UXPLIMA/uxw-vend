@@ -81,6 +81,8 @@ model Product {
   availableUntilMinute Int?
   /** countdown | hidden - what a visitor sees while it is shut. */
   outsideWindow        String    @default("countdown")
+  /** Role ids that may buy it. Empty means anyone. Advertised, not hidden. */
+  roleIds              String[]  @default([])
   /** How many one account may buy, and over what period. */
   perPersonLimit       Int?
   perPersonPeriod      String    @default("ever")

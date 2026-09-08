@@ -34,6 +34,7 @@ export const PUBLIC_PRODUCT = {
     availableFromMinute: true,
     availableUntilMinute: true,
     outsideWindow: true,
+    roleIds: true,
     perPersonLimit: true,
     perPersonPeriod: true,
     periodStock: true,

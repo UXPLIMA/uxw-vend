@@ -30,6 +30,9 @@ export const productSchema = z.object({
     availableFromMinute: z.number().int().min(0).max(1439).optional().nullable(),
     availableUntilMinute: z.number().int().min(0).max(1439).optional().nullable(),
     outsideWindow: z.enum(["countdown", "hidden"]).optional(),
+    /** The form writes one role, or "" for everyone; the column holds a list. */
+    roleId: z.string().max(64).optional().nullable(),
+    roleIds: z.array(z.string().max(64)).max(20).optional(),
     perPersonLimit: z.number().int().min(1).max(100_000).optional().nullable(),
     perPersonPeriod: z.enum(["ever", "day", "week", "month"]).optional(),
     periodStock: z.number().int().min(1).max(1_000_000).optional().nullable(),

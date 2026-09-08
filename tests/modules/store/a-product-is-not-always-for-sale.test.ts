@@ -30,6 +30,7 @@ const TUESDAY_MORNING = new Date("2026-09-08T07:00:00Z");
 
 const always: ProductRules = {
     isActive: true,
+    roleIds: [],
     availableFrom: null,
     availableUntil: null,
     availableDays: [],
@@ -47,7 +48,7 @@ const always: ProductRules = {
     saleUntil: null,
 };
 
-const counted = { boughtByPerson: 0, soldInPeriod: 0 };
+const counted = { boughtByPerson: 0, soldInPeriod: 0, roleId: "member" };
 
 describe("a product with no rules", () => {
     it("is for sale", () => {
@@ -203,5 +204,35 @@ describe("what a shopper pays", () => {
     it("never charges more than the ordinary price", () => {
         // A typo in the admin form is not a price rise.
         expect(effectivePrice({ ...onSale, salePrice: 150 }, FRIDAY_EVENING).price).toBe(100);
+    });
+});
+
+describe("a product for certain ranks", () => {
+    const vipOnly: ProductRules = { ...always, roleIds: ["role-vip"] };
+
+    it("is for sale to somebody who has the rank", () => {
+        const buyer = { ...counted, roleId: "role-vip" };
+        expect(availabilityOf(vipOnly, buyer, FRIDAY_EVENING, ZONE).state).toBe("open");
+    });
+
+    it("is refused to somebody who does not", () => {
+        const shut = availabilityOf(vipOnly, counted, FRIDAY_EVENING, ZONE);
+        expect(shut.state).toBe("wrong_role");
+        expect(shut.buyable).toBe(false);
+    });
+
+    it("is refused to a visitor with no account at all", () => {
+        expect(availabilityOf(vipOnly, { ...counted, roleId: null }, FRIDAY_EVENING, ZONE).state).toBe("wrong_role");
+    });
+
+    it("says the rank before the clock, because that is the one they cannot wait out", () => {
+        // Shut and not for them: telling them to come back on Friday wastes
+        // their Friday.
+        const both = { ...vipOnly, availableDays: [5], availableFromMinute: 18 * 60, availableUntilMinute: 22 * 60 };
+        expect(availabilityOf(both, counted, TUESDAY_MORNING, ZONE).state).toBe("wrong_role");
+    });
+
+    it("lets everybody in when no rank is named", () => {
+        expect(availabilityOf(always, { ...counted, roleId: null }, FRIDAY_EVENING, ZONE).state).toBe("open");
     });
 });

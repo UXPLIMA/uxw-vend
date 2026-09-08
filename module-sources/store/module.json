@@ -2,7 +2,7 @@
   "id": "store",
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
-  "version": "2.5.0",
+  "version": "2.5.1",
   "coreVersion": "^1.31.0",
   "category": "commerce",
   "author": "uxwVend Team",
@@ -94,6 +94,15 @@
       "max": 100,
       "label": "Default creator-code commission (%)",
       "description": "The creator's cut of an order that used their code, when the code does not name its own."
+    },
+    {
+      "key": "lowStockAt",
+      "type": "number",
+      "default": 5,
+      "min": 0,
+      "max": 1000,
+      "label": "Say \"only N left\" at",
+      "description": "A limited product says how few are left once it drops to this many. Zero says nothing at all."
     }
   ],
   "navGroups": [
@@ -909,7 +918,12 @@
         "state_sold_out": "Sold out",
         "state_sold_out_for_now": "Gone for now",
         "state_limit_reached": "You have had yours",
-        "state_open": "On sale"
+        "state_open": "On sale",
+        "adm_whoMayBuy": "Who may buy it",
+        "adm_whoMayBuy_everyone": "Anyone",
+        "adm_whoMayBuyHint": "A product for one rank is listed to everybody with a badge, because the person who cannot buy it is the person who might buy the rank.",
+        "state_wrong_role": "For certain ranks only",
+        "onlyLeft": "Only {count} left"
       },
       "cart": {
         "title": "Shopping Cart",
@@ -1488,7 +1502,12 @@
         "state_sold_out": "Tükendi",
         "state_sold_out_for_now": "Şimdilik tükendi",
         "state_limit_reached": "Senin hakkın doldu",
-        "state_open": "Satışta"
+        "state_open": "Satışta",
+        "adm_whoMayBuy": "Kimler alabilir",
+        "adm_whoMayBuy_everyone": "Herkes",
+        "adm_whoMayBuyHint": "Tek bir rütbeye özel ürün herkese rozetle gösterilir - alamayan kişi, rütbeyi alabilecek kişidir.",
+        "state_wrong_role": "Yalnızca belirli rütbeler",
+        "onlyLeft": "Son {count} tane"
       },
       "cart": {
         "title": "Alışveriş Sepeti",

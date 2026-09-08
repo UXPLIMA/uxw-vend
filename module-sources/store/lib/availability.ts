@@ -31,6 +31,8 @@ export type OutsideWindow = (typeof OUTSIDE_WINDOW)[number];
 
 export interface ProductRules {
     isActive: boolean;
+    /** Role ids that may buy it. Empty means anyone. */
+    roleIds: string[];
     /** The run: absolute instants, so they mean the same thing everywhere. */
     availableFrom: Date | null;
     availableUntil: Date | null;
@@ -52,8 +54,10 @@ export interface ProductRules {
     saleUntil: Date | null;
 }
 
-/** What the caller had to count before asking. */
+/** What the caller had to look up before asking. */
 export interface Counts {
+    /** The buyer's role, for a product sold to certain ranks. */
+    roleId?: string | null;
     /** Paid units this person already has, inside the per-person period. */
     boughtByPerson: number;
     /** Paid units everyone has, inside the refilling period. */
@@ -63,6 +67,7 @@ export interface Counts {
 export type AvailabilityState =
     | "open"
     | "off"
+    | "wrong_role"
     | "early"
     | "ended"
     | "closed"
@@ -192,6 +197,12 @@ export function availabilityOf(
     });
 
     if (!rules.isActive) return answer("off");
+
+    // Before the clock: a rank is the one refusal a shopper cannot wait out,
+    // and telling them to come back on Friday wastes their Friday.
+    if (rules.roleIds.length > 0 && (!counts.roleId || !rules.roleIds.includes(counts.roleId))) {
+        return answer("wrong_role");
+    }
 
     if (rules.availableFrom && now < rules.availableFrom) {
         return answer("early", { opensAt: rules.availableFrom });

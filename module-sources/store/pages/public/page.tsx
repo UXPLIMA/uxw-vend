@@ -5,7 +5,7 @@ import { Link } from "@/core/sdk/navigation";
 import { PageFrame } from "@/core/sdk/layout";
 import { Coins, Box, ChevronRight, Search, X } from "lucide-react";
 import { SkeletonServerModes, SkeletonProductGrid } from "../../components/skeletons/store-skeletons";
-import { AvailabilityNote, type AvailabilityInfo } from "../../components/AvailabilityNote";
+import { AvailabilityNote, LowStockNote, type AvailabilityInfo } from "../../components/AvailabilityNote";
 import { useTranslations } from "next-intl";
 import { Badge, LoadFailed, NativeSelect, Pagination, RichContent, useSiteCurrency } from "@/core/sdk/ui";
 interface Category {
@@ -46,6 +46,8 @@ export default function StorePage() {
     const [sortBy, setSortBy] = useState("newest");
     const [productPage, setProductPage] = useState(1);
     const [productPages, setProductPages] = useState(1);
+    // What the shop calls "nearly gone", from its own settings.
+    const [lowStockAt, setLowStockAt] = useState(0);
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState<Product[] | null>(null);
     const [searching, setSearching] = useState(false);
@@ -85,6 +87,7 @@ export default function StorePage() {
                     if (cancelled) return;
                     setProducts(data.products || []);
                     setProductPages(Math.max(1, Number(data.pagination?.pages ?? data.pages ?? 1)));
+                    setLowStockAt(Number(data.lowStockAt ?? 0));
                     setFailed(false);
                     setLoadingProducts(false);
                 })
@@ -390,9 +393,12 @@ export default function StorePage() {
                                             )}
                                             <div className="text-primary font-bold">{formatPrice(product.price)}</div>
                                         </div>
-                                        {product.availability && (
-                                            <div className="mb-3">
-                                                <AvailabilityNote info={product.availability} compact />
+                                        {(product.availability || product.stock !== null) && (
+                                            <div className="mb-3 flex flex-wrap gap-2">
+                                                {product.availability && (
+                                                    <AvailabilityNote info={product.availability} compact />
+                                                )}
+                                                <LowStockNote stock={product.stock} at={lowStockAt} />
                                             </div>
                                         )}
                                         <div className="text-sm text-muted-foreground group-hover:text-primary transition-colors">

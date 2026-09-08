@@ -11,7 +11,7 @@ import { toast } from "sonner";
 import { Minus, Plus, Check, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { errorMessage } from "@/core/sdk";
-import { AvailabilityNote, type AvailabilityInfo } from "../../../../components/AvailabilityNote";
+import { AvailabilityNote, LowStockNote, type AvailabilityInfo } from "../../../../components/AvailabilityNote";
 
 interface Product {
     id: string;
@@ -32,6 +32,7 @@ interface Product {
     availability?: AvailabilityInfo;
     was?: number | null;
     onSale?: boolean;
+    lowStockAt?: number;
 }
 
 export default function ProductDetailPage() {
@@ -211,6 +212,7 @@ export default function ProductDetailPage() {
     // The window, the per-person limit and today's allowance, answered by the
     // endpoint for this person. The button follows it rather than guessing.
     const availability = product.availability;
+    const lowStockAt = Number(product.lowStockAt ?? 0);
     const forSale = inStock && (availability?.buyable ?? true);
 
     return (
@@ -338,6 +340,7 @@ export default function ProductDetailPage() {
                             {product.stock !== null && inStock && (
                                 <span className="text-muted-foreground">({t('available', { count: product.stock })})</span>
                             )}
+                            <LowStockNote stock={product.stock} at={lowStockAt} />
                         </div>
 
                         {/* Quantity */}

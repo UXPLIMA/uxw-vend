@@ -31,6 +31,10 @@ export async function availabilityData(input: Partial<ProductInput>): Promise<Re
     set("availableFromMinute", input.availableFromMinute);
     set("availableUntilMinute", input.availableUntilMinute);
     set("outsideWindow", input.outsideWindow);
+    // One role is the question an operator asks; the column stays a list so
+    // several remain possible through the API.
+    if (input.roleId !== undefined) data.roleIds = input.roleId ? [input.roleId] : [];
+    else set("roleIds", input.roleIds);
     set("perPersonLimit", input.perPersonLimit);
     set("perPersonPeriod", input.perPersonPeriod);
     set("periodStock", input.periodStock);

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, log, prisma, readJsonBody, sanitizeHtml } from "@/core/sdk/server";
+import { isAdmin, log, moduleSettings, prisma, readJsonBody, sanitizeHtml } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { productSchema } from "../../../lib/validations";
 import { availabilityData } from "../../../lib/availability-input";
@@ -50,9 +50,12 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             return NextResponse.json({ error: "Product not found" }, { status: 404 });
         }
 
+        const { lowStockAt } = await moduleSettings<{ lowStockAt: number }>("store");
+
         return NextResponse.json({
             product: {
                 ...product,
+                lowStockAt,
                 availability: {
                     state: state.state,
                     buyable: state.buyable,

@@ -21,6 +21,7 @@ import {
 export interface ProductRow {
     id: string;
     isActive: boolean;
+    roleIds: string[];
     stock: number | null;
     price: unknown;
     availableFrom: Date | null;
@@ -43,6 +44,7 @@ const asNumber = (value: unknown): number => Number(value ?? 0);
 export function rulesOf(row: ProductRow): ProductRules {
     return {
         isActive: row.isActive,
+        roleIds: row.roleIds ?? [],
         availableFrom: row.availableFrom,
         availableUntil: row.availableUntil,
         availableDays: row.availableDays ?? [],
@@ -103,12 +105,24 @@ export function onTheShelfWhere(now: Date) {
 export function hideShut<T extends ProductRow>(rows: T[], now: Date, zone: string): T[] {
     return rows.filter((row) => {
         if (row.outsideWindow !== "hidden") return true;
-        const state = availabilityOf(rulesOf(row), { boughtByPerson: 0, soldInPeriod: 0 }, now, zone);
+        // Nobody in particular, so a rank-gated product is judged on its
+        // hours alone here. The list is shared-cached and cannot vary by who
+        // is reading; a rank is advertised rather than hidden, which is also
+        // how somebody learns the rank is worth buying.
+        const state = availabilityOf(
+            { ...rulesOf(row), roleIds: [] },
+            { boughtByPerson: 0, soldInPeriod: 0 },
+            now,
+            zone,
+        );
         return state.state === "open" || state.state === "limit_reached";
     });
 }
 
 interface CountReader {
+    user?: {
+        findUnique(args: { where: { id: string }; select: { roleId: true } }): Promise<{ roleId: string | null } | null>;
+    };
     orderItem: {
         aggregate(args: {
             where: Record<string, unknown>;
@@ -173,9 +187,17 @@ export async function availabilityFor(
 ): Promise<Availability & { price: number; was: number | null; onSale: boolean }> {
     const rules = rulesOf(row);
     const where = zone ?? (await siteTimeZone());
-    const counts = await countsFor(db, row.id, userId, rules, now);
+    const [counts, buyer] = await Promise.all([
+        countsFor(db, row.id, userId, rules, now),
+        // Only asked when the product names a rank: an extra read on every
+        // product page for a rule almost no product uses is a read nobody
+        // needed.
+        rules.roleIds.length > 0 && userId && db.user
+            ? db.user.findUnique({ where: { id: userId }, select: { roleId: true } })
+            : Promise.resolve(null),
+    ]);
     return {
-        ...availabilityOf(rules, counts, now, where),
+        ...availabilityOf(rules, { ...counts, roleId: buyer?.roleId ?? null }, now, where),
         ...effectivePrice(rules, now),
     };
 }

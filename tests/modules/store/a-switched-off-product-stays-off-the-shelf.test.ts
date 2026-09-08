@@ -45,6 +45,9 @@ vi.mock("@/core/sdk/server", () => ({
     // The clock every schedule is read on. These rows carry no schedule, so
     // any zone gives the same answer.
     siteTimeZone: async () => "UTC",
+    // What the shop calls "nearly gone". Zero switches the badge off, which
+    // is the state these rows are testing around.
+    moduleSettings: async () => ({ lowStockAt: 0 }),
     log: { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() },
     isAdmin: async () => callerIsAdmin,
     readJsonBody: async (request: Request) => request.json(),
