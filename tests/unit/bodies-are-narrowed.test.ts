@@ -19,15 +19,25 @@ import path from "node:path";
  */
 
 const ROOT = path.resolve(__dirname, "../..");
-const HANDLER = /export (?:async function|const) (GET|POST|PATCH|PUT|DELETE)\b/g;
-const BODY_BINDING = /(?:const|let)\s+(\w+)\s*=\s*(?:await\s+)?(?:readJsonBody|request\.json|req\.json)\b/g;
+/*
+ * Built fresh at each use rather than shared.
+ *
+ * A `/g` regex carries `lastIndex`, and `.test()` advances it: one shared
+ * constant used by both `test()` below and `matchAll()` above meant the
+ * scanner started reading each sample from wherever the last file left off.
+ * It passed for a year and then broke on a change that only added route
+ * files, because what flipped it was whether the last file tested happened to
+ * match. The self-tests at the bottom are what caught it.
+ */
+const handlerPattern = () => /export (?:async function|const) (GET|POST|PATCH|PUT|DELETE)\b/g;
+const bodyBindingPattern = () => /(?:const|let)\s+(\w+)\s*=\s*(?:await\s+)?(?:readJsonBody|request\.json|req\.json)\b/g;
 const GUARD = /\.(safeParse|parse)\(/;
 
 type Handler = { verb: string; body: string };
 
 function splitHandlers(source: string): Handler[] {
     const starts: { at: number; verb: string }[] = [];
-    for (const m of source.matchAll(HANDLER)) starts.push({ at: m.index, verb: m[1] });
+    for (const m of source.matchAll(handlerPattern())) starts.push({ at: m.index, verb: m[1] });
     return starts.map((s, i) => ({
         verb: s.verb,
         body: source.slice(s.at, i + 1 < starts.length ? starts[i + 1].at : source.length),
@@ -36,7 +46,7 @@ function splitHandlers(source: string): Handler[] {
 
 /** Names bound to a raw JSON body inside one handler. */
 function bodyNames(handler: string): string[] {
-    return [...handler.matchAll(BODY_BINDING)].map((m) => m[1]);
+    return [...handler.matchAll(bodyBindingPattern())].map((m) => m[1]);
 }
 
 /** Reaching into a value: a property read, a destructure, or a spread. */
@@ -103,7 +113,7 @@ describe("readJsonBody hands back something nobody can read by accident", () => 
 
     it("finds handlers to check at all", () => {
         const files = routeFiles(path.join(ROOT, "module-sources"));
-        const withBodies = files.filter((f) => BODY_BINDING.test(fs.readFileSync(f, "utf8")));
+        const withBodies = files.filter((f) => bodyBindingPattern().test(fs.readFileSync(f, "utf8")));
         expect(withBodies.length).toBeGreaterThan(30);
     });
 });

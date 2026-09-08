@@ -64,19 +64,19 @@ beforeEach(() => {
 
 describe("the wheel a visitor is shown", () => {
     it("carries what it takes to draw a segment", async () => {
-        const res = await GET();
+        const res = await GET(new Request("http://x/api/v1/wheel/prizes") as never);
         const body = (await res.json()) as { prizes: Record<string, unknown>[] };
         expect(body.prizes[0]).toMatchObject({ name: "100 credits", color: "#3b82f6", value: 100 });
     });
 
     it("does not carry how often that segment wins", async () => {
-        const res = await GET();
+        const res = await GET(new Request("http://x/api/v1/wheel/prizes") as never);
         const body = (await res.json()) as { prizes: Record<string, unknown>[] };
         expect(Object.keys(body.prizes[0]!)).not.toContain("probability");
     });
 
     it("asks the database for no more than it hands out", async () => {
-        await GET();
+        await GET(new Request("http://x/api/v1/wheel/prizes") as never);
         expect(asked().select).toBeDefined();
         expect(Object.keys(asked().select as object)).not.toContain("probability");
     });
@@ -84,7 +84,7 @@ describe("the wheel a visitor is shown", () => {
     it("still shows an administrator the odds they set", async () => {
         session.mockResolvedValue({ user: { id: "admin-1" } });
         isAdmin.mockResolvedValue(true);
-        const res = await GET();
+        const res = await GET(new Request("http://x/api/v1/wheel/prizes") as never);
         const body = (await res.json()) as { prizes: Record<string, unknown>[] };
         expect(body.prizes[0]).toHaveProperty("probability", 5);
     });

@@ -79,25 +79,46 @@ describe("every settings key the code reads can be written", () => {
     });
 });
 
-describe("the wheel's paid spin can be switched on", () => {
-    const manifest = JSON.parse(
-        fs.readFileSync(path.join(ROOT, "module-sources/wheel/module.json"), "utf8"),
+describe("the wheel's price can be set", () => {
+    const wheelsScreen = fs.readFileSync(
+        path.join(ROOT, "module-sources/wheel/pages/admin/wheels/page.tsx"),
+        "utf8",
     );
     const spin = fs.readFileSync(
         path.join(ROOT, "module-sources/wheel/api/spin/route.ts"),
         "utf8",
     );
+    const schema = fs.readFileSync(
+        path.join(ROOT, "module-sources/wheel/schema.prisma"),
+        "utf8",
+    );
 
-    it("declares the cost as a module setting", () => {
-        const cost = manifest.settings?.find((s: { key: string }) => s.key === "spinCost");
-        expect(cost).toBeTruthy();
-        expect(cost.type).toBe("number");
-        expect(cost.min).toBe(0);
+    /*
+     * The price used to be a `wheel_spin_cost` row in the settings table that
+     * no screen wrote and no manifest declared a default for, so it was always
+     * absent, so the cost was always zero, so the whole paid half of the route
+     * - the balance check, the debit, the "not enough credits" answer and the
+     * button that offered another turn - could not be reached by any operator.
+     *
+     * It became a module setting, and then a column: a site runs several
+     * wheels and each one has its own price, which a module-wide number cannot
+     * express. What has to stay true is the same thing either way - the number
+     * the endpoint charges is a number an operator can change.
+     */
+
+    it("keeps the price on the wheel, where a second wheel can have a different one", () => {
+        expect(schema).toMatch(/model Wheel \{[\s\S]*?cost\s+Int/);
     });
 
-    it("reads it from there rather than from a row nothing writes", () => {
-        expect(spin).toContain('moduleSettings<{ spinCost: number }>("wheel")');
+    it("offers it on the screen that edits a wheel", () => {
+        expect(wheelsScreen).toContain('key: "cost"');
+        expect(wheelsScreen).toContain('type: "number"');
+    });
+
+    it("charges what the wheel says, not a number nothing writes", () => {
+        expect(spin).toContain("wheel.cost");
         expect(spin).not.toMatch(/key:\s*"wheel_spin_cost"/);
+        expect(spin).not.toContain('moduleSettings<{ spinCost: number }>("wheel")');
     });
 });
 

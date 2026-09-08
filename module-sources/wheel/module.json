@@ -2,7 +2,7 @@
   "id": "wheel",
   "name": "Wheel of Fortune",
   "description": "Spin-to-win game with configurable prizes and cooldowns",
-  "version": "1.1.3",
+  "version": "1.2.0",
   "coreVersion": "^1.29.0",
   "category": "commerce",
   "author": "uxwVend",
@@ -11,6 +11,12 @@
     "wheel.manage"
   ],
   "menu": [
+    {
+      "label": "Wheels",
+      "path": "/wheel-wheels",
+      "icon": "Dices",
+      "group": "commerce"
+    },
     {
       "label": "Wheel Prizes",
       "path": "/wheel-prizes",
@@ -26,6 +32,10 @@
     }
   ],
   "adminRoutes": [
+    {
+      "path": "/wheel-wheels",
+      "component": "pages/admin/wheels/page.tsx"
+    },
     {
       "path": "/wheel-prizes",
       "component": "pages/admin/prizes/page.tsx"
@@ -50,19 +60,19 @@
         "maxRequests": 30,
         "windowMs": 60000
       }
-    }
-  ],
-  "settings": [
+    },
     {
-      "key": "spinCost",
-      "type": "number",
-      "default": 0,
-      "min": 0,
-      "max": 100000,
-      "label": "Cost of an extra spin, in credits",
-      "description": "A visitor gets one free spin a day. Above zero, they may buy further spins at this price; at zero there are no paid spins and the wheel is once a day."
+      "path": "/wheel/wheels",
+      "handler": "api/wheels/route.ts",
+      "description": "List the wheels a visitor can see, or create one (admin)."
+    },
+    {
+      "path": "/wheel/wheels/[id]",
+      "handler": "api/wheels/[id]/route.ts",
+      "description": "Update or delete a single wheel (admin)."
     }
   ],
+  "settings": [],
   "dependencies": [
     "credits",
     "store"
@@ -81,13 +91,6 @@
     "en": {
       "wheel": {
         "title": "Wheel of Fortune",
-        "subtitle": "Spin the wheel and win amazing prizes",
-        "loginToSpin": "Log in to spin",
-        "spinning": "Spinning…",
-        "availablePrizes": "Available prizes",
-        "youWon": "You won: {prize}!",
-        "creditsAdded": "{value} credits added",
-        "couponCreated": "${value} coupon created",
         "adm_title": "Wheel Prizes",
         "adm_subtitle": "Manage spin wheel prizes",
         "adm_field1Label": "Name",
@@ -103,15 +106,45 @@
         "adm_field8Label": "Probability",
         "adm_field9Label": "Active",
         "description": "Spin the wheel for a chance to win prizes! One free spin per day.",
-        "noPrizes": "No prizes configured yet",
-        "spinAgainCost": "Spin again ({cost} credits)",
-        "spin": "Spin!",
-        "betterLuckNextTime": "Better luck next time! You got: {prize}",
-        "valueCredits": "{value} credits",
-        "errorAlreadySpun": "You already spun today. Come back tomorrow!",
-        "errorNotEnoughCredits": "Not enough credits. You need {cost} credits for another spin.",
-        "errorGeneric": "Spin failed. Try again.",
-        "couponCode": "Your coupon code: {code}"
+        "couponCode": "Your code",
+        "adm_wheels_title": "Wheels",
+        "adm_wheels_subtitle": "A site can run several: a free daily one, a weekly one for a rank, one that costs credits.",
+        "adm_wheels_name": "Name",
+        "adm_wheels_namePlaceholder": "Weekly VIP wheel",
+        "adm_wheels_slug": "Address",
+        "adm_wheels_description": "Description",
+        "adm_wheels_cooldown": "How often one person may turn it",
+        "adm_wheels_cooldownHours": "Hours between turns (custom only)",
+        "adm_wheels_cost": "Credits per turn",
+        "adm_wheels_role": "Who may turn it",
+        "adm_wheels_roleEveryone": "Anyone with an account",
+        "adm_wheels_order": "Order",
+        "adm_wheels_active": "Active",
+        "cooldown_none": "As often as they like",
+        "cooldown_daily": "Once a day",
+        "cooldown_weekly": "Once a week",
+        "cooldown_monthly": "Once a month",
+        "cooldown_custom": "Every so many hours",
+        "cooldown_customEvery": "Every {hours} hours",
+        "thisWheel": "This wheel",
+        "howOften": "How often",
+        "costsPerTurn": "Per turn",
+        "yourCredits": "Your credits",
+        "whatIsOnIt": "What is on it",
+        "free": "Free",
+        "credits": "{count} credits",
+        "turn": "Turn the wheel",
+        "turnForCredits": "Turn for {count} credits",
+        "pickAWheel": "Pick a wheel",
+        "noWheels": "No wheels are set up yet.",
+        "wheelWith": "A wheel with {count} prizes",
+        "membersOnly": "For certain ranks only",
+        "refusal_wheel_signed_out": "Sign in to turn this wheel.",
+        "refusal_wheel_wheel_off": "This wheel is switched off.",
+        "refusal_wheel_wrong_role": "This wheel is for another rank.",
+        "refusal_wheel_too_soon": "You have turned this one recently.",
+        "refusal_wheel_too_soon_at": "You can turn this one again on {when}.",
+        "refusal_wheel_not_enough_credits": "You do not have enough credits for this one."
       },
       "admin": {
         "menu_wheel": "Wheel",
@@ -119,7 +152,8 @@
         "subtitle": "Manage your platform settings and content",
         "menu_wheel_wheel_prizes": "Wheel Prizes",
         "module_wheel_name": "Wheel of Fortune",
-        "module_wheel_description": "Spin-to-win game with configurable prizes and cooldowns"
+        "module_wheel_description": "Spin-to-win game with configurable prizes and cooldowns",
+        "menu_wheel_wheels": "Wheels"
       },
       "pageTitles": {
         "wheel": "Wheel"
@@ -134,13 +168,6 @@
     "tr": {
       "wheel": {
         "title": "Şans Çarkı",
-        "subtitle": "Çarkı çevir ve harika ödülleri kazan",
-        "loginToSpin": "Çevirmek için giriş yapın",
-        "spinning": "Dönüyor…",
-        "availablePrizes": "Mevcut ödüller",
-        "youWon": "Kazandınız: {prize}!",
-        "creditsAdded": "{value} kredi hesabınıza eklendi",
-        "couponCreated": "${value} kupon oluşturuldu",
         "adm_title": "Çark Ödülleri",
         "adm_subtitle": "Çark ödüllerini yönetin",
         "adm_field1Label": "Ad",
@@ -156,15 +183,45 @@
         "adm_field8Label": "Olasılık",
         "adm_field9Label": "Aktif",
         "description": "Ödül kazanmak için çarkı çevirin! Günde bir bedava çevirme hakkınız var.",
-        "noPrizes": "Henüz ödül tanımlanmamış",
-        "spinAgainCost": "Tekrar çevir ({cost} kredi)",
-        "spin": "Çevir!",
-        "betterLuckNextTime": "Bir dahaki sefere! Çıkan: {prize}",
-        "valueCredits": "{value} kredi",
-        "errorAlreadySpun": "Bugün çarkı zaten çevirdin. Yarın tekrar gel!",
-        "errorNotEnoughCredits": "Yetersiz kredi. Tekrar çevirmek için {cost} kredi lazım.",
-        "errorGeneric": "Çark çevrilemedi. Tekrar dene.",
-        "couponCode": "Kupon kodun: {code}"
+        "couponCode": "Kodun",
+        "adm_wheels_title": "Çarklar",
+        "adm_wheels_subtitle": "Bir site birden fazla çark çalıştırabilir: ücretsiz günlük, bir rütbeye özel haftalık, kredili olan.",
+        "adm_wheels_name": "Ad",
+        "adm_wheels_namePlaceholder": "Haftalık VIP çarkı",
+        "adm_wheels_slug": "Adres",
+        "adm_wheels_description": "Açıklama",
+        "adm_wheels_cooldown": "Bir kişi ne sıklıkla çevirebilir",
+        "adm_wheels_cooldownHours": "Çevirmeler arası saat (yalnızca özel)",
+        "adm_wheels_cost": "Çevirme başına kredi",
+        "adm_wheels_role": "Kimler çevirebilir",
+        "adm_wheels_roleEveryone": "Hesabı olan herkes",
+        "adm_wheels_order": "Sıra",
+        "adm_wheels_active": "Aktif",
+        "cooldown_none": "İstedikleri kadar",
+        "cooldown_daily": "Günde bir",
+        "cooldown_weekly": "Haftada bir",
+        "cooldown_monthly": "Ayda bir",
+        "cooldown_custom": "Belirli saatte bir",
+        "cooldown_customEvery": "{hours} saatte bir",
+        "thisWheel": "Bu çark",
+        "howOften": "Sıklık",
+        "costsPerTurn": "Çevirme başına",
+        "yourCredits": "Kredin",
+        "whatIsOnIt": "Üzerinde ne var",
+        "free": "Ücretsiz",
+        "credits": "{count} kredi",
+        "turn": "Çarkı çevir",
+        "turnForCredits": "{count} kredi ile çevir",
+        "pickAWheel": "Bir çark seç",
+        "noWheels": "Henüz çark kurulmamış.",
+        "wheelWith": "{count} ödüllü çark",
+        "membersOnly": "Yalnızca belirli rütbeler",
+        "refusal_wheel_signed_out": "Çevirmek için giriş yap.",
+        "refusal_wheel_wheel_off": "Bu çark kapalı.",
+        "refusal_wheel_wrong_role": "Bu çark başka bir rütbe için.",
+        "refusal_wheel_too_soon": "Bunu yakın zamanda çevirdin.",
+        "refusal_wheel_too_soon_at": "Bunu tekrar {when} tarihinde çevirebilirsin.",
+        "refusal_wheel_not_enough_credits": "Bunun için yeterli kredin yok."
       },
       "admin": {
         "menu_wheel": "Çark Ödülleri",
@@ -172,7 +229,8 @@
         "subtitle": "Platform ayarlarınızı ve içeriklerinizi yönetin",
         "menu_wheel_wheel_prizes": "Çark Ödülleri",
         "module_wheel_name": "Şans Çarkı",
-        "module_wheel_description": "Yapılandırılabilir ödüller ve bekleme süreleriyle çevir-kazan oyunu"
+        "module_wheel_description": "Yapılandırılabilir ödüller ve bekleme süreleriyle çevir-kazan oyunu",
+        "menu_wheel_wheels": "Çarklar"
       },
       "pageTitles": {
         "wheel": "Çark"

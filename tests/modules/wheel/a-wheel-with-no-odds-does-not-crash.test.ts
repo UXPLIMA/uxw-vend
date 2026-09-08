@@ -30,13 +30,28 @@ const transaction = vi.fn(async (fn: (tx: unknown) => Promise<unknown>) =>
 
 vi.mock("@/core/sdk/server", () => ({
     prisma: {
+        // The prizes belong to a wheel now, and the wheel carries the rules
+        // the route used to read from a module setting.
+        wheel: {
+            findFirst: async () => ({
+                id: "w1",
+                name: "Wheel of Fortune",
+                slug: "wheel",
+                cooldown: "daily",
+                cooldownHours: 24,
+                cost: 0,
+                roleIds: [],
+                isActive: true,
+                prizes,
+            }),
+        },
         wheelSpin: { findFirst: () => findFirst(), create: async () => ({}) },
         wheelPrize: { findMany: () => findMany() },
-        user: { findUnique: async () => ({ creditBalance: 1000 }) },
+        user: { findUnique: async () => ({ creditBalance: 1000, roleId: "member" }) },
         activityFeedItem: { create: async () => ({}) },
         $transaction: (fn: (tx: unknown) => Promise<unknown>) => transaction(fn),
     },
-    moduleSettings: async () => ({ spinCost: 0 }),
+    moduleSettings: async () => ({}),
     rateLimitForRoleAsync: async () => true,
     log: { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() },
 }));
@@ -45,7 +60,9 @@ vi.mock("@/core/sdk/auth", () => ({ auth: async () => ({ user: { id: "u1", role:
 
 async function spin() {
     const route = await import("@/modules/wheel/api/spin/route");
-    return route.POST();
+    // `?wheel=` names which one; without it the route takes the first, which
+    // is what an install with a single wheel means by "the wheel".
+    return route.POST(new Request("http://x/api/v1/wheel/spin") as never);
 }
 
 describe("a wheel whose prizes all have zero odds", () => {

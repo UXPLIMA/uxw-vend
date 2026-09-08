@@ -1,49 +1,101 @@
 import type { ModuleSeed } from "@/core/sdk/seed";
 
 /**
- * A prize wheel with weights that add up, and a history of spins.
+ * Two wheels, because one wheel tests nothing about having several.
  *
- * The probabilities are deliberately uneven: a wheel where every slice is
- * equally likely never shows whether the weighting works.
+ * A free daily one everybody can turn, and a weekly one that costs credits -
+ * between them they cover every rule the page has to draw: a cooldown, a
+ * price, a wheel you can turn and one you cannot yet.
  */
-const PRIZES: [string, string, number, number, string][] = [
-    ["50 credits", "credits", 50, 30, "#3b82f6"],
-    ["100 credits", "credits", 100, 20, "#22c55e"],
-    ["250 credits", "credits", 250, 10, "#f59e0b"],
-    ["Common key", "item", 1, 20, "#06b6d4"],
-    ["Rare key", "item", 1, 10, "#a855f7"],
-    ["Legendary key", "item", 1, 3, "#eab308"],
-    ["Nothing this time", "none", 0, 5, "#6b7280"],
-    ["VIP for a day", "rank", 1, 2, "#ef4444"],
+const WHEELS: {
+    slug: string;
+    name: string;
+    description: string;
+    cooldown: string;
+    cost: number;
+    prizes: [string, string, number, number, string][];
+}[] = [
+    {
+        slug: "daily",
+        name: "Daily wheel",
+        description: "One free turn a day. Everything on it is small; that is the point.",
+        cooldown: "daily",
+        cost: 0,
+        prizes: [
+            ["50 credits", "credits", 50, 30, "#3b82f6"],
+            ["100 credits", "credits", 100, 20, "#22c55e"],
+            ["250 credits", "credits", 250, 10, "#f59e0b"],
+            ["Common key", "item", 1, 20, "#06b6d4"],
+            ["Rare key", "item", 1, 10, "#a855f7"],
+            ["Nothing this time", "nothing", 0, 8, "#6b7280"],
+            ["Legendary key", "item", 1, 2, "#eab308"],
+        ],
+    },
+    {
+        slug: "big-one",
+        name: "The big one",
+        description: "Costs credits, turns once a week, and the prizes are worth the wait.",
+        cooldown: "weekly",
+        cost: 250,
+        prizes: [
+            ["1000 credits", "credits", 1000, 20, "#3b82f6"],
+            ["2500 credits", "credits", 2500, 8, "#22c55e"],
+            ["10 percent off", "coupon", 10, 25, "#f59e0b"],
+            ["25 percent off", "coupon", 25, 12, "#ef4444"],
+            ["VIP for a week", "item", 1, 5, "#a855f7"],
+            ["Nothing this time", "nothing", 0, 30, "#6b7280"],
+        ],
+    },
 ];
 
 export const seed: ModuleSeed = {
     run: async (ctx) => {
-        const prizes: { id: string; name: string; value: number }[] = [];
-        for (const [index, [name, type, value, probability, color]] of PRIZES.entries()) {
-            const existing = await ctx.prisma.wheelPrize.findFirst({ where: { name } });
-            if (existing) { prizes.push(existing); continue; }
-            prizes.push(await ctx.create("wheelPrize", () => ctx.prisma.wheelPrize.create({
-                data: { name, type, value, probability, color, order: index },
-            })));
-        }
-
+        let prizes = 0;
         let spins = 0;
-        for (const user of ctx.users) {
-            for (let i = 0; i < ctx.int(0, 6); i++) {
-                const prize = ctx.pick(prizes);
-                await ctx.create("wheelSpin", () => ctx.prisma.wheelSpin.create({
-                    data: {
-                        userId: user.id,
-                        prizeId: prize.id,
-                        prizeName: prize.name,
-                        prizeValue: prize.value,
-                        createdAt: ctx.daysAgo(60),
-                    },
-                }));
-                spins += 1;
+
+        for (const [index, plan] of WHEELS.entries()) {
+            const existing = await ctx.prisma.wheel.findUnique({ where: { slug: plan.slug }, select: { id: true } });
+            const wheel = existing ?? await ctx.create("wheel", () => ctx.prisma.wheel.create({
+                data: {
+                    slug: plan.slug,
+                    name: plan.name,
+                    description: plan.description,
+                    cooldown: plan.cooldown,
+                    cost: plan.cost,
+                    order: index,
+                },
+            }));
+
+            const madePrizes: { id: string; name: string; value: number }[] = [];
+            for (const [order, [name, type, value, probability, color]] of plan.prizes.entries()) {
+                const already = await ctx.prisma.wheelPrize.findFirst({ where: { wheelId: wheel.id, name } });
+                if (already) { madePrizes.push(already); continue; }
+                madePrizes.push(await ctx.create("wheelPrize", () => ctx.prisma.wheelPrize.create({
+                    data: { wheelId: wheel.id, name, type, value, probability, color, order },
+                })));
+                prizes += 1;
+            }
+
+            // A history, so the page has something behind "you turned this
+            // recently" and the admin screen is not looking at an empty table.
+            for (const user of ctx.some(ctx.users, Math.ceil(ctx.users.length / 2))) {
+                for (let i = 0; i < ctx.int(0, 4); i++) {
+                    const prize = ctx.pick(madePrizes);
+                    await ctx.create("wheelSpin", () => ctx.prisma.wheelSpin.create({
+                        data: {
+                            userId: user.id,
+                            wheelId: wheel.id,
+                            prizeId: prize.id,
+                            prizeName: prize.name,
+                            prizeValue: prize.value,
+                            createdAt: ctx.daysAgo(60),
+                        },
+                    }));
+                    spins += 1;
+                }
             }
         }
-        ctx.log(`${prizes.length} prizes, ${spins} spins`);
+
+        ctx.log(`${WHEELS.length} wheels, ${prizes} prizes, ${spins} turns`);
     },
 };

@@ -1,92 +1,97 @@
-import { NextResponse } from "next/server";
-import { moduleSettings, prisma, rateLimitForRoleAsync } from "@/core/sdk/server";
+import { NextRequest, NextResponse } from "next/server";
+import { prisma, rateLimitForRoleAsync } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { randomInt } from "crypto";
+import { drawPrize, nextTurnAt, refusalFor } from "../../lib/wheels";
 
-// POST - Spin the wheel (1 free spin per day, paid spins via credits)
-export async function POST() {
+/**
+ * Turn a wheel.
+ *
+ * The rules - is it on, may this person reach it, have they turned it
+ * recently, can they pay for it - are `refusalFor`, the same function the page
+ * asks before it draws the button. Two copies of that logic is how a disabled
+ * button and a working endpoint end up in the same release.
+ *
+ * `?wheel=<slug>` names which one. Without it, the first wheel the site has,
+ * which is what an install with one wheel means by "the wheel".
+ */
+export async function POST(request: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
     const allowed = await rateLimitForRoleAsync(
         `wheel-spin:${session.user.id}`,
         { maxRequests: 20, windowMs: 3_600_000 },
-        session.user.role
+        session.user.role,
     );
     if (!allowed) {
         return NextResponse.json({ error: "Too many requests" }, { status: 429 });
     }
 
-    // What an extra spin costs.
-    //
-    // This used to be read from a `wheel_spin_cost` row in the settings table
-    // that no screen wrote and no manifest declared a default for, so it was
-    // always absent, so the cost was always zero, so `paidSpin` was never
-    // true. The whole paid-spin half of this route - the balance check, the
-    // debit, the "not enough credits" answer, and the "spin again for N
-    // credits" button on the page - could not be reached by any operator. It
-    // is a module setting now, which is the thing core already renders a
-    // panel for.
-    const { spinCost } = await moduleSettings<{ spinCost: number }>("wheel");
-
-    // Check daily cooldown
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const todaySpin = await prisma.wheelSpin.findFirst({
-        where: { userId: session.user.id, createdAt: { gte: today } },
+    const slug = new URL(request.url).searchParams.get("wheel");
+    const wheel = await prisma.wheel.findFirst({
+        where: slug ? { slug } : {},
+        orderBy: [{ order: "asc" }, { createdAt: "asc" }],
+        include: { prizes: { where: { isActive: true }, orderBy: { order: "asc" } } },
     });
-
-    let paidSpin = false;
-    if (todaySpin) {
-        if (spinCost <= 0) {
-            return NextResponse.json(
-                { error: "You already spun today. Come back tomorrow!", code: "wheel_already_spun" },
-                { status: 429 },
-            );
-        }
-        // Check if user has enough credits for a paid spin
-        const user = await prisma.user.findUnique({ where: { id: session.user.id }, select: { creditBalance: true } });
-        if (!user || Number(user.creditBalance) < spinCost) {
-            return NextResponse.json(
-                { error: `Not enough credits. You need ${spinCost} credits for another spin.`, code: "wheel_not_enough_credits", cost: spinCost },
-                { status: 429 },
-            );
-        }
-        paidSpin = true;
+    if (!wheel) {
+        return NextResponse.json({ error: "No wheel here", code: "wheel_missing" }, { status: 404 });
     }
 
-    // Get active prizes
-    const prizes = await prisma.wheelPrize.findMany({ where: { isActive: true } });
-    if (prizes.length === 0) {
-        return NextResponse.json({ error: "No prizes configured" }, { status: 400 });
-    }
+    const [user, lastSpin] = await Promise.all([
+        prisma.user.findUnique({
+            where: { id: session.user.id },
+            select: { creditBalance: true, roleId: true },
+        }),
+        prisma.wheelSpin.findFirst({
+            where: { userId: session.user.id, wheelId: wheel.id },
+            orderBy: { createdAt: "desc" },
+            select: { createdAt: true },
+        }),
+    ]);
 
-    // Weighted random selection using cryptographically secure randomness
-    const totalWeight = prizes.reduce((sum, p) => sum + p.probability, 0);
+    const rules = {
+        cooldown: wheel.cooldown,
+        cooldownHours: wheel.cooldownHours,
+        cost: wheel.cost,
+        roleIds: wheel.roleIds,
+        isActive: wheel.isActive,
+    };
+    const refusal = refusalFor(rules, {
+        signedIn: true,
+        roleId: user?.roleId ?? null,
+        credits: Number(user?.creditBalance ?? 0),
+        lastTurn: lastSpin?.createdAt ?? null,
+    });
+    if (refusal) {
+        // Each refusal is its own answer so the page can say which one it was
+        // rather than "no": a wheel you may not reach, one you have to wait
+        // for and one you cannot afford are three different things to a reader.
+        const status = refusal === "wrong_role" ? 403 : 429;
+        return NextResponse.json(
+            {
+                error: refusal,
+                code: `wheel_${refusal}`,
+                cost: wheel.cost,
+                nextTurnAt: nextTurnAt(rules, lastSpin?.createdAt ?? null),
+            },
+            { status },
+        );
+    }
 
     // Zero is a probability the screen accepts and the column stores, which is
-    // how an operator switches one prize off. Do it to all of them and the
-    // weights sum to zero, and `randomInt(0, 0)` does not return zero: it
-    // throws, so every spin answered 500. There is nothing to draw from, which
-    // is the same answer as having no prizes at all, said differently so an
-    // operator can tell the two apart.
-    if (totalWeight <= 0) {
+    // how an operator switches one prize off. Do it to all of them and there
+    // is nothing to draw from - the same answer as no prizes at all, said
+    // differently so an operator can tell the two apart.
+    if (wheel.prizes.length === 0) {
+        return NextResponse.json({ error: "No prizes configured", code: "wheel_no_prizes" }, { status: 400 });
+    }
+    const selectedPrize = drawPrize(wheel.prizes, (max) => randomInt(0, max));
+    if (!selectedPrize) {
         return NextResponse.json(
             { error: "Every prize has odds of zero, so there is nothing to draw.", code: "wheel_no_odds" },
             { status: 400 },
         );
-    }
-
-    let random = randomInt(0, Math.ceil(totalWeight * 1000)) / 1000;
-    let selectedPrize = prizes[0];
-
-    for (const prize of prizes) {
-        random -= prize.probability;
-        if (random <= 0) {
-            selectedPrize = prize;
-            break;
-        }
     }
 
     // A one-time coupon, minted here rather than inside the transaction so the
@@ -99,32 +104,32 @@ export async function POST() {
         ? `WHEEL-${Date.now().toString(36).toUpperCase()}-${randomInt(0, 1679616).toString(36).toUpperCase().padStart(4, "0")}`
         : null;
 
-    // One spin is one event, so it is one transaction.
+    // One turn is one event, so it is one transaction.
     //
-    // Every step of it used to be its own call. A paid spin decremented the
+    // Every step of it used to be its own call. A paid turn decremented the
     // balance and then wrote the ledger row separately, so a failure in
     // between took a person's credits and left nothing saying where they went;
-    // a credits prize did the same in the other direction, and a spin could be
+    // a credits prize did the same in the other direction, and a turn could be
     // paid for without being recorded at all. Either half failing now undoes
     // the other.
     const spun = await prisma.$transaction(async (tx) => {
-        if (paidSpin) {
-            // The balance read above is a snapshot: two spins submitted
-            // together both saw enough credits, both spun, and the balance
+        if (wheel.cost > 0) {
+            // The balance read above is a snapshot: two turns submitted
+            // together both saw enough credits, both turned, and the balance
             // went negative. The condition is what makes the second deduction
             // find nothing to update.
             const debited = await tx.user.updateMany({
-                where: { id: session.user.id, creditBalance: { gte: spinCost } },
-                data: { creditBalance: { decrement: spinCost } },
+                where: { id: session.user.id, creditBalance: { gte: wheel.cost } },
+                data: { creditBalance: { decrement: wheel.cost } },
             });
             if (debited.count === 0) return false;
 
             await tx.creditTransaction.create({
                 data: {
                     userId: session.user.id,
-                    amount: -spinCost,
+                    amount: -wheel.cost,
                     type: "wheel_spin",
-                    description: `Wheel of Fortune: Paid spin (${spinCost} credits)`,
+                    description: `${wheel.name}: paid turn (${wheel.cost} credits)`,
                 },
             });
         }
@@ -132,6 +137,7 @@ export async function POST() {
         await tx.wheelSpin.create({
             data: {
                 userId: session.user.id,
+                wheelId: wheel.id,
                 prizeId: selectedPrize.id,
                 prizeName: selectedPrize.name,
                 prizeValue: selectedPrize.value,
@@ -148,14 +154,14 @@ export async function POST() {
                     userId: session.user.id,
                     amount: selectedPrize.value,
                     type: "wheel_prize",
-                    description: `Wheel of Fortune: ${selectedPrize.name}`,
+                    description: `${wheel.name}: ${selectedPrize.name}`,
                 },
             });
         } else if (couponCode) {
             await tx.coupon.create({
                 data: {
                     code: couponCode,
-                    description: `Wheel of Fortune prize: ${selectedPrize.name}`,
+                    description: `${wheel.name} prize: ${selectedPrize.name}`,
                     type: "FIXED",
                     value: selectedPrize.value,
                     usageLimit: 1,
@@ -169,28 +175,29 @@ export async function POST() {
 
     if (!spun) {
         return NextResponse.json(
-            { error: `Not enough credits. You need ${spinCost} credits for another spin.`, code: "wheel_not_enough_credits", cost: spinCost },
+            { error: "not_enough_credits", code: "wheel_not_enough_credits", cost: wheel.cost },
             { status: 429 },
         );
     }
 
-    // Find index for frontend animation
-    const prizeIndex = prizes.findIndex((p) => p.id === selectedPrize.id);
+    // Which slice to stop on, in the order the page drew them.
+    const prizeIndex = wheel.prizes.findIndex((p) => p.id === selectedPrize.id);
 
-    // Fire hooks + activity feed entry
     const { doActionAsync } = await import("@/core/sdk");
     await doActionAsync("wheel.spin.completed", {
         userId: session.user.id,
+        wheelId: wheel.id,
         prizeId: selectedPrize.id,
         prizeName: selectedPrize.name,
         prizeType: selectedPrize.type,
         prizeValue: selectedPrize.value,
-        paidSpin,
-        spinCost,
+        paidSpin: wheel.cost > 0,
+        spinCost: wheel.cost,
     });
     if (selectedPrize.value > 0) {
         await doActionAsync("wheel.prize.won", {
             userId: session.user.id,
+            wheelId: wheel.id,
             prizeId: selectedPrize.id,
             prizeName: selectedPrize.name,
             prizeType: selectedPrize.type,
@@ -219,6 +226,7 @@ export async function POST() {
             // written and the code existed only in the database.
             code: couponCode,
         },
-        cost: spinCost,
+        cost: wheel.cost,
+        nextTurnAt: nextTurnAt(rules, new Date()),
     });
 }

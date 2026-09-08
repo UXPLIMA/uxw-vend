@@ -7,8 +7,41 @@
 
 // ==================== WHEEL OF FORTUNE ====================
 
+/**
+ * One wheel. A site may run several: a free daily one for everybody, a weekly
+ * one for the people who bought a rank, one that costs credits.
+ *
+ * The cooldown, the price and who may reach it belong here rather than to the
+ * module, because they are what makes two wheels two wheels.
+ */
+model Wheel {
+  id            String   @id @default(cuid())
+  name          String
+  slug          String   @unique
+  description   String?
+  /** none | daily | weekly | monthly | custom - see lib/wheels.ts */
+  cooldown      String   @default("daily")
+  /** Hours between turns when `cooldown` is custom. */
+  cooldownHours Int      @default(24)
+  /** What one turn costs in credits. Zero is free. */
+  cost          Int      @default(0)
+  /** Role ids that may turn it. Empty means anyone with an account. */
+  roleIds       String[] @default([])
+  isActive      Boolean  @default(true)
+  order         Int      @default(0)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  prizes WheelPrize[]
+  spins  WheelSpin[]
+
+  @@index([isActive, order])
+}
+
 model WheelPrize {
   id          String  @id @default(cuid())
+  wheelId     String?
+  wheel       Wheel?  @relation(fields: [wheelId], references: [id], onDelete: Cascade)
   name        String
   type        String
   value       Int     @default(0)
@@ -16,10 +49,14 @@ model WheelPrize {
   probability Int     @default(10)
   isActive    Boolean @default(true)
   order       Int     @default(0)
+
+  @@index([wheelId])
 }
 
 model WheelSpin {
   id        String   @id @default(cuid())
+  wheelId   String?
+  wheel     Wheel?   @relation(fields: [wheelId], references: [id], onDelete: SetNull)
   userId    String
   user      User     @relation("WheelSpins", fields: [userId], references: [id], onDelete: Cascade)
   prizeId   String?
@@ -27,5 +64,12 @@ model WheelSpin {
   prizeValue Int     @default(0)
   createdAt DateTime @default(now())
 
-  @@index([userId])
+  // Read as "when did this person last turn this wheel", which is the
+  // question every cooldown asks.
+  // A lone @@index([userId]) would be dead weight beside it: an index that
+  // leads with the same column already answers those reads.
+  @@index([userId, wheelId, createdAt])
+  // The foreign key's own index: retiring a wheel has to find its turns
+  // without reading the table.
+  @@index([wheelId])
 }
