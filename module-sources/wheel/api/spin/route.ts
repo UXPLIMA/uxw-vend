@@ -56,6 +56,7 @@ export async function POST(request: NextRequest) {
         cost: wheel.cost,
         roleIds: wheel.roleIds,
         isActive: wheel.isActive,
+        hasPrizes: wheel.prizes.length > 0,
     };
     const refusal = refusalFor(rules, {
         signedIn: true,
@@ -67,7 +68,9 @@ export async function POST(request: NextRequest) {
         // Each refusal is its own answer so the page can say which one it was
         // rather than "no": a wheel you may not reach, one you have to wait
         // for and one you cannot afford are three different things to a reader.
-        const status = refusal === "wrong_role" ? 403 : 429;
+        // A wheel with nothing on it is not a rate limit and not a
+        // permission: it is a wheel an operator has not finished setting up.
+        const status = refusal === "wrong_role" ? 403 : refusal === "no_prizes" ? 400 : 429;
         return NextResponse.json(
             {
                 error: refusal,
@@ -81,11 +84,9 @@ export async function POST(request: NextRequest) {
 
     // Zero is a probability the screen accepts and the column stores, which is
     // how an operator switches one prize off. Do it to all of them and there
-    // is nothing to draw from - the same answer as no prizes at all, said
-    // differently so an operator can tell the two apart.
-    if (wheel.prizes.length === 0) {
-        return NextResponse.json({ error: "No prizes configured", code: "wheel_no_prizes" }, { status: 400 });
-    }
+    // is nothing to draw from - said differently from a wheel with no prizes
+    // at all (which `refusalFor` refused above) so an operator can tell the
+    // two apart.
     const selectedPrize = drawPrize(wheel.prizes, (max) => randomInt(0, max));
     if (!selectedPrize) {
         return NextResponse.json(

@@ -35,7 +35,7 @@ export default function Page() {
         <AdminCrudPage
             title={t("adm_wheels_title")}
             subtitle={t("adm_wheels_subtitle")}
-            apiPath="/api/v1/wheel/wheels"
+            apiPath="/api/v1/wheel/admin/wheels"
             listKey="wheels"
             displayField="name"
             secondaryField="slug"

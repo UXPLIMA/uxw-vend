@@ -22,6 +22,7 @@ const open = {
     cost: 0,
     roleIds: [] as string[],
     isActive: true,
+    hasPrizes: true,
 };
 const turner = { signedIn: true, roleId: "member", credits: 0, lastTurn: null as Date | null };
 const NOW = new Date("2026-09-08T12:00:00Z");
@@ -90,6 +91,17 @@ describe("who a wheel refuses, and why", () => {
         const paid = { ...open, cost: 250 };
         expect(refusalFor(paid, { ...turner, credits: 100 }, NOW)).toBe("not_enough_credits");
         expect(refusalFor(paid, { ...turner, credits: 250 }, NOW)).toBeNull();
+    });
+
+    it("refuses a wheel with nothing on it, before it asks anything else", () => {
+        // The endpoint has always refused this (`wheel_no_prizes`) while the
+        // page drew an enabled button over a blank disc, which is the drift
+        // this function exists to prevent. It is said before "sign in" and
+        // before the cooldown because it is the one refusal no reader can do
+        // anything about: signing in and waiting a day both lead back here.
+        const empty = { ...open, hasPrizes: false };
+        expect(refusalFor(empty, turner, NOW)).toBe("no_prizes");
+        expect(refusalFor(empty, { ...turner, signedIn: false }, NOW)).toBe("no_prizes");
     });
 
     it("says the earliest reason, so a reader is told the one they can act on", () => {

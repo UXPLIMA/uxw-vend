@@ -24,6 +24,8 @@ export interface WheelRules {
     /** Role ids that may turn it. Empty means anyone with an account. */
     roleIds: string[];
     isActive: boolean;
+    /** Whether anything is on it. A wheel with no prizes cannot be turned. */
+    hasPrizes: boolean;
 }
 
 /** Hours in each named cooldown; `custom` carries its own. */
@@ -58,6 +60,7 @@ export function nextTurnAt(
 export type Refusal =
     | "signed_out"
     | "wheel_off"
+    | "no_prizes"
     | "wrong_role"
     | "too_soon"
     | "not_enough_credits"
@@ -80,6 +83,11 @@ export interface Turner {
  */
 export function refusalFor(rules: WheelRules, turner: Turner, now: Date = new Date()): Refusal {
     if (!rules.isActive) return "wheel_off";
+    // Before "sign in" and before the cooldown, because it is the one refusal
+    // the reader cannot act on: signing in and waiting a day both lead back to
+    // a blank disc. The endpoint has always refused this; the page drew an
+    // enabled button over it until the rule moved here.
+    if (!rules.hasPrizes) return "no_prizes";
     if (!turner.signedIn) return "signed_out";
     if (rules.roleIds.length > 0 && (!turner.roleId || !rules.roleIds.includes(turner.roleId))) {
         return "wrong_role";

@@ -2,7 +2,7 @@
   "id": "wheel",
   "name": "Wheel of Fortune",
   "description": "Spin-to-win game with configurable prizes and cooldowns",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "coreVersion": "^1.29.0",
   "category": "commerce",
   "author": "uxwVend",
@@ -64,11 +64,16 @@
     {
       "path": "/wheel/wheels",
       "handler": "api/wheels/route.ts",
-      "description": "List the wheels a visitor can see, or create one (admin)."
+      "description": "List the wheels a visitor can see, with their prizes."
     },
     {
-      "path": "/wheel/wheels/[id]",
-      "handler": "api/wheels/[id]/route.ts",
+      "path": "/wheel/admin/wheels",
+      "handler": "api/admin/wheels/route.ts",
+      "description": "List every wheel including the switched-off ones, or create one (admin)."
+    },
+    {
+      "path": "/wheel/admin/wheels/[id]",
+      "handler": "api/admin/wheels/[id]/route.ts",
       "description": "Update or delete a single wheel (admin)."
     }
   ],
@@ -141,6 +146,7 @@
         "membersOnly": "For certain ranks only",
         "refusal_wheel_signed_out": "Sign in to turn this wheel.",
         "refusal_wheel_wheel_off": "This wheel is switched off.",
+        "refusal_wheel_no_prizes": "There is nothing on this wheel yet.",
         "refusal_wheel_wrong_role": "This wheel is for another rank.",
         "refusal_wheel_too_soon": "You have turned this one recently.",
         "refusal_wheel_too_soon_at": "You can turn this one again on {when}.",
@@ -218,6 +224,7 @@
         "membersOnly": "Yalnızca belirli rütbeler",
         "refusal_wheel_signed_out": "Çevirmek için giriş yap.",
         "refusal_wheel_wheel_off": "Bu çark kapalı.",
+        "refusal_wheel_no_prizes": "Bu çarkta henüz ödül yok.",
         "refusal_wheel_wrong_role": "Bu çark başka bir rütbe için.",
         "refusal_wheel_too_soon": "Bunu yakın zamanda çevirdin.",
         "refusal_wheel_too_soon_at": "Bunu tekrar {when} tarihinde çevirebilirsin.",

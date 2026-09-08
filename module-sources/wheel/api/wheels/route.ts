@@ -1,7 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
+import { NextResponse } from "next/server";
+import { prisma } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
-import { wheelSchema } from "../../lib/validations";
 import { refusalFor, nextTurnAt } from "../../lib/wheels";
 
 /**
@@ -10,22 +9,21 @@ import { refusalFor, nextTurnAt } from "../../lib/wheels";
  * One answer rather than a list plus a probe per wheel: the page draws a
  * button per wheel and every one of them needs the same four facts - is it on,
  * may I turn it, when may I turn it next, and what does it cost.
+ *
+ * This used to answer two different shapes at one address, picked by whether
+ * the reader was an administrator: a visitor got wheels with their prizes,
+ * an administrator got the raw rows their editing screen wanted. The page
+ * lists what is on the wheel, so an administrator opening /wheel got a
+ * TypeError instead of a page. An administrator browsing the site is a
+ * visitor; the screen that manages wheels asks /api/v1/wheel/admin/wheels,
+ * which is a different question and says so in its address.
  */
+
+/** Names the reader, so no shared cache may hold a copy of it. */
+const PRIVATE = { "Cache-Control": "private, no-store" };
+
 export async function GET() {
     const session = await auth();
-    const moderator = session?.user?.id ? await isAdmin(session.user.id) : false;
-
-    // The admin screen edits every wheel, including the ones switched off and
-    // the rules a visitor has no business reading.
-    if (moderator) {
-        const all = await prisma.wheel.findMany({ orderBy: [{ order: "asc" }, { createdAt: "asc" }] });
-        return NextResponse.json({
-            // `roleId` is what the form writes: one role is the question an
-            // operator asks, and the column stays a list so several stay
-            // possible through the API.
-            wheels: all.map((wheel) => ({ ...wheel, roleId: wheel.roleIds[0] ?? "" })),
-        });
-    }
 
     const [wheels, user] = await Promise.all([
         prisma.wheel.findMany({
@@ -65,6 +63,7 @@ export async function GET() {
                 cost: wheel.cost,
                 roleIds: wheel.roleIds,
                 isActive: wheel.isActive,
+                hasPrizes: wheel.prizes.length > 0,
             };
             const lastTurn = lastTurnOf.get(wheel.id) ?? null;
             const refusal = refusalFor(rules, {
@@ -89,30 +88,5 @@ export async function GET() {
             };
         }),
         credits: Number(user?.creditBalance ?? 0),
-    });
-}
-
-// POST /api/v1/wheel/wheels - create one (admin)
-export async function POST(request: NextRequest) {
-    const session = await auth();
-    if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    if (!(await isAdmin(session.user.id))) {
-        return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-    }
-    const body = await readJsonBody(request);
-    if (body instanceof NextResponse) return body;
-
-    const parsed = wheelSchema.safeParse(body);
-    if (!parsed.success) {
-        return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
-    }
-
-    const existing = await prisma.wheel.findUnique({ where: { slug: parsed.data.slug } });
-    if (existing) return NextResponse.json({ error: "That address is taken" }, { status: 409 });
-
-    const { roleId, ...fields } = parsed.data;
-    const wheel = await prisma.wheel.create({
-        data: { ...fields, roleIds: roleId ? [roleId] : (fields.roleIds ?? []) },
-    });
-    return NextResponse.json({ wheel }, { status: 201 });
+    }, { headers: PRIVATE });
 }

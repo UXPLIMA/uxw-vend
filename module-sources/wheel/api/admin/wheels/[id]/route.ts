@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
-import { wheelSchema } from "../../../lib/validations";
+import { wheelSchema } from "../../../../lib/validations";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -13,7 +13,7 @@ async function refuse(): Promise<NextResponse | null> {
     return null;
 }
 
-// PATCH /api/v1/wheel/wheels/[id]
+// PATCH /api/v1/wheel/admin/wheels/[id]
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const refused = await refuse();
     if (refused) return refused;
@@ -38,7 +38,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     return NextResponse.json({ wheel });
 }
 
-// DELETE /api/v1/wheel/wheels/[id]
+// DELETE /api/v1/wheel/admin/wheels/[id]
 export async function DELETE(_request: NextRequest, { params }: RouteParams) {
     const refused = await refuse();
     if (refused) return refused;

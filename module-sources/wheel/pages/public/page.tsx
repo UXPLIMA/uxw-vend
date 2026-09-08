@@ -177,6 +177,7 @@ export default function WheelPage() {
                         </dl>
                     </div>
 
+                    {wheel.prizes.length > 0 && (
                     <div className="bg-card rounded-xl border border-border p-5">
                         <h2 className="font-bold text-foreground mb-3">{t("whatIsOnIt")}</h2>
                         <ul className="space-y-2 text-sm">
@@ -192,6 +193,7 @@ export default function WheelPage() {
                             ))}
                         </ul>
                     </div>
+                    )}
                 </div>
             ) : null}
         >
@@ -227,7 +229,16 @@ export default function WheelPage() {
                         </div>
                     )}
 
-                    {wheel && (
+                    {wheel && wheel.prizes.length === 0 && (
+                        <Card>
+                            <CardContent className="py-12 text-center text-muted-foreground">
+                                <Gift className="w-8 h-8 mx-auto mb-3 opacity-40" aria-hidden="true" />
+                                <p>{t("refusal_wheel_no_prizes")}</p>
+                            </CardContent>
+                        </Card>
+                    )}
+
+                    {wheel && wheel.prizes.length > 0 && (
                         <Card>
                             <CardContent className="p-6">
                                 <div className="flex flex-col items-center gap-6">
