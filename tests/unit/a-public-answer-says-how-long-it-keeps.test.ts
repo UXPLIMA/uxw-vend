@@ -81,7 +81,11 @@ describe("a public answer", () => {
                 if (!SHARED_CACHE.test(source)) continue;
                 const handler = getHandler(source);
                 if (!handler) continue;
-                if (/\bauth\s*\(\s*\)|\bisAdmin\b|\bsession\b/.test(handler)) {
+                // Comments are prose about the code, and this file's own
+                // comment explains that it reads no session - which is the
+                // sentence that used to fail it.
+                const code = handler.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/[^\n]*/g, "");
+                if (/\bauth\s*\(\s*\)|\bisAdmin\b|\bsession\b/.test(code)) {
                     leaky.push(path.relative(ROOT, file));
                 }
             }

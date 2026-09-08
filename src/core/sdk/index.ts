@@ -68,6 +68,14 @@ export { sharedJson, peekShared, invalidateShared } from "@/core/lib/shared-requ
 export { copyText } from "@/core/lib/copy-text";
 
 export { writeError, errorMessage } from "@/core/lib/write-result";
+
+/**
+ * The site's clock, as pure functions. "Friday at 18:00" is not a moment
+ * until somebody says whose clock; `siteTimeZone()` in `@/core/sdk/server`
+ * answers that, and these read it. Safe in a browser bundle - they are
+ * `Intl` and arithmetic.
+ */
+export { zonedNow, weekdayIn, minutesInto, isValidTimeZone, wallClockToInstant, instantToWallClock, DEFAULT_TIME_ZONE } from "@/core/lib/site-time";
 export type { WriteErrorBody } from "@/core/lib/write-result";
 export type { Translator } from "@/core/lib/auth-error-message";
 

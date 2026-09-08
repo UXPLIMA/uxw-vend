@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { generateOrderNumber } from "@/core/sdk";
-import { log, logActivity, moduleSettings, prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
+import { log, logActivity, moduleSettings, prisma, rateLimitForRole, readJsonBody, siteTimeZone } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { deliverProduct } from "../../lib/delivery";
 import { claimStock, shortOfStock, stockClaims } from "../../lib/stock";
+import { effectivePrice } from "../../lib/availability";
+import { availabilityFor, rulesOf, type ProductRow } from "../../lib/availability-server";
 import { countSales } from "../../lib/popularity";
 import { resolveCurrency } from "../../lib/currency";
 import { startPaymentSession, isPaymentProviderAvailable } from "../../lib/payments";
@@ -108,6 +110,52 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Some products are not available" }, { status: 400 });
         }
 
+        // ── Check each product is for sale, to this person, right now ──
+        //
+        // The list and the buy button ask the same question, but this is the
+        // one that has to be true: a limit enforced only where a browser can
+        // see it is not a limit. A window that closed while somebody sat on
+        // the checkout page closes here too.
+        const zone = await siteTimeZone();
+        const now = new Date();
+        for (const product of products) {
+            const wanted = items.find((i) => i.productId === product.id)?.quantity ?? 1;
+            const state = await availabilityFor(prisma, product as unknown as ProductRow, session.user.id, now, zone);
+            if (!state.buyable) {
+                return NextResponse.json(
+                    {
+                        error: `${product.name}: ${state.state}`,
+                        code: `store_${state.state}`,
+                        productId: product.id,
+                        opensAt: state.opensAt,
+                    },
+                    { status: 409 },
+                );
+            }
+            if (state.remainingForPerson !== null && wanted > state.remainingForPerson) {
+                return NextResponse.json(
+                    {
+                        error: `${product.name}: limit_reached`,
+                        code: "store_limit_reached",
+                        productId: product.id,
+                        remaining: state.remainingForPerson,
+                    },
+                    { status: 409 },
+                );
+            }
+            if (state.remainingInPeriod !== null && wanted > state.remainingInPeriod) {
+                return NextResponse.json(
+                    {
+                        error: `${product.name}: sold_out_for_now`,
+                        code: "store_sold_out_for_now",
+                        productId: product.id,
+                        opensAt: state.opensAt,
+                    },
+                    { status: 409 },
+                );
+            }
+        }
+
         // ── Check subscription constraints ──
         const subscriptionProducts = products.filter((p) => p.type === "SUBSCRIPTION");
         if (subscriptionProducts.length > 1) {
@@ -157,7 +205,10 @@ export async function POST(request: NextRequest) {
                 id: p.id,
                 name: p.name,
                 type: p.type,
-                price: Number(p.price),
+                // What a sale sets, not what the column says: the shop shows
+                // the sale price and a checkout that charged the other one
+                // would be taking a different amount from the one on screen.
+                price: effectivePrice(rulesOf(p as unknown as ProductRow), now).price,
                 categoryId: p.categoryId,
             })),
             bulkDiscounts,

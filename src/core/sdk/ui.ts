@@ -19,6 +19,15 @@ export { Badge, badgeClassName } from "@/core/components/ui/badge";
  * its author thought of.
  */
 export { NavIcon } from "@/core/components/ui/NavIcon";
+
+/**
+ * The site's public settings, fetched once per page however many components
+ * ask. A module reaching for `/api/v1/public-settings` directly is what this
+ * replaces: the allow-list is core's, so the module would be reading a
+ * contract it cannot see, and two of them have already shipped code that
+ * silently got `undefined` on every load.
+ */
+export { useSiteSettings } from "@/core/hooks/useSiteSettings";
 export type { BadgeTone } from "@/core/components/ui/badge";
 export { Card, CardHeader, CardTitle, CardContent } from "@/core/components/ui/card";
 export { Checkbox, CheckboxField } from "@/core/components/ui/checkbox";

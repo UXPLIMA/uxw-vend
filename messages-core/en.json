@@ -1121,7 +1121,9 @@
     "common_listTruncated": "Only the first 500 are shown. Narrow the list to see the rest.",
     "err": {
       "demo_disabled": "This is the public demo, so this change is not saved. Run your own instance to try it."
-    }
+    },
+    "siteSettings_timezone": "Time zone",
+    "siteSettings_timezoneHint": "The clock every schedule is read on: a shop window that opens at 18:00, a sale that ends at midnight."
   },
   "footer": {
     "quickLinks": "Quick Links",

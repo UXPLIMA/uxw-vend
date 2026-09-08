@@ -37,7 +37,14 @@ vi.mock("@/core/sdk/server", () => ({
             count: (args: unknown) => count(args as never),
             findFirst: (args: unknown) => findFirst(args),
         },
+        // What the availability rules count: units already paid for, by this
+        // person and by everybody. Nothing here sets a limit, so the answer is
+        // always none.
+        orderItem: { aggregate: async () => ({ _sum: { quantity: null } }) },
     },
+    // The clock every schedule is read on. These rows carry no schedule, so
+    // any zone gives the same answer.
+    siteTimeZone: async () => "UTC",
     log: { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() },
     isAdmin: async () => callerIsAdmin,
     readJsonBody: async (request: Request) => request.json(),

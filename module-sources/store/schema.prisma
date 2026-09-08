@@ -62,6 +62,36 @@ model Product {
   subscriptionInterval      String?
   subscriptionIntervalCount Int?      @default(1)
   stripePriceId             String?
+
+  // ---- When it is for sale -------------------------------------------
+  //
+  // The shop had one switch per product, so every shape a community
+  // actually sells needed somebody watching a clock: a seasonal pack turned
+  // on by hand on the 20th, a Friday evening offer somebody had to be awake
+  // for, "one per account" enforced afterwards by apologising. The hours are
+  // read on the site's own clock (Settings > Site), because "Friday at
+  // 18:00" is not a moment until somebody says whose clock.
+  /** The run. Absolute instants, so they mean the same thing everywhere. */
+  availableFrom        DateTime?
+  availableUntil       DateTime?
+  /** Weekly window: 0 is Sunday. Empty means every day. */
+  availableDays        Int[]     @default([])
+  /** Minutes past midnight, site clock. Null means all day. May wrap. */
+  availableFromMinute  Int?
+  availableUntilMinute Int?
+  /** countdown | hidden - what a visitor sees while it is shut. */
+  outsideWindow        String    @default("countdown")
+  /** How many one account may buy, and over what period. */
+  perPersonLimit       Int?
+  perPersonPeriod      String    @default("ever")
+  /** An allowance that refills: "ten a day" rather than "ten, ever". */
+  periodStock          Int?
+  periodStockWindow    String    @default("day")
+  /** A sale with a start and an end, rather than a price somebody remembers. */
+  salePrice            Decimal?  @db.Decimal(10, 2)
+  saleFrom             DateTime?
+  saleUntil            DateTime?
+
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -75,6 +105,8 @@ model Product {
   @@index([categoryId])
   @@index([isActive, isFeatured])
   @@index([isActive, unitsSold])
+  // The list asks for what is on sale right now on every visit.
+  @@index([isActive, availableFrom, availableUntil])
 }
 
 enum ProductType {

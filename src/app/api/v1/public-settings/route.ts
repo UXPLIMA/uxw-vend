@@ -21,6 +21,10 @@ const PUBLIC_KEYS = [
     "footer_copyright",
     "custom_css",
     "navbar_links",
+    // The zone every schedule is read in. The admin product form shows it
+    // beside the hours it is asking for, because "18:00" with no zone next to
+    // it is what makes somebody schedule a sale three hours out.
+    "site_timezone",
     "theme_color_primary",
     "theme_color_secondary",
     "theme_color_accent",

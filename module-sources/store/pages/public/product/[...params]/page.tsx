@@ -11,6 +11,7 @@ import { toast } from "sonner";
 import { Minus, Plus, Check, ChevronLeft, ChevronRight, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { errorMessage } from "@/core/sdk";
+import { AvailabilityNote, type AvailabilityInfo } from "../../../../components/AvailabilityNote";
 
 interface Product {
     id: string;
@@ -28,6 +29,9 @@ interface Product {
         name: string;
         slug: string;
     };
+    availability?: AvailabilityInfo;
+    was?: number | null;
+    onSale?: boolean;
 }
 
 export default function ProductDetailPage() {
@@ -204,6 +208,10 @@ export default function ProductDetailPage() {
     const maxStock = product.stock ?? 99;
     const totalPrice = product.price * quantity;
     const inStock = product.stock === null || product.stock > 0;
+    // The window, the per-person limit and today's allowance, answered by the
+    // endpoint for this person. The button follows it rather than guessing.
+    const availability = product.availability;
+    const forSale = inStock && (availability?.buyable ?? true);
 
     return (
         <PageFrame
@@ -312,6 +320,17 @@ export default function ProductDetailPage() {
                             )}
                         </div>
 
+                        {availability && (
+                            <div className="mb-4">
+                                <AvailabilityNote info={availability} />
+                                {availability.remainingForPerson !== null && availability.remainingForPerson !== undefined && (
+                                    <p className="mt-1 text-sm text-muted-foreground">
+                                        {t("perPersonLeft", { count: availability.remainingForPerson })}
+                                    </p>
+                                )}
+                            </div>
+                        )}
+
                         {/* Stock */}
                         <div className="flex items-center gap-2 text-sm mb-4">
                             <div className={`w-2 h-2 rounded-full ${inStock ? 'bg-success' : 'bg-destructive'}`}></div>
@@ -322,7 +341,7 @@ export default function ProductDetailPage() {
                         </div>
 
                         {/* Quantity */}
-                        {inStock && (
+                        {forSale && (
                             <div className="mb-4">
                                 <label className="text-sm font-medium text-foreground mb-2 block">{t('quantity')}</label>
                                 <div className="flex items-center gap-3">
@@ -394,7 +413,7 @@ export default function ProductDetailPage() {
                             <Button
                                 className="flex-1 bg-primary hover:bg-primary/90 text-primary-foreground rounded-sm"
                                 onClick={buyNow}
-                                disabled={!inStock || addingToCart}
+                                disabled={!forSale || addingToCart}
                             >
                                 {addingToCart ? <Loader2 className="w-4 h-4 animate-spin" /> : t('buyNow')}
                             </Button>
@@ -402,7 +421,7 @@ export default function ProductDetailPage() {
                                 variant="outline"
                                 className="flex-1 border-border text-foreground hover:bg-muted rounded-sm"
                                 onClick={addToCart}
-                                disabled={!inStock || addingToCart}
+                                disabled={!forSale || addingToCart}
                             >
                                 {addedToCart ? (
                                     <><Check className="w-4 h-4" /> {t('addedToCart')}</>

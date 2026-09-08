@@ -3,15 +3,20 @@ import { slugify } from "@/core/sdk";
 import { isAdmin, log, pageParams, prisma, readJsonBody, sanitizeHtml } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { productSchema } from "../../lib/validations";
+import { availabilityData } from "../../lib/availability-input";
 import { PUBLIC_PRODUCT } from "../../lib/public-product";
+import { availabilityOf, effectivePrice } from "../../lib/availability";
+import { hideShut, onTheShelfWhere, rulesOf, type ProductRow } from "../../lib/availability-server";
+import { siteTimeZone } from "@/core/sdk/server";
 
 /**
- * The listing is the same whoever asked: it filters on query parameters and
- * reads no session. `s-maxage` speaks to shared caches and not to browsers,
- * so no visitor's own cache is involved. If this ever starts varying by who
- * is asking, it has to lose this.
+ * The listing is the same whoever asked - it reads no session - but it is no
+ * longer the same at every moment: a product may open at 18:00 and shut at
+ * 22:00, and a shared cache would keep serving the shut answer into the
+ * opening, or the open one past it. Thirty seconds was already short; five
+ * keeps the window honest while still absorbing a burst.
  */
-const SHARED_CACHE = { "Cache-Control": "public, max-age=0, s-maxage=30, stale-while-revalidate=60" };
+const SHARED_CACHE = { "Cache-Control": "public, max-age=0, s-maxage=5, stale-while-revalidate=10" };
 
 
 // GET /api/v1/store/products - List products
@@ -30,8 +35,9 @@ export async function GET(request: NextRequest) {
         // hold, that answer would have been cached and served as well as
         // computed. The screen that needs the full list asks
         // /api/v1/store/admin/products, which checks who is asking.
+        const now = new Date();
         const where = {
-            isActive: true,
+            ...onTheShelfWhere(now),
             ...(category && { category: { slug: category } }),
             ...(featured && { isFeatured: true }),
             ...(search && {
@@ -63,8 +69,32 @@ export async function GET(request: NextRequest) {
             prisma.product.count({ where }),
         ]);
 
+        // The hour of a weekly window is applied here rather than in SQL: see
+        // hideShut. A product an operator asked to hide while it is shut is
+        // gone from the list; one set to count down is still listed, with the
+        // state that says so.
+        const zone = await siteTimeZone();
+        const onShelf = hideShut(products as unknown as ProductRow[], now, zone);
+        const annotated = onShelf.map((row) => {
+            const rules = rulesOf(row);
+            // Nobody in particular: this answer is shared-cached, so it
+            // carries no per-person counting. The product page and the
+            // checkout do that, where the session is known.
+            const state = availabilityOf(rules, { boughtByPerson: 0, soldInPeriod: 0 }, now, zone);
+            return {
+                ...row,
+                availability: {
+                    state: state.state,
+                    buyable: state.buyable,
+                    opensAt: state.opensAt,
+                    closesAt: state.closesAt,
+                },
+                ...effectivePrice(rules, now),
+            };
+        });
+
         return NextResponse.json({
-            products,
+            products: annotated,
             pagination: {
                 page,
                 limit,
@@ -136,6 +166,7 @@ export async function POST(request: NextRequest) {
                 deliveryData: data.deliveryData,
                 subscriptionInterval: data.type === "SUBSCRIPTION" ? data.subscriptionInterval : null,
                 subscriptionIntervalCount: data.type === "SUBSCRIPTION" ? data.subscriptionIntervalCount : null,
+                ...(await availabilityData(data)),
             },
             include: {
                 category: true,

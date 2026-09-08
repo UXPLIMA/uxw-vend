@@ -17,6 +17,44 @@ const CATEGORIES: [string, string][] = [
     ["Boosters", "More XP and money for everyone online."],
 ];
 
+/**
+ * A rule to show for each shape the shop can now sell in. Without one of
+ * each, the window, the limit and the sale are branches nobody looks at.
+ */
+const SCHEDULES: Record<string, Record<string, unknown>> = {
+    "Weekend booster pack": {
+        // Friday and Saturday evenings only.
+        availableDays: [5, 6],
+        availableFromMinute: 18 * 60,
+        availableUntilMinute: 23 * 60,
+        outsideWindow: "countdown",
+    },
+    "Legendary key": {
+        // Ten a day, and one per person a day: the two limits together.
+        periodStock: 10,
+        periodStockWindow: "day",
+        perPersonLimit: 1,
+        perPersonPeriod: "day",
+    },
+    "Key bundle (10)": {
+        // A sale that started yesterday and ends in a few days.
+        salePrice: 19.99,
+        saleFrom: new Date(Date.now() - 86_400_000),
+        saleUntil: new Date(Date.now() + 4 * 86_400_000),
+    },
+    "MVP+": {
+        // One to an account, ever: a rank nobody needs twice.
+        perPersonLimit: 1,
+        perPersonPeriod: "ever",
+    },
+    "Legend": {
+        // A run that has not opened yet, with a countdown to it.
+        availableFrom: new Date(Date.now() + 2 * 86_400_000),
+        availableUntil: new Date(Date.now() + 9 * 86_400_000),
+        outsideWindow: "countdown",
+    },
+};
+
 const PRODUCTS: [string, string, number, number | null][] = [
     ["VIP", "Ranks", 9.99, null],
     ["VIP+", "Ranks", 19.99, 24.99],
@@ -75,6 +113,7 @@ export const seed: ModuleSeed = {
                     isFeatured: index < 3,
                     createdAt: ctx.daysAgo(365),
                     categoryId: categories.get(category)?.id ?? null,
+                    ...(SCHEDULES[name] ?? {}),
                 },
             }));
             products.push({ id: row.id, price, name });

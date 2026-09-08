@@ -8,10 +8,26 @@ import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { Textarea } from "@/core/components/ui/textarea";
+import { NativeSelect } from "@/core/components/ui/native-select";
 import { Loader2, Check } from "lucide-react";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 import { LoadFailed } from "@/core/components/ui/load-failed";
 import { useSettingsLoad } from "@/core/hooks/useSettingsLoad";
+
+/**
+ * Every zone this runtime knows, so an operator picks rather than types.
+ *
+ * `supportedValuesOf` is the list the platform itself uses; the fallback is
+ * for a runtime that does not carry it, where a short list beats an empty
+ * dropdown.
+ */
+const zones: string[] = (() => {
+    try {
+        return (Intl as unknown as { supportedValuesOf(key: string): string[] }).supportedValuesOf("timeZone");
+    } catch {
+        return ["UTC", "Europe/Istanbul", "Europe/London", "Europe/Berlin", "America/New_York", "America/Los_Angeles", "Asia/Tokyo"];
+    }
+})();
 
 /** The header's submit button points at the form by id; they are the same form. */
 const FORM_ID = "site-settings-form";
@@ -32,6 +48,7 @@ export default function SiteSettingsPage() {
         socialTwitter: "",
         socialYoutube: "",
         socialDiscord: "",
+        timezone: "UTC",
     });
 
     // A read that failed would otherwise offer this form at its defaults, and
@@ -47,6 +64,7 @@ export default function SiteSettingsPage() {
             socialTwitter: (s.socialTwitter as string) || "",
             socialYoutube: (s.socialYoutube as string) || "",
             socialDiscord: (s.socialDiscord as string) || "",
+            timezone: (s.site_timezone as string) || "UTC",
         });
     });
 
@@ -60,7 +78,9 @@ export default function SiteSettingsPage() {
             const res = await fetch("/api/v1/settings", {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(form),
+                // `timezone` is the field's name; `site_timezone` is the row
+                // everything scheduled reads.
+                body: JSON.stringify({ ...form, site_timezone: form.timezone, timezone: undefined }),
             });
 
             if (!res.ok) {
@@ -137,6 +157,18 @@ export default function SiteSettingsPage() {
                                     onChange={(e) => setForm({ ...form, siteDescription: e.target.value })}
                                     rows={3}
                                 />
+                            </div>
+                            <div>
+                                <Label htmlFor="site-timezone">{t("siteSettings_timezone")}</Label>
+                                <NativeSelect
+                                    id="site-timezone"
+                                    className="mt-1"
+                                    value={form.timezone}
+                                    onChange={(e) => setForm({ ...form, timezone: e.target.value })}
+                                >
+                                    {zones.map((zone) => <option key={zone} value={zone}>{zone}</option>)}
+                                </NativeSelect>
+                                <p className="mt-1 text-sm text-muted-foreground">{t("siteSettings_timezoneHint")}</p>
                             </div>
                             <div>
                                 <Label>{t("siteSettings_serverIp")}</Label>

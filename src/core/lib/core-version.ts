@@ -12,6 +12,13 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.31.0 - the site's clock. `siteTimeZone()` joins `@/core/sdk/server` and
+ * the pure readers - `zonedNow`, `weekdayIn`, `minutesInto`,
+ * `wallClockToInstant`, `instantToWallClock` - join `@/core/sdk`. "Opens
+ * Friday at 18:00" is not a moment until somebody says whose clock, and the
+ * only answer that starts a limited run at the same instant for everybody is
+ * the operator's. Additive; nothing scheduled existed before it.
+ *
  * 1.30.0 - `NavIcon` joins `@/core/sdk/ui`. Modules store an icon as a Lucide
  * name - a forum category, a help category, a nav link - and had no way to
  * draw one, so the forum printed the name beside the category ("MessageSquare
@@ -209,4 +216,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.30.0";
+export const CORE_API_VERSION = "1.31.0";

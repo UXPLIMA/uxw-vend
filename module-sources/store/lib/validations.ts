@@ -19,6 +19,24 @@ export const productSchema = z.object({
     deliveryData: z.any().optional(),
     subscriptionInterval: z.enum(["month", "year"]).optional().nullable(),
     subscriptionIntervalCount: z.number().int().min(1).max(12).optional().nullable(),
+
+    // When it is for sale. The dates arrive as the operator typed them -
+    // "2026-10-20T18:00" - and the server turns them into instants on the
+    // site's clock, because a browser would use its own and an operator on
+    // holiday would schedule a sale three hours out.
+    availableFrom: z.string().max(32).optional().nullable(),
+    availableUntil: z.string().max(32).optional().nullable(),
+    availableDays: z.array(z.number().int().min(0).max(6)).max(7).optional(),
+    availableFromMinute: z.number().int().min(0).max(1439).optional().nullable(),
+    availableUntilMinute: z.number().int().min(0).max(1439).optional().nullable(),
+    outsideWindow: z.enum(["countdown", "hidden"]).optional(),
+    perPersonLimit: z.number().int().min(1).max(100_000).optional().nullable(),
+    perPersonPeriod: z.enum(["ever", "day", "week", "month"]).optional(),
+    periodStock: z.number().int().min(1).max(1_000_000).optional().nullable(),
+    periodStockWindow: z.enum(["day", "week", "month"]).optional(),
+    salePrice: z.number().min(0).optional().nullable(),
+    saleFrom: z.string().max(32).optional().nullable(),
+    saleUntil: z.string().max(32).optional().nullable(),
 });
 
 export const categorySchema = z.object({

@@ -76,6 +76,12 @@ export { encryptSecret, decryptSecret } from "@/core/lib/secret-storage";
 
 // --- Audit trail ---
 export { logActivity } from "@/core/lib/activity-log";
+/**
+ * The site's own clock. "Opens Friday at 18:00" is not a moment until
+ * somebody says whose clock, and the only answer that makes a limited run
+ * start at the same instant for everybody is the operator's.
+ */
+export { siteTimeZone } from "@/core/lib/site-time-setting";
 
 // --- Content revisions ---
 export { recordRevision } from "@/core/lib/revisions";

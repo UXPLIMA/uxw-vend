@@ -24,8 +24,18 @@ import { join, relative } from "path";
 const ROOT = join(__dirname, "../..");
 const SCANNED = ["src/app", "src/core", "module-sources"];
 
-/** The helper's own home, plus the hook that wraps it. */
-const HELPER_FILES = ["src/core/lib/utils.ts"];
+/**
+ * The helper's own home, plus the hook that wraps it - and one file that
+ * formats nothing anybody reads.
+ *
+ * `site-time.ts` asks `Intl` what the wall clock says in a named zone, and
+ * parses the answer. The tag there is a parsing device, not a rendering
+ * choice: it is picked precisely because "en-US" gives fixed, ASCII day names
+ * and a 24-hour option, and its output never reaches a page. Handing it the
+ * reader's locale would break the parse in any locale that spells Friday
+ * differently, which is all of them.
+ */
+const HELPER_FILES = ["src/core/lib/utils.ts", "src/core/lib/site-time.ts"];
 
 function sourceFiles(dir: string, out: string[] = []): string[] {
     if (!statSync(dir, { throwIfNoEntry: false })?.isDirectory()) return out;

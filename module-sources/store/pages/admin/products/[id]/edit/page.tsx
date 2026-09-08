@@ -2,11 +2,19 @@
 
 
 import { useTranslations } from "next-intl";
+import {
+    AvailabilityFields,
+    EMPTY_AVAILABILITY,
+    availabilityPayload,
+    timeFromMinutes,
+    type AvailabilityValue,
+} from "../../_fields/AvailabilityFields";
+import { instantToWallClock } from "@/core/sdk";
 import { useState, useEffect, use } from "react";
 import Image from "next/image";
 import { useRouter } from "@/core/sdk/navigation";
 import { Link } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, CardHeader, CardTitle, FileUpload, Input, Label, LoadFailed, RichTextEditor, useConfirm, NativeSelect, CheckboxField } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, CheckboxField, FileUpload, Input, Label, LoadFailed, NativeSelect, RichTextEditor, useConfirm, useSiteSettings } from "@/core/sdk/ui";
 import { ArrowLeft, Loader2, Trash2, X, Plus } from "lucide-react";
 import { writeError } from "@/core/sdk";
 import { AdminPageHeader } from "@/core/sdk/admin";
@@ -33,6 +41,11 @@ export default function EditProductPage(props: PageProps) {
     const [deleting, setDeleting] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [categories, setCategories] = useState<Category[]>([]);
+    const [availability, setAvailability] = useState<AvailabilityValue>(EMPTY_AVAILABILITY);
+    // The zone the hours are read in, shown beside them: "18:00" with no zone
+    // next to it is what makes somebody schedule a sale three hours out.
+    const { settings } = useSiteSettings();
+    const timeZone = (settings.site_timezone as string) || "UTC";
     const { confirm } = useConfirm();
 
     const [form, setForm] = useState({
@@ -87,6 +100,26 @@ export default function EditProductPage(props: PageProps) {
                 });
             }
             setCategories(catData.categories || []);
+            const where = timeZone;
+            if (p) {
+                // The columns hold instants; the form shows the wall clock the
+                // operator typed, in the site's zone.
+                setAvailability({
+                    availableFrom: p.availableFrom ? instantToWallClock(new Date(p.availableFrom), where) : "",
+                    availableUntil: p.availableUntil ? instantToWallClock(new Date(p.availableUntil), where) : "",
+                    availableDays: p.availableDays ?? [],
+                    availableFrom24: timeFromMinutes(p.availableFromMinute),
+                    availableUntil24: timeFromMinutes(p.availableUntilMinute),
+                    outsideWindow: p.outsideWindow || "countdown",
+                    perPersonLimit: p.perPersonLimit ? String(p.perPersonLimit) : "",
+                    perPersonPeriod: p.perPersonPeriod || "ever",
+                    periodStock: p.periodStock ? String(p.periodStock) : "",
+                    periodStockWindow: p.periodStockWindow || "day",
+                    salePrice: p.salePrice ? String(p.salePrice) : "",
+                    saleFrom: p.saleFrom ? instantToWallClock(new Date(p.saleFrom), where) : "",
+                    saleUntil: p.saleUntil ? instantToWallClock(new Date(p.saleUntil), where) : "",
+                });
+            }
             setFailed(false);
             setLoading(false);
         }).catch(() => {
@@ -117,6 +150,7 @@ export default function EditProductPage(props: PageProps) {
                 isFeatured: form.isFeatured,
                 subscriptionInterval: form.type === "SUBSCRIPTION" ? form.subscriptionInterval : null,
                 subscriptionIntervalCount: form.type === "SUBSCRIPTION" ? parseInt(form.subscriptionIntervalCount) || 1 : null,
+                ...availabilityPayload(availability),
             };
 
             const res = await fetch(`/api/v1/store/products/${productId}`, {
@@ -363,6 +397,8 @@ export default function EditProductPage(props: PageProps) {
                                 </div>
                             </CardContent>
                         </Card>
+
+                        <AvailabilityFields value={availability} onChange={setAvailability} timeZone={timeZone} />
 
                         <Card>
                             <CardHeader>

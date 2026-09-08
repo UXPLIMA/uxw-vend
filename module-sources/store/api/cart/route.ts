@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { log, moduleSettings, prisma, rateLimitForRoleAsync, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { availabilityFor, type ProductRow } from "../../lib/availability-server";
 import { z } from "zod";
 
 const cartItemSchema = z.object({
@@ -113,6 +114,28 @@ export async function POST(request: NextRequest) {
             return NextResponse.json(
                 { error: "Insufficient stock" },
                 { status: 400 }
+            );
+        }
+
+        // The window, the per-person limit and today's allowance. Asked here
+        // as a courtesy so a shopper is told at the moment they add rather
+        // than at the till; the checkout asks again, because that is where it
+        // has to be true.
+        const state = await availabilityFor(prisma, product as unknown as ProductRow, session.user.id);
+        if (!state.buyable) {
+            return NextResponse.json(
+                { error: state.state, code: `store_${state.state}`, opensAt: state.opensAt },
+                { status: 409 },
+            );
+        }
+        if (state.remainingForPerson !== null && quantity > state.remainingForPerson) {
+            return NextResponse.json(
+                {
+                    error: "limit_reached",
+                    code: "store_limit_reached",
+                    remaining: state.remainingForPerson,
+                },
+                { status: 409 },
             );
         }
 

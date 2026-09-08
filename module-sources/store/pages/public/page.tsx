@@ -5,6 +5,7 @@ import { Link } from "@/core/sdk/navigation";
 import { PageFrame } from "@/core/sdk/layout";
 import { Coins, Box, ChevronRight, Search, X } from "lucide-react";
 import { SkeletonServerModes, SkeletonProductGrid } from "../../components/skeletons/store-skeletons";
+import { AvailabilityNote, type AvailabilityInfo } from "../../components/AvailabilityNote";
 import { useTranslations } from "next-intl";
 import { Badge, LoadFailed, NativeSelect, Pagination, RichContent, useSiteCurrency } from "@/core/sdk/ui";
 interface Category {
@@ -29,6 +30,9 @@ interface Product {
     isFeatured: boolean;
     category: { slug: string; name: string };
     type: string;
+    availability?: AvailabilityInfo;
+    was?: number | null;
+    onSale?: boolean;
 }
 
 export default function StorePage() {
@@ -376,11 +380,21 @@ export default function StorePage() {
                                     <div className="p-4">
                                         <h3 className="font-semibold text-foreground mb-1 line-clamp-1">{product.name}</h3>
                                         <div className="flex items-center gap-2 mb-3">
-                                            {product.comparePrice && (
-                                                <span className="line-through text-muted-foreground text-xs">{formatPrice(product.comparePrice)}</span>
+                                            {/* `was` is what a scheduled sale
+                                                puts here; comparePrice is the
+                                                one an operator typed. */}
+                                            {(product.was ?? product.comparePrice) && (
+                                                <span className="line-through text-muted-foreground text-xs">
+                                                    {formatPrice(Number(product.was ?? product.comparePrice))}
+                                                </span>
                                             )}
                                             <div className="text-primary font-bold">{formatPrice(product.price)}</div>
                                         </div>
+                                        {product.availability && (
+                                            <div className="mb-3">
+                                                <AvailabilityNote info={product.availability} compact />
+                                            </div>
+                                        )}
                                         <div className="text-sm text-muted-foreground group-hover:text-primary transition-colors">
                                             {t('viewDetails')} →
                                         </div>

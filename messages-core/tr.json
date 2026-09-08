@@ -1121,7 +1121,9 @@
     "common_listTruncated": "Yalnızca ilk 500 tanesi gösteriliyor. Geri kalanını görmek için listeyi daraltın.",
     "err": {
       "demo_disabled": "Burası herkese açık demo, bu yüzden bu değişiklik kaydedilmedi. Denemek için kendi kurulumunu çalıştır."
-    }
+    },
+    "siteSettings_timezone": "Saat dilimi",
+    "siteSettings_timezoneHint": "Zamanlı her şeyin okunduğu saat: 18:00'da açılan bir satış, gece yarısı biten bir indirim."
   },
   "footer": {
     "quickLinks": "Hızlı Bağlantılar",

@@ -2,11 +2,17 @@
 
 
 import { useTranslations } from "next-intl";
+import {
+    AvailabilityFields,
+    EMPTY_AVAILABILITY,
+    availabilityPayload,
+    type AvailabilityValue,
+} from "../_fields/AvailabilityFields";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "@/core/sdk/navigation";
 import { Link } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, CardHeader, CardTitle, FileUpload, Input, Label, RichTextEditor, NativeSelect, CheckboxField } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, CheckboxField, FileUpload, Input, Label, NativeSelect, RichTextEditor, useSiteSettings } from "@/core/sdk/ui";
 import { ArrowLeft, Loader2, X } from "lucide-react";
 import { writeError } from "@/core/sdk";
 import { AdminPageHeader } from "@/core/sdk/admin";
@@ -24,6 +30,11 @@ export default function NewProductPage() {
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [categories, setCategories] = useState<Category[]>([]);
+    const [availability, setAvailability] = useState<AvailabilityValue>(EMPTY_AVAILABILITY);
+    // The zone the hours are read in, shown beside them: "18:00" with no zone
+    // next to it is what makes somebody schedule a sale three hours out.
+    const { settings } = useSiteSettings();
+    const timeZone = (settings.site_timezone as string) || "UTC";
 
     const [form, setForm] = useState({
         name: "",
@@ -68,6 +79,7 @@ export default function NewProductPage() {
                 isFeatured: form.isFeatured,
                 subscriptionInterval: form.type === "SUBSCRIPTION" ? form.subscriptionInterval : null,
                 subscriptionIntervalCount: form.type === "SUBSCRIPTION" ? parseInt(form.subscriptionIntervalCount) || 1 : null,
+                ...availabilityPayload(availability),
             };
 
             const res = await fetch("/api/v1/store/products", {
@@ -278,6 +290,8 @@ export default function NewProductPage() {
                                 </div>
                             </CardContent>
                         </Card>
+
+                        <AvailabilityFields value={availability} onChange={setAvailability} timeZone={timeZone} />
 
                         <Card>
                             <CardHeader>
