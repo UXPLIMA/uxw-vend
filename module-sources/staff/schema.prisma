@@ -3,7 +3,6 @@
 
 // @@user-relations-start
 //   staffProfile     StaffMember[]      @relation("StaffProfile")
-//   staffApplications StaffApplication[] @relation("StaffApplications")
 // @@user-relations-end
 
 // ==================== STAFF PAGE ====================
@@ -19,21 +18,4 @@ model StaffMember {
   isActive  Boolean @default(true)
 
   @@index([userId])
-}
-
-// ==================== STAFF APPLICATIONS ====================
-
-model StaffApplication {
-  id        String   @id @default(cuid())
-  userId    String?
-  user      User?    @relation("StaffApplications", fields: [userId], references: [id], onDelete: SetNull)
-  position  String
-  content   String   @db.Text
-  status    String   @default("pending")
-  adminNote String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([userId])
-  @@index([status])
 }

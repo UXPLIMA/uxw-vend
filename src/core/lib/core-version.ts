@@ -12,6 +12,15 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.29.0 - `@/core/sdk/seed` carries the types for `seed.ts`, the file a
+ * module may ship beside its manifest to fill an install with data worth
+ * looking at. An empty site answers every question with "nothing here yet",
+ * which is the one state nobody needs to test: pagination, ordering,
+ * truncation, a name too long for its column and empty-against-failed all
+ * hide until there is data. `scripts/seed-demo.ts` finds those files, orders
+ * them by what they declare they need, and can take back exactly what it
+ * wrote. Types only, and additive.
+ *
  * 1.28.0 - `PageFrame` joins `@/core/sdk/layout`. Every module wrote its own
  * public page shell, and thirty-one hand-written shells drifted: nine content
  * widths, a breadcrumb on nine of the thirty-one, two page backgrounds, and a
@@ -194,4 +203,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.28.0";
+export const CORE_API_VERSION = "1.29.0";

@@ -2,8 +2,8 @@
   "id": "staff",
   "name": "Staff",
   "description": "Staff member listing and applications",
-  "version": "1.1.2",
-  "coreVersion": "^1.28.0",
+  "version": "1.1.4",
+  "coreVersion": "^1.29.0",
   "category": "management",
   "author": "uxwVend",
   "icon": "Users",
@@ -11,12 +11,6 @@
     "staff.manage"
   ],
   "menu": [
-    {
-      "label": "Staff Applications",
-      "path": "/staff-applications",
-      "icon": "FileText",
-      "group": "community"
-    },
     {
       "label": "Staff Members",
       "path": "/staff-members",
@@ -33,10 +27,6 @@
   ],
   "adminRoutes": [
     {
-      "path": "/staff-applications",
-      "component": "pages/admin/applications/page.tsx"
-    },
-    {
       "path": "/staff-members",
       "component": "pages/admin/members/page.tsx"
     }
@@ -48,74 +38,18 @@
       "description": "List staff members and create new ones (admin)."
     },
     {
-      "path": "/staff-applications",
-      "handler": "api/applications/route.ts",
-      "description": "List staff applications and submit a new application."
-    },
-    {
-      "path": "/staff-applications/[id]",
-      "handler": "api/applications/[id]/route.ts",
-      "description": "Update application status or delete an application (admin)."
-    },
-    {
       "path": "/staff/[id]",
       "handler": "api/[id]/route.ts",
       "description": "Update or delete a single staff member (admin)."
-    },
-    {
-      "path": "/staff/applications",
-      "handler": "api/applications/route.ts",
-      "description": "List staff applications and submit a new application."
-    },
-    {
-      "path": "/staff/applications/[id]",
-      "handler": "api/applications/[id]/route.ts",
-      "description": "Update application status or delete an application (admin)."
     }
   ],
   "translations": {
     "en": {
       "staff": {
-        "adm_applicationUpdated": "Application updated",
-        "adm_rejectReasonLabel": "Why is this application being rejected?",
-        "adm_rejectReasonPlaceholder": "Optional - kept with the application",
-        "adm_rejectTitle": "Reject application",
-        "adm_writeFailed": "That change could not be saved.",
         "title": "Our team",
         "description": "Meet our staff members",
         "members": "Staff Members",
-        "applications": "Staff Applications",
-        "apply": "Apply for Staff",
-        "applyDescription": "Submit your application to join our team",
-        "position": "Position",
-        "positionPlaceholder": "Which role are you applying for? (e.g. Moderator)",
-        "applicationContent": "Your application",
-        "applicationContentPlaceholder": "Tell us about yourself, your experience, your availability, and why you'd like to join the team.",
-        "submitting": "Submitting…",
-        "loginToApply": "Please log in to submit a staff application.",
-        "submit": "Submit Application",
-        "applicationSent": "Application submitted successfully",
-        "applicationError": "Failed to submit application",
-        "pending": "Pending",
-        "approved": "Approved",
-        "rejected": "Rejected",
-        "status": "Status",
-        "date": "Date",
-        "approve": "Approve",
-        "reject": "Reject",
-        "notes": "Notes",
         "role": "Role",
-        "adm_title": "Staff Members",
-        "adm_subtitle": "Manage staff members",
-        "adm_field1Label": "Name",
-        "adm_field1Placeholder": "Staff member name",
-        "adm_field2Label": "Role",
-        "adm_field2Placeholder": "e.g. Moderator",
-        "adm_field3Label": "Avatar URL",
-        "adm_field3Placeholder": "https://example.com/avatar.png",
-        "adm_field4Label": "Order",
-        "adm_field4Placeholder": "0",
-        "adm_field5Label": "Active",
         "adm_members_title": "Staff Members",
         "adm_members_subtitle": "Manage staff members",
         "adm_members_field1Label": "Name",
@@ -127,33 +61,17 @@
         "adm_members_field4Label": "Order",
         "adm_members_field4Placeholder": "0",
         "adm_members_field5Label": "Active",
-        "adm_staffApplications": "Staff Applications",
-        "adm_noApplications": "No applications yet",
-        "adm_accept": "Accept",
-        "adm_reject": "Reject",
-        "adm_adminNote": "Admin Note",
-        "adm_pendingReview": "{count} pending review",
-        "adm_apps_all": "All",
-        "adm_apps_pending": "Pending",
-        "adm_apps_accepted": "Accepted",
-        "adm_apps_rejected": "Rejected",
         "subtitle": "The people behind the community",
-        "empty": "No staff members listed yet",
-        "adm_listTruncated": "Only the first 500 are shown. Narrow the list to see the rest."
+        "empty": "No staff members listed yet"
       },
       "admin": {
         "menu_staff": "Staff",
         "menu_staff_0": "Staff Members",
-        "menu_staff_1": "Applications",
         "title": "Admin Panel",
         "subtitle": "Manage your platform settings and content",
-        "accept": "Accept",
-        "reject": "Reject",
-        "adminNote": "Admin note",
-        "menu_staff_staff_applications": "Staff Applications",
         "menu_staff_staff_members": "Staff Members",
         "module_staff_name": "Staff",
-        "module_staff_description": "Staff member listing and applications"
+        "module_staff_description": "The people who run this place, and the screen that manages them."
       },
       "pageTitles": {
         "staff": "Staff"
@@ -164,46 +82,10 @@
     },
     "tr": {
       "staff": {
-        "adm_applicationUpdated": "Başvuru güncellendi",
-        "adm_rejectReasonLabel": "Bu başvuru neden reddediliyor?",
-        "adm_rejectReasonPlaceholder": "İsteğe bağlı - başvuruyla birlikte saklanır",
-        "adm_rejectTitle": "Başvuruyu reddet",
-        "adm_writeFailed": "Bu değişiklik kaydedilemedi.",
         "title": "Ekibimiz",
         "description": "Ekip üyelerimizle tanışın",
         "members": "Ekip Üyeleri",
-        "applications": "Ekip Başvuruları",
-        "apply": "Ekibe Başvur",
-        "applyDescription": "Ekibimize katılmak için başvurunuzu gönderin",
-        "position": "Pozisyon",
-        "positionPlaceholder": "Hangi pozisyona başvuruyorsun? (örn. Moderatör)",
-        "applicationContent": "Başvurun",
-        "applicationContentPlaceholder": "Kendinden, deneyimlerinden, müsaitliğinden ve neden ekibe katılmak istediğinden bahset.",
-        "submitting": "Gönderiliyor…",
-        "loginToApply": "Personel başvurusu göndermek için giriş yap.",
-        "submit": "Başvuruyu Gönder",
-        "applicationSent": "Başvuru başarıyla gönderildi",
-        "applicationError": "Başvuru gönderilemedi",
-        "pending": "Beklemede",
-        "approved": "Onaylandı",
-        "rejected": "Reddedildi",
-        "status": "Durum",
-        "date": "Tarih",
-        "approve": "Onayla",
-        "reject": "Reddet",
-        "notes": "Notlar",
         "role": "Rol",
-        "adm_title": "Ekip Üyeleri",
-        "adm_subtitle": "Ekip üyelerini yönetin",
-        "adm_field1Label": "Ad",
-        "adm_field1Placeholder": "Ekip üyesi adı",
-        "adm_field2Label": "Rol",
-        "adm_field2Placeholder": "örn. Moderatör",
-        "adm_field3Label": "Avatar URL",
-        "adm_field3Placeholder": "https://example.com/avatar.png",
-        "adm_field4Label": "Sıra",
-        "adm_field4Placeholder": "0",
-        "adm_field5Label": "Aktif",
         "adm_members_title": "Ekip Üyeleri",
         "adm_members_subtitle": "Ekip üyelerini yönetin",
         "adm_members_field1Label": "Ad",
@@ -215,33 +97,17 @@
         "adm_members_field4Label": "Sıra",
         "adm_members_field4Placeholder": "0",
         "adm_members_field5Label": "Aktif",
-        "adm_staffApplications": "Ekip Başvuruları",
-        "adm_noApplications": "Henüz başvuru yok",
-        "adm_accept": "Kabul Et",
-        "adm_reject": "Reddet",
-        "adm_adminNote": "Yönetici Notu",
-        "adm_pendingReview": "{count} inceleme bekliyor",
-        "adm_apps_all": "Tümü",
-        "adm_apps_pending": "Bekleyen",
-        "adm_apps_accepted": "Kabul Edilen",
-        "adm_apps_rejected": "Reddedilen",
         "subtitle": "Topluluğun arkasındaki ekip",
-        "empty": "Henüz ekip üyesi listelenmemiş",
-        "adm_listTruncated": "Yalnızca ilk 500 tanesi gösteriliyor. Geri kalanını görmek için listeyi daraltın."
+        "empty": "Henüz ekip üyesi listelenmemiş"
       },
       "admin": {
         "menu_staff": "Personel",
         "menu_staff_0": "Ekip Üyeleri",
-        "menu_staff_1": "Başvurular",
         "title": "Yönetim Paneli",
         "subtitle": "Platform ayarlarınızı ve içeriklerinizi yönetin",
-        "accept": "Kabul Et",
-        "reject": "Reddet",
-        "adminNote": "Yönetici notu",
-        "menu_staff_staff_applications": "Personel Başvuruları",
         "menu_staff_staff_members": "Personel Üyeleri",
         "module_staff_name": "Ekip",
-        "module_staff_description": "Ekip üyesi listesi ve başvurular"
+        "module_staff_description": "Burayı yönetenler ve onları yöneten ekran."
       },
       "pageTitles": {
         "staff": "Ekip"
@@ -260,12 +126,6 @@
     }
   ],
   "userDataExport": [
-    {
-      "model": "staffApplication",
-      "key": "staff.applications",
-      "column": "userId",
-      "erasure": "retain"
-    },
     {
       "model": "staffMember",
       "key": "staff.profile",

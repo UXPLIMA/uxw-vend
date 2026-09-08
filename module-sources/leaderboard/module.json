@@ -2,7 +2,7 @@
   "id": "leaderboard",
   "name": "Leaderboard",
   "description": "Player rankings by purchases, votes, and activity",
-  "version": "1.1.13",
+  "version": "1.1.14",
   "coreVersion": "^1.28.0",
   "category": "commerce",
   "author": "uxwVend",
@@ -43,7 +43,8 @@
         "topBuyers": "Top Buyers",
         "topVoters": "Top Voters",
         "totalSpent": "Total Spent",
-        "votes": "Votes"
+        "votes": "Votes",
+        "subtitle": "The members who buy, vote and post the most."
       },
       "pageTitles": {
         "leaderboard": "Leaderboard"
@@ -74,7 +75,8 @@
         "topBuyers": "En Çok Satın Alanlar",
         "topVoters": "En Çok Oy Verenler",
         "totalSpent": "Toplam Harcama",
-        "votes": "Oylar"
+        "votes": "Oylar",
+        "subtitle": "En çok satın alan, oy veren ve en aktif üyeler."
       },
       "pageTitles": {
         "leaderboard": "Sıralama"

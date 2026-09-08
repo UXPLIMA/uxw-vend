@@ -63,7 +63,7 @@ export default function LeaderboardPage() {
     return (
         <PageFrame
             title={t("title")}
-            description={t("rank")}
+            description={t("subtitle")}
         >
             <div className="flex flex-wrap gap-2 mb-6">
                 {tabs.map((tab) => (

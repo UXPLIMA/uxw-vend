@@ -139,3 +139,6 @@ tsconfig.modules.generated.json
 
 # Local demo runner written by hand; holds a dev DB URL, never committed.
 .run-demo.sh
+
+# What scripts/seed-demo.ts wrote, so --clean can take it back. Per machine.
+.seed-ledger.json

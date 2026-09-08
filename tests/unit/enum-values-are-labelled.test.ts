@@ -127,7 +127,6 @@ describe("what a reader sees is a label, not a column", () => {
         expectKeys("punishments", "punishments", ["ban", "mute", "kick", "warning", "console"]);
         expectKeys("referral", "referral", ["pending", "completed", "rewarded", "creditsUnit"]);
         expectKeys("blog", "blog", ["adm_draft", "adm_published", "adm_scheduled", "adm_archived"]);
-        expectKeys("staff", "staff", ["adm_apps_pending", "adm_apps_accepted", "adm_apps_rejected"]);
         expectKeys("custom-forms", "customForms", ["adm_submissionNew"]);
 
         for (const locale of ["en", "tr"]) {

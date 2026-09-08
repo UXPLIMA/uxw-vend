@@ -1,0 +1,130 @@
+import type { ModuleSeed } from "@/core/sdk/seed";
+
+/**
+ * A shop that has been trading for a while.
+ *
+ * Products across categories at different prices, some featured, some with a
+ * compare-at price, a few limited to a stock count and one deliberately sold
+ * out - and orders behind them in every status, spread over months, so the
+ * revenue chart, the popular-products ordering and the order filters all have
+ * something real to sort. `unitsSold` is written from the paid orders rather
+ * than made up, because that is the column the public ranking reads.
+ */
+const CATEGORIES: [string, string][] = [
+    ["Ranks", "Permanent upgrades for your account."],
+    ["Crate keys", "Open a crate, get a drop."],
+    ["Cosmetics", "Hats, trails and pets."],
+    ["Boosters", "More XP and money for everyone online."],
+];
+
+const PRODUCTS: [string, string, number, number | null][] = [
+    ["VIP", "Ranks", 9.99, null],
+    ["VIP+", "Ranks", 19.99, 24.99],
+    ["MVP", "Ranks", 39.99, null],
+    ["MVP+", "Ranks", 74.99, 89.99],
+    ["Legend", "Ranks", 129.99, null],
+    ["Common key", "Crate keys", 1.49, null],
+    ["Rare key", "Crate keys", 3.99, null],
+    ["Legendary key", "Crate keys", 9.99, 12.99],
+    ["Key bundle (10)", "Crate keys", 29.99, 39.9],
+    ["Particle trail", "Cosmetics", 4.99, null],
+    ["Pet: baby dragon", "Cosmetics", 7.99, null],
+    ["Hat collection", "Cosmetics", 14.99, null],
+    ["2x XP for an hour", "Boosters", 2.99, null],
+    ["2x money for an hour", "Boosters", 2.99, null],
+    ["Weekend booster pack", "Boosters", 9.99, 14.99],
+];
+
+const STATUSES = ["COMPLETED", "COMPLETED", "COMPLETED", "PENDING", "PROCESSING", "CANCELLED", "REFUNDED"] as const;
+
+export const seed: ModuleSeed = {
+    run: async (ctx) => {
+        const categories = new Map<string, { id: string }>();
+        for (const [index, [name, description]] of CATEGORIES.entries()) {
+            const slug = name.toLowerCase().replace(/\s+/g, "-");
+            categories.set(name, await ctx.create("category", () => ctx.prisma.category.upsert({
+                where: { slug },
+                update: {},
+                create: { name, slug, description, order: index },
+            })));
+        }
+
+        const products: { id: string; price: number; name: string }[] = [];
+        for (const [index, [name, category, price, comparePrice]] of PRODUCTS.entries()) {
+            const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+            const limited = index % 5 === 4;
+            // A shop that already sells something keeps what it sells: an
+            // existing slug is the operator's product, not this tool's.
+            const existing = await ctx.prisma.product.findUnique({ where: { slug }, select: { id: true } });
+            if (existing) {
+                products.push({ id: existing.id, price, name });
+                continue;
+            }
+            const row = await ctx.create("product", () => ctx.prisma.product.create({
+                data: {
+                    name,
+                    slug,
+                    description: ctx.html(2),
+                    shortDesc: ctx.sentence(),
+                    price,
+                    comparePrice,
+                    // Most digital goods are unlimited; a couple are limited,
+                    // and one is out of stock on purpose - that is the state
+                    // the buy button has to refuse.
+                    stock: limited ? (index === 4 ? 0 : ctx.int(1, 25)) : null,
+                    isFeatured: index < 3,
+                    createdAt: ctx.daysAgo(365),
+                    categoryId: categories.get(category)?.id ?? null,
+                },
+            }));
+            products.push({ id: row.id, price, name });
+        }
+
+        const howMany = 8 * ctx.scale;
+        const sold = new Map<string, number>();
+        for (let i = 0; i < howMany; i++) {
+            const status = ctx.pick(STATUSES);
+            const lines = ctx.some(products, ctx.int(1, 3));
+            const items = lines.map((product) => ({ product, quantity: ctx.int(1, 3) }));
+            const subtotal = items.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
+            const createdAt = ctx.daysAgo(240);
+
+            const order = await ctx.create("order", () => ctx.prisma.order.create({
+                data: {
+                    orderNumber: `DEMO-${String(1000 + i)}`,
+                    status,
+                    subtotal,
+                    total: subtotal,
+                    currency: "USD",
+                    paymentMethod: ctx.pick(["stripe", "paypal", "paytr", "credits"]),
+                    userId: ctx.pick(ctx.users).id,
+                    createdAt,
+                },
+            }));
+
+            for (const { product, quantity } of items) {
+                await ctx.create("orderItem", () => ctx.prisma.orderItem.create({
+                    data: {
+                        orderId: order.id,
+                        productId: product.id,
+                        name: product.name,
+                        price: product.price,
+                        quantity,
+                    },
+                }));
+                if (status === "COMPLETED") {
+                    sold.set(product.id, (sold.get(product.id) ?? 0) + quantity);
+                }
+            }
+        }
+
+        // What sells is counted when it sells: the public "popular" ordering
+        // reads this column, so it has to match the orders above rather than
+        // be invented.
+        for (const [productId, units] of sold) {
+            await ctx.prisma.product.update({ where: { id: productId }, data: { unitsSold: units } });
+        }
+
+        ctx.log(`${products.length} products in ${categories.size} categories, ${howMany} orders`);
+    },
+};

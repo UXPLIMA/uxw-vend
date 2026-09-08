@@ -3,12 +3,9 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { useSession } from "next-auth/react";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, LoadFailed, Textarea } from "@/core/sdk/ui";
+import { Card, CardContent, LoadFailed } from "@/core/sdk/ui";
 import { PageFrame } from "@/core/sdk/layout";
-import { Loader2, Send } from "lucide-react";
-import { toast } from "sonner";
-import { errorMessage } from "@/core/sdk";
+import { Loader2 } from "lucide-react";
 
 interface StaffMember {
     id: string;
@@ -20,14 +17,10 @@ interface StaffMember {
 
 export default function StaffPage() {
     const t = useTranslations('staff');
-    const { data: session } = useSession();
     const [members, setMembers] = useState<StaffMember[]>([]);
     const [failed, setFailed] = useState(false);
     const [reloadKey, setReloadKey] = useState(0);
     const [loading, setLoading] = useState(true);
-    const [position, setPosition] = useState("");
-    const [content, setContent] = useState("");
-    const [submitting, setSubmitting] = useState(false);
 
     useEffect(() => {
         let cancelled = false;
@@ -37,30 +30,6 @@ export default function StaffPage() {
             .catch(() => { if (cancelled) return; setFailed(true); setLoading(false); });
         return () => { cancelled = true; };
     }, [reloadKey]);
-
-    const submit = async () => {
-        if (!position.trim() || !content.trim()) return;
-        setSubmitting(true);
-        try {
-            const res = await fetch("/api/v1/staff/applications", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ position: position.trim(), content: content.trim() }),
-            });
-            const data = await res.json();
-            if (!res.ok) {
-                toast.error(errorMessage(data, t("applicationError"), t));
-            } else {
-                toast.success(t("applicationSent"));
-                setPosition("");
-                setContent("");
-            }
-        } catch {
-            toast.error(t("applicationError"));
-        } finally {
-            setSubmitting(false);
-        }
-    };
 
     return (
         <PageFrame
@@ -98,48 +67,6 @@ export default function StaffPage() {
                 </div>
             )}
 
-            <Card className="max-w-2xl mx-auto mt-12">
-                <CardHeader>
-                    <CardTitle>{t("apply")}</CardTitle>
-                    <p className="text-sm text-muted-foreground">{t("applyDescription")}</p>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    {!session?.user ? (
-                        <p className="text-center text-muted-foreground py-6">{t("loginToApply")}</p>
-                    ) : (
-                        <>
-                            <div>
-                                <Label htmlFor="apply-position">{t("position")}</Label>
-                                <Input
-                                    id="apply-position"
-                                    value={position}
-                                    onChange={e => setPosition(e.target.value)}
-                                    placeholder={t("positionPlaceholder")}
-                                />
-                            </div>
-                            <div>
-                                <Label htmlFor="apply-content">{t("applicationContent")}</Label>
-                                <Textarea
-                                    id="apply-content"
-                                    rows={6}
-                                    value={content}
-                                    onChange={e => setContent(e.target.value)}
-                                    placeholder={t("applicationContentPlaceholder")}
-                                />
-                            </div>
-                            <div className="flex justify-end">
-                                <Button onClick={submit} disabled={submitting || !position.trim() || !content.trim()}>
-                                    {submitting ? (
-                                        <><Loader2 className="w-4 h-4 animate-spin" /> {t("submitting")}</>
-                                    ) : (
-                                        <><Send className="w-4 h-4" /> {t("submit")}</>
-                                    )}
-                                </Button>
-                            </div>
-                        </>
-                    )}
-                </CardContent>
-            </Card>
         </PageFrame>
     );
 }

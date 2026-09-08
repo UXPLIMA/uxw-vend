@@ -31,10 +31,6 @@ const CAPPED: { endpoint: string; screen: string }[] = [
         endpoint: "module-sources/store/api/coupons/route.ts",
         screen: "module-sources/store/pages/admin/coupons/page.tsx",
     },
-    {
-        endpoint: "module-sources/staff/api/applications/route.ts",
-        screen: "module-sources/staff/pages/admin/applications/page.tsx",
-    },
 ];
 
 describe("a list that stops at its ceiling", () => {
