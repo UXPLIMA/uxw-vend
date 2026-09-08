@@ -97,7 +97,7 @@ export function IconPicker({
                     onClick={() => setOpen(true)}
                     aria-haspopup="dialog"
                     aria-expanded={open}
-                    className="flex h-11 flex-1 min-w-0 items-center gap-2 rounded-lg border border-border bg-background px-3 text-sm text-foreground transition-colors hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:cursor-not-allowed disabled:opacity-50"
+                    className="flex h-10 flex-1 min-w-0 items-center gap-2 rounded-lg border border-border bg-background px-3 text-sm text-foreground transition-colors hover:border-primary focus:outline-none focus:ring-2 focus:ring-primary/50 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                     {selected
                         ? <NavIcon name={selected} className="h-4 w-4 flex-shrink-0 text-muted-foreground" />

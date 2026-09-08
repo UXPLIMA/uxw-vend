@@ -73,7 +73,7 @@ const NativeSelect = React.forwardRef<HTMLSelectElement, NativeSelectProps>(
                         "focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary",
                         "disabled:cursor-not-allowed disabled:opacity-50",
                         "w-full",
-                        inputSize === "sm" ? "h-9 pl-3 pr-8" : "h-11 pl-4 pr-10",
+                        inputSize === "sm" ? "h-9 pl-3 pr-8" : "h-10 pl-4 pr-10",
                         error && "border-destructive focus:ring-destructive/50 focus:border-destructive",
                         selectClass,
                     )}
