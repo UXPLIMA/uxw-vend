@@ -2,8 +2,8 @@
   "id": "forum",
   "name": "Forum Module",
   "description": "Community discussion forum with categories, topics, and replies",
-  "version": "1.1.28",
-  "coreVersion": "^1.24.0",
+  "version": "1.1.29",
+  "coreVersion": "^1.28.0",
   "category": "community",
   "author": "uxwVend Team",
   "icon": "MessageSquare",
@@ -183,7 +183,6 @@
         "allTopics": "All Topics",
         "noTopics": "No topics yet. Be the first to start a discussion!",
         "createTopic": "Create Topic",
-        "backToForum": "Back to forum",
         "replies": "{count} replies",
         "views": "{count} views",
         "likes": "{count} likes",
@@ -254,7 +253,9 @@
         "topicsCount": "{count, plural, one {# topic} other {# topics}}",
         "guestViewDisabled": "This forum is for members only.",
         "signIn": "Sign in",
-        "adm_writeFailed": "That did not go through. Please try again."
+        "adm_writeFailed": "That did not go through. Please try again.",
+        "pinned": "Pinned",
+        "locked": "Locked"
       },
       "admin": {
         "menu_forum": "Forum",
@@ -316,7 +317,6 @@
         "allTopics": "Tüm Konular",
         "noTopics": "Henüz konu yok. Bir tartışma başlatmak için ilk siz olun!",
         "createTopic": "Konu Oluştur",
-        "backToForum": "Foruma dön",
         "replies": "{count} yanıt",
         "views": "{count} görüntülenme",
         "likes": "{count} beğeni",
@@ -387,7 +387,9 @@
         "topicsCount": "{count, plural, one {# konu} other {# konu}}",
         "guestViewDisabled": "Bu forum yalnızca üyelere açıktır.",
         "signIn": "Giriş yap",
-        "adm_writeFailed": "İşlem tamamlanmadı. Lütfen tekrar deneyin."
+        "adm_writeFailed": "İşlem tamamlanmadı. Lütfen tekrar deneyin.",
+        "pinned": "Sabitlenmiş",
+        "locked": "Kilitli"
       },
       "admin": {
         "menu_forum": "Forum",

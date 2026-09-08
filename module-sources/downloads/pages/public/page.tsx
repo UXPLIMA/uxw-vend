@@ -3,8 +3,7 @@
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Button, Card, CardContent, LoadFailed } from "@/core/sdk/ui";
-import { Footer, Navbar } from "@/core/sdk/layout";
-import { ThemeComponentSlot } from "@/core/sdk/theme";
+import { PageFrame } from "@/core/sdk/layout";
 import { Loader2, Download, FileText } from "lucide-react";
 
 interface DownloadItem {
@@ -51,48 +50,41 @@ export default function DownloadsPage() {
     };
 
     return (
-        <div className="min-h-screen flex flex-col bg-muted">
-            <ThemeComponentSlot name="Hero" />
-            <Navbar />
-
-            <main className="container mx-auto px-4 py-6 flex-1 max-w-4xl">
-                <h1 className="text-3xl font-bold text-foreground mb-2">{t('title')}</h1>
-                <p className="text-muted-foreground mb-8">{t('subtitle')}</p>
-
-                {loading ? (
-                    <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>
-                ) : failed ? (
-                    <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
-                ) : downloads.length === 0 ? (
-                    <Card><CardContent className="py-12 text-center text-muted-foreground">{t('empty')}</CardContent></Card>
-                ) : (
-                    <div className="space-y-3">
-                        {downloads.map((dl) => (
-                            <Card key={dl.id} className="hover:shadow-md transition-shadow">
-                                <CardContent className="p-4 flex items-center gap-4">
-                                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                                        <FileText className="w-6 h-6 text-primary" />
+        <PageFrame
+            title={t('title')}
+            description={t('subtitle')}
+        >
+            {loading ? (
+                <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>
+            ) : failed ? (
+                <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
+            ) : downloads.length === 0 ? (
+                <Card><CardContent className="py-12 text-center text-muted-foreground">{t('empty')}</CardContent></Card>
+            ) : (
+                <div className="space-y-3">
+                    {downloads.map((dl) => (
+                        <Card key={dl.id} className="hover:shadow-md transition-shadow">
+                            <CardContent className="p-4 flex items-center gap-4">
+                                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <FileText className="w-6 h-6 text-primary" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <h2 className="font-medium text-foreground">{dl.title}</h2>
+                                    {dl.description && <p className="text-sm text-muted-foreground line-clamp-1">{dl.description}</p>}
+                                    <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
+                                        <span>{dl.fileName}</span>
+                                        <span>{formatFileSize(dl.fileSize, t('unknownSize'))}</span>
+                                        <span>{t('downloadsCount', { count: dl.downloads })}</span>
                                     </div>
-                                    <div className="flex-1 min-w-0">
-                                        <h2 className="font-medium text-foreground">{dl.title}</h2>
-                                        {dl.description && <p className="text-sm text-muted-foreground line-clamp-1">{dl.description}</p>}
-                                        <div className="flex items-center gap-3 text-xs text-muted-foreground mt-1">
-                                            <span>{dl.fileName}</span>
-                                            <span>{formatFileSize(dl.fileSize, t('unknownSize'))}</span>
-                                            <span>{t('downloadsCount', { count: dl.downloads })}</span>
-                                        </div>
-                                    </div>
-                                    <Button size="sm" onClick={() => handleDownload(dl.id)}>
-                                        <Download className="w-4 h-4" /> {t('downloadAction')}
-                                    </Button>
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
-                )}
-            </main>
-
-            <Footer />
-        </div>
+                                </div>
+                                <Button size="sm" onClick={() => handleDownload(dl.id)}>
+                                    <Download className="w-4 h-4" /> {t('downloadAction')}
+                                </Button>
+                            </CardContent>
+                        </Card>
+                    ))}
+                </div>
+            )}
+        </PageFrame>
     );
 }

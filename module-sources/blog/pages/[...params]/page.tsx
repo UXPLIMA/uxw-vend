@@ -2,8 +2,7 @@ import { formatDate } from "@/core/sdk";
 import { RichContent } from "@/core/sdk/ui";
 import { buildArticleJsonLd, moduleSettings, prisma, resolveAppUrl } from "@/core/sdk/server";
 import { Link } from "@/core/sdk/navigation";
-import { Footer, Navbar, Slot, StandardSidebarLayout } from "@/core/sdk/layout";
-import { ThemeComponentSlot } from "@/core/sdk/theme";
+import { PageFrame, Slot } from "@/core/sdk/layout";
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getTranslations, getLocale } from "next-intl/server";
@@ -79,7 +78,6 @@ export default async function BlogArticlePage({ params }: PageProps) {
 
     const relatedArticles = await getRelatedArticles(article.id, article.categoryId);
     const { allowComments } = await moduleSettings<{ allowComments: boolean }>("blog");
-    const commonT = await getTranslations("common");
     const t = await getTranslations("blog");
     const dateTag = dateLocaleTag(await getLocale());
 
@@ -101,190 +99,165 @@ export default async function BlogArticlePage({ params }: PageProps) {
     });
 
     return (
-        <div className="min-h-screen flex flex-col bg-muted">
+        <PageFrame
+            title={article.title}
+            trail={[
+                { label: t("breadcrumb"), href: "/blog" },
+                ...(article.category
+                    ? [{ label: article.category.name, href: `/blog?category=${encodeURIComponent(article.category.slug)}` }]
+                    : []),
+            ]}
+            sidebar={(
+                <aside className="space-y-6">
+                    {/* Related Articles */}
+                    {relatedArticles.length > 0 && (
+                        <div className="bg-card rounded-xl border border-border p-5">
+                            <h2 className="font-bold text-foreground mb-4">{t("relatedArticles")}</h2>
+                            <div className="space-y-4">
+                                {relatedArticles.map((related) => (
+                                    <Link
+                                        key={related.id}
+                                        href={`/blog/${related.number}/${related.slug}`}
+                                        className="block group"
+                                    >
+                                        {related.coverImage && (
+                                            <div className="h-24 rounded-lg overflow-hidden mb-2">
+                                                <Image
+                                                    src={related.coverImage}
+                                                    alt={related.title}
+                                                    width={0}
+                                                    height={0}
+                                                    sizes="100vw"
+                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                                                />
+                                            </div>
+                                        )}
+                                        <h3 className="text-sm font-medium text-foreground group-hover:text-primary transition-colors line-clamp-2">
+                                            {related.title}
+                                        </h3>
+                                        <p className="text-xs text-muted-foreground mt-1">
+                                            {formatDate(related.publishedAt || new Date(), undefined, dateTag)}
+                                        </p>
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Share */}
+                    <div className="bg-card rounded-xl border border-border p-5">
+                        <h2 className="font-bold text-foreground mb-4">{t("share")}</h2>
+                        <div className="flex gap-2">
+                            <a
+                                href={shareTwitter}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex-1 py-2 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors text-center"
+                            >
+                                Twitter
+                            </a>
+                            <a
+                                href={shareFacebook}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex-1 py-2 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors text-center"
+                            >
+                                Facebook
+                            </a>
+                        </div>
+                    </div>
+    </aside>
+            )}
+        >
             <script
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: articleJsonLd }}
             />
-            <ThemeComponentSlot name="Hero" />
-            <Navbar />
 
-            <main className="container mx-auto px-4 py-6 flex-1">
-                <StandardSidebarLayout sidebar={(
-                            <aside className="space-y-6">
-                                {/* Related Articles */}
-                                {relatedArticles.length > 0 && (
-                                    <div className="bg-card rounded-xl border border-border p-5">
-                                        <h2 className="font-bold text-foreground mb-4">{t("relatedArticles")}</h2>
-                                        <div className="space-y-4">
-                                            {relatedArticles.map((related) => (
-                                                <Link
-                                                    key={related.id}
-                                                    href={`/blog/${related.number}/${related.slug}`}
-                                                    className="block group"
-                                                >
-                                                    {related.coverImage && (
-                                                        <div className="h-24 rounded-lg overflow-hidden mb-2">
-                                                            <Image
-                                                                src={related.coverImage}
-                                                                alt={related.title}
-                                                                width={0}
-                                                                height={0}
-                                                                sizes="100vw"
-                                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                                                            />
-                                                        </div>
-                                                    )}
-                                                    <h3 className="text-sm font-medium text-foreground group-hover:text-primary transition-colors line-clamp-2">
-                                                        {related.title}
-                                                    </h3>
-                                                    <p className="text-xs text-muted-foreground mt-1">
-                                                        {formatDate(related.publishedAt || new Date(), undefined, dateTag)}
-                                                    </p>
-                                                </Link>
-                                            ))}
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* Share */}
-                                <div className="bg-card rounded-xl border border-border p-5">
-                                    <h2 className="font-bold text-foreground mb-4">{t("share")}</h2>
-                                    <div className="flex gap-2">
-                                        <a
-                                            href={shareTwitter}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="flex-1 py-2 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors text-center"
-                                        >
-                                            Twitter
-                                        </a>
-                                        <a
-                                            href={shareFacebook}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="flex-1 py-2 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors text-center"
-                                        >
-                                            Facebook
-                                        </a>
-                                    </div>
-                                </div>
-                            </aside>
-                        )}>
-                    {(
-                            <div className="lg:col-span-3">
-                                {/* Breadcrumb */}
-                                <div className="text-sm text-muted-foreground mb-6">
-                                    <Link href="/" className="hover:text-primary">{commonT("home")}</Link>
-                                    <span className="mx-2">/</span>
-                                    <Link href="/blog" className="hover:text-primary">{t("breadcrumb")}</Link>
-                                    {article.category && (
-                                        <>
-                                            <span className="mx-2">/</span>
-                                            <Link href={`/blog?category=${encodeURIComponent(article.category.slug)}`} className="hover:text-primary">
-                                                {article.category.name}
-                                            </Link>
-                                        </>
-                                    )}
-                                    <span className="mx-2">/</span>
-                                    <span className="text-foreground">{article.title}</span>
-                                </div>
-
-                                {/* Main Content */}
-                                <article className="bg-card rounded-xl border border-border overflow-hidden">
-                                    {article.coverImage && (
-                                        <div className="h-64 md:h-96 overflow-hidden">
-                                            <Image
-                                                src={article.coverImage}
-                                                alt={article.title}
-                                                width={0}
-                                                height={0}
-                                                sizes="100vw"
-                                                className="w-full h-full object-cover"
-                                            />
-                                        </div>
-                                    )}
-                                    <div className="p-6 md:p-8">
-                                        {/* Meta */}
-                                        <div className="flex items-center gap-4 mb-4">
-                                            {article.category && (
-                                                <Link
-                                                    href={`/blog?category=${encodeURIComponent(article.category.slug)}`}
-                                                    className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium hover:bg-primary/10 transition-colors"
-                                                >
-                                                    {article.category.name}
-                                                </Link>
-                                            )}
-                                            <span className="text-sm text-muted-foreground">
-                                                {formatDate(article.publishedAt || article.createdAt, undefined, dateTag)}
-                                            </span>
-                                            <span className="text-sm text-muted-foreground">
-                                                {t("views", { count: article.views })}
-                                            </span>
-                                        </div>
-
-                                        {/* Title */}
-                                        <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
-                                            {article.title}
-                                        </h1>
-
-                                        {/* Author (may be null when account was deleted) */}
-                                        {article.author && (
-                                            <div className="flex items-center gap-3 mb-8 pb-8 border-b border-border">
-                                                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground font-bold">
-                                                    {article.author.avatar ? (
-                                                        <Image src={article.author.avatar} alt={article.author.username} width={40} height={40} className="w-full h-full rounded-full object-cover" />
-                                                    ) : (
-                                                        article.author.username.charAt(0).toUpperCase()
-                                                    )}
-                                                </div>
-                                                <div>
-                                                    <p className="font-medium text-foreground">{article.author.username}</p>
-                                                    <p className="text-sm text-muted-foreground">{t("author")}</p>
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {/* Slot: above article content - e.g. related products, author box, ad */}
-                                        <Slot name="blog.article.aboveContent" context={{ articleId: article.id, articleSlug: article.slug }} />
-
-                                        {/* Content - RichTextEditor stores HTML, sanitize before render */}
-                                        <RichContent
-                                            className="text-lg"
-                                            html={article.content}
-                                        />
-
-
-                                        {/* Slot: below article content */}
-                                        <Slot name="blog.article.belowContent" context={{ articleId: article.id, articleSlug: article.slug }} />
-
-                                        {/* Tags */}
-                                        {article.tags.length > 0 && (
-                                            <div className="mt-8 pt-8 border-t border-border">
-                                                <div className="flex flex-wrap gap-2">
-                                                    {article.tags.map((tag) => (
-                                                        <Link
-                                                            key={tag.slug}
-                                                            href={`/blog?tag=${encodeURIComponent(tag.slug)}`}
-                                                            className="px-3 py-1 rounded-full bg-muted text-foreground text-sm hover:bg-muted transition-colors"
-                                                        >
-                                                            #{tag.name}
-                                                        </Link>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-
-                                        {/* Comment Section */}
-                                        {allowComments && <CommentSection articleId={article.id} />}
-                                    </div>
-                                </article>
-                            </div>
+            {/* Main Content */}
+            <article className="bg-card rounded-xl border border-border overflow-hidden">
+                {article.coverImage && (
+                    <div className="h-64 md:h-96 overflow-hidden">
+                        <Image
+                            src={article.coverImage}
+                            alt={article.title}
+                            width={0}
+                            height={0}
+                            sizes="100vw"
+                            className="w-full h-full object-cover"
+                        />
+                    </div>
+                )}
+                <div className="p-6 md:p-8">
+                    {/* Meta */}
+                    <div className="flex items-center gap-4 mb-4">
+                        {article.category && (
+                            <Link
+                                href={`/blog?category=${encodeURIComponent(article.category.slug)}`}
+                                className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium hover:bg-primary/10 transition-colors"
+                            >
+                                {article.category.name}
+                            </Link>
                         )}
-                </StandardSidebarLayout>
-            </main>
+                        <span className="text-sm text-muted-foreground">
+                            {formatDate(article.publishedAt || article.createdAt, undefined, dateTag)}
+                        </span>
+                        <span className="text-sm text-muted-foreground">
+                            {t("views", { count: article.views })}
+                        </span>
+                    </div>
 
-            <Footer />
-        </div>
+                    {/* Author (may be null when account was deleted) */}
+                    {article.author && (
+                        <div className="flex items-center gap-3 mb-8 pb-8 border-b border-border">
+                            <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground font-bold">
+                                {article.author.avatar ? (
+                                    <Image src={article.author.avatar} alt={article.author.username} width={40} height={40} className="w-full h-full rounded-full object-cover" />
+                                ) : (
+                                    article.author.username.charAt(0).toUpperCase()
+                                )}
+                            </div>
+                            <div>
+                                <p className="font-medium text-foreground">{article.author.username}</p>
+                                <p className="text-sm text-muted-foreground">{t("author")}</p>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Slot: above article content - e.g. related products, author box, ad */}
+                    <Slot name="blog.article.aboveContent" context={{ articleId: article.id, articleSlug: article.slug }} />
+
+                    {/* Content - RichTextEditor stores HTML, sanitize before render */}
+                    <RichContent
+                        className="text-lg"
+                        html={article.content}
+                    />
+
+
+                    {/* Slot: below article content */}
+                    <Slot name="blog.article.belowContent" context={{ articleId: article.id, articleSlug: article.slug }} />
+
+                    {/* Tags */}
+                    {article.tags.length > 0 && (
+                        <div className="mt-8 pt-8 border-t border-border">
+                            <div className="flex flex-wrap gap-2">
+                                {article.tags.map((tag) => (
+                                    <Link
+                                        key={tag.slug}
+                                        href={`/blog?tag=${encodeURIComponent(tag.slug)}`}
+                                        className="px-3 py-1 rounded-full bg-muted text-foreground text-sm hover:bg-muted transition-colors"
+                                    >
+                                        #{tag.name}
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Comment Section */}
+                    {allowComments && <CommentSection articleId={article.id} />}
+                </div>
+            </article>
+        </PageFrame>
     );
 }

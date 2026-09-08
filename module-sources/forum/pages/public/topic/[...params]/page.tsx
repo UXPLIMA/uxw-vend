@@ -8,9 +8,8 @@ import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { Link } from "@/core/sdk/navigation";
 import { Button, Card, CardContent, RichContent, Textarea } from "@/core/sdk/ui";
-import { Footer, Navbar } from "@/core/sdk/layout";
-import { ThemeComponentSlot } from "@/core/sdk/theme";
-import { ArrowLeft, ChevronLeft, ChevronRight, Pin, Lock, Eye, ThumbsUp, Send, Loader2 } from "lucide-react";
+import { PageFrame } from "@/core/sdk/layout";
+import { ChevronLeft, ChevronRight, Pin, Lock, Eye, ThumbsUp, Send, Loader2 } from "lucide-react";
 import { useRelativeTime } from "@/core/sdk/ui";
 import { useTranslations } from "next-intl";
 
@@ -154,145 +153,144 @@ export default function TopicDetailPage() {
     );
 
     return (
-        <div className="min-h-screen flex flex-col bg-muted">
-            <ThemeComponentSlot name="Hero" />
-            <Navbar />
-
-            <main className="container mx-auto px-4 py-6 flex-1 max-w-4xl">
-                <Link href="/forum" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary mb-4">
-                    <ArrowLeft className="w-4 h-4" /> {t('backToForum')}
-                </Link>
-
-                {loading ? (
-                    <div className="text-center py-12">
-                        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground mx-auto" />
-                    </div>
-                ) : restricted ? (
-                    <Card>
-                        <CardContent className="py-12 text-center space-y-3">
-                            <p className="text-muted-foreground">{t('guestViewDisabled')}</p>
-                            <Link href="/auth/login" className="text-primary hover:underline text-sm">{t('signIn')}</Link>
-                        </CardContent>
-                    </Card>
-                ) : !topic ? (
-                    <Card>
-                        <CardContent className="py-12 text-center">
-                            <p className="text-muted-foreground">{t('topicNotFound')}</p>
-                        </CardContent>
-                    </Card>
-                ) : (
-                    <>
-                        {/* Topic Header */}
-                        <div className="mb-6">
-                            <div className="flex items-center gap-2 mb-2">
-                                {topic.isPinned && <Pin className="w-4 h-4 text-primary" />}
-                                {topic.isLocked && <Lock className="w-4 h-4 text-muted-foreground" />}
-                                <h1 className="text-2xl font-bold text-foreground">{topic.title}</h1>
-                            </div>
-                            <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                                <span
-                                    className="px-2 py-0.5 rounded text-xs"
-                                    style={{
-                                        backgroundColor: (topic.category.color || "#6366f1") + "20",
-                                        color: topic.category.color || "#6366f1",
-                                    }}
-                                >
-                                    {topic.category.name}
+        <PageFrame
+            title={topic?.title ?? t('title')}
+            trail={[{ label: t('title'), href: '/forum' }]}
+        >
+            {loading ? (
+                <div className="text-center py-12">
+                    <Loader2 className="w-8 h-8 animate-spin text-muted-foreground mx-auto" />
+                </div>
+            ) : restricted ? (
+                <Card>
+                    <CardContent className="py-12 text-center space-y-3">
+                        <p className="text-muted-foreground">{t('guestViewDisabled')}</p>
+                        <Link href="/auth/login" className="text-primary hover:underline text-sm">{t('signIn')}</Link>
+                    </CardContent>
+                </Card>
+            ) : !topic ? (
+                <Card>
+                    <CardContent className="py-12 text-center">
+                        <p className="text-muted-foreground">{t('topicNotFound')}</p>
+                    </CardContent>
+                </Card>
+            ) : (
+                <>
+                    {/* The title is the page's, so the frame draws it. What
+                        is left here says what state the topic is in, and a
+                        bare icon says it to nobody using a screen reader. */}
+                    <div className="mb-6">
+                        <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground">
+                            {topic.isPinned && (
+                                <span className="flex items-center gap-1 text-primary">
+                                    <Pin className="w-3 h-3" aria-hidden="true" />{t('pinned')}
                                 </span>
-                                <span className="flex items-center gap-1"><Eye className="w-3 h-3" />{t('viewsCount', { count: topic.views })}</span>
-                                <button
-                                    onClick={toggleLike}
-                                    className={`flex items-center gap-1 px-2 py-0.5 rounded transition-colors ${liked ? "bg-primary/10 text-primary" : "hover:bg-muted"}`}
-                                >
-                                    <ThumbsUp className={`w-3 h-3 ${liked ? "fill-primary" : ""}`} />
-                                    {t('likesCount', { count: likeCount })}
-                                </button>
-                            </div>
+                            )}
+                            {topic.isLocked && (
+                                <span className="flex items-center gap-1">
+                                    <Lock className="w-3 h-3" aria-hidden="true" />{t('locked')}
+                                </span>
+                            )}
+                            <span
+                                className="px-2 py-0.5 rounded text-xs"
+                                style={{
+                                    backgroundColor: (topic.category.color || "#6366f1") + "20",
+                                    color: topic.category.color || "#6366f1",
+                                }}
+                            >
+                                {topic.category.name}
+                            </span>
+                            <span className="flex items-center gap-1"><Eye className="w-3 h-3" />{t('viewsCount', { count: topic.views })}</span>
+                            <button
+                                onClick={toggleLike}
+                                className={`flex items-center gap-1 px-2 py-0.5 rounded transition-colors ${liked ? "bg-primary/10 text-primary" : "hover:bg-muted"}`}
+                            >
+                                <ThumbsUp className={`w-3 h-3 ${liked ? "fill-primary" : ""}`} />
+                                {t('likesCount', { count: likeCount })}
+                            </button>
                         </div>
+                    </div>
 
-                        {/* Original Post */}
-                        <Card className="mb-4 border-l-4 border-l-blue-500">
-                            <CardContent className="p-5">
-                                <div className="flex items-center gap-3 mb-4">
-                                    {renderAvatar(topic.author)}
-                                    <div>
-                                        <p className="font-medium text-foreground">{topic.author.username}</p>
-                                        <p className="text-xs text-muted-foreground">{relativeTime(new Date(topic.createdAt))}</p>
-                                    </div>
+                    {/* Original Post */}
+                    <Card className="mb-4 border-l-4 border-l-blue-500">
+                        <CardContent className="p-5">
+                            <div className="flex items-center gap-3 mb-4">
+                                {renderAvatar(topic.author)}
+                                <div>
+                                    <p className="font-medium text-foreground">{topic.author.username}</p>
+                                    <p className="text-xs text-muted-foreground">{relativeTime(new Date(topic.createdAt))}</p>
                                 </div>
-                                <RichContent
-                                    html={topic.content}
+                            </div>
+                            <RichContent
+                                html={topic.content}
+                            />
+                        </CardContent>
+                    </Card>
+
+                    {/* Replies */}
+                    {topic.posts.length > 0 && (
+                        <div className="space-y-3 mb-6">
+                            <h2 className="text-sm font-medium text-muted-foreground">{t('repliesCount', { count: topic.posts.length })}</h2>
+                            {topic.posts.map((post) => (
+                                <PostCard key={post.id} post={post} renderAvatar={renderAvatar} />
+                            ))}
+                        </div>
+                    )}
+
+                    {/* Reply pager - a long thread arrives a page at a time */}
+                    {postsPages > 1 && (
+                        <nav className="flex items-center justify-center gap-3 mb-6" aria-label={t('replies', { count: topic.posts.length })}>
+                            <Button
+                                variant="outline" size="icon"
+                                onClick={() => setPostsPage((p) => Math.max(1, p - 1))}
+                                disabled={postsPage <= 1}
+                                aria-label={t('previous')}
+                            >
+                                <ChevronLeft className="w-4 h-4" />
+                            </Button>
+                            <span className="text-sm text-muted-foreground">
+                                {t('pageOf', { page: postsPage, total: postsPages })}
+                            </span>
+                            <Button
+                                variant="outline" size="icon"
+                                onClick={() => setPostsPage((p) => Math.min(postsPages, p + 1))}
+                                disabled={postsPage >= postsPages}
+                                aria-label={t('next')}
+                            >
+                                <ChevronRight className="w-4 h-4" />
+                            </Button>
+                        </nav>
+                    )}
+
+                    {/* Reply Form */}
+                    {!topic.isLocked ? (
+                        <Card>
+                            <CardContent className="p-5">
+                                <h2 className="font-medium text-foreground mb-3">{t('reply')}</h2>
+                                <Textarea
+                                    value={replyContent}
+                                    onChange={(e) => setReplyContent(e.target.value)}
+                                    placeholder={t('writeYourReply')} aria-label={t('writeYourReply')}
+                                    rows={4}
+                                    className="mb-3"
                                 />
+                                <Button onClick={submitReply} disabled={sending || !replyContent.trim()}>
+                                    {sending ? (
+                                        <><Loader2 className="w-4 h-4 animate-spin" /> {t('posting')}</>
+                                    ) : (
+                                        <><Send className="w-4 h-4" /> {t('postReply')}</>
+                                    )}
+                                </Button>
                             </CardContent>
                         </Card>
-
-                        {/* Replies */}
-                        {topic.posts.length > 0 && (
-                            <div className="space-y-3 mb-6">
-                                <h2 className="text-sm font-medium text-muted-foreground">{t('repliesCount', { count: topic.posts.length })}</h2>
-                                {topic.posts.map((post) => (
-                                    <PostCard key={post.id} post={post} renderAvatar={renderAvatar} />
-                                ))}
-                            </div>
-                        )}
-
-                        {/* Reply pager - a long thread arrives a page at a time */}
-                        {postsPages > 1 && (
-                            <nav className="flex items-center justify-center gap-3 mb-6" aria-label={t('replies', { count: topic.posts.length })}>
-                                <Button
-                                    variant="outline" size="icon"
-                                    onClick={() => setPostsPage((p) => Math.max(1, p - 1))}
-                                    disabled={postsPage <= 1}
-                                    aria-label={t('previous')}
-                                >
-                                    <ChevronLeft className="w-4 h-4" />
-                                </Button>
-                                <span className="text-sm text-muted-foreground">
-                                    {t('pageOf', { page: postsPage, total: postsPages })}
-                                </span>
-                                <Button
-                                    variant="outline" size="icon"
-                                    onClick={() => setPostsPage((p) => Math.min(postsPages, p + 1))}
-                                    disabled={postsPage >= postsPages}
-                                    aria-label={t('next')}
-                                >
-                                    <ChevronRight className="w-4 h-4" />
-                                </Button>
-                            </nav>
-                        )}
-
-                        {/* Reply Form */}
-                        {!topic.isLocked ? (
-                            <Card>
-                                <CardContent className="p-5">
-                                    <h2 className="font-medium text-foreground mb-3">{t('reply')}</h2>
-                                    <Textarea
-                                        value={replyContent}
-                                        onChange={(e) => setReplyContent(e.target.value)}
-                                        placeholder={t('writeYourReply')} aria-label={t('writeYourReply')}
-                                        rows={4}
-                                        className="mb-3"
-                                    />
-                                    <Button onClick={submitReply} disabled={sending || !replyContent.trim()}>
-                                        {sending ? (
-                                            <><Loader2 className="w-4 h-4 animate-spin" /> {t('posting')}</>
-                                        ) : (
-                                            <><Send className="w-4 h-4" /> {t('postReply')}</>
-                                        )}
-                                    </Button>
-                                </CardContent>
-                            </Card>
-                        ) : (
-                            <div className="text-center py-4 text-muted-foreground text-sm">
-                                <Lock className="w-4 h-4 inline mr-1" /> {t('topicLocked')}
-                            </div>
-                        )}
-                    </>
-                )}
-            </main>
-
-            <Footer />
-        </div>
+                    ) : (
+                        <div className="text-center py-4 text-muted-foreground text-sm">
+                            <Lock className="w-4 h-4 inline mr-1" /> {t('topicLocked')}
+                        </div>
+                    )}
+                </>
+            )}
+        </PageFrame>
     );
 }
 

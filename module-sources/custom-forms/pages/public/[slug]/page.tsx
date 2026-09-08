@@ -2,9 +2,8 @@
 
 import { useState, useEffect, use } from "react";
 import { useTranslations } from "next-intl";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, Textarea, NativeSelect, CheckboxField } from "@/core/sdk/ui";
-import { Footer, Navbar } from "@/core/sdk/layout";
-import { ThemeComponentSlot } from "@/core/sdk/theme";
+import { Button, Card, CardContent, Input, Label, Textarea, NativeSelect, CheckboxField } from "@/core/sdk/ui";
+import { PageFrame } from "@/core/sdk/layout";
 import { Loader2, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 
@@ -31,6 +30,7 @@ interface PageProps {
 export default function FormPage({ params }: PageProps) {
     const { slug } = use(params);
     const t = useTranslations("customForms");
+    const commonT = useTranslations("common");
     const [form, setForm] = useState<CustomForm | null>(null);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
@@ -107,47 +107,39 @@ export default function FormPage({ params }: PageProps) {
     };
 
     return (
-        <div className="min-h-screen flex flex-col bg-muted">
-            <ThemeComponentSlot name="Hero" />
-            <Navbar />
-
-            <main className="container mx-auto px-4 py-6 flex-1 max-w-2xl">
-                {loading ? (
-                    <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>
-                ) : !form ? (
-                    <Card><CardContent className="py-12 text-center text-muted-foreground">{t("formNotFound")}</CardContent></Card>
-                ) : submitted ? (
-                    <Card>
-                        <CardContent className="py-12 text-center">
-                            <CheckCircle className="w-12 h-12 text-success mx-auto mb-3" />
-                            <h1 className="text-xl font-bold text-foreground mb-1">{t("thankYou")}</h1>
-                            <p className="text-muted-foreground">{t("thankYouBody")}</p>
-                        </CardContent>
-                    </Card>
-                ) : (
-                    <Card>
-                        <CardHeader>
-                            <CardTitle as="h1">{form.title}</CardTitle>
-                            {form.description && <p className="text-sm text-muted-foreground">{form.description}</p>}
-                        </CardHeader>
-                        <CardContent>
-                            <form onSubmit={handleSubmit} className="space-y-4">
-                                {form.fields.map((field) => (
-                                    <div key={field.name}>
-                                        <Label>{field.label} {field.required && <span className="text-destructive">*</span>}</Label>
-                                        {renderField(field)}
-                                    </div>
-                                ))}
-                                <Button type="submit" disabled={submitting}>
-                                    {submitting ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("submitting")}</> : t("submit")}
-                                </Button>
-                            </form>
-                        </CardContent>
-                    </Card>
-                )}
-            </main>
-
-            <Footer />
-        </div>
+        <PageFrame
+            title={form?.title ?? commonT("loading")}
+            description={form?.description || undefined}
+        >
+            {loading ? (
+                <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>
+            ) : !form ? (
+                <Card><CardContent className="py-12 text-center text-muted-foreground">{t("formNotFound")}</CardContent></Card>
+            ) : submitted ? (
+                <Card>
+                    <CardContent className="py-12 text-center">
+                        <CheckCircle className="w-12 h-12 text-success mx-auto mb-3" />
+                        <h2 className="text-xl font-bold text-foreground mb-1">{t("thankYou")}</h2>
+                        <p className="text-muted-foreground">{t("thankYouBody")}</p>
+                    </CardContent>
+                </Card>
+            ) : (
+                <Card>
+                    <CardContent className="pt-6">
+                        <form onSubmit={handleSubmit} className="space-y-4">
+                            {form.fields.map((field) => (
+                                <div key={field.name}>
+                                    <Label>{field.label} {field.required && <span className="text-destructive">*</span>}</Label>
+                                    {renderField(field)}
+                                </div>
+                            ))}
+                            <Button type="submit" disabled={submitting}>
+                                {submitting ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("submitting")}</> : t("submit")}
+                            </Button>
+                        </form>
+                    </CardContent>
+                </Card>
+            )}
+        </PageFrame>
     );
 }

@@ -2,9 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { Link, useRouter } from "@/core/sdk/navigation";
-import { Button, Label, Textarea, NativeSelect, buttonClassName } from "@/core/sdk/ui";
-import { Footer, Navbar } from "@/core/sdk/layout";
-import { ThemeComponentSlot } from "@/core/sdk/theme";
+import { Button, Input, Label, Textarea, NativeSelect, buttonClassName } from "@/core/sdk/ui";
+import { PageFrame } from "@/core/sdk/layout";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { writeError } from "@/core/sdk";
@@ -68,51 +67,41 @@ export default function NewTicketPage() {
 
     if (!session?.user) {
         return (
-            <div className="min-h-screen flex flex-col bg-muted">
-                <ThemeComponentSlot name="Hero" />
-                <Navbar />
-                <main className="container mx-auto px-4 py-6 flex-1">
-                    <div className="bg-card rounded-xl p-8 text-center">
-                        <p className="text-muted-foreground mb-4">{t('loginToCreate')}</p>
-                        <Link href="/auth/login" className={buttonClassName("default", "default")}>{t('login')}</Link>
-                    </div>
-                </main>
-                <Footer />
-            </div>
+            <PageFrame
+                title={t('createNewTicket')}
+                trail={[{ label: t('title'), href: '/support' }]}
+            >
+                <div className="bg-card rounded-xl p-8 text-center">
+                    <p className="text-muted-foreground mb-4">{t('loginToCreate')}</p>
+                    <Link href="/auth/login" className={buttonClassName("default", "default")}>{t('login')}</Link>
+                </div>
+            </PageFrame>
         );
     }
 
     return (
-        <div className="min-h-screen flex flex-col bg-muted">
-            <ThemeComponentSlot name="Hero" />
-            <Navbar />
+        <PageFrame
+            title={t('createNewTicket')}
+            trail={[{ label: t('title'), href: '/support' }]}
+        >
+            {/* The card spans the page. It used to be max-w-3xl inside a
+                full-width one, which left the right half of every screen
+                empty beside a form that looked cut off. */}
+            <div className="bg-card rounded-xl border border-border p-6">
+                {departmentsLoaded && departments.length === 0 ? (
+                    <div className="text-center py-10">
+                        <p className="font-medium text-foreground">{t('noDepartmentsTitle')}</p>
+                        <p className="text-sm text-muted-foreground mt-1 max-w-md mx-auto">{t('noDepartmentsHelp')}</p>
+                    </div>
+                ) : (<>
+                {error && (
+                    <div role="alert" className="mb-4 p-3 bg-destructive/10 border border-destructive/20 text-destructive rounded-lg text-sm">
+                        {error}
+                    </div>
+                )}
 
-            <main className="container mx-auto px-4 py-6 flex-1">
-                {/* Breadcrumb */}
-                <div className="text-sm text-muted-foreground mb-4">
-                    <Link href="/" className="hover:text-primary">{commonT('home')}</Link>
-                    <span className="mx-2">/</span>
-                    <Link href="/support" className="hover:text-primary">{t('title')}</Link>
-                    <span className="mx-2">/</span>
-                    <span className="text-foreground">{t('newTicket')}</span>
-                </div>
-
-                <h1 className="text-2xl font-bold text-foreground mb-6">{t('createNewTicket')}</h1>
-
-                <div className="bg-card rounded-xl border border-border p-6 max-w-3xl">
-                    {departmentsLoaded && departments.length === 0 ? (
-                        <div className="text-center py-10">
-                            <p className="font-medium text-foreground">{t('noDepartmentsTitle')}</p>
-                            <p className="text-sm text-muted-foreground mt-1 max-w-md mx-auto">{t('noDepartmentsHelp')}</p>
-                        </div>
-                    ) : (<>
-                    {error && (
-                        <div role="alert" className="mb-4 p-3 bg-destructive/10 border border-destructive/20 text-destructive rounded-lg text-sm">
-                            {error}
-                        </div>
-                    )}
-
-                    <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="space-y-4">
+                    <div className="grid gap-4 sm:grid-cols-2">
                         <div>
                             <Label htmlFor="department">{t('department')} *</Label>
                             <NativeSelect
@@ -143,44 +132,42 @@ export default function NewTicketPage() {
                                 <option value="URGENT">{t('urgent')}</option>
                             </NativeSelect>
                         </div>
+                    </div>
 
-                        <div>
-                            <Label htmlFor="subject">{t('subject')} *</Label>
-                            <input
-                                id="subject"
-                                type="text"
-                                value={formData.subject}
-                                onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
-                                className="w-full mt-1 px-3 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
-                                placeholder={t('briefDescription')}
-                                required
-                            />
-                        </div>
+                    <div>
+                        <Label htmlFor="subject">{t('subject')} *</Label>
+                        <Input
+                            id="subject"
+                            type="text"
+                            value={formData.subject}
+                            onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                            className="mt-1"
+                            placeholder={t('briefDescription')}
+                            required
+                        />
+                    </div>
 
-                        <div>
-                            <Label htmlFor="content">{t('message')} *</Label>
-                            <Textarea
-                                id="content"
-                                value={formData.content}
-                                onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                                placeholder={t('describeIssue')}
-                                rows={8}
-                                required
-                            />
-                        </div>
+                    <div>
+                        <Label htmlFor="content">{t('message')} *</Label>
+                        <Textarea
+                            id="content"
+                            value={formData.content}
+                            onChange={(e) => setFormData({ ...formData, content: e.target.value })}
+                            placeholder={t('describeIssue')}
+                            rows={8}
+                            required
+                        />
+                    </div>
 
-                        <div className="flex gap-3">
-                            <Button type="submit" disabled={loading}>
-                                {loading ? t('creating') : t('createTicket')}
-                            </Button>
-                            <Link href="/support" className={buttonClassName("outline", "default")}>{t('cancel')}</Link>
-                        </div>
-                    </form>
-                    </>)}
-                </div>
-            </main>
-
-            <Footer />
-        </div>
+                    <div className="flex gap-3">
+                        <Button type="submit" disabled={loading}>
+                            {loading ? t('creating') : t('createTicket')}
+                        </Button>
+                        <Link href="/support" className={buttonClassName("outline", "default")}>{t('cancel')}</Link>
+                    </div>
+                </form>
+                </>)}
+            </div>
+        </PageFrame>
     );
 }

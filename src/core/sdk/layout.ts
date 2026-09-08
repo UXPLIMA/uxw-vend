@@ -7,5 +7,12 @@
  * know which theme is active.
  */
 export { Navbar, Footer } from "@/core/components/layout";
+/**
+ * The whole public page: chrome, measure, crumb trail, title, and the column
+ * a sidebar goes in. `StandardSidebarLayout` stays exported for a page that
+ * needs two columns somewhere other than under a page header.
+ */
+export { PageFrame } from "@/core/components/layout/PageFrame";
+export type { PageFrameProps } from "@/core/components/layout/PageFrame";
 export { default as StandardSidebarLayout } from "@/core/components/layout/SidebarLayout";
 export { Slot } from "@/core/components/Slot";

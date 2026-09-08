@@ -5,8 +5,7 @@ import Image from "next/image";
 import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/core/sdk/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/core/sdk/ui";
-import { Footer, Navbar } from "@/core/sdk/layout";
-import { ThemeComponentSlot } from "@/core/sdk/theme";
+import { PageFrame } from "@/core/sdk/layout";
 import { Loader2, MessageSquare, FileText, ShoppingCart, ThumbsUp, Calendar } from "lucide-react";
 import { getMinecraftAvatar } from "../../../lib/minecraft";
 import { dateLocaleTag } from "@/core/sdk";
@@ -53,120 +52,114 @@ export default function PlayerProfilePage({ params }: PageProps) {
     }, [username]);
 
     return (
-        <div className="min-h-screen flex flex-col bg-muted">
-            <ThemeComponentSlot name="Hero" />
-            <Navbar />
-
-            <main className="container mx-auto px-4 py-6 flex-1 max-w-3xl">
-                {loading ? (
-                    <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>
-                ) : !player ? (
-                    <Card><CardContent className="py-12 text-center text-muted-foreground">{t("playerNotFound")}</CardContent></Card>
-                ) : (
-                    <>
-                        {/* Profile Header */}
-                        <div className="flex items-center gap-5 mb-8">
-                            {(() => {
-                                // Only call mc-heads.net when we know this user has a linked
-                                // Minecraft account - otherwise the service 301s an HTML page
-                                // that Next/Image rejects with a 400.
-                                const mcAccount = player.linkedAccounts.find(
-                                    (a) => (a.provider || "").toLowerCase() === "minecraft" && a.username,
-                                );
-                                const avatarSrc = player.avatar
-                                    || (mcAccount?.username ? getMinecraftAvatar(mcAccount.username, 80) : null);
-                                if (avatarSrc) {
-                                    return (
-                                        <Image
-                                            src={avatarSrc}
-                                            alt={player.username}
-                                            width={80}
-                                            height={80}
-                                            className="w-20 h-20 rounded-xl object-cover shadow-sm"
-                                        />
-                                    );
-                                }
+        <PageFrame
+            title={player?.username ?? username}
+        >
+            {loading ? (
+                <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>
+            ) : !player ? (
+                <Card><CardContent className="py-12 text-center text-muted-foreground">{t("playerNotFound")}</CardContent></Card>
+            ) : (
+                <>
+                    {/* Profile Header */}
+                    <div className="flex items-center gap-5 mb-8">
+                        {(() => {
+                            // Only call mc-heads.net when we know this user has a linked
+                            // Minecraft account - otherwise the service 301s an HTML page
+                            // that Next/Image rejects with a 400.
+                            const mcAccount = player.linkedAccounts.find(
+                                (a) => (a.provider || "").toLowerCase() === "minecraft" && a.username,
+                            );
+                            const avatarSrc = player.avatar
+                                || (mcAccount?.username ? getMinecraftAvatar(mcAccount.username, 80) : null);
+                            if (avatarSrc) {
                                 return (
-                                    <div className="w-20 h-20 rounded-xl shadow-sm bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white text-2xl font-bold">
-                                        {player.username.charAt(0).toUpperCase()}
-                                    </div>
+                                    <Image
+                                        src={avatarSrc}
+                                        alt={player.username}
+                                        width={80}
+                                        height={80}
+                                        className="w-20 h-20 rounded-xl object-cover shadow-sm"
+                                    />
                                 );
-                            })()}
-                            <div>
-                                <h1 className="text-2xl font-bold text-foreground">{player.username}</h1>
-                                {player.role && (
-                                    <span className="text-sm font-medium px-2 py-0.5 rounded mt-1 inline-block" style={{
-                                        backgroundColor: (player.role.color || "#6b7280") + "15",
-                                        color: player.role.color || "#6b7280",
-                                    }}>
-                                        {player.role.displayName}
-                                    </span>
-                                )}
-                                <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1">
-                                    <Calendar className="w-3 h-3" />
-                                    {t("joinDate")}: {new Date(player.createdAt).toLocaleDateString(__dateTag)}
-                                </p>
-                            </div>
-                        </div>
-
-                        {/* Stats */}
-                        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
-                            {[
-                                { key: "orders", label: t("stat_orders"), value: player._count.orders, icon: ShoppingCart },
-                                { key: "topics", label: t("stat_topics"), value: player._count.topics, icon: MessageSquare },
-                                { key: "posts", label: t("stat_posts"), value: player._count.posts, icon: FileText },
-                                { key: "comments", label: t("stat_comments"), value: player._count.comments, icon: FileText },
-                                { key: "suggestions", label: t("stat_suggestions"), value: player._count.suggestions, icon: ThumbsUp },
-                            ].filter((s): s is typeof s & { value: number } => s.value !== undefined).map((s) => (
-                                <Card key={s.key}>
-                                    <CardContent className="p-3 text-center">
-                                        <s.icon className="w-4 h-4 mx-auto text-muted-foreground mb-1" />
-                                        <p className="text-xl font-bold">{s.value}</p>
-                                        <p className="text-xs text-muted-foreground">{s.label}</p>
-                                    </CardContent>
-                                </Card>
-                            ))}
-                        </div>
-
-                        <div className="grid md:grid-cols-2 gap-6">
-                            {/* Linked Accounts */}
-                            {player.linkedAccounts.length > 0 && (
-                                <Card>
-                                    <CardHeader><CardTitle className="text-sm">{t("linkedAccounts")}</CardTitle></CardHeader>
-                                    <CardContent>
-                                        <div className="space-y-2">
-                                            {player.linkedAccounts.map((acc) => (
-                                                <div key={acc.provider} className="flex items-center gap-2 text-sm">
-                                                    <span className="capitalize font-medium text-foreground">{acc.provider}</span>
-                                                    {acc.username && <span className="text-muted-foreground">{acc.username}</span>}
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </CardContent>
-                                </Card>
+                            }
+                            return (
+                                <div className="w-20 h-20 rounded-xl shadow-sm bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white text-2xl font-bold">
+                                    {player.username.charAt(0).toUpperCase()}
+                                </div>
+                            );
+                        })()}
+                        <div>
+                            {player.role && (
+                                <span className="text-sm font-medium px-2 py-0.5 rounded mt-1 inline-block" style={{
+                                    backgroundColor: (player.role.color || "#6b7280") + "15",
+                                    color: player.role.color || "#6b7280",
+                                }}>
+                                    {player.role.displayName}
+                                </span>
                             )}
-
-                            {/* Recent Topics */}
-                            {player.recentTopics.length > 0 && (
-                                <Card>
-                                    <CardHeader><CardTitle className="text-sm">{t("activity")}</CardTitle></CardHeader>
-                                    <CardContent>
-                                        <div className="space-y-2">
-                                            {player.recentTopics.map((topic) => (
-                                                <Link key={topic.id} href={`/forum/topic/${topic.id}/${topic.slug}`} className="block text-sm text-foreground hover:text-primary transition-colors truncate">
-                                                    {topic.title}
-                                                </Link>
-                                            ))}
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            )}
+                            <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1">
+                                <Calendar className="w-3 h-3" />
+                                {t("joinDate")}: {new Date(player.createdAt).toLocaleDateString(__dateTag)}
+                            </p>
                         </div>
-                    </>
-                )}
-            </main>
+                    </div>
 
-            <Footer />
-        </div>
+                    {/* Stats */}
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-6">
+                        {[
+                            { key: "orders", label: t("stat_orders"), value: player._count.orders, icon: ShoppingCart },
+                            { key: "topics", label: t("stat_topics"), value: player._count.topics, icon: MessageSquare },
+                            { key: "posts", label: t("stat_posts"), value: player._count.posts, icon: FileText },
+                            { key: "comments", label: t("stat_comments"), value: player._count.comments, icon: FileText },
+                            { key: "suggestions", label: t("stat_suggestions"), value: player._count.suggestions, icon: ThumbsUp },
+                        ].filter((s): s is typeof s & { value: number } => s.value !== undefined).map((s) => (
+                            <Card key={s.key}>
+                                <CardContent className="p-3 text-center">
+                                    <s.icon className="w-4 h-4 mx-auto text-muted-foreground mb-1" />
+                                    <p className="text-xl font-bold">{s.value}</p>
+                                    <p className="text-xs text-muted-foreground">{s.label}</p>
+                                </CardContent>
+                            </Card>
+                        ))}
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-6">
+                        {/* Linked Accounts */}
+                        {player.linkedAccounts.length > 0 && (
+                            <Card>
+                                <CardHeader><CardTitle className="text-sm">{t("linkedAccounts")}</CardTitle></CardHeader>
+                                <CardContent>
+                                    <div className="space-y-2">
+                                        {player.linkedAccounts.map((acc) => (
+                                            <div key={acc.provider} className="flex items-center gap-2 text-sm">
+                                                <span className="capitalize font-medium text-foreground">{acc.provider}</span>
+                                                {acc.username && <span className="text-muted-foreground">{acc.username}</span>}
+                                            </div>
+                                        ))}
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        )}
+
+                        {/* Recent Topics */}
+                        {player.recentTopics.length > 0 && (
+                            <Card>
+                                <CardHeader><CardTitle className="text-sm">{t("activity")}</CardTitle></CardHeader>
+                                <CardContent>
+                                    <div className="space-y-2">
+                                        {player.recentTopics.map((topic) => (
+                                            <Link key={topic.id} href={`/forum/topic/${topic.id}/${topic.slug}`} className="block text-sm text-foreground hover:text-primary transition-colors truncate">
+                                                {topic.title}
+                                            </Link>
+                                        ))}
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        )}
+                    </div>
+                </>
+            )}
+        </PageFrame>
     );
 }

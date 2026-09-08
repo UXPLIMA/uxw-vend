@@ -3,8 +3,7 @@
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Card, CardContent, LoadFailed, RichContent } from "@/core/sdk/ui";
-import { Footer, Navbar } from "@/core/sdk/layout";
-import { ThemeComponentSlot } from "@/core/sdk/theme";
+import { PageFrame } from "@/core/sdk/layout";
 import { useLocalDate } from "@/core/sdk/ui";
 import { Loader2 } from "lucide-react";
 
@@ -36,62 +35,55 @@ export default function ChangelogPage() {
     }, [reloadKey]);
 
     return (
-        <div className="min-h-screen flex flex-col bg-muted">
-            <ThemeComponentSlot name="Hero" />
-            <Navbar />
-
-            <main className="container mx-auto px-4 py-6 flex-1 max-w-3xl">
-                <h1 className="text-3xl font-bold text-foreground mb-2">{t('title')}</h1>
-                <p className="text-muted-foreground mb-8">{t('subtitle')}</p>
-
-                {loading ? (
-                    <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>
-                ) : failed ? (
-                    <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
-                ) : entries.length === 0 ? (
-                    <Card><CardContent className="py-12 text-center text-muted-foreground">{t('empty')}</CardContent></Card>
-                ) : (
-                    <div className="relative">
-                        <div className="absolute left-[19px] top-0 bottom-0 w-0.5 bg-border" />
-                        <div className="space-y-6">
-                            {entries.map((entry) => {
-                                return (
-                                    <div key={entry.id} className="relative pl-12">
-                                        <div className="absolute left-0 top-1 w-10 h-10 rounded-full bg-card border-2 border-border flex items-center justify-center z-10">
-                                            <span className="text-xs font-bold text-muted-foreground">v</span>
-                                        </div>
-                                        <Card>
-                                            <CardContent className="p-5">
-                                                <div className="flex items-center gap-2 mb-2">
-                                                    <span
-                                                        className="text-xs px-2 py-0.5 rounded font-medium text-white"
-                                                        style={{ backgroundColor: entry.color || "#3b82f6" }}
-                                                    >
-                                                        {entry.type}
-                                                    </span>
-                                                    <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded font-mono">
-                                                        v{entry.version}
-                                                    </span>
-                                                    <span className="text-xs text-muted-foreground">
-                                                        {formatLocalDate(entry.createdAt)}
-                                                    </span>
-                                                </div>
-                                                <h2 className="font-bold text-foreground mb-2">{entry.title}</h2>
-                                                <RichContent
-                                                    className="text-sm text-muted-foreground"
-                                                    html={entry.content}
-                                                />
-                                            </CardContent>
-                                        </Card>
+        <PageFrame
+            title={t('title')}
+            description={t('subtitle')}
+        >
+            {loading ? (
+                <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>
+            ) : failed ? (
+                <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
+            ) : entries.length === 0 ? (
+                <Card><CardContent className="py-12 text-center text-muted-foreground">{t('empty')}</CardContent></Card>
+            ) : (
+                <div className="relative">
+                    <div className="absolute left-[19px] top-0 bottom-0 w-0.5 bg-border" />
+                    <div className="space-y-6">
+                        {entries.map((entry) => {
+                            return (
+                                <div key={entry.id} className="relative pl-12">
+                                    <div className="absolute left-0 top-1 w-10 h-10 rounded-full bg-card border-2 border-border flex items-center justify-center z-10">
+                                        <span className="text-xs font-bold text-muted-foreground">v</span>
                                     </div>
-                                );
-                            })}
-                        </div>
+                                    <Card>
+                                        <CardContent className="p-5">
+                                            <div className="flex items-center gap-2 mb-2">
+                                                <span
+                                                    className="text-xs px-2 py-0.5 rounded font-medium text-white"
+                                                    style={{ backgroundColor: entry.color || "#3b82f6" }}
+                                                >
+                                                    {entry.type}
+                                                </span>
+                                                <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded font-mono">
+                                                    v{entry.version}
+                                                </span>
+                                                <span className="text-xs text-muted-foreground">
+                                                    {formatLocalDate(entry.createdAt)}
+                                                </span>
+                                            </div>
+                                            <h2 className="font-bold text-foreground mb-2">{entry.title}</h2>
+                                            <RichContent
+                                                className="text-sm text-muted-foreground"
+                                                html={entry.content}
+                                            />
+                                        </CardContent>
+                                    </Card>
+                                </div>
+                            );
+                        })}
                     </div>
-                )}
-            </main>
-
-            <Footer />
-        </div>
+                </div>
+            )}
+        </PageFrame>
     );
 }

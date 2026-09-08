@@ -6,8 +6,7 @@ import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Button, Textarea, buttonClassName } from "@/core/sdk/ui";
-import { Footer, Navbar, StandardSidebarLayout } from "@/core/sdk/layout";
-import { ThemeComponentSlot } from "@/core/sdk/theme";
+import { PageFrame, StandardSidebarLayout } from "@/core/sdk/layout";
 import { useRelativeTime } from "@/core/sdk/ui";
 import { labelFor, PRIORITY_KEYS, STATUS_KEYS } from "../../../../lib/status-labels";
 
@@ -111,148 +110,132 @@ export default function TicketDetailPage({ params }: PageProps) {
 
     if (!session?.user) {
         return (
-            <div className="min-h-screen flex flex-col bg-muted">
-                <ThemeComponentSlot name="Hero" />
-                <Navbar />
-                <main className="container mx-auto px-4 py-6 flex-1">
-                    <div className="bg-card rounded-xl p-8 text-center">
-                        <p className="text-muted-foreground mb-4">{t("loginToView")}</p>
-                        <Link href="/auth/login" className={buttonClassName("default", "default")}>{t("login")}</Link>
-                    </div>
-                </main>
-                <Footer />
-            </div>
+            <PageFrame
+                title={t("ticket")}
+                trail={[{ label: t("support"), href: '/support' }]}
+            >
+                <div className="bg-card rounded-xl p-8 text-center">
+                    <p className="text-muted-foreground mb-4">{t("loginToView")}</p>
+                    <Link href="/auth/login" className={buttonClassName("default", "default")}>{t("login")}</Link>
+                </div>
+            </PageFrame>
         );
     }
 
     return (
-        <div className="min-h-screen flex flex-col bg-muted">
-            <ThemeComponentSlot name="Hero" />
-            <Navbar />
-
-            <main className="container mx-auto px-4 py-6 flex-1">
-                {/* Breadcrumb */}
-                <div className="text-sm text-muted-foreground mb-4">
-                    <Link href="/" className="hover:text-primary">{t("home")}</Link>
-                    <span className="mx-2">/</span>
-                    <Link href="/support" className="hover:text-primary">{t("support")}</Link>
-                    <span className="mx-2">/</span>
-                    <span className="text-foreground">{t("ticket")}</span>
+        <PageFrame
+            title={ticket?.subject ?? t("ticket")}
+            trail={[{ label: t("support"), href: '/support' }]}
+        >
+            {loading ? (
+                <div className="bg-card rounded-xl p-8 text-center">
+                    <p className="text-muted-foreground">{t("loadingTicket")}</p>
                 </div>
-
-                {loading ? (
-                    <div className="bg-card rounded-xl p-8 text-center">
-                        <p className="text-muted-foreground">{t("loadingTicket")}</p>
-                    </div>
-                ) : error ? (
-                    <div className="bg-card rounded-xl p-8 text-center">
-                        <p className="text-destructive mb-4">{error}</p>
-                        <Link href="/support" className={buttonClassName("outline", "default")}>{t("backToSupport")}</Link>
-                    </div>
-                ) : ticket ? (
-                    <StandardSidebarLayout sidebar={(
-                                <div className="space-y-4">
-                                    <div className="bg-card rounded-xl border border-border p-4">
-                                        <h2 className="font-bold text-foreground mb-3">{t("ticketInfo")}</h2>
-                                        <div className="space-y-2 text-sm">
-                                            <div className="flex justify-between">
-                                                <span className="text-muted-foreground">{t("createdAt")}</span>
-                                                <span className="text-foreground">{relativeTime(ticket.createdAt)}</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-muted-foreground">{t("updatedAt")}</span>
-                                                <span className="text-foreground">{relativeTime(ticket.updatedAt)}</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span className="text-muted-foreground">{t("messages")}</span>
-                                                <span className="text-foreground">{ticket.messages.length}</span>
-                                            </div>
-                                            {ticket.assignedTo && (
-                                                <div className="flex justify-between">
-                                                    <span className="text-muted-foreground">{t("assignedTo")}</span>
-                                                    <span className="text-foreground">{ticket.assignedTo.username}</span>
-                                                </div>
-                                            )}
+            ) : error ? (
+                <div className="bg-card rounded-xl p-8 text-center">
+                    <p className="text-destructive mb-4">{error}</p>
+                    <Link href="/support" className={buttonClassName("outline", "default")}>{t("backToSupport")}</Link>
+                </div>
+            ) : ticket ? (
+                <StandardSidebarLayout sidebar={(
+                            <div className="space-y-4">
+                                <div className="bg-card rounded-xl border border-border p-4">
+                                    <h2 className="font-bold text-foreground mb-3">{t("ticketInfo")}</h2>
+                                    <div className="space-y-2 text-sm">
+                                        <div className="flex justify-between">
+                                            <span className="text-muted-foreground">{t("createdAt")}</span>
+                                            <span className="text-foreground">{relativeTime(ticket.createdAt)}</span>
                                         </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-muted-foreground">{t("updatedAt")}</span>
+                                            <span className="text-foreground">{relativeTime(ticket.updatedAt)}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-muted-foreground">{t("messages")}</span>
+                                            <span className="text-foreground">{ticket.messages.length}</span>
+                                        </div>
+                                        {ticket.assignedTo && (
+                                            <div className="flex justify-between">
+                                                <span className="text-muted-foreground">{t("assignedTo")}</span>
+                                                <span className="text-foreground">{ticket.assignedTo.username}</span>
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
-                            )}>
-                        {(
-                                <div className="space-y-4">
-                                    {/* Ticket Header */}
-                                    <div className="bg-card rounded-xl border border-border p-6">
-                                        <h1 className="text-xl font-bold text-foreground mb-2">{ticket.subject}</h1>
-                                        <div className="flex flex-wrap gap-3 text-sm">
-                                            <span className={`px-2 py-1 rounded font-medium ${statusColors[ticket.status]}`}>
-                                                {labelFor(t, STATUS_KEYS, ticket.status)}
-                                            </span>
-                                            <span className="text-muted-foreground">
-                                                {t("priority")}: <strong>{labelFor(t, PRIORITY_KEYS, ticket.priority)}</strong>
-                                            </span>
-                                            <span className="text-muted-foreground">
-                                                {t("department")}: <strong>{ticket.department.name}</strong>
-                                            </span>
-                                        </div>
+                            </div>
+                        )}>
+                    {(
+                            <div className="space-y-4">
+                                {/* Ticket Header */}
+                                <div className="bg-card rounded-xl border border-border p-6">
+                                    <div className="flex flex-wrap gap-3 text-sm">
+                                        <span className={`px-2 py-1 rounded font-medium ${statusColors[ticket.status]}`}>
+                                            {labelFor(t, STATUS_KEYS, ticket.status)}
+                                        </span>
+                                        <span className="text-muted-foreground">
+                                            {t("priority")}: <strong>{labelFor(t, PRIORITY_KEYS, ticket.priority)}</strong>
+                                        </span>
+                                        <span className="text-muted-foreground">
+                                            {t("department")}: <strong>{ticket.department.name}</strong>
+                                        </span>
                                     </div>
+                                </div>
 
-                                    {/* Messages */}
-                                    <div className="space-y-4">
-                                        {ticket.messages.map((message) => (
-                                            <div
-                                                key={message.id}
-                                                className={`bg-card rounded-xl border p-4 ${message.isStaffReply
-                                                    ? "border-primary/20 bg-primary/50"
-                                                    : "border-border"
-                                                    }`}
-                                            >
-                                                <div className="flex items-center gap-3 mb-3">
-                                                    <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground font-bold">
-                                                        {message.user.avatar ? (
-                                                            <>{/* eslint-disable-next-line @next/next/no-img-element */}
-                                                            <img src={message.user.avatar} alt="" className="w-full h-full rounded-full object-cover" /></>
-                                                        ) : (
-                                                            message.user.username.charAt(0).toUpperCase()
+                                {/* Messages */}
+                                <div className="space-y-4">
+                                    {ticket.messages.map((message) => (
+                                        <div
+                                            key={message.id}
+                                            className={`bg-card rounded-xl border p-4 ${message.isStaffReply
+                                                ? "border-primary/20 bg-primary/50"
+                                                : "border-border"
+                                                }`}
+                                        >
+                                            <div className="flex items-center gap-3 mb-3">
+                                                <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center text-muted-foreground font-bold">
+                                                    {message.user.avatar ? (
+                                                        <>{/* eslint-disable-next-line @next/next/no-img-element */}
+                                                        <img src={message.user.avatar} alt="" className="w-full h-full rounded-full object-cover" /></>
+                                                    ) : (
+                                                        message.user.username.charAt(0).toUpperCase()
+                                                    )}
+                                                </div>
+                                                <div>
+                                                    <div className="flex items-center gap-2">
+                                                        <span className="font-medium text-foreground">{message.user.username}</span>
+                                                        {message.isStaffReply && (
+                                                            <span className="px-2 py-0.5 bg-primary/10 text-primary text-xs rounded font-medium">{t("staff")}</span>
                                                         )}
                                                     </div>
-                                                    <div>
-                                                        <div className="flex items-center gap-2">
-                                                            <span className="font-medium text-foreground">{message.user.username}</span>
-                                                            {message.isStaffReply && (
-                                                                <span className="px-2 py-0.5 bg-primary/10 text-primary text-xs rounded font-medium">{t("staff")}</span>
-                                                            )}
-                                                        </div>
-                                                        <span className="text-xs text-muted-foreground">{relativeTime(message.createdAt)}</span>
-                                                    </div>
+                                                    <span className="text-xs text-muted-foreground">{relativeTime(message.createdAt)}</span>
                                                 </div>
-                                                <div className="text-foreground whitespace-pre-wrap">{message.content}</div>
                                             </div>
-                                        ))}
-                                    </div>
-
-                                    {/* Reply Form */}
-                                    {ticket.status !== "CLOSED" && (
-                                        <div className="bg-card rounded-xl border border-border p-4">
-                                            <form onSubmit={handleReply}>
-                                                <Textarea
-                                                    value={reply}
-                                                    onChange={(e) => setReply(e.target.value)}
-                                                    placeholder={t("replyPlaceholder")} aria-label={t("replyPlaceholder")}
-                                                    rows={4}
-                                                    className="mb-3"
-                                                />
-                                                <Button type="submit" disabled={sending || !reply.trim()}>
-                                                    {sending ? "Sending..." : "Send Reply"}
-                                                </Button>
-                                            </form>
+                                            <div className="text-foreground whitespace-pre-wrap">{message.content}</div>
                                         </div>
-                                    )}
+                                    ))}
                                 </div>
-                            )}
-                    </StandardSidebarLayout>
-                ) : null}
-            </main>
 
-            <Footer />
-        </div>
+                                {/* Reply Form */}
+                                {ticket.status !== "CLOSED" && (
+                                    <div className="bg-card rounded-xl border border-border p-4">
+                                        <form onSubmit={handleReply}>
+                                            <Textarea
+                                                value={reply}
+                                                onChange={(e) => setReply(e.target.value)}
+                                                placeholder={t("replyPlaceholder")} aria-label={t("replyPlaceholder")}
+                                                rows={4}
+                                                className="mb-3"
+                                            />
+                                            <Button type="submit" disabled={sending || !reply.trim()}>
+                                                {sending ? "Sending..." : "Send Reply"}
+                                            </Button>
+                                        </form>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                </StandardSidebarLayout>
+            ) : null}
+        </PageFrame>
     );
 }

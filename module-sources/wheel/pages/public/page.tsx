@@ -4,8 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { Button, Card, CardContent, LoadFailed, useSiteCurrency } from "@/core/sdk/ui";
-import { Footer, Navbar } from "@/core/sdk/layout";
-import { ThemeComponentSlot } from "@/core/sdk/theme";
+import { PageFrame } from "@/core/sdk/layout";
 import { Loader2, PartyPopper } from "lucide-react";
 import { errorMessage } from "@/core/sdk";
 
@@ -137,102 +136,95 @@ export default function WheelPage() {
     };
 
     return (
-        <div className="min-h-screen flex flex-col bg-muted">
-            <ThemeComponentSlot name="Hero" />
-            <Navbar />
-
-            <main className="container mx-auto px-4 py-6 flex-1 flex flex-col items-center">
-                <h1 className="text-3xl font-bold text-foreground mb-2">{t('title')}</h1>
-                <p className="text-muted-foreground mb-8">{t('description')}</p>
-
-                {loading ? (
-                    <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-                ) : failed ? (
-                    <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
-                ) : prizes.length === 0 ? (
-                    <Card><CardContent className="py-12 text-center text-muted-foreground">{t('noPrizes')}</CardContent></Card>
-                ) : (
-                    <div className="flex flex-col items-center gap-6">
-                        {/* Wheel */}
-                        <div className="relative">
-                            {/* Pointer */}
-                            <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 z-10">
-                                <div className="w-0 h-0 border-l-[12px] border-r-[12px] border-t-[20px] border-l-transparent border-r-transparent border-t-red-500" />
-                            </div>
-
-                            <div
-                                className="transition-transform duration-[4000ms] ease-out"
-                                style={{ transform: `rotate(${rotation}deg)` }}
-                            >
-                                <canvas ref={canvasRef} className="w-[320px] h-[320px]" />
-                            </div>
+        <PageFrame
+            title={t('title')}
+            description={t('description')}
+        >
+            {loading ? (
+                <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>
+            ) : failed ? (
+                <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
+            ) : prizes.length === 0 ? (
+                <Card><CardContent className="py-12 text-center text-muted-foreground">{t('noPrizes')}</CardContent></Card>
+            ) : (
+                <div className="flex flex-col items-center gap-6">
+                    {/* Wheel */}
+                    <div className="relative">
+                        {/* Pointer */}
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-2 z-10">
+                            <div className="w-0 h-0 border-l-[12px] border-r-[12px] border-t-[20px] border-l-transparent border-r-transparent border-t-red-500" />
                         </div>
 
-                        {/* Spin Button */}
-                        <Button
-                            size="lg"
-                            className="text-lg px-8"
-                            onClick={spin}
-                            disabled={spinning || !session?.user}
+                        <div
+                            className="transition-transform duration-[4000ms] ease-out"
+                            style={{ transform: `rotate(${rotation}deg)` }}
                         >
-                            {spinning ? (
-                                <><Loader2 className="w-5 h-5 animate-spin" /> {t('spinning')}</>
-                            ) : !session?.user ? (
-                                t('loginToSpin')
-                            ) : freeSpinUsed && spinCost > 0 ? (
-                                t('spinAgainCost', { cost: spinCost })
-                            ) : (
-                                t('spin')
-                            )}
-                        </Button>
-
-                        {/* Result */}
-                        {result && (
-                            <Card className={`w-full max-w-sm ${result.type === "error" ? "border-destructive/20" : "border-success/20"}`}>
-                                <CardContent className="p-6 text-center">
-                                    {result.type === "error" ? (
-                                        <p className="text-destructive">{result.name}</p>
-                                    ) : result.type === "nothing" ? (
-                                        <p className="text-muted-foreground">{t('betterLuckNextTime', { prize: result.name })}</p>
-                                    ) : (
-                                        <div>
-                                            <PartyPopper className="w-8 h-8 text-warning mx-auto mb-2" />
-                                            <p className="font-bold text-foreground text-lg">{t('youWon', { prize: result.name })}</p>
-                                            {result.value > 0 && (
-                                                <p className="text-sm text-muted-foreground mt-1">
-                                                    {result.type === "credits" ? t('creditsAdded', { value: result.value }) : t('couponCreated', { value: result.value })}
-                                                </p>
-                                            )}
-                                            {/* A coupon nobody is told the code of is not a prize. */}
-                                            {result.code && (
-                                                <p className="mt-3 font-mono text-base font-bold tracking-wider text-foreground">
-                                                    {t('couponCode', { code: result.code })}
-                                                </p>
-                                            )}
-                                        </div>
-                                    )}
-                                </CardContent>
-                            </Card>
-                        )}
-
-                        {/* Prize List */}
-                        <div className="w-full max-w-sm">
-                            <h2 className="text-sm font-medium text-muted-foreground mb-2">{t('availablePrizes')}</h2>
-                            <div className="space-y-1">
-                                {prizes.map((p) => (
-                                    <div key={p.id} className="flex items-center gap-2 text-sm">
-                                        <div className="w-3 h-3 rounded-full" style={{ backgroundColor: p.color }} />
-                                        <span className="text-foreground">{p.name}</span>
-                                        {p.value > 0 && <span className="text-muted-foreground text-xs">({p.type === "credits" ? t('valueCredits', { value: p.value }) : money(p.value)})</span>}
-                                    </div>
-                                ))}
-                            </div>
+                            <canvas ref={canvasRef} className="w-[320px] h-[320px]" />
                         </div>
                     </div>
-                )}
-            </main>
 
-            <Footer />
-        </div>
+                    {/* Spin Button */}
+                    <Button
+                        size="lg"
+                        className="text-lg px-8"
+                        onClick={spin}
+                        disabled={spinning || !session?.user}
+                    >
+                        {spinning ? (
+                            <><Loader2 className="w-5 h-5 animate-spin" /> {t('spinning')}</>
+                        ) : !session?.user ? (
+                            t('loginToSpin')
+                        ) : freeSpinUsed && spinCost > 0 ? (
+                            t('spinAgainCost', { cost: spinCost })
+                        ) : (
+                            t('spin')
+                        )}
+                    </Button>
+
+                    {/* Result */}
+                    {result && (
+                        <Card className={`w-full max-w-sm ${result.type === "error" ? "border-destructive/20" : "border-success/20"}`}>
+                            <CardContent className="p-6 text-center">
+                                {result.type === "error" ? (
+                                    <p className="text-destructive">{result.name}</p>
+                                ) : result.type === "nothing" ? (
+                                    <p className="text-muted-foreground">{t('betterLuckNextTime', { prize: result.name })}</p>
+                                ) : (
+                                    <div>
+                                        <PartyPopper className="w-8 h-8 text-warning mx-auto mb-2" />
+                                        <p className="font-bold text-foreground text-lg">{t('youWon', { prize: result.name })}</p>
+                                        {result.value > 0 && (
+                                            <p className="text-sm text-muted-foreground mt-1">
+                                                {result.type === "credits" ? t('creditsAdded', { value: result.value }) : t('couponCreated', { value: result.value })}
+                                            </p>
+                                        )}
+                                        {/* A coupon nobody is told the code of is not a prize. */}
+                                        {result.code && (
+                                            <p className="mt-3 font-mono text-base font-bold tracking-wider text-foreground">
+                                                {t('couponCode', { code: result.code })}
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
+                            </CardContent>
+                        </Card>
+                    )}
+
+                    {/* Prize List */}
+                    <div className="w-full max-w-sm">
+                        <h2 className="text-sm font-medium text-muted-foreground mb-2">{t('availablePrizes')}</h2>
+                        <div className="space-y-1">
+                            {prizes.map((p) => (
+                                <div key={p.id} className="flex items-center gap-2 text-sm">
+                                    <div className="w-3 h-3 rounded-full" style={{ backgroundColor: p.color }} />
+                                    <span className="text-foreground">{p.name}</span>
+                                    {p.value > 0 && <span className="text-muted-foreground text-xs">({p.type === "credits" ? t('valueCredits', { value: p.value }) : money(p.value)})</span>}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            )}
+        </PageFrame>
     );
 }

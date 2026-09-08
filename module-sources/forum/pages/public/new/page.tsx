@@ -1,11 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Link, useRouter } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, LoadFailed, Textarea, NativeSelect } from "@/core/sdk/ui";
-import { Footer, Navbar } from "@/core/sdk/layout";
-import { ThemeComponentSlot } from "@/core/sdk/theme";
-import { ArrowLeft, Loader2, FolderPlus } from "lucide-react";
+import { useRouter } from "@/core/sdk/navigation";
+import { Button, Card, CardContent, Input, Label, LoadFailed, Textarea, NativeSelect } from "@/core/sdk/ui";
+import { PageFrame } from "@/core/sdk/layout";
+import { Loader2, FolderPlus } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { writeError } from "@/core/sdk";
 
@@ -70,92 +69,81 @@ export default function NewTopicPage() {
     };
 
     return (
-        <div className="min-h-screen flex flex-col bg-muted">
-            <ThemeComponentSlot name="Hero" />
-            <Navbar />
+        <PageFrame
+            title={t('newTopic')}
+            trail={[{ label: t('title'), href: '/forum' }]}
+        >
+            <Card>
+                <CardContent className="pt-6">
+                    {failed ? (
+                        <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
+                    ) : categoriesLoaded && categories.length === 0 ? (
+                        <div className="text-center py-10">
+                            <FolderPlus className="w-12 h-12 text-muted-foreground/40 mx-auto mb-3" />
+                            <p className="font-medium text-foreground">{t('noCategoriesTitle')}</p>
+                            <p className="text-sm text-muted-foreground mt-1 max-w-md mx-auto">{t('noCategoriesHelp')}</p>
+                        </div>
+                    ) : (
+                        <>
+                            {error && (
+                                <div role="alert" className="mb-4 p-3 bg-destructive/10 border border-destructive/20 text-destructive text-sm rounded-lg">
+                                    {error}
+                                </div>
+                            )}
 
-            <main className="container mx-auto px-4 py-6 flex-1 max-w-3xl">
-                <Link href="/forum" className="flex items-center gap-1 text-sm text-muted-foreground hover:text-primary mb-4">
-                    <ArrowLeft className="w-4 h-4" /> {t('backToForum')}
-                </Link>
+                            <form onSubmit={handleSubmit} className="space-y-4">
+                                <div>
+                                    <Label>{t('categoryLabel')}</Label>
+                                    <NativeSelect
+                                        aria-label={t('categoryLabel')}
+                                        value={form.categoryId}
+                                        onChange={(e) => setForm({ ...form, categoryId: e.target.value })} className="w-full"
+                                        required
+                                    >
+                                        <option value="">{t('selectCategory')}</option>
+                                        {categories.map((cat) => (
+                                            <option key={cat.id} value={cat.id}>{cat.name}</option>
+                                        ))}
+                                    </NativeSelect>
+                                </div>
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle as="h1">{t('newTopic')}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        {failed ? (
-                            <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
-                        ) : categoriesLoaded && categories.length === 0 ? (
-                            <div className="text-center py-10">
-                                <FolderPlus className="w-12 h-12 text-muted-foreground/40 mx-auto mb-3" />
-                                <p className="font-medium text-foreground">{t('noCategoriesTitle')}</p>
-                                <p className="text-sm text-muted-foreground mt-1 max-w-md mx-auto">{t('noCategoriesHelp')}</p>
-                            </div>
-                        ) : (
-                            <>
-                                {error && (
-                                    <div role="alert" className="mb-4 p-3 bg-destructive/10 border border-destructive/20 text-destructive text-sm rounded-lg">
-                                        {error}
-                                    </div>
-                                )}
+                                <div>
+                                    <Label>{t('titleLabel')}</Label>
+                                    <Input
+                                        aria-label={t('titleLabel')}
+                                        value={form.title}
+                                        onChange={(e) => setForm({ ...form, title: e.target.value })}
+                                        placeholder={t('topicTitle')}
+                                        required
+                                        minLength={3}
+                                    />
+                                </div>
 
-                                <form onSubmit={handleSubmit} className="space-y-4">
-                                    <div>
-                                        <Label>{t('categoryLabel')}</Label>
-                                        <NativeSelect
-                                            aria-label={t('categoryLabel')}
-                                            value={form.categoryId}
-                                            onChange={(e) => setForm({ ...form, categoryId: e.target.value })} className="w-full"
-                                            required
-                                        >
-                                            <option value="">{t('selectCategory')}</option>
-                                            {categories.map((cat) => (
-                                                <option key={cat.id} value={cat.id}>{cat.name}</option>
-                                            ))}
-                                        </NativeSelect>
-                                    </div>
+                                <div>
+                                    <Label>{t('contentLabel')}</Label>
+                                    <Textarea
+                                        aria-label={t('contentLabel')}
+                                        value={form.content}
+                                        onChange={(e) => setForm({ ...form, content: e.target.value })}
+                                        placeholder={t('topicContent')}
+                                        rows={8}
+                                        required
+                                        minLength={10}
+                                    />
+                                </div>
 
-                                    <div>
-                                        <Label>{t('titleLabel')}</Label>
-                                        <Input
-                                            aria-label={t('titleLabel')}
-                                            value={form.title}
-                                            onChange={(e) => setForm({ ...form, title: e.target.value })}
-                                            placeholder={t('topicTitle')}
-                                            required
-                                            minLength={3}
-                                        />
-                                    </div>
-
-                                    <div>
-                                        <Label>{t('contentLabel')}</Label>
-                                        <Textarea
-                                            aria-label={t('contentLabel')}
-                                            value={form.content}
-                                            onChange={(e) => setForm({ ...form, content: e.target.value })}
-                                            placeholder={t('topicContent')}
-                                            rows={8}
-                                            required
-                                            minLength={10}
-                                        />
-                                    </div>
-
-                                    <Button type="submit" disabled={saving}>
-                                        {saving ? (
-                                            <><Loader2 className="w-4 h-4 animate-spin" /> {t('creating')}</>
-                                        ) : (
-                                            t('createTopic')
-                                        )}
-                                    </Button>
-                                </form>
-                            </>
-                        )}
-                    </CardContent>
-                </Card>
-            </main>
-
-            <Footer />
-        </div>
+                                <Button type="submit" disabled={saving}>
+                                    {saving ? (
+                                        <><Loader2 className="w-4 h-4 animate-spin" /> {t('creating')}</>
+                                    ) : (
+                                        t('createTopic')
+                                    )}
+                                </Button>
+                            </form>
+                        </>
+                    )}
+                </CardContent>
+            </Card>
+        </PageFrame>
     );
 }

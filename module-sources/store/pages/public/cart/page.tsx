@@ -4,8 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Link, useRouter } from "@/core/sdk/navigation";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Skeleton, useConfirm, useSiteCurrency, buttonClassName } from "@/core/sdk/ui";
-import { Footer, Navbar } from "@/core/sdk/layout";
-import { ThemeComponentSlot } from "@/core/sdk/theme";
+import { PageFrame } from "@/core/sdk/layout";
 import * as LucideIcons from "lucide-react";
 import { Loader2, Check, X, CreditCard, Coins, ShoppingCart } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -260,311 +259,305 @@ export default function CartPage() {
     const finalTotal = cart ? cart.total - couponDiscount : 0;
 
     return (
-        <div className="min-h-screen flex flex-col bg-muted">
-            <ThemeComponentSlot name="Hero" />
-            <Navbar />
-
-            <main className="container mx-auto px-4 py-6 flex-1">
-                <h1 className="text-3xl font-bold mb-8">{t('shoppingCart')}</h1>
-
-                {loading ? (
-                    // Drawn to the measurements of the card below, which is
-                    // what a visitor with nothing in their cart gets: a mark,
-                    // a heading, a line of explanation and a button. A bare
-                    // spinner stood 128px tall against that card's 300px, so
-                    // the answer arriving pushed the footer down by 174px.
-                    <Card>
-                        <CardContent className="py-12 text-center" aria-busy="true">
-                            <Skeleton className="w-16 h-16 rounded-full mx-auto mb-4" />
-                            <Skeleton className="h-7 w-48 mx-auto mb-2" />
-                            <Skeleton className="h-6 w-72 mx-auto mb-6" />
-                            <Skeleton className="h-10 w-36 mx-auto" />
-                        </CardContent>
-                    </Card>
-                ) : !cart || cart.items.length === 0 ? (
-                    <Card>
-                        <CardContent className="py-12 text-center">
-                            <ShoppingCart className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-                            <h2 className="text-xl font-semibold mb-2">{t('cartEmpty')}</h2>
-                            <p className="text-muted-foreground mb-6">
-                                {t('cartEmptyDesc')}
-                            </p>
-                            <Link href="/store" className={buttonClassName("default", "default")}>{t('browseStore')}</Link>
-                        </CardContent>
-                    </Card>
-                ) : (
-                    <div className="grid lg:grid-cols-3 gap-8">
-                        {/* Cart Items */}
-                        <div className="lg:col-span-2 space-y-4">
-                            {cart.items.map((item) => (
-                                <Card key={item.id}>
-                                    <CardContent className="p-4">
-                                        <div className="flex gap-4">
-                                            <div className="w-20 h-20 bg-muted rounded-lg overflow-hidden flex-shrink-0">
-                                                {item.product.image ? (
-                                                    <Image
-                                                        src={item.product.image}
-                                                        alt={item.product.name}
-                                                        width={80}
-                                                        height={80}
-                                                        className="w-full h-full object-cover"
-                                                    />
-                                                ) : (
-                                                    <div className="w-full h-full flex items-center justify-center bg-muted">
-                                                        <ShoppingCart className="w-6 h-6 text-muted-foreground" />
-                                                    </div>
-                                                )}
-                                            </div>
-
-                                            <div className="flex-1">
-                                                <Link
-                                                    href={`/store/product/${item.product.id}/${item.product.slug}`}
-                                                    className="font-semibold hover:text-primary transition-colors"
-                                                >
-                                                    {item.product.name}
-                                                </Link>
-                                                <p className="text-primary font-bold mt-1">
-                                                    {formatPrice(item.product.price)}
-                                                </p>
-                                            </div>
-
-                                            <div className="flex items-center gap-2">
-                                                <Button
-                                                    variant="outline"
-                                                    size="icon"
-                                                    aria-label={t("cart_decreaseQuantity", { name: item.product.name })}
-                                                    onClick={() => updateQuantity(item.product.id, Math.max(1, item.quantity - 1))}
-                                                >
-                                                    <span aria-hidden="true">-</span>
-                                                </Button>
-                                                <span className="w-8 text-center">{item.quantity}</span>
-                                                <Button
-                                                    variant="outline"
-                                                    size="icon"
-                                                    aria-label={t("cart_increaseQuantity", { name: item.product.name })}
-                                                    onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
-                                                >
-                                                    <span aria-hidden="true">+</span>
-                                                </Button>
-                                            </div>
-
-                                            <div className="text-right">
-                                                <p className="font-bold">
-                                                    {formatPrice(item.product.price * item.quantity)}
-                                                </p>
-                                                <button
-                                                    onClick={() => removeItem(item.product.id)}
-                                                    className="text-sm text-destructive hover:underline mt-1"
-                                                >
-                                                    {t('remove')}
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            ))}
-
-                            <Button variant="ghost" onClick={clearCart} className="text-muted-foreground">
-                                {t('clearCart')}
-                            </Button>
-                        </div>
-
-                        {/* Order Summary */}
-                        <div>
-                            <Card className="sticky top-24">
-                                <CardHeader>
-                                    <CardTitle>{t('orderSummary')}</CardTitle>
-                                </CardHeader>
-                                <CardContent className="space-y-4">
-                                    <div className="flex justify-between">
-                                        <span className="text-muted-foreground">{t('items', { count: cart.itemCount })}</span>
-                                        <span>{formatPrice(cart.total)}</span>
-                                    </div>
-
-                                    {/* Coupon */}
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium">{t('couponCode')}</label>
-                                        {couponApplied ? (
-                                            <div className="flex items-center justify-between bg-success/10 border border-success/20 rounded-md px-3 py-2">
-                                                <div className="flex items-center gap-2">
-                                                    <Check className="w-4 h-4 text-success" />
-                                                    <span className="text-sm font-medium text-success">{couponApplied}</span>
-                                                </div>
-                                                <button onClick={removeCoupon} aria-label={commonT('remove')}>
-                                                    <X className="w-4 h-4 text-muted-foreground hover:text-muted-foreground" aria-hidden="true" />
-                                                </button>
-                                            </div>
-                                        ) : (
-                                            <div className="flex gap-2">
-                                                <Input
-                                                    placeholder={t('enterCode')} aria-label={t('enterCode')}
-                                                    value={couponCode}
-                                                    onChange={(e) => setCouponCode(e.target.value)}
-                                                    onKeyDown={(e) => e.key === "Enter" && applyCoupon()}
+        <PageFrame
+            title={t('shoppingCart')}
+            trail={[{ label: t('title'), href: '/store' }]}
+        >
+            {loading ? (
+                // Drawn to the measurements of the card below, which is
+                // what a visitor with nothing in their cart gets: a mark,
+                // a heading, a line of explanation and a button. A bare
+                // spinner stood 128px tall against that card's 300px, so
+                // the answer arriving pushed the footer down by 174px.
+                <Card>
+                    <CardContent className="py-12 text-center" aria-busy="true">
+                        <Skeleton className="w-16 h-16 rounded-full mx-auto mb-4" />
+                        <Skeleton className="h-7 w-48 mx-auto mb-2" />
+                        <Skeleton className="h-6 w-72 mx-auto mb-6" />
+                        <Skeleton className="h-10 w-36 mx-auto" />
+                    </CardContent>
+                </Card>
+            ) : !cart || cart.items.length === 0 ? (
+                <Card>
+                    <CardContent className="py-12 text-center">
+                        <ShoppingCart className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                        <h2 className="text-xl font-semibold mb-2">{t('cartEmpty')}</h2>
+                        <p className="text-muted-foreground mb-6">
+                            {t('cartEmptyDesc')}
+                        </p>
+                        <Link href="/store" className={buttonClassName("default", "default")}>{t('browseStore')}</Link>
+                    </CardContent>
+                </Card>
+            ) : (
+                <div className="grid lg:grid-cols-3 gap-8">
+                    {/* Cart Items */}
+                    <div className="lg:col-span-2 space-y-4">
+                        {cart.items.map((item) => (
+                            <Card key={item.id}>
+                                <CardContent className="p-4">
+                                    <div className="flex gap-4">
+                                        <div className="w-20 h-20 bg-muted rounded-lg overflow-hidden flex-shrink-0">
+                                            {item.product.image ? (
+                                                <Image
+                                                    src={item.product.image}
+                                                    alt={item.product.name}
+                                                    width={80}
+                                                    height={80}
+                                                    className="w-full h-full object-cover"
                                                 />
-                                                <Button variant="outline" onClick={applyCoupon}>
-                                                    {t('apply')}
-                                                </Button>
-                                            </div>
-                                        )}
-                                        {couponError && (
-                                            <p role="alert" className="text-sm text-destructive">{couponError}</p>
-                                        )}
-                                    </div>
-
-                                    {/* Creator Code */}
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium">{t('creatorCode')}</label>
-                                        {creatorApplied ? (
-                                            <div className="flex items-center justify-between bg-primary/10 border border-primary/20 rounded-md px-3 py-2">
-                                                <div className="flex items-center gap-2">
-                                                    <Check className="w-4 h-4 text-primary" />
-                                                    <span className="text-sm font-medium text-primary">{creatorApplied.code} ({creatorApplied.discountPercent}% off)</span>
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center bg-muted">
+                                                    <ShoppingCart className="w-6 h-6 text-muted-foreground" />
                                                 </div>
-                                                <button onClick={removeCreatorCode} aria-label={commonT('remove')}>
-                                                    <X className="w-4 h-4 text-muted-foreground" aria-hidden="true" />
-                                                </button>
-                                            </div>
-                                        ) : (
-                                            <div className="flex gap-2">
-                                                <Input
-                                                    placeholder={t('creatorCode')} aria-label={t('creatorCode')}
-                                                    value={creatorCodeInput}
-                                                    onChange={(e) => setCreatorCodeInput(e.target.value)}
-                                                    onKeyDown={(e) => e.key === "Enter" && applyCreatorCode()}
-                                                />
-                                                <Button variant="outline" onClick={applyCreatorCode}>{t('apply')}</Button>
-                                            </div>
-                                        )}
-                                        {creatorError && <p role="alert" className="text-sm text-destructive">{creatorError}</p>}
-                                    </div>
-
-                                    {/* Player Name */}
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium">{t('playerName')} <span className="text-destructive">*</span></label>
-                                        <Input
-                                            aria-label={t('playerName')}
-                                            placeholder={t('playerNamePlaceholder')}
-                                            value={playerName}
-                                            onChange={(e) => setPlayerName(e.target.value)}
-                                            required
-                                        />
-                                        <p className="text-xs text-muted-foreground">{t('playerNameHelp')}</p>
-                                    </div>
-
-                                    {couponDiscount > 0 && (
-                                        <div className="flex justify-between text-success">
-                                            <span>{t('couponDiscount')}</span>
-                                            <span>-{formatPrice(couponDiscount)}</span>
-                                        </div>
-                                    )}
-
-                                    {creatorApplied && (
-                                        <div className="flex justify-between text-primary">
-                                            <span>{t('creatorDiscount', { percent: creatorApplied.discountPercent })}</span>
-                                            <span>-{formatPrice((cart.total - couponDiscount) * creatorApplied.discountPercent / 100)}</span>
-                                        </div>
-                                    )}
-
-                                    <hr className="border-border" />
-
-                                    <div className="flex justify-between text-lg font-bold">
-                                        <span>{t('total')}</span>
-                                        <span className="text-primary">{formatPrice(
-                                            Math.max(0, cart.total - couponDiscount - (creatorApplied ? (cart.total - couponDiscount) * creatorApplied.discountPercent / 100 : 0))
-                                        )}</span>
-                                    </div>
-
-                                    {/* Payment Method */}
-                                    <div className="space-y-2">
-                                        <label className="text-sm font-medium">{t('paymentMethod')}</label>
-                                        <div className="grid gap-2">
-                                            {providers.map((provider) => (
-                                                <button
-                                                    key={provider.id}
-                                                    type="button"
-                                                    onClick={() => setPaymentMethod(provider.id)}
-                                                    className={`flex items-center gap-3 p-3 rounded-lg border transition-colors text-left ${
-                                                        paymentMethod === provider.id
-                                                            ? "border-primary bg-primary/5 ring-1 ring-primary"
-                                                            : "border-border hover:border-muted-foreground"
-                                                    }`}
-                                                >
-                                                    <ProviderIcon name={provider.icon} />
-                                                    <div className="flex-1">
-                                                        <span className="text-sm font-medium">{provider.label}</span>
-                                                        {provider.description && (
-                                                            <p className="text-xs text-muted-foreground">{provider.description}</p>
-                                                        )}
-                                                    </div>
-                                                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                                                        paymentMethod === provider.id ? "border-primary" : "border-muted-foreground"
-                                                    }`}>
-                                                        {paymentMethod === provider.id && <div className="w-2 h-2 rounded-full bg-primary" />}
-                                                    </div>
-                                                </button>
-                                            ))}
-                                            {creditsAvailable && (
-                                                <button
-                                                    type="button"
-                                                    onClick={() => setPaymentMethod("credits")}
-                                                    className={`flex items-center gap-3 p-3 rounded-lg border transition-colors text-left ${
-                                                        paymentMethod === "credits"
-                                                            ? "border-primary bg-primary/5 ring-1 ring-primary"
-                                                            : "border-border hover:border-muted-foreground"
-                                                    }`}
-                                                >
-                                                    <Coins className="w-5 h-5 text-muted-foreground flex-shrink-0" />
-                                                    <div className="flex-1">
-                                                        <span className="text-sm font-medium">{t('payWithCredits')}</span>
-                                                        <p className="text-xs text-muted-foreground">
-                                                            {t('balance', { amount: formatPrice(creditBalance) })}
-                                                            {cart && creditBalance < Math.max(0, cart.total - couponDiscount - (creatorApplied ? (cart.total - couponDiscount) * creatorApplied.discountPercent / 100 : 0)) && (
-                                                                <span className="text-destructive">({t('insufficient')})</span>
-                                                            )}
-                                                        </p>
-                                                    </div>
-                                                    <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
-                                                        paymentMethod === "credits" ? "border-primary" : "border-muted-foreground"
-                                                    }`}>
-                                                        {paymentMethod === "credits" && <div className="w-2 h-2 rounded-full bg-primary" />}
-                                                    </div>
-                                                </button>
-                                            )}
-                                            {providers.length === 0 && !creditsAvailable && (
-                                                <p className="text-sm text-muted-foreground">{t('noPaymentMethods')}</p>
                                             )}
                                         </div>
+
+                                        <div className="flex-1">
+                                            <Link
+                                                href={`/store/product/${item.product.id}/${item.product.slug}`}
+                                                className="font-semibold hover:text-primary transition-colors"
+                                            >
+                                                {item.product.name}
+                                            </Link>
+                                            <p className="text-primary font-bold mt-1">
+                                                {formatPrice(item.product.price)}
+                                            </p>
+                                        </div>
+
+                                        <div className="flex items-center gap-2">
+                                            <Button
+                                                variant="outline"
+                                                size="icon"
+                                                aria-label={t("cart_decreaseQuantity", { name: item.product.name })}
+                                                onClick={() => updateQuantity(item.product.id, Math.max(1, item.quantity - 1))}
+                                            >
+                                                <span aria-hidden="true">-</span>
+                                            </Button>
+                                            <span className="w-8 text-center">{item.quantity}</span>
+                                            <Button
+                                                variant="outline"
+                                                size="icon"
+                                                aria-label={t("cart_increaseQuantity", { name: item.product.name })}
+                                                onClick={() => updateQuantity(item.product.id, item.quantity + 1)}
+                                            >
+                                                <span aria-hidden="true">+</span>
+                                            </Button>
+                                        </div>
+
+                                        <div className="text-right">
+                                            <p className="font-bold">
+                                                {formatPrice(item.product.price * item.quantity)}
+                                            </p>
+                                            <button
+                                                onClick={() => removeItem(item.product.id)}
+                                                className="text-sm text-destructive hover:underline mt-1"
+                                            >
+                                                {t('remove')}
+                                            </button>
+                                        </div>
                                     </div>
-
-                                    {checkoutError && (
-                                        <p role="alert" className="text-sm text-destructive text-center">{checkoutError}</p>
-                                    )}
-
-                                    <Button
-                                        className="w-full"
-                                        size="lg"
-                                        onClick={handleCheckout}
-                                        disabled={checkingOut || !playerName.trim() || !paymentMethod}
-                                    >
-                                        {checkingOut ? (
-                                            <><Loader2 className="w-4 h-4 animate-spin" /> {t('processing')}</>
-                                        ) : (
-                                            t('proceedToCheckout')
-                                        )}
-                                    </Button>
-
-                                    <p className="text-xs text-muted-foreground text-center">
-                                        {t('secureCheckout')}
-                                    </p>
                                 </CardContent>
                             </Card>
-                        </div>
-                    </div>
-                )}
-            </main>
+                        ))}
 
-            <Footer />
-        </div>
+                        <Button variant="ghost" onClick={clearCart} className="text-muted-foreground">
+                            {t('clearCart')}
+                        </Button>
+                    </div>
+
+                    {/* Order Summary */}
+                    <div>
+                        <Card className="sticky top-24">
+                            <CardHeader>
+                                <CardTitle>{t('orderSummary')}</CardTitle>
+                            </CardHeader>
+                            <CardContent className="space-y-4">
+                                <div className="flex justify-between">
+                                    <span className="text-muted-foreground">{t('items', { count: cart.itemCount })}</span>
+                                    <span>{formatPrice(cart.total)}</span>
+                                </div>
+
+                                {/* Coupon */}
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">{t('couponCode')}</label>
+                                    {couponApplied ? (
+                                        <div className="flex items-center justify-between bg-success/10 border border-success/20 rounded-md px-3 py-2">
+                                            <div className="flex items-center gap-2">
+                                                <Check className="w-4 h-4 text-success" />
+                                                <span className="text-sm font-medium text-success">{couponApplied}</span>
+                                            </div>
+                                            <button onClick={removeCoupon} aria-label={commonT('remove')}>
+                                                <X className="w-4 h-4 text-muted-foreground hover:text-muted-foreground" aria-hidden="true" />
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="flex gap-2">
+                                            <Input
+                                                placeholder={t('enterCode')} aria-label={t('enterCode')}
+                                                value={couponCode}
+                                                onChange={(e) => setCouponCode(e.target.value)}
+                                                onKeyDown={(e) => e.key === "Enter" && applyCoupon()}
+                                            />
+                                            <Button variant="outline" onClick={applyCoupon}>
+                                                {t('apply')}
+                                            </Button>
+                                        </div>
+                                    )}
+                                    {couponError && (
+                                        <p role="alert" className="text-sm text-destructive">{couponError}</p>
+                                    )}
+                                </div>
+
+                                {/* Creator Code */}
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">{t('creatorCode')}</label>
+                                    {creatorApplied ? (
+                                        <div className="flex items-center justify-between bg-primary/10 border border-primary/20 rounded-md px-3 py-2">
+                                            <div className="flex items-center gap-2">
+                                                <Check className="w-4 h-4 text-primary" />
+                                                <span className="text-sm font-medium text-primary">{creatorApplied.code} ({creatorApplied.discountPercent}% off)</span>
+                                            </div>
+                                            <button onClick={removeCreatorCode} aria-label={commonT('remove')}>
+                                                <X className="w-4 h-4 text-muted-foreground" aria-hidden="true" />
+                                            </button>
+                                        </div>
+                                    ) : (
+                                        <div className="flex gap-2">
+                                            <Input
+                                                placeholder={t('creatorCode')} aria-label={t('creatorCode')}
+                                                value={creatorCodeInput}
+                                                onChange={(e) => setCreatorCodeInput(e.target.value)}
+                                                onKeyDown={(e) => e.key === "Enter" && applyCreatorCode()}
+                                            />
+                                            <Button variant="outline" onClick={applyCreatorCode}>{t('apply')}</Button>
+                                        </div>
+                                    )}
+                                    {creatorError && <p role="alert" className="text-sm text-destructive">{creatorError}</p>}
+                                </div>
+
+                                {/* Player Name */}
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">{t('playerName')} <span className="text-destructive">*</span></label>
+                                    <Input
+                                        aria-label={t('playerName')}
+                                        placeholder={t('playerNamePlaceholder')}
+                                        value={playerName}
+                                        onChange={(e) => setPlayerName(e.target.value)}
+                                        required
+                                    />
+                                    <p className="text-xs text-muted-foreground">{t('playerNameHelp')}</p>
+                                </div>
+
+                                {couponDiscount > 0 && (
+                                    <div className="flex justify-between text-success">
+                                        <span>{t('couponDiscount')}</span>
+                                        <span>-{formatPrice(couponDiscount)}</span>
+                                    </div>
+                                )}
+
+                                {creatorApplied && (
+                                    <div className="flex justify-between text-primary">
+                                        <span>{t('creatorDiscount', { percent: creatorApplied.discountPercent })}</span>
+                                        <span>-{formatPrice((cart.total - couponDiscount) * creatorApplied.discountPercent / 100)}</span>
+                                    </div>
+                                )}
+
+                                <hr className="border-border" />
+
+                                <div className="flex justify-between text-lg font-bold">
+                                    <span>{t('total')}</span>
+                                    <span className="text-primary">{formatPrice(
+                                        Math.max(0, cart.total - couponDiscount - (creatorApplied ? (cart.total - couponDiscount) * creatorApplied.discountPercent / 100 : 0))
+                                    )}</span>
+                                </div>
+
+                                {/* Payment Method */}
+                                <div className="space-y-2">
+                                    <label className="text-sm font-medium">{t('paymentMethod')}</label>
+                                    <div className="grid gap-2">
+                                        {providers.map((provider) => (
+                                            <button
+                                                key={provider.id}
+                                                type="button"
+                                                onClick={() => setPaymentMethod(provider.id)}
+                                                className={`flex items-center gap-3 p-3 rounded-lg border transition-colors text-left ${
+                                                    paymentMethod === provider.id
+                                                        ? "border-primary bg-primary/5 ring-1 ring-primary"
+                                                        : "border-border hover:border-muted-foreground"
+                                                }`}
+                                            >
+                                                <ProviderIcon name={provider.icon} />
+                                                <div className="flex-1">
+                                                    <span className="text-sm font-medium">{provider.label}</span>
+                                                    {provider.description && (
+                                                        <p className="text-xs text-muted-foreground">{provider.description}</p>
+                                                    )}
+                                                </div>
+                                                <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                                                    paymentMethod === provider.id ? "border-primary" : "border-muted-foreground"
+                                                }`}>
+                                                    {paymentMethod === provider.id && <div className="w-2 h-2 rounded-full bg-primary" />}
+                                                </div>
+                                            </button>
+                                        ))}
+                                        {creditsAvailable && (
+                                            <button
+                                                type="button"
+                                                onClick={() => setPaymentMethod("credits")}
+                                                className={`flex items-center gap-3 p-3 rounded-lg border transition-colors text-left ${
+                                                    paymentMethod === "credits"
+                                                        ? "border-primary bg-primary/5 ring-1 ring-primary"
+                                                        : "border-border hover:border-muted-foreground"
+                                                }`}
+                                            >
+                                                <Coins className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                                                <div className="flex-1">
+                                                    <span className="text-sm font-medium">{t('payWithCredits')}</span>
+                                                    <p className="text-xs text-muted-foreground">
+                                                        {t('balance', { amount: formatPrice(creditBalance) })}
+                                                        {cart && creditBalance < Math.max(0, cart.total - couponDiscount - (creatorApplied ? (cart.total - couponDiscount) * creatorApplied.discountPercent / 100 : 0)) && (
+                                                            <span className="text-destructive">({t('insufficient')})</span>
+                                                        )}
+                                                    </p>
+                                                </div>
+                                                <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center ${
+                                                    paymentMethod === "credits" ? "border-primary" : "border-muted-foreground"
+                                                }`}>
+                                                    {paymentMethod === "credits" && <div className="w-2 h-2 rounded-full bg-primary" />}
+                                                </div>
+                                            </button>
+                                        )}
+                                        {providers.length === 0 && !creditsAvailable && (
+                                            <p className="text-sm text-muted-foreground">{t('noPaymentMethods')}</p>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {checkoutError && (
+                                    <p role="alert" className="text-sm text-destructive text-center">{checkoutError}</p>
+                                )}
+
+                                <Button
+                                    className="w-full"
+                                    size="lg"
+                                    onClick={handleCheckout}
+                                    disabled={checkingOut || !playerName.trim() || !paymentMethod}
+                                >
+                                    {checkingOut ? (
+                                        <><Loader2 className="w-4 h-4 animate-spin" /> {t('processing')}</>
+                                    ) : (
+                                        t('proceedToCheckout')
+                                    )}
+                                </Button>
+
+                                <p className="text-xs text-muted-foreground text-center">
+                                    {t('secureCheckout')}
+                                </p>
+                            </CardContent>
+                        </Card>
+                    </div>
+                </div>
+            )}
+        </PageFrame>
     );
 }

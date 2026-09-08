@@ -2,8 +2,8 @@
   "id": "store",
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
-  "version": "2.4.6",
-  "coreVersion": "^1.26.0",
+  "version": "2.4.7",
+  "coreVersion": "^1.28.0",
   "category": "commerce",
   "author": "uxwVend Team",
   "icon": "ShoppingBag",
@@ -867,7 +867,8 @@
         "cart_increaseQuantity": "Increase quantity of {name}",
         "product_goToImage": "Go to image {n}",
         "clearCartConfirm": "Everything in your cart will be removed. This cannot be undone.",
-        "adm_listTruncated": "Only the first 500 are shown. Narrow the list to see the rest."
+        "adm_listTruncated": "Only the first 500 are shown. Narrow the list to see the rest.",
+        "allProducts": "All products"
       },
       "cart": {
         "title": "Shopping Cart",
@@ -1404,7 +1405,8 @@
         "cart_increaseQuantity": "{name} adedini artır",
         "product_goToImage": "{n}. görsele git",
         "clearCartConfirm": "Sepetinizdeki her şey kaldırılacak. Bu işlem geri alınamaz.",
-        "adm_listTruncated": "Yalnızca ilk 500 tanesi gösteriliyor. Geri kalanını görmek için listeyi daraltın."
+        "adm_listTruncated": "Yalnızca ilk 500 tanesi gösteriliyor. Geri kalanını görmek için listeyi daraltın.",
+        "allProducts": "Tüm ürünler"
       },
       "cart": {
         "title": "Alışveriş Sepeti",

@@ -3,9 +3,8 @@
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/core/sdk/navigation";
-import { Button, LoadFailed, useSiteCurrency, buttonClassName } from "@/core/sdk/ui";
-import { Footer, Navbar } from "@/core/sdk/layout";
-import { ThemeComponentSlot } from "@/core/sdk/theme";
+import { LoadFailed, useSiteCurrency, buttonClassName } from "@/core/sdk/ui";
+import { PageFrame } from "@/core/sdk/layout";
 import { Check, X, Crown, Loader2 } from "lucide-react";
 
 interface Product {
@@ -56,14 +55,15 @@ export default function VipTablePage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex flex-col bg-muted">
-                <ThemeComponentSlot name="Hero" />
-                <Navbar />
-                <main className="container mx-auto px-4 py-6 flex-1 flex items-center justify-center">
+            <PageFrame
+                title={t("vip_title")}
+                description={t("vip_subtitle")}
+                trail={[{ label: t('title'), href: '/store' }]}
+            >
+                <div className="flex justify-center py-12">
                     <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-                </main>
-                <Footer />
-            </div>
+                </div>
+            </PageFrame>
         );
     }
 
@@ -78,120 +78,112 @@ export default function VipTablePage() {
     });
 
     return (
-        <div className="min-h-screen flex flex-col bg-muted">
-            <ThemeComponentSlot name="Hero" />
-            <Navbar />
-
-            <main className="container mx-auto px-4 py-6 flex-1">
-                <div className="text-center mb-8">
-                    <h1 className="text-3xl font-bold text-foreground mb-2">{t("vip_title")}</h1>
-                    <p className="text-muted-foreground">{t("vip_subtitle")}</p>
+        <PageFrame
+            title={t("vip_title")}
+            description={t("vip_subtitle")}
+            trail={[{ label: t('title'), href: '/store' }]}
+        >
+            {failed ? (
+                <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
+            ) : products.length === 0 ? (
+                <div className="text-center py-12 bg-card rounded-xl border border-border">
+                    <Crown className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
+                    <p className="text-muted-foreground">{t("vip_empty")}</p>
                 </div>
-
-                {failed ? (
-                    <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
-                ) : products.length === 0 ? (
-                    <div className="text-center py-12 bg-card rounded-xl border border-border">
-                        <Crown className="w-12 h-12 text-muted-foreground mx-auto mb-3" />
-                        <p className="text-muted-foreground">{t("vip_empty")}</p>
-                    </div>
-                ) : allFeatures.length > 0 ? (
-                    /* Full comparison table when features are available */
-                    <div className="bg-card rounded-xl border border-border overflow-x-auto">
-                        <table className="w-full">
-                            <thead>
-                                <tr className="border-b">
-                                    <th className="text-left py-4 px-6 font-medium text-muted-foreground min-w-[200px]">{t("vip_feature")}</th>
-                                    {productFeatures.map(({ product }) => (
-                                        <th key={product.id} className="text-center py-4 px-4 min-w-[150px]">
-                                            <div className="flex flex-col items-center gap-1">
-                                                {product.image ? (
-                                                    <>{/* eslint-disable-next-line @next/next/no-img-element */}
-                                                    <img src={product.image} alt="" className="w-10 h-10 rounded-lg object-cover" /></>
-                                                ) : (
-                                                    <Crown className="w-8 h-8 text-warning" />
+            ) : allFeatures.length > 0 ? (
+                /* Full comparison table when features are available */
+                <div className="bg-card rounded-xl border border-border overflow-x-auto">
+                    <table className="w-full">
+                        <thead>
+                            <tr className="border-b">
+                                <th className="text-left py-4 px-6 font-medium text-muted-foreground min-w-[200px]">{t("vip_feature")}</th>
+                                {productFeatures.map(({ product }) => (
+                                    <th key={product.id} className="text-center py-4 px-4 min-w-[150px]">
+                                        <div className="flex flex-col items-center gap-1">
+                                            {product.image ? (
+                                                <>{/* eslint-disable-next-line @next/next/no-img-element */}
+                                                <img src={product.image} alt="" className="w-10 h-10 rounded-lg object-cover" /></>
+                                            ) : (
+                                                <Crown className="w-8 h-8 text-warning" />
+                                            )}
+                                            <span className="font-bold text-foreground">{product.name}</span>
+                                            <div>
+                                                {product.comparePrice && (
+                                                    <span className="text-xs text-muted-foreground line-through mr-1">{formatPrice(product.comparePrice)}</span>
                                                 )}
-                                                <span className="font-bold text-foreground">{product.name}</span>
-                                                <div>
-                                                    {product.comparePrice && (
-                                                        <span className="text-xs text-muted-foreground line-through mr-1">{formatPrice(product.comparePrice)}</span>
-                                                    )}
-                                                    <span className="text-primary font-bold">{formatPrice(product.price)}</span>
-                                                </div>
+                                                <span className="text-primary font-bold">{formatPrice(product.price)}</span>
                                             </div>
-                                        </th>
-                                    ))}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {allFeatures.map((feature, i) => (
-                                    <tr key={i} className={i % 2 === 0 ? "bg-muted" : ""}>
-                                        <td className="py-3 px-6 text-sm text-foreground">{feature}</td>
-                                        {productFeatures.map(({ product, features }) => (
-                                            <td key={product.id} className="text-center py-3 px-4">
-                                                {features.includes(feature) ? (
-                                                    <Check className="w-5 h-5 text-success mx-auto" />
-                                                ) : (
-                                                    <X className="w-5 h-5 text-muted-foreground mx-auto" />
-                                                )}
-                                            </td>
-                                        ))}
-                                    </tr>
+                                        </div>
+                                    </th>
                                 ))}
-                            </tbody>
-                            <tfoot>
-                                <tr className="border-t">
-                                    <td className="py-4 px-6"></td>
-                                    {productFeatures.map(({ product }) => (
-                                        <td key={product.id} className="text-center py-4 px-4">
-                                            <Link href={`/store/product/${product.number}/${product.slug}`} className={buttonClassName("default", "sm", "bg-primary hover:bg-primary/90 text-primary-foreground")}>
-                                                    {t("vip_buy")}
-                                                </Link>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {allFeatures.map((feature, i) => (
+                                <tr key={i} className={i % 2 === 0 ? "bg-muted" : ""}>
+                                    <td className="py-3 px-6 text-sm text-foreground">{feature}</td>
+                                    {productFeatures.map(({ product, features }) => (
+                                        <td key={product.id} className="text-center py-3 px-4">
+                                            {features.includes(feature) ? (
+                                                <Check className="w-5 h-5 text-success mx-auto" />
+                                            ) : (
+                                                <X className="w-5 h-5 text-muted-foreground mx-auto" />
+                                            )}
                                         </td>
                                     ))}
                                 </tr>
-                            </tfoot>
-                        </table>
-                    </div>
-                ) : (
-                    /* Card layout when no feature comparison */
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {products.map((product, i) => (
-                            <div
-                                key={product.id}
-                                className={`bg-card rounded-xl border p-6 text-center relative ${i === Math.floor(products.length / 2) ? "ring-2 ring-primary scale-105" : ""}`}
-                            >
-                                {i === Math.floor(products.length / 2) && (
-                                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-xs px-3 py-1 rounded-full font-bold">
-                                        {t("vip_popular")}
-                                    </div>
-                                )}
-                                {product.image ? (
-                                    <>{/* eslint-disable-next-line @next/next/no-img-element */}
-                                    <img src={product.image} alt="" className="w-16 h-16 rounded-lg object-cover mx-auto mb-3" /></>
-                                ) : (
-                                    <Crown className="w-12 h-12 text-warning mx-auto mb-3" />
-                                )}
-                                <h2 className="text-xl font-bold text-foreground mb-1">{product.name}</h2>
-                                <div className="mb-4">
-                                    {product.comparePrice && (
-                                        <span className="text-muted-foreground line-through text-sm mr-2">{formatPrice(product.comparePrice)}</span>
-                                    )}
-                                    <span className="text-2xl font-bold text-primary">{formatPrice(product.price)}</span>
+                            ))}
+                        </tbody>
+                        <tfoot>
+                            <tr className="border-t">
+                                <td className="py-4 px-6"></td>
+                                {productFeatures.map(({ product }) => (
+                                    <td key={product.id} className="text-center py-4 px-4">
+                                        <Link href={`/store/product/${product.number}/${product.slug}`} className={buttonClassName("default", "sm", "bg-primary hover:bg-primary/90 text-primary-foreground")}>
+                                                {t("vip_buy")}
+                                            </Link>
+                                    </td>
+                                ))}
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            ) : (
+                /* Card layout when no feature comparison */
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {products.map((product, i) => (
+                        <div
+                            key={product.id}
+                            className={`bg-card rounded-xl border p-6 text-center relative ${i === Math.floor(products.length / 2) ? "ring-2 ring-primary scale-105" : ""}`}
+                        >
+                            {i === Math.floor(products.length / 2) && (
+                                <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground text-xs px-3 py-1 rounded-full font-bold">
+                                    {t("vip_popular")}
                                 </div>
-                                {product.description && (
-                                    <p className="text-sm text-muted-foreground mb-4">{product.description}</p>
+                            )}
+                            {product.image ? (
+                                <>{/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img src={product.image} alt="" className="w-16 h-16 rounded-lg object-cover mx-auto mb-3" /></>
+                            ) : (
+                                <Crown className="w-12 h-12 text-warning mx-auto mb-3" />
+                            )}
+                            <h2 className="text-xl font-bold text-foreground mb-1">{product.name}</h2>
+                            <div className="mb-4">
+                                {product.comparePrice && (
+                                    <span className="text-muted-foreground line-through text-sm mr-2">{formatPrice(product.comparePrice)}</span>
                                 )}
-                                <Link href={`/store/product/${product.number}/${product.slug}`} className={buttonClassName("default", "default", "w-full bg-primary hover:bg-primary/90 text-primary-foreground")}>
-                                        {t("vip_buy")}
-                                    </Link>
+                                <span className="text-2xl font-bold text-primary">{formatPrice(product.price)}</span>
                             </div>
-                        ))}
-                    </div>
-                )}
-            </main>
-
-            <Footer />
-        </div>
+                            {product.description && (
+                                <p className="text-sm text-muted-foreground mb-4">{product.description}</p>
+                            )}
+                            <Link href={`/store/product/${product.number}/${product.slug}`} className={buttonClassName("default", "default", "w-full bg-primary hover:bg-primary/90 text-primary-foreground")}>
+                                    {t("vip_buy")}
+                                </Link>
+                        </div>
+                    ))}
+                </div>
+            )}
+        </PageFrame>
     );
 }

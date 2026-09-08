@@ -1,8 +1,7 @@
 import { formatDate } from "@/core/sdk";
 import { prisma } from "@/core/sdk/server";
 import { Link } from "@/core/sdk/navigation";
-import { Footer, Navbar, StandardSidebarLayout } from "@/core/sdk/layout";
-import { ThemeComponentSlot } from "@/core/sdk/theme";
+import { PageFrame } from "@/core/sdk/layout";
 import { NewsGrid } from "../components/news-grid";
 import { getTranslations, getLocale } from "next-intl/server";
 import { dateLocaleTag } from "@/core/sdk";
@@ -116,113 +115,87 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
     const commonT = await getTranslations('common');
 
     return (
-        <div className="min-h-screen flex flex-col">
-            <ThemeComponentSlot name="Hero" />
-            <Navbar />
+        <PageFrame
+            title={activeName ?? t('title')}
+            trail={activeName ? [{ label: t('title'), href: '/blog' }] : []}
+            sidebar={(
+                <aside className="space-y-6">
+                    {/* Categories */}
+                    <div className="bg-card rounded-xl border border-border p-5">
+                        <h2 className="font-bold text-foreground mb-4">{t('categories')}</h2>
+                        <div className="space-y-2">
+                            {categories.map((category) => (
+                                <Link
+                                    key={category.id}
+                                    href={blogHref({ category: category.slug })}
+                                    aria-current={filter.category === category.slug ? "page" : undefined}
+                                    className={`flex items-center justify-between p-2 rounded-lg transition-colors ${filter.category === category.slug ? "bg-muted font-medium" : "hover:bg-muted"}`}
+                                >
+                                    <span className="text-foreground">{category.name}</span>
+                                    <span className="text-sm text-muted-foreground">
+                                        {category._count.articles}
+                                    </span>
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
 
-            <main className="container mx-auto px-4 py-6 flex-1">
-                <StandardSidebarLayout sidebar={(
-                            <aside className="space-y-6">
-                                {/* Categories */}
-                                <div className="bg-card rounded-xl border border-border p-5">
-                                    <h2 className="font-bold text-foreground mb-4">{t('categories')}</h2>
-                                    <div className="space-y-2">
-                                        {categories.map((category) => (
-                                            <Link
-                                                key={category.id}
-                                                href={blogHref({ category: category.slug })}
-                                                aria-current={filter.category === category.slug ? "page" : undefined}
-                                                className={`flex items-center justify-between p-2 rounded-lg transition-colors ${filter.category === category.slug ? "bg-muted font-medium" : "hover:bg-muted"}`}
-                                            >
-                                                <span className="text-foreground">{category.name}</span>
-                                                <span className="text-sm text-muted-foreground">
-                                                    {category._count.articles}
-                                                </span>
-                                            </Link>
-                                        ))}
-                                    </div>
-                                </div>
-
-                                {/* Recent Posts */}
-                                <div className="bg-card rounded-xl border border-border p-5">
-                                    <h2 className="font-bold text-foreground mb-4">{t('recentPosts')}</h2>
-                                    <div className="space-y-4">
-                                        {recent.map((article) => (
-                                            <Link
-                                                key={article.id}
-                                                href={`/blog/${article.number}/${article.slug}`}
-                                                className="block group"
-                                            >
-                                                <h3 className="text-sm font-medium text-foreground group-hover:text-primary transition-colors line-clamp-2">
-                                                    {article.title}
-                                                </h3>
-                                                <p className="text-xs text-muted-foreground mt-1">
-                                                    {formatDate(article.publishedAt || article.createdAt, undefined, dateTag)}
-                                                </p>
-                                            </Link>
-                                        ))}
-                                    </div>
-                                </div>
-                            </aside>
-                        )}>
-                    {(
-                            <div className="lg:col-span-3">
-                                {/* Breadcrumb */}
-                                <div className="text-sm text-muted-foreground mb-6">
-                                    <Link href="/" className="hover:text-primary">{commonT('home')}</Link>
-                                    <span className="mx-2">/</span>
-                                    {activeName ? (
-                                        <>
-                                            <Link href="/blog" className="hover:text-primary">{t('title')}</Link>
-                                            <span className="mx-2">/</span>
-                                            <span className="text-foreground">{activeName}</span>
-                                        </>
-                                    ) : (
-                                        <span className="text-foreground">{t('title')}</span>
-                                    )}
-                                </div>
-
-                                <h1 className="text-3xl font-bold text-foreground mb-2">{activeName ?? t('title')}</h1>
-                                {(filter.category || filter.tag) && (
-                                    <p className="mb-8 text-sm text-muted-foreground">
-                                        <Link href="/blog" className="text-primary hover:underline">{t('allArticles')}</Link>
+                    {/* Recent Posts */}
+                    <div className="bg-card rounded-xl border border-border p-5">
+                        <h2 className="font-bold text-foreground mb-4">{t('recentPosts')}</h2>
+                        <div className="space-y-4">
+                            {recent.map((article) => (
+                                <Link
+                                    key={article.id}
+                                    href={`/blog/${article.number}/${article.slug}`}
+                                    className="block group"
+                                >
+                                    <h3 className="text-sm font-medium text-foreground group-hover:text-primary transition-colors line-clamp-2">
+                                        {article.title}
+                                    </h3>
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                        {formatDate(article.publishedAt || article.createdAt, undefined, dateTag)}
                                     </p>
-                                )}
-                                {!(filter.category || filter.tag) && <div className="mb-8" />}
+                                </Link>
+                            ))}
+                        </div>
+                    </div>
+                </aside>
+            )}
+        >
+            {(filter.category || filter.tag) && (
+                <p className="mb-6 text-sm text-muted-foreground">
+                    <Link href="/blog" className="text-primary hover:underline">{t('allArticles')}</Link>
+                </p>
+            )}
 
-                                {articles.length === 0 ? (
-                                    <div className="bg-card rounded-xl p-12 text-center space-y-3">
-                                        <p className="text-muted-foreground">{t('noArticles')}</p>
-                                        {(filter.category || filter.tag) && (
-                                            <Link href="/blog" className="text-sm text-primary hover:underline">{t('allArticles')}</Link>
-                                        )}
-                                    </div>
-                                ) : (
-                                    <>
-                                        <NewsGrid posts={articles} />
-                                        {pages > 1 && (
-                                            <nav className="flex items-center justify-between mt-8" aria-label={t('title')}>
-                                                {page > 1 ? (
-                                                    <Link href={blogHref(filter, page - 1)} className="text-sm text-primary hover:underline">
-                                                        {commonT('previous')}
-                                                    </Link>
-                                                ) : <span />}
-                                                <span className="text-sm text-muted-foreground">{page} / {pages}</span>
-                                                {page < pages ? (
-                                                    <Link href={blogHref(filter, page + 1)} className="text-sm text-primary hover:underline">
-                                                        {commonT('next')}
-                                                    </Link>
-                                                ) : <span />}
-                                            </nav>
-                                        )}
-                                    </>
-                                )}
-                            </div>
-                        )}
-                </StandardSidebarLayout>
-            </main>
-
-            <Footer />
-        </div>
+            {articles.length === 0 ? (
+                <div className="bg-card rounded-xl p-12 text-center space-y-3">
+                    <p className="text-muted-foreground">{t('noArticles')}</p>
+                    {(filter.category || filter.tag) && (
+                        <Link href="/blog" className="text-sm text-primary hover:underline">{t('allArticles')}</Link>
+                    )}
+                </div>
+            ) : (
+                <>
+                    <NewsGrid posts={articles} />
+                    {pages > 1 && (
+                        <nav className="flex items-center justify-between mt-8" aria-label={t('title')}>
+                            {page > 1 ? (
+                                <Link href={blogHref(filter, page - 1)} className="text-sm text-primary hover:underline">
+                                    {commonT('previous')}
+                                </Link>
+                            ) : <span />}
+                            <span className="text-sm text-muted-foreground">{page} / {pages}</span>
+                            {page < pages ? (
+                                <Link href={blogHref(filter, page + 1)} className="text-sm text-primary hover:underline">
+                                    {commonT('next')}
+                                </Link>
+                            ) : <span />}
+                        </nav>
+                    )}
+                </>
+            )}
+        </PageFrame>
     );
 }

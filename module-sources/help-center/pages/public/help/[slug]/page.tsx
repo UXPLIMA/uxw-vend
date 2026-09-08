@@ -5,8 +5,7 @@ import { RichContent } from "@/core/sdk/ui";
 import { Link } from "@/core/sdk/navigation";
 import { useTranslations } from "next-intl";
 import { ThumbsUp, ThumbsDown } from "lucide-react";
-import { Footer, Navbar } from "@/core/sdk/layout";
-import { ThemeComponentSlot } from "@/core/sdk/theme";
+import { PageFrame } from "@/core/sdk/layout";
 import { toast } from "sonner";
 import { writeError } from "@/core/sdk";
 
@@ -30,7 +29,6 @@ interface PageProps {
 export default function HelpArticlePage({ params }: PageProps) {
     const { slug } = use(params);
     const t = useTranslations("helpCenter");
-    const commonT = useTranslations("common");
     const [article, setArticle] = useState<Article | null>(null);
     const [loading, setLoading] = useState(true);
     const [feedbackGiven, setFeedbackGiven] = useState(false);
@@ -71,99 +69,81 @@ export default function HelpArticlePage({ params }: PageProps) {
     };
 
     return (
-        <div className="min-h-screen flex flex-col bg-muted">
-            <ThemeComponentSlot name="Hero" />
-            <Navbar />
-
-            <main className="container mx-auto px-4 py-6 flex-1">
-                {/* Breadcrumb */}
-                <div className="text-sm text-muted-foreground mb-4">
-                    <Link href="/" className="hover:text-primary">{commonT("home")}</Link>
-                    <span className="mx-2">/</span>
-                    <Link href="/help" className="hover:text-primary">{t("title")}</Link>
-                    {article?.category && (
-                        <>
-                            <span className="mx-2">/</span>
-                            <Link href={`/help/category/${article.category.slug}`} className="hover:text-primary">
-                                {article.category.name}
-                            </Link>
-                        </>
-                    )}
-                    <span className="mx-2">/</span>
-                    <span className="text-foreground">{article?.title || ""}</span>
+        <PageFrame
+            title={article?.title ?? t("title")}
+            trail={[
+                { label: t("title"), href: "/help" },
+                ...(article?.category
+                    ? [{ label: article.category.name, href: `/help/category/${article.category.slug}` }]
+                    : []),
+            ]}
+        >
+            {loading ? (
+                <div className="bg-card rounded-xl p-8 text-center">
+                    <p className="text-muted-foreground">{t("loading")}</p>
                 </div>
-
-                {loading ? (
-                    <div className="bg-card rounded-xl p-8 text-center">
-                        <p className="text-muted-foreground">{t("loading")}</p>
-                    </div>
-                ) : !article ? (
-                    <div className="bg-card rounded-xl p-8 text-center">
-                        <h1 className="text-xl font-bold text-foreground mb-2">{t("articleNotFound")}</h1>
-                        <p className="text-muted-foreground mb-4">{t("articleNotFoundBody")}</p>
-                        <Link href="/help" className="text-primary hover:underline">
-                            {t("backToHelp")}
-                        </Link>
-                    </div>
-                ) : (
-                    <div className="max-w-3xl mx-auto">
-                        <div className="bg-card rounded-xl border border-border p-8">
-                            <h1 className="text-2xl font-bold text-foreground mb-4">{article.title}</h1>
-
-                            <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6 pb-6 border-b">
-                                <span>{t("articleCategory", { name: article.category.name })}</span>
-                                {article.views !== null && (
-                                    <>
-                                        <span>•</span>
-                                        <span>{t("views", { count: article.views })}</span>
-                                    </>
-                                )}
-                            </div>
-
-                            {/* Article Content */}
-                            <RichContent
-                                className="mb-8"
-                                html={article.content}
-                            />
-
-                            {/* Feedback */}
-                            {article.settings?.enableFeedback !== false && (
-                            <div className="border-t pt-6">
-                                <p className="font-medium text-foreground mb-3">{t("wasHelpful")}</p>
-                                {feedbackGiven ? (
-                                    <p className="text-success">{t("feedbackThanks")}</p>
-                                ) : (
-                                    <div className="flex gap-3">
-                                        <button
-                                            onClick={() => submitFeedback(true)}
-                                            className="px-4 py-2 bg-success/10 text-success rounded-lg hover:bg-success/10 transition-colors inline-flex items-center gap-2"
-                                        >
-                                            <ThumbsUp className="w-4 h-4" /> {t("helpfulYes")}
-                                        </button>
-                                        <button
-                                            onClick={() => submitFeedback(false)}
-                                            className="px-4 py-2 bg-muted text-foreground rounded-lg hover:bg-muted transition-colors inline-flex items-center gap-2"
-                                        >
-                                            <ThumbsDown className="w-4 h-4" /> {t("helpfulNo")}
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
+            ) : !article ? (
+                <div className="bg-card rounded-xl p-8 text-center">
+                    <h2 className="text-xl font-bold text-foreground mb-2">{t("articleNotFound")}</h2>
+                    <p className="text-muted-foreground mb-4">{t("articleNotFoundBody")}</p>
+                    <Link href="/help" className="text-primary hover:underline">
+                        {t("backToHelp")}
+                    </Link>
+                </div>
+            ) : (
+                <div className="max-w-3xl">
+                    <div className="bg-card rounded-xl border border-border p-8">
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6 pb-6 border-b">
+                            <span>{t("articleCategory", { name: article.category.name })}</span>
+                            {article.views !== null && (
+                                <>
+                                    <span>•</span>
+                                    <span>{t("views", { count: article.views })}</span>
+                                </>
                             )}
                         </div>
 
-                        {/* Related */}
-                        <div className="mt-6 text-center">
-                            <p className="text-muted-foreground mb-2">{t("stillNeedHelp")}</p>
-                            <Link href="/support/new" className="text-primary hover:underline font-medium">
-                                {t("createTicket")}
-                            </Link>
-                        </div>
-                    </div>
-                )}
-            </main>
+                        {/* Article Content */}
+                        <RichContent
+                            className="mb-8"
+                            html={article.content}
+                        />
 
-            <Footer />
-        </div>
+                        {/* Feedback */}
+                        {article.settings?.enableFeedback !== false && (
+                        <div className="border-t pt-6">
+                            <p className="font-medium text-foreground mb-3">{t("wasHelpful")}</p>
+                            {feedbackGiven ? (
+                                <p className="text-success">{t("feedbackThanks")}</p>
+                            ) : (
+                                <div className="flex gap-3">
+                                    <button
+                                        onClick={() => submitFeedback(true)}
+                                        className="px-4 py-2 bg-success/10 text-success rounded-lg hover:bg-success/10 transition-colors inline-flex items-center gap-2"
+                                    >
+                                        <ThumbsUp className="w-4 h-4" /> {t("helpfulYes")}
+                                    </button>
+                                    <button
+                                        onClick={() => submitFeedback(false)}
+                                        className="px-4 py-2 bg-muted text-foreground rounded-lg hover:bg-muted transition-colors inline-flex items-center gap-2"
+                                    >
+                                        <ThumbsDown className="w-4 h-4" /> {t("helpfulNo")}
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                        )}
+                    </div>
+
+                    {/* Related */}
+                    <div className="mt-6 text-center">
+                        <p className="text-muted-foreground mb-2">{t("stillNeedHelp")}</p>
+                        <Link href="/support/new" className="text-primary hover:underline font-medium">
+                            {t("createTicket")}
+                        </Link>
+                    </div>
+                </div>
+            )}
+        </PageFrame>
     );
 }

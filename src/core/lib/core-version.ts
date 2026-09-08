@@ -12,6 +12,15 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.28.0 - `PageFrame` joins `@/core/sdk/layout`. Every module wrote its own
+ * public page shell, and thirty-one hand-written shells drifted: nine content
+ * widths, a breadcrumb on nine of the thirty-one, two page backgrounds, and a
+ * couple of titles wearing an icon nobody else's title had. Moving between two
+ * modules moved the left edge of the text. The frame owns the measure, the
+ * trail and the header, so a page cannot set a width of its own - it never
+ * writes the element that would carry one. An addition; `StandardSidebarLayout`
+ * is unchanged and still exported.
+ *
  * 1.27.0 - `buttonClassName` joins `@/core/sdk/ui`, beside `Button` the way
  * `badgeClassName` sits beside `Badge`. A control that navigates has to be an
  * anchor, and forty module call sites were wrapping a `<Button>` in a `<Link>`
@@ -185,4 +194,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.27.0";
+export const CORE_API_VERSION = "1.28.0";

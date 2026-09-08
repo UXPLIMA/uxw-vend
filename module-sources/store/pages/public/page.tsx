@@ -2,8 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Link } from "@/core/sdk/navigation";
-import { Footer, Navbar } from "@/core/sdk/layout";
-import { ThemeComponentSlot } from "@/core/sdk/theme";
+import { PageFrame } from "@/core/sdk/layout";
 import { Coins, Box, ChevronRight, Search, X } from "lucide-react";
 import { SkeletonServerModes, SkeletonProductGrid } from "../../components/skeletons/store-skeletons";
 import { useTranslations } from "next-intl";
@@ -136,269 +135,256 @@ export default function StorePage() {
     };
 
     return (
-        <div className="min-h-screen flex flex-col bg-muted">
-            {/* Shared Hero Banner */}
-            <ThemeComponentSlot name="Hero" />
-
-            {/* Shared Navbar */}
-            <Navbar />
-
-            {/* Main Content */}
-            <main className="container mx-auto px-4 py-6 flex-1">
-                {/* Breadcrumb */}
-                <div className="text-sm text-muted-foreground mb-6 flex items-center gap-2">
-                    <button onClick={resetView} className="hover:text-primary">{commonT('home')}</button>
-                    <ChevronRight className="w-4 h-4" />
-                    <button onClick={resetView} className="hover:text-primary">{t('title')}</button>
-
-                    {activeMode && (
-                        <>
-                            <ChevronRight className="w-4 h-4" />
-                            {activeCategory ? (
-                                <button
-                                    type="button"
-                                    onClick={() => setActiveCategory(null)}
-                                    className="text-foreground capitalize hover:text-primary"
-                                >
-                                    {activeRootCategory?.name || activeMode}
-                                </button>
-                            ) : (
-                                <span className="text-foreground capitalize">
-                                    {activeRootCategory?.name || activeMode}
-                                </span>
-                            )}
-                        </>
-                    )}
-                    {activeCategory && (
-                        <>
-                            <ChevronRight className="w-4 h-4" />
+        <PageFrame title={t('title')}>
+            {/* Where the reader has drilled to inside the store. The frame's
+                crumb trail says how they arrived; this is category state
+                rather than a route, which is why it is buttons. */}
+            {activeMode && (
+            <div className="text-sm text-muted-foreground mb-6 flex items-center gap-2">
+                <button onClick={resetView} className="hover:text-primary">{t('allProducts')}</button>
+                {activeMode && (
+                    <>
+                        <ChevronRight className="w-4 h-4" />
+                        {activeCategory ? (
+                            <button
+                                type="button"
+                                onClick={() => setActiveCategory(null)}
+                                className="text-foreground capitalize hover:text-primary"
+                            >
+                                {activeRootCategory?.name || activeMode}
+                            </button>
+                        ) : (
                             <span className="text-foreground capitalize">
-                                {categories.find(c => c.slug === activeCategory)?.name || activeCategory}
+                                {activeRootCategory?.name || activeMode}
                             </span>
-                        </>
+                        )}
+                    </>
+                )}
+                {activeCategory && (
+                    <>
+                        <ChevronRight className="w-4 h-4" />
+                        <span className="text-foreground capitalize">
+                            {categories.find(c => c.slug === activeCategory)?.name || activeCategory}
+                        </span>
+                    </>
+                )}
+            </div>
+            )}
+
+            {/* Search Bar */}
+            <form onSubmit={handleSearch} className="mb-6">
+                <div className="relative max-w-lg">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none z-10" />
+                    <input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                        placeholder={t('searchProducts')}
+                        aria-label={t('searchProducts')}
+                        style={{ paddingLeft: "2.5rem", paddingRight: "2.5rem" }}
+                        className="w-full py-2.5 bg-card border border-border rounded-lg text-sm focus:outline-none focus:border-primary/30 focus:ring-1 focus:ring-primary"
+                    />
+                    {searchQuery && (
+                        <button type="button" onClick={clearSearch} aria-label={commonT('close')} className="absolute right-3 top-1/2 -translate-y-1/2">
+                            <X className="w-4 h-4 text-muted-foreground hover:text-muted-foreground" aria-hidden="true" />
+                        </button>
                     )}
                 </div>
+            </form>
 
-                <h1 className="text-3xl font-bold text-foreground mb-4">{t('title')}</h1>
-
-                {/* Search Bar */}
-                <form onSubmit={handleSearch} className="mb-6">
-                    <div className="relative max-w-lg">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none z-10" />
-                        <input
-                            type="text"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            placeholder={t('searchProducts')}
-                            aria-label={t('searchProducts')}
-                            style={{ paddingLeft: "2.5rem", paddingRight: "2.5rem" }}
-                            className="w-full py-2.5 bg-card border border-border rounded-lg text-sm focus:outline-none focus:border-primary/30 focus:ring-1 focus:ring-primary"
-                        />
-                        {searchQuery && (
-                            <button type="button" onClick={clearSearch} aria-label={commonT('close')} className="absolute right-3 top-1/2 -translate-y-1/2">
-                                <X className="w-4 h-4 text-muted-foreground hover:text-muted-foreground" aria-hidden="true" />
-                            </button>
-                        )}
+            {/* Search Results */}
+            {searchResults !== null && (
+                <section className="mb-8">
+                    <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-xl font-bold text-foreground">
+                            {searching ? t('searching') : t('searchResultsFor', { query: searchQuery, count: searchResults.length })}
+                        </h2>
+                        <button onClick={clearSearch} className="text-sm text-primary hover:underline">{t('clear')}</button>
                     </div>
-                </form>
-
-                {/* Search Results */}
-                {searchResults !== null && (
-                    <section className="mb-8">
-                        <div className="flex items-center justify-between mb-4">
-                            <h2 className="text-xl font-bold text-foreground">
-                                {searching ? t('searching') : t('searchResultsFor', { query: searchQuery, count: searchResults.length })}
-                            </h2>
-                            <button onClick={clearSearch} className="text-sm text-primary hover:underline">{t('clear')}</button>
+                    {!searching && searchResults.length === 0 ? (
+                        <div className="bg-card rounded-xl p-8 text-center border border-border">
+                            <p className="text-muted-foreground">{t('noProductsSearch')}</p>
                         </div>
-                        {!searching && searchResults.length === 0 ? (
-                            <div className="bg-card rounded-xl p-8 text-center border border-border">
-                                <p className="text-muted-foreground">{t('noProductsSearch')}</p>
-                            </div>
-                        ) : !searching ? (
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                                {searchResults.map((product) => (
-                                    <Link
-                                        key={product.id}
-                                        href={`/store/product/${product.number}/${product.slug}`}
-                                        className="bg-card rounded-lg border border-border overflow-hidden hover:shadow-md transition-all group"
-                                    >
-                                        <div className="h-44 bg-muted flex items-center justify-center overflow-hidden">
-                                            {product.image ? (
-                                                <>{/* eslint-disable-next-line @next/next/no-img-element */}
-                                                <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" /></>
-                                            ) : (
-                                                <Box className="w-16 h-16 text-muted-foreground" />
+                    ) : !searching ? (
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                            {searchResults.map((product) => (
+                                <Link
+                                    key={product.id}
+                                    href={`/store/product/${product.number}/${product.slug}`}
+                                    className="bg-card rounded-lg border border-border overflow-hidden hover:shadow-md transition-all group"
+                                >
+                                    <div className="h-44 bg-muted flex items-center justify-center overflow-hidden">
+                                        {product.image ? (
+                                            <>{/* eslint-disable-next-line @next/next/no-img-element */}
+                                            <img src={product.image} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" /></>
+                                        ) : (
+                                            <Box className="w-16 h-16 text-muted-foreground" />
+                                        )}
+                                    </div>
+                                    <div className="p-4">
+                                        <h3 className="font-semibold text-foreground mb-1 line-clamp-1">{product.name}</h3>
+                                        <div className="text-primary font-bold">{formatPrice(product.price)}</div>
+                                    </div>
+                                </Link>
+                            ))}
+                        </div>
+                    ) : null}
+                </section>
+            )}
+
+            {/* Root Categories (Server Modes) */}
+            {showModes && (
+                <section>
+                    <h2 className="text-xl font-bold text-foreground mb-6">{t('title')}</h2>
+                    {loadingCategories ? (
+                        <SkeletonServerModes />
+                    ) : failed ? (
+                        <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
+                    ) : rootCategories.length === 0 ? (
+                        <div className="text-center py-12 bg-card rounded-xl">
+                            <p className="text-muted-foreground">{t('noCategories')}</p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+                            {rootCategories.map((mode) => (
+                                <button
+                                    key={mode.id}
+                                    onClick={() => handleModeSelect(mode.slug)}
+                                    className="bg-card rounded-lg border border-border overflow-hidden hover:shadow-md transition-all group text-left"
+                                >
+                                    <div className="h-32 bg-muted flex items-center justify-center overflow-hidden">
+                                        {mode.image ? (
+                                            <>{/* eslint-disable-next-line @next/next/no-img-element */}
+                                            <img src={mode.image} alt={mode.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" /></>
+                                        ) : (
+                                            <Box className="w-12 h-12 text-muted-foreground" />
+                                        )}
+                                    </div>
+                                    <div className="p-4">
+                                        <h3 className="font-semibold text-foreground">{mode.name}</h3>
+                                        {mode.description && (
+                                            <RichContent
+                                                className="text-sm text-muted-foreground mt-1"
+                                                html={mode.description}
+                                            />
+                                        )}
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
+                    )}
+                </section>
+            )}
+
+            {/* Sub Categories */}
+            {showSubCategories && (
+                <section>
+                    <div className="flex justify-between items-center mb-6">
+                        <h2 className="text-xl font-bold text-foreground">{activeRootCategory?.name} - {t('categories')}</h2>
+                    </div>
+
+                    {subCategories.length > 0 ? (
+                        <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-10">
+                            {subCategories.map((cat) => (
+                                <button
+                                    key={cat.id}
+                                    onClick={() => setActiveCategory(cat.slug)}
+                                    className="bg-card rounded-lg border border-border overflow-hidden hover:shadow-md transition-all group text-left"
+                                >
+                                    <div className="h-32 bg-muted flex items-center justify-center overflow-hidden">
+                                        {cat.image ? (
+                                            <>{/* eslint-disable-next-line @next/next/no-img-element */}
+                                            <img src={cat.image} alt={cat.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" /></>
+                                        ) : (
+                                            <Coins className="w-12 h-12 text-muted-foreground" />
+                                        )}
+                                    </div>
+                                    <div className="p-4">
+                                        <h3 className="font-medium text-foreground">{cat.name}</h3>
+                                    </div>
+                                </button>
+                            ))}
+                        </div>
+                    ) : (
+                        <div className="text-center py-8">
+                            <p className="text-muted-foreground">{t('noSubCategories')}</p>
+                            {/* If no sub-categories, we likely want to show products directly. 
+                                The logic `showProducts = ... || (activeMode && subCategories.length === 0)` handles this below. 
+                            */}
+                        </div>
+                    )}
+                </section>
+            )}
+
+            {/* Products Grid */}
+            {(showProducts || (activeMode && subCategories.length === 0)) && (
+                <section>
+                    <div className="flex items-center justify-between mb-6">
+                        <h2 className="text-xl font-bold text-foreground">{t('products')}</h2>
+                        <NativeSelect
+                            value={sortBy}
+                            onChange={(e) => setSortBy(e.target.value)}
+                            aria-label={t('sortBy')} inputSize="sm"
+                        >
+                            <option value="newest">{t('newest')}</option>
+                            <option value="price_asc">{t('priceLowHigh')}</option>
+                            <option value="price_desc">{t('priceHighLow')}</option>
+                            <option value="popular">{t('mostPopular')}</option>
+                        </NativeSelect>
+                    </div>
+                    {loadingProducts ? (
+                        <SkeletonProductGrid count={4} />
+                    ) : failed ? (
+                        <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
+                    ) : products.length === 0 ? (
+                        <div className="bg-card rounded-xl p-8 text-center border border-border">
+                            <p className="text-muted-foreground">{t('noProducts')}</p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                            {products.map((product) => (
+                                <Link
+                                    key={product.id}
+                                    href={`/store/product/${product.number}/${product.slug}`}
+                                    className="bg-card rounded-lg border border-border overflow-hidden hover:shadow-md transition-all group"
+                                >
+                                    <div className={`h-44 bg-muted flex items-center justify-center overflow-hidden relative`}>
+                                        {product.isFeatured && (
+                                            <span className="absolute top-2 right-2 bg-warning text-warning text-xs font-bold px-2 py-1 rounded-full z-10">
+                                                {t('featured')}
+                                            </span>
+                                        )}
+                                        {product.image ? (
+                                            <>
+                                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                                            <img
+                                                src={product.image}
+                                                alt={product.name}
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                                            />
+                                            </>
+                                        ) : (
+                                            <Box className="w-16 h-16 text-muted-foreground" />
+                                        )}
+                                    </div>
+                                    <div className="p-4">
+                                        <h3 className="font-semibold text-foreground mb-1 line-clamp-1">{product.name}</h3>
+                                        <div className="flex items-center gap-2 mb-3">
+                                            {product.comparePrice && (
+                                                <span className="line-through text-muted-foreground text-xs">{formatPrice(product.comparePrice)}</span>
                                             )}
-                                        </div>
-                                        <div className="p-4">
-                                            <h3 className="font-semibold text-foreground mb-1 line-clamp-1">{product.name}</h3>
                                             <div className="text-primary font-bold">{formatPrice(product.price)}</div>
                                         </div>
-                                    </Link>
-                                ))}
-                            </div>
-                        ) : null}
-                    </section>
-                )}
-
-                {/* Root Categories (Server Modes) */}
-                {showModes && (
-                    <section>
-                        <h2 className="text-xl font-bold text-foreground mb-6">{t('title')}</h2>
-                        {loadingCategories ? (
-                            <SkeletonServerModes />
-                        ) : failed ? (
-                            <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
-                        ) : rootCategories.length === 0 ? (
-                            <div className="text-center py-12 bg-card rounded-xl">
-                                <p className="text-muted-foreground">{t('noCategories')}</p>
-                            </div>
-                        ) : (
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
-                                {rootCategories.map((mode) => (
-                                    <button
-                                        key={mode.id}
-                                        onClick={() => handleModeSelect(mode.slug)}
-                                        className="bg-card rounded-lg border border-border overflow-hidden hover:shadow-md transition-all group text-left"
-                                    >
-                                        <div className="h-32 bg-muted flex items-center justify-center overflow-hidden">
-                                            {mode.image ? (
-                                                <>{/* eslint-disable-next-line @next/next/no-img-element */}
-                                                <img src={mode.image} alt={mode.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" /></>
-                                            ) : (
-                                                <Box className="w-12 h-12 text-muted-foreground" />
-                                            )}
+                                        <div className="text-sm text-muted-foreground group-hover:text-primary transition-colors">
+                                            {t('viewDetails')} →
                                         </div>
-                                        <div className="p-4">
-                                            <h3 className="font-semibold text-foreground">{mode.name}</h3>
-                                            {mode.description && (
-                                                <RichContent
-                                                    className="text-sm text-muted-foreground mt-1"
-                                                    html={mode.description}
-                                                />
-                                            )}
-                                        </div>
-                                    </button>
-                                ))}
-                            </div>
-                        )}
-                    </section>
-                )}
-
-                {/* Sub Categories */}
-                {showSubCategories && (
-                    <section>
-                        <div className="flex justify-between items-center mb-6">
-                            <h2 className="text-xl font-bold text-foreground">{activeRootCategory?.name} - {t('categories')}</h2>
+                                    </div>
+                                </Link>
+                            ))}
                         </div>
-
-                        {subCategories.length > 0 ? (
-                            <div className="grid grid-cols-2 md:grid-cols-3 gap-6 mb-10">
-                                {subCategories.map((cat) => (
-                                    <button
-                                        key={cat.id}
-                                        onClick={() => setActiveCategory(cat.slug)}
-                                        className="bg-card rounded-lg border border-border overflow-hidden hover:shadow-md transition-all group text-left"
-                                    >
-                                        <div className="h-32 bg-muted flex items-center justify-center overflow-hidden">
-                                            {cat.image ? (
-                                                <>{/* eslint-disable-next-line @next/next/no-img-element */}
-                                                <img src={cat.image} alt={cat.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform" /></>
-                                            ) : (
-                                                <Coins className="w-12 h-12 text-muted-foreground" />
-                                            )}
-                                        </div>
-                                        <div className="p-4">
-                                            <h3 className="font-medium text-foreground">{cat.name}</h3>
-                                        </div>
-                                    </button>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="text-center py-8">
-                                <p className="text-muted-foreground">{t('noSubCategories')}</p>
-                                {/* If no sub-categories, we likely want to show products directly. 
-                                    The logic `showProducts = ... || (activeMode && subCategories.length === 0)` handles this below. 
-                                */}
-                            </div>
-                        )}
-                    </section>
-                )}
-
-                {/* Products Grid */}
-                {(showProducts || (activeMode && subCategories.length === 0)) && (
-                    <section>
-                        <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-xl font-bold text-foreground">{t('products')}</h2>
-                            <NativeSelect
-                                value={sortBy}
-                                onChange={(e) => setSortBy(e.target.value)}
-                                aria-label={t('sortBy')} inputSize="sm"
-                            >
-                                <option value="newest">{t('newest')}</option>
-                                <option value="price_asc">{t('priceLowHigh')}</option>
-                                <option value="price_desc">{t('priceHighLow')}</option>
-                                <option value="popular">{t('mostPopular')}</option>
-                            </NativeSelect>
-                        </div>
-                        {loadingProducts ? (
-                            <SkeletonProductGrid count={4} />
-                        ) : failed ? (
-                            <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
-                        ) : products.length === 0 ? (
-                            <div className="bg-card rounded-xl p-8 text-center border border-border">
-                                <p className="text-muted-foreground">{t('noProducts')}</p>
-                            </div>
-                        ) : (
-                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                                {products.map((product) => (
-                                    <Link
-                                        key={product.id}
-                                        href={`/store/product/${product.number}/${product.slug}`}
-                                        className="bg-card rounded-lg border border-border overflow-hidden hover:shadow-md transition-all group"
-                                    >
-                                        <div className={`h-44 bg-muted flex items-center justify-center overflow-hidden relative`}>
-                                            {product.isFeatured && (
-                                                <span className="absolute top-2 right-2 bg-warning text-warning text-xs font-bold px-2 py-1 rounded-full z-10">
-                                                    {t('featured')}
-                                                </span>
-                                            )}
-                                            {product.image ? (
-                                                <>
-                                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                <img
-                                                    src={product.image}
-                                                    alt={product.name}
-                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                                                />
-                                                </>
-                                            ) : (
-                                                <Box className="w-16 h-16 text-muted-foreground" />
-                                            )}
-                                        </div>
-                                        <div className="p-4">
-                                            <h3 className="font-semibold text-foreground mb-1 line-clamp-1">{product.name}</h3>
-                                            <div className="flex items-center gap-2 mb-3">
-                                                {product.comparePrice && (
-                                                    <span className="line-through text-muted-foreground text-xs">{formatPrice(product.comparePrice)}</span>
-                                                )}
-                                                <div className="text-primary font-bold">{formatPrice(product.price)}</div>
-                                            </div>
-                                            <div className="text-sm text-muted-foreground group-hover:text-primary transition-colors">
-                                                {t('viewDetails')} →
-                                            </div>
-                                        </div>
-                                    </Link>
-                                ))}
-                            </div>
-                        )}
-                    </section>
-                )}
-            </main>
-
-            {/* Shared Footer */}
-            <Footer />
-        </div>
+                    )}
+                </section>
+            )}
+        </PageFrame>
     );
 }

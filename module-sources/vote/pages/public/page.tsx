@@ -4,8 +4,7 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { Button, Card, CardContent, LoadFailed } from "@/core/sdk/ui";
-import { Footer, Navbar } from "@/core/sdk/layout";
-import { ThemeComponentSlot } from "@/core/sdk/theme";
+import { PageFrame } from "@/core/sdk/layout";
 import { Loader2, ExternalLink, ThumbsUp } from "lucide-react";
 import { toast } from "sonner";
 
@@ -81,53 +80,45 @@ export default function VotePage() {
     };
 
     return (
-        <div className="min-h-screen flex flex-col bg-muted">
-            <ThemeComponentSlot name="Hero" />
-            <Navbar />
+        <PageFrame
+            title={t("title")}
+            description={t("description")}
+        >
+            {!session?.user && (
+                <p className="mb-6 text-sm text-muted-foreground">{t("loginToVote")}</p>
+            )}
 
-            <main className="container mx-auto px-4 py-6 flex-1 max-w-2xl">
-                <div className="text-center mb-8">
-                    <h1 className="text-3xl font-bold text-foreground mb-2">{t("title")}</h1>
-                    <p className="text-muted-foreground">{t("description")}</p>
-                    {!session?.user && (
-                        <p className="mt-2 text-sm text-muted-foreground">{t("loginToVote")}</p>
-                    )}
+            {loading ? (
+                <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>
+            ) : failed ? (
+                <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
+            ) : sites.length === 0 ? (
+                <Card><CardContent className="py-12 text-center text-muted-foreground">{t("noSites")}</CardContent></Card>
+            ) : (
+                <div className="space-y-3">
+                    {sites.map((site) => (
+                        <Card key={site.id} className="hover:shadow-md transition-shadow">
+                            <CardContent className="p-4 flex items-center gap-4">
+                                <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
+                                    <ThumbsUp className="w-6 h-6 text-primary" />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                    <h2 className="font-medium truncate">{site.name}</h2>
+                                    <p className="text-sm text-muted-foreground">
+                                        {site._count.votes} {t("totalVotes").toLowerCase()}
+                                    </p>
+                                </div>
+                                <Button size="sm" onClick={() => vote(site)} disabled={voting === site.id}>
+                                    {voting === site.id
+                                        ? <Loader2 className="w-3 h-3 animate-spin" />
+                                        : <ExternalLink className="w-3 h-3" />}
+                                    {t("voteNow")}
+                                </Button>
+                            </CardContent>
+                        </Card>
+                    ))}
                 </div>
-
-                {loading ? (
-                    <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>
-                ) : failed ? (
-                    <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
-                ) : sites.length === 0 ? (
-                    <Card><CardContent className="py-12 text-center text-muted-foreground">{t("noSites")}</CardContent></Card>
-                ) : (
-                    <div className="space-y-3">
-                        {sites.map((site) => (
-                            <Card key={site.id} className="hover:shadow-md transition-shadow">
-                                <CardContent className="p-4 flex items-center gap-4">
-                                    <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
-                                        <ThumbsUp className="w-6 h-6 text-primary" />
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <h2 className="font-medium truncate">{site.name}</h2>
-                                        <p className="text-sm text-muted-foreground">
-                                            {site._count.votes} {t("totalVotes").toLowerCase()}
-                                        </p>
-                                    </div>
-                                    <Button size="sm" onClick={() => vote(site)} disabled={voting === site.id}>
-                                        {voting === site.id
-                                            ? <Loader2 className="w-3 h-3 animate-spin" />
-                                            : <ExternalLink className="w-3 h-3" />}
-                                        {t("voteNow")}
-                                    </Button>
-                                </CardContent>
-                            </Card>
-                        ))}
-                    </div>
-                )}
-            </main>
-
-            <Footer />
-        </div>
+            )}
+        </PageFrame>
     );
 }

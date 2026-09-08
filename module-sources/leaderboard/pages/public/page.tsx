@@ -4,8 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { Button, Card, CardContent, LoadFailed, useSiteCurrency } from "@/core/sdk/ui";
-import { Footer, Navbar } from "@/core/sdk/layout";
-import { ThemeComponentSlot } from "@/core/sdk/theme";
+import { PageFrame } from "@/core/sdk/layout";
 import { Loader2, Trophy, Crown, Medal } from "lucide-react";
 // Minecraft avatar helper - inline
 function getMinecraftAvatar(username: string, size = 64) { return `https://mc-heads.net/avatar/${username}/${size}`; }
@@ -62,67 +61,58 @@ export default function LeaderboardPage() {
     }, [activeTab, reloadKey]);
 
     return (
-        <div className="min-h-screen flex flex-col bg-muted">
-            <ThemeComponentSlot name="Hero" />
-            <Navbar />
+        <PageFrame
+            title={t("title")}
+            description={t("rank")}
+        >
+            <div className="flex flex-wrap gap-2 mb-6">
+                {tabs.map((tab) => (
+                    <Button key={tab.id} variant={activeTab === tab.id ? "default" : "outline"} onClick={() => setActiveTab(tab.id)}>
+                        <tab.icon className="w-4 h-4" /> {tab.label}
+                    </Button>
+                ))}
+            </div>
 
-            <main className="container mx-auto px-4 py-6 flex-1 max-w-3xl">
-                <div className="text-center mb-8">
-                    <h1 className="text-3xl font-bold text-foreground mb-2">{t("title")}</h1>
-                    <p className="text-muted-foreground">{t("rank")}</p>
-                </div>
-
-                <div className="flex flex-wrap justify-center gap-2 mb-6">
-                    {tabs.map((tab) => (
-                        <Button key={tab.id} variant={activeTab === tab.id ? "default" : "outline"} onClick={() => setActiveTab(tab.id)}>
-                            <tab.icon className="w-4 h-4" /> {tab.label}
-                        </Button>
-                    ))}
-                </div>
-
-                <Card>
-                    <CardContent className="p-0">
-                        {loading ? (
-                            <div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
-                        ) : failed ? (
-                            <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
-                        ) : entries.length === 0 ? (
-                            <p className="text-muted-foreground text-center py-12">{t("noData")}</p>
-                        ) : (
-                            <div className="divide-y">
-                                {entries.map((entry, i) => (
-                                    <div key={i} className="flex items-center gap-4 p-4">
-                                        <div className={`w-8 text-center font-bold text-lg ${rankColors[i] || "text-muted-foreground"}`}>
-                                            #{i + 1}
-                                        </div>
-                                        <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center font-bold text-sm overflow-hidden">
-                                            <Image
-                                                src={entry.avatar || getMinecraftAvatar(entry.username, 40)}
-                                                alt={entry.username}
-                                                width={40}
-                                                height={40}
-                                                className="w-full h-full object-cover"
-                                                onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                                            />
-                                        </div>
-                                        <div className="flex-1">
-                                            <p className="font-medium">{entry.username}</p>
-                                        </div>
-                                        <div className="text-right font-bold">
-                                            {activeTab === "buyers" ? formatPrice(entry.value) : entry.value}
-                                            <span className="text-xs text-muted-foreground ml-1">
-                                                {activeTab === "buyers" ? t("totalSpent").toLowerCase() : activeTab === "voters" ? t("votes").toLowerCase() : t("activity").toLowerCase()}
-                                            </span>
-                                        </div>
+            <Card>
+                <CardContent className="p-0">
+                    {loading ? (
+                        <div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
+                    ) : failed ? (
+                        <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
+                    ) : entries.length === 0 ? (
+                        <p className="text-muted-foreground text-center py-12">{t("noData")}</p>
+                    ) : (
+                        <div className="divide-y">
+                            {entries.map((entry, i) => (
+                                <div key={i} className="flex items-center gap-4 p-4">
+                                    <div className={`w-8 text-center font-bold text-lg ${rankColors[i] || "text-muted-foreground"}`}>
+                                        #{i + 1}
                                     </div>
-                                ))}
-                            </div>
-                        )}
-                    </CardContent>
-                </Card>
-            </main>
-
-            <Footer />
-        </div>
+                                    <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center font-bold text-sm overflow-hidden">
+                                        <Image
+                                            src={entry.avatar || getMinecraftAvatar(entry.username, 40)}
+                                            alt={entry.username}
+                                            width={40}
+                                            height={40}
+                                            className="w-full h-full object-cover"
+                                            onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
+                                        />
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className="font-medium">{entry.username}</p>
+                                    </div>
+                                    <div className="text-right font-bold">
+                                        {activeTab === "buyers" ? formatPrice(entry.value) : entry.value}
+                                        <span className="text-xs text-muted-foreground ml-1">
+                                            {activeTab === "buyers" ? t("totalSpent").toLowerCase() : activeTab === "voters" ? t("votes").toLowerCase() : t("activity").toLowerCase()}
+                                        </span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </CardContent>
+            </Card>
+        </PageFrame>
     );
 }

@@ -5,8 +5,7 @@ import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useSession } from "next-auth/react";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, LoadFailed, Textarea } from "@/core/sdk/ui";
-import { Footer, Navbar } from "@/core/sdk/layout";
-import { ThemeComponentSlot } from "@/core/sdk/theme";
+import { PageFrame } from "@/core/sdk/layout";
 import { Loader2, Send } from "lucide-react";
 import { toast } from "sonner";
 import { errorMessage } from "@/core/sdk";
@@ -64,92 +63,83 @@ export default function StaffPage() {
     };
 
     return (
-        <div className="min-h-screen flex flex-col bg-muted">
-            <ThemeComponentSlot name="Hero" />
-            <Navbar />
+        <PageFrame
+            title={t('title')}
+            description={t('subtitle')}
+        >
+            {loading ? (
+                <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>
+            ) : failed ? (
+                <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
+            ) : members.length === 0 ? (
+                <Card className="max-w-4xl mx-auto"><CardContent className="py-12 text-center text-muted-foreground">{t('empty')}</CardContent></Card>
+            ) : (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-4xl mx-auto">
+                    {members.map((member) => {
+                        const avatarUrl = member.avatar || member.user?.avatar;
+                        const initial = member.name[0].toUpperCase();
 
-            <main className="container mx-auto px-4 py-6 flex-1">
-                <div className="text-center mb-8">
-                    <h1 className="text-3xl font-bold text-foreground mb-2">{t('title')}</h1>
-                    <p className="text-muted-foreground">{t('subtitle')}</p>
-                </div>
-
-                {loading ? (
-                    <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>
-                ) : failed ? (
-                    <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
-                ) : members.length === 0 ? (
-                    <Card className="max-w-4xl mx-auto"><CardContent className="py-12 text-center text-muted-foreground">{t('empty')}</CardContent></Card>
-                ) : (
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-4xl mx-auto">
-                        {members.map((member) => {
-                            const avatarUrl = member.avatar || member.user?.avatar;
-                            const initial = member.name[0].toUpperCase();
-
-                            return (
-                                <Card key={member.id} className="text-center hover:shadow-md transition-shadow">
-                                    <CardContent className="p-6">
-                                        <div className="w-20 h-20 rounded-full mx-auto mb-3 bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white text-2xl font-bold overflow-hidden">
-                                            {avatarUrl ? (
-                                                <Image src={avatarUrl} alt={member.name} width={80} height={80} className="w-full h-full object-cover" />
-                                            ) : (
-                                                initial
-                                            )}
-                                        </div>
-                                        <h2 className="font-bold text-foreground">{member.name}</h2>
-                                        <p className="text-sm text-primary font-medium">{member.role}</p>
-                                    </CardContent>
-                                </Card>
-                            );
-                        })}
-                    </div>
-                )}
-
-                <Card className="max-w-2xl mx-auto mt-12">
-                    <CardHeader>
-                        <CardTitle>{t("apply")}</CardTitle>
-                        <p className="text-sm text-muted-foreground">{t("applyDescription")}</p>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                        {!session?.user ? (
-                            <p className="text-center text-muted-foreground py-6">{t("loginToApply")}</p>
-                        ) : (
-                            <>
-                                <div>
-                                    <Label htmlFor="apply-position">{t("position")}</Label>
-                                    <Input
-                                        id="apply-position"
-                                        value={position}
-                                        onChange={e => setPosition(e.target.value)}
-                                        placeholder={t("positionPlaceholder")}
-                                    />
-                                </div>
-                                <div>
-                                    <Label htmlFor="apply-content">{t("applicationContent")}</Label>
-                                    <Textarea
-                                        id="apply-content"
-                                        rows={6}
-                                        value={content}
-                                        onChange={e => setContent(e.target.value)}
-                                        placeholder={t("applicationContentPlaceholder")}
-                                    />
-                                </div>
-                                <div className="flex justify-end">
-                                    <Button onClick={submit} disabled={submitting || !position.trim() || !content.trim()}>
-                                        {submitting ? (
-                                            <><Loader2 className="w-4 h-4 animate-spin" /> {t("submitting")}</>
+                        return (
+                            <Card key={member.id} className="text-center hover:shadow-md transition-shadow">
+                                <CardContent className="p-6">
+                                    <div className="w-20 h-20 rounded-full mx-auto mb-3 bg-gradient-to-br from-primary to-accent flex items-center justify-center text-white text-2xl font-bold overflow-hidden">
+                                        {avatarUrl ? (
+                                            <Image src={avatarUrl} alt={member.name} width={80} height={80} className="w-full h-full object-cover" />
                                         ) : (
-                                            <><Send className="w-4 h-4" /> {t("submit")}</>
+                                            initial
                                         )}
-                                    </Button>
-                                </div>
-                            </>
-                        )}
-                    </CardContent>
-                </Card>
-            </main>
+                                    </div>
+                                    <h2 className="font-bold text-foreground">{member.name}</h2>
+                                    <p className="text-sm text-primary font-medium">{member.role}</p>
+                                </CardContent>
+                            </Card>
+                        );
+                    })}
+                </div>
+            )}
 
-            <Footer />
-        </div>
+            <Card className="max-w-2xl mx-auto mt-12">
+                <CardHeader>
+                    <CardTitle>{t("apply")}</CardTitle>
+                    <p className="text-sm text-muted-foreground">{t("applyDescription")}</p>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                    {!session?.user ? (
+                        <p className="text-center text-muted-foreground py-6">{t("loginToApply")}</p>
+                    ) : (
+                        <>
+                            <div>
+                                <Label htmlFor="apply-position">{t("position")}</Label>
+                                <Input
+                                    id="apply-position"
+                                    value={position}
+                                    onChange={e => setPosition(e.target.value)}
+                                    placeholder={t("positionPlaceholder")}
+                                />
+                            </div>
+                            <div>
+                                <Label htmlFor="apply-content">{t("applicationContent")}</Label>
+                                <Textarea
+                                    id="apply-content"
+                                    rows={6}
+                                    value={content}
+                                    onChange={e => setContent(e.target.value)}
+                                    placeholder={t("applicationContentPlaceholder")}
+                                />
+                            </div>
+                            <div className="flex justify-end">
+                                <Button onClick={submit} disabled={submitting || !position.trim() || !content.trim()}>
+                                    {submitting ? (
+                                        <><Loader2 className="w-4 h-4 animate-spin" /> {t("submitting")}</>
+                                    ) : (
+                                        <><Send className="w-4 h-4" /> {t("submit")}</>
+                                    )}
+                                </Button>
+                            </div>
+                        </>
+                    )}
+                </CardContent>
+            </Card>
+        </PageFrame>
     );
 }

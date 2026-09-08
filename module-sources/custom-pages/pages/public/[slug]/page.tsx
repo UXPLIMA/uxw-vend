@@ -5,8 +5,7 @@ import { useTranslations } from "next-intl";
 import { Render, type Data } from "@measured/puck";
 import "@measured/puck/puck.css";
 import { Card, CardContent, RichContent } from "@/core/sdk/ui";
-import { Footer, Navbar } from "@/core/sdk/layout";
-import { ThemeComponentSlot } from "@/core/sdk/theme";
+import { PageFrame } from "@/core/sdk/layout";
 import { useMergedBlockConfig } from "@/core/sdk/blocks";
 import { Loader2 } from "lucide-react";
 
@@ -23,6 +22,7 @@ interface CustomPage {
 
 export default function CustomPageView({ params }: PageProps) {
     const t = useTranslations("customPages");
+    const commonT = useTranslations("common");
     const { slug } = use(params);
     const [page, setPage] = useState<CustomPage | null>(null);
     const [loading, setLoading] = useState(true);
@@ -49,22 +49,17 @@ export default function CustomPageView({ params }: PageProps) {
     }, [slug]);
 
     return (
-        <div className="min-h-screen flex flex-col bg-muted">
-            <ThemeComponentSlot name="Hero" />
-            <Navbar />
-
-            <main className="container mx-auto px-4 py-6 flex-1 max-w-4xl">
-                {loading ? (
-                    <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>
-                ) : notFound ? (
-                    <Card><CardContent className="py-12 text-center text-muted-foreground">{t("pageNotFound")}</CardContent></Card>
-                ) : page ? (
-                    <PageContent page={page} />
-                ) : null}
-            </main>
-
-            <Footer />
-        </div>
+        <PageFrame
+            title={page?.title ?? commonT("loading")}
+        >
+            {loading ? (
+                <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>
+            ) : notFound ? (
+                <Card><CardContent className="py-12 text-center text-muted-foreground">{t("pageNotFound")}</CardContent></Card>
+            ) : page ? (
+                <PageContent page={page} />
+            ) : null}
+        </PageFrame>
     );
 }
 
