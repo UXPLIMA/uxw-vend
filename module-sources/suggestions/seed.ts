@@ -23,10 +23,22 @@ const IDEAS = [
     "An in-game mail system",
 ];
 
+const REPLIES = [
+    "This would save me twenty minutes a day.",
+    "Would it work on the survival world too, or only creative?",
+    "We looked at this last year and the plugin could not do it. Worth another try.",
+    "Please. I have asked for this three times.",
+    "It is already possible with /warp, just not obvious.",
+    "Not sure about this one - it would make the economy easier to abuse.",
+    "Happy to test it if you need somebody.",
+    "Planned for the next season, as it happens.",
+];
+
 export const seed: ModuleSeed = {
     run: async (ctx) => {
         const howMany = Math.min(IDEAS.length * 2, 4 * ctx.scale);
         let votes = 0;
+        let comments = 0;
 
         for (let i = 0; i < howMany; i++) {
             const base = IDEAS[i % IDEAS.length];
@@ -58,8 +70,23 @@ export const seed: ModuleSeed = {
                 data: { upvotes: voters.length },
             });
             votes += voters.length;
+
+            // A board that only counts votes says how many, never why. The
+            // discussion is the "why", so the seed writes one.
+            for (const commenter of ctx.some(ctx.users, ctx.int(0, 5))) {
+                await ctx.create("suggestionComment", () => ctx.prisma.suggestionComment.create({
+                    data: {
+                        content: `<p>${ctx.pick(REPLIES)}</p>`,
+                        suggestionId: suggestion.id,
+                        authorId: commenter.id,
+                        moderationState: ctx.chance(92) ? "APPROVED" : "PENDING",
+                        createdAt: new Date(suggestion.createdAt.getTime() + ctx.int(1, 200) * 3_600_000),
+                    },
+                }));
+                comments += 1;
+            }
         }
 
-        ctx.log(`${howMany} suggestions, ${votes} votes`);
+        ctx.log(`${howMany} suggestions, ${votes} votes, ${comments} comments`);
     },
 };

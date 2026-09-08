@@ -18,3 +18,12 @@ export const suggestionUpdateSchema = z.object({
     title: z.string().trim().min(1).max(200).optional(),
     content: z.string().trim().min(1).max(10_000).optional(),
 });
+
+/**
+ * A reply on the board. The ceiling is deliberate: the column is `@db.Text`,
+ * so without one a single reply is the module's cheapest route to a megabyte
+ * of stored HTML per submission.
+ */
+export const suggestionCommentSchema = z.object({
+    content: z.string().trim().min(2, "Write something first").max(4_000),
+});

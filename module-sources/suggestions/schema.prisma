@@ -4,6 +4,7 @@
 // @@user-relations-start
 //   suggestions      Suggestion[]       @relation("Suggestions")
 //   suggestionVotes  SuggestionVote[]   @relation("SuggestionVotes")
+//   suggestionComments SuggestionComment[] @relation("SuggestionComments")
 // @@user-relations-end
 
 // ==================== SUGGESTIONS ====================
@@ -21,7 +22,8 @@ model Suggestion {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  votes SuggestionVote[]
+  votes    SuggestionVote[]
+  comments SuggestionComment[]
 
   @@index([status])
   @@index([authorId])
@@ -29,6 +31,9 @@ model Suggestion {
   // The moderation queue counts and lists PENDING rows on every load of the
   // admin screen, once per provider, with nothing else to narrow it.
   @@index([moderationState])
+  // The board's own list, and the resolver behind /suggestions/<id>: both ask
+  // for the public, approved rows and nothing else.
+  @@index([visibility, moderationState])
 }
 
 model SuggestionVote {
@@ -41,4 +46,32 @@ model SuggestionVote {
 
   @@unique([suggestionId, userId])
   @@index([userId])
+}
+
+// ==================== DISCUSSION ====================
+
+/**
+ * What people said about a suggestion.
+ *
+ * A board that only counts votes answers "how many" and never "why", so the
+ * one thing an operator needs before building something - what people
+ * actually want out of it - was the one thing the board could not hold.
+ */
+model SuggestionComment {
+  id              String   @id @default(cuid())
+  content         String   @db.Text
+  moderationState String   @default("APPROVED")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  suggestionId String
+  suggestion   Suggestion @relation(fields: [suggestionId], references: [id], onDelete: Cascade)
+  authorId     String?
+  author       User?      @relation("SuggestionComments", fields: [authorId], references: [id], onDelete: SetNull)
+
+  // Read as "the discussion under this suggestion, oldest first".
+  @@index([suggestionId, createdAt])
+  @@index([authorId])
+  // The moderation queue counts and lists PENDING rows on every load.
+  @@index([moderationState])
 }

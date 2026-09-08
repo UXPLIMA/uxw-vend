@@ -2,7 +2,7 @@
   "id": "suggestions",
   "name": "Suggestions",
   "description": "Community feature suggestions with voting",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "coreVersion": "^1.29.0",
   "category": "community",
   "author": "uxwVend",
@@ -15,6 +15,12 @@
       "path": "/suggestions",
       "component": "pages/public/page.tsx",
       "titleKey": "pageTitles.suggestions"
+    },
+    {
+      "path": "/suggestions/[id]",
+      "component": "pages/public/[id]/page.tsx",
+      "titleKey": "pageTitles.suggestions",
+      "resolver": "lib/suggestion-exists.ts"
     }
   ],
   "adminRoutes": [
@@ -46,6 +52,16 @@
       "path": "/suggestions/[id]",
       "handler": "api/[id]/route.ts",
       "description": "Update or delete a single suggestion (admin)."
+    },
+    {
+      "path": "/suggestions/[id]/comments",
+      "handler": "api/[id]/comments/route.ts",
+      "description": "List the discussion under a suggestion, or add to it."
+    },
+    {
+      "path": "/suggestions/comments/[id]",
+      "handler": "api/comments/[id]/route.ts",
+      "description": "Delete a comment (its author, or a moderator)."
     }
   ],
   "hooksEmitted": [
@@ -125,10 +141,25 @@
         "loginToVote": "Log in to vote",
         "deletedUser": "Deleted user",
         "login": "Log in",
-        "visibility": "Visibility"
+        "visibility": "Visibility",
+        "discussion": "Discussion ({count})",
+        "noComments": "Nobody has said anything yet. Be the first.",
+        "commentPlaceholder": "What do you think of this idea?",
+        "postComment": "Post comment",
+        "loginToComment": "Sign in to join the discussion.",
+        "awaitingReview": "Waiting for review",
+        "discussionTruncated": "Only the first replies are shown.",
+        "notFound": "This suggestion is not here.",
+        "backToBoard": "Back to the board",
+        "moderation_suggestionComment": "Suggestion comments",
+        "moderationSettings_suggestionComments": "Suggestion comments",
+        "moderationSettings_suggestionCommentsDesc": "Hold replies on the suggestion board until somebody approves them.",
+        "deleteCommentTitle": "Delete this comment?",
+        "deleteCommentBody": "It disappears from the discussion for everyone. This cannot be undone."
       },
       "activity": {
-        "suggestionCreated": "suggested:"
+        "suggestionCreated": "suggested:",
+        "suggestionCommented": "Commented on a suggestion"
       },
       "nav": {
         "suggestions": "Suggestions"
@@ -167,8 +198,8 @@
         "feature": "Özellik İsteği",
         "other": "Diğer",
         "vote": "Oy",
-        "votes": "Oy",
-        "upvote": "Olumlu Oy",
+        "votes": "Oylar",
+        "upvote": "Oy ver",
         "removeVote": "Oyu geri al",
         "submitted": "Öneri başarıyla gönderildi",
         "submitError": "Öneri gönderilemedi",
@@ -187,10 +218,25 @@
         "loginToVote": "Oy vermek için giriş yapın",
         "deletedUser": "Silinmiş kullanıcı",
         "login": "Giriş yap",
-        "visibility": "Görünürlük"
+        "visibility": "Görünürlük",
+        "discussion": "Tartışma ({count})",
+        "noComments": "Henüz kimse bir şey söylemedi. İlk sen ol.",
+        "commentPlaceholder": "Bu fikir hakkında ne düşünüyorsun?",
+        "postComment": "Yorumu gönder",
+        "loginToComment": "Tartışmaya katılmak için giriş yap.",
+        "awaitingReview": "İnceleme bekliyor",
+        "discussionTruncated": "Yalnızca ilk yanıtlar gösteriliyor.",
+        "notFound": "Bu öneri burada değil.",
+        "backToBoard": "Panoya dön",
+        "moderation_suggestionComment": "Öneri yorumları",
+        "moderationSettings_suggestionComments": "Öneri yorumları",
+        "moderationSettings_suggestionCommentsDesc": "Öneri panosundaki yanıtları biri onaylayana kadar beklet.",
+        "deleteCommentTitle": "Bu yorum silinsin mi?",
+        "deleteCommentBody": "Tartışmadan herkes için kalkar. Bu geri alınamaz."
       },
       "activity": {
-        "suggestionCreated": "öneri gönderdi:"
+        "suggestionCreated": "öneri gönderdi:",
+        "suggestionCommented": "Bir öneriye yorum yaptı"
       },
       "nav": {
         "suggestions": "Öneriler"
@@ -212,6 +258,12 @@
       "key": "suggestions.votes",
       "column": "userId",
       "erasure": "purge"
+    },
+    {
+      "model": "suggestionComment",
+      "key": "suggestions.comments",
+      "column": "authorId",
+      "erasure": "retain"
     }
   ],
   "moderationProviders": [
@@ -223,6 +275,15 @@
       "settingLabelKey": "moderationSettings_suggestions",
       "settingDescKey": "moderationSettings_suggestionsDesc",
       "handler": "moderation/provider.ts"
+    },
+    {
+      "id": "suggestion-comment",
+      "label": "Suggestion comments",
+      "labelKey": "moderation_suggestionComment",
+      "settingKey": "suggestion_comments",
+      "settingLabelKey": "moderationSettings_suggestionComments",
+      "settingDescKey": "moderationSettings_suggestionCommentsDesc",
+      "handler": "moderation/comments.ts"
     }
   ],
   "navLinks": [
@@ -247,6 +308,11 @@
       "type": "suggestions.suggestion.created",
       "prefix": "Suggested: ",
       "key": "suggestionCreated"
+    },
+    {
+      "type": "suggestions.comment.created",
+      "prefix": "Commented on: ",
+      "key": "suggestionCommented"
     }
   ]
 }

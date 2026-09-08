@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-08",
-  "updatedAt": "2026-09-08T17:49:04Z",
+  "updatedAt": "2026-09-08T18:08:35Z",
   "modules": [
     {
       "id": "announcements",
@@ -2537,13 +2537,13 @@
           "description": "Oylamalı topluluk özellik önerileri"
         }
       },
-      "version": "1.1.4",
+      "version": "1.1.5",
       "coreVersion": "^1.29.0",
       "author": "uxwVend",
       "icon": "MessageSquare",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-08T17:49:04Z",
+      "updatedAt": "2026-09-08T18:08:35Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -2563,9 +2563,9 @@
         "listens": []
       },
       "stats": {
-        "publicRoutes": 1,
+        "publicRoutes": 2,
         "adminRoutes": 1,
-        "apiRoutes": 3,
+        "apiRoutes": 5,
         "widgets": 0
       }
     },

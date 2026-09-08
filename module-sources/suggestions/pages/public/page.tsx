@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
-import { useRouter } from "@/core/sdk/navigation";
+import { Link, useRouter } from "@/core/sdk/navigation";
 import { Button, Card, CardContent, Input, LoadFailed, NativeSelect, Pagination, Textarea, usePagedRows } from "@/core/sdk/ui";
 import { PageFrame } from "@/core/sdk/layout";
 import { stripHtmlTags } from "@/core/sdk";
@@ -205,7 +205,11 @@ export default function SuggestionsPage() {
                                     </button>
                                     <div className="flex-1 min-w-0">
                                         <div className="flex items-center gap-2 mb-1">
-                                            <h2 className="font-medium text-foreground">{s.title}</h2>
+                                            <h2 className="font-medium text-foreground">
+                                                <Link href={`/suggestions/${s.id}`} className="hover:text-primary transition-colors">
+                                                    {s.title}
+                                                </Link>
+                                            </h2>
                                             <span className={`text-xs px-2 py-0.5 rounded ${badgeClass(s.status)}`}>
                                                 {statusLabel(t, s.status)}
                                             </span>

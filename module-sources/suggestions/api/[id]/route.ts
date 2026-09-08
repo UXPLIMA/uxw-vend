@@ -5,6 +5,37 @@ import { suggestionUpdateSchema } from "../../lib/validations";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
+/**
+ * GET /api/v1/suggestions/[id] - one suggestion, for its own page.
+ *
+ * A board row links here, and so does the moderation queue, which has been
+ * pointing at `/suggestions/<id>` since it was written. A private suggestion
+ * is its author's and a moderator's; one waiting for review is the same.
+ */
+export async function GET(_request: NextRequest, { params }: RouteParams) {
+    const { id } = await params;
+    const session = await auth();
+    const moderator = session?.user?.id ? await isAdmin(session.user.id) : false;
+
+    const suggestion = await prisma.suggestion.findUnique({
+        where: { id },
+        include: {
+            author: { select: { id: true, username: true, avatar: true } },
+            _count: { select: { comments: true } },
+        },
+    });
+    if (!suggestion) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+    const mine = suggestion.authorId && suggestion.authorId === session?.user?.id;
+    const readable = moderator || mine
+        || (suggestion.visibility === "public" && suggestion.moderationState === "APPROVED");
+    // The same answer either way: a suggestion nobody may read must not be
+    // distinguishable from one that does not exist.
+    if (!readable) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+    return NextResponse.json({ suggestion });
+}
+
 // PATCH /api/v1/suggestions/[id] - Update status (admin) or content (author)
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const session = await auth();
