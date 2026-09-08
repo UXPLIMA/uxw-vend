@@ -2,7 +2,7 @@
   "id": "help-center",
   "name": "Help Center",
   "description": "Knowledge base with categories and searchable articles",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "coreVersion": "^1.29.0",
   "category": "management",
   "author": "uxwVend Team",
@@ -162,7 +162,8 @@
         "title": "Help Center",
         "views": "{count} views",
         "wasHelpful": "Was this article helpful?",
-        "feedbackFailed": "Your feedback did not reach us. Please try again."
+        "feedbackFailed": "Your feedback did not reach us. Please try again.",
+        "inThisCategory": "In this category"
       },
       "admin": {
         "menu_help-center": "Help Center",
@@ -262,7 +263,8 @@
         "title": "Yardım Merkezi",
         "views": "{count} görüntülenme",
         "wasHelpful": "Bu makale yardımcı oldu mu?",
-        "feedbackFailed": "Geri bildiriminiz bize ulaşmadı. Lütfen tekrar deneyin."
+        "feedbackFailed": "Geri bildiriminiz bize ulaşmadı. Lütfen tekrar deneyin.",
+        "inThisCategory": "Bu kategoride"
       },
       "admin": {
         "menu_help-center": "Yardım Merkezi",

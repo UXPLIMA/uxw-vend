@@ -5,7 +5,7 @@ import { Award, Check, Loader2, Users } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { PageFrame } from "@/core/sdk/layout";
-import { LoadFailed } from "@/core/sdk/ui";
+import { LoadFailed, Pagination, usePagedRows } from "@/core/sdk/ui";
 
 interface TrophyRow {
     id: string;
@@ -30,6 +30,7 @@ export default function PublicTrophiesPage() {
     const [loading, setLoading] = useState(true);
     const [failed, setFailed] = useState(false);
     const [reloadKey, setReloadKey] = useState(0);
+    const paged = usePagedRows(trophies, 12);
 
     useEffect(() => {
         let cancelled = false;
@@ -79,7 +80,7 @@ export default function PublicTrophiesPage() {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {trophies.map((tr) => {
+                    {paged.rows.map((tr) => {
                         const earned = earnedIds.has(tr.id);
                         return (
                             <div
@@ -124,6 +125,9 @@ export default function PublicTrophiesPage() {
                         );
                     })}
                 </div>
+            )}
+            {paged.pages > 1 && (
+                <Pagination className="mt-6" page={paged.page} pages={paged.pages} total={paged.total} onPageChange={paged.setPage} />
             )}
         </PageFrame>
     );

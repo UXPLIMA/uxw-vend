@@ -183,6 +183,17 @@ body {
  * looking like the one control nobody styled. A theme that sets the radius to
  * zero still gets square corners, which is what such a theme is asking for.
  */
+/*
+ * One section heading's worth of vertical space: the line box of `text-xl`
+ * (1.75rem) plus the `mb-6` (1.5rem) under it. A homepage widget column uses
+ * it to start level with the cards in the column beside it, which begin under
+ * exactly that heading.
+ */
+.uxw-heading-spacer {
+    height: 1.75rem;
+    margin-bottom: 1.5rem;
+}
+
 .uxw-checkbox-radius {
   border-radius: min(var(--uxw-radius), 0.375rem);
 }

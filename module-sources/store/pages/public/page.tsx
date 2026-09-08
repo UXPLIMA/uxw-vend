@@ -6,7 +6,7 @@ import { PageFrame } from "@/core/sdk/layout";
 import { Coins, Box, ChevronRight, Search, X } from "lucide-react";
 import { SkeletonServerModes, SkeletonProductGrid } from "../../components/skeletons/store-skeletons";
 import { useTranslations } from "next-intl";
-import { LoadFailed, NativeSelect, RichContent, useSiteCurrency } from "@/core/sdk/ui";
+import { Badge, LoadFailed, NativeSelect, Pagination, RichContent, useSiteCurrency } from "@/core/sdk/ui";
 interface Category {
     id: string;
     name: string;
@@ -40,6 +40,8 @@ export default function StorePage() {
     const [loadingCategories, setLoadingCategories] = useState(true);
     const [loadingProducts, setLoadingProducts] = useState(false);
     const [sortBy, setSortBy] = useState("newest");
+    const [productPage, setProductPage] = useState(1);
+    const [productPages, setProductPages] = useState(1);
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState<Product[] | null>(null);
     const [searching, setSearching] = useState(false);
@@ -70,11 +72,15 @@ export default function StorePage() {
         const categorySlug = activeCategory || activeMode;
         if (categorySlug) {
             setLoadingProducts(true);
-            fetch(`/api/v1/store/products?category=${categorySlug}&limit=12&sort=${sortBy}`)
+            // Paged by the endpoint rather than trimmed by it: the page used
+            // to ask for twelve and draw them with no way to reach the
+            // thirteenth, so a category quietly ended at its first screenful.
+            fetch(`/api/v1/store/products?category=${categorySlug}&limit=12&page=${productPage}&sort=${sortBy}`)
                 .then((res) => { if (!res.ok) throw new Error("load failed"); return res.json(); })
                 .then((data) => {
                     if (cancelled) return;
                     setProducts(data.products || []);
+                    setProductPages(Math.max(1, Number(data.pagination?.pages ?? data.pages ?? 1)));
                     setFailed(false);
                     setLoadingProducts(false);
                 })
@@ -87,7 +93,11 @@ export default function StorePage() {
             setProducts([]);
         }
         return () => { cancelled = true; };
-    }, [activeCategory, activeMode, sortBy, reloadKey]);
+    }, [activeCategory, activeMode, sortBy, productPage, reloadKey]);
+
+    // A reader who was on page three of one category has not asked to be on
+    // page three of the next one.
+    useEffect(() => { setProductPage(1); }, [activeCategory, activeMode, sortBy]);
 
     // Derived state
     const rootCategories = categories.filter((c) => c.parentId === null);
@@ -305,14 +315,7 @@ export default function StorePage() {
                                 </button>
                             ))}
                         </div>
-                    ) : (
-                        <div className="text-center py-8">
-                            <p className="text-muted-foreground">{t('noSubCategories')}</p>
-                            {/* If no sub-categories, we likely want to show products directly. 
-                                The logic `showProducts = ... || (activeMode && subCategories.length === 0)` handles this below. 
-                            */}
-                        </div>
-                    )}
+                    ) : null}
                 </section>
             )}
 
@@ -350,9 +353,12 @@ export default function StorePage() {
                                 >
                                     <div className={`h-44 bg-muted flex items-center justify-center overflow-hidden relative`}>
                                         {product.isFeatured && (
-                                            <span className="absolute top-2 right-2 bg-warning text-warning text-xs font-bold px-2 py-1 rounded-full z-10">
+                                            // The badge used to be `bg-warning text-warning`: the
+                                            // label was the colour it was printed on, so the pill
+                                            // read as an empty orange smudge in every theme.
+                                            <Badge tone="warning" className="absolute top-2 right-2 z-10">
                                                 {t('featured')}
-                                            </span>
+                                            </Badge>
                                         )}
                                         {product.image ? (
                                             <>
@@ -382,6 +388,14 @@ export default function StorePage() {
                                 </Link>
                             ))}
                         </div>
+                    )}
+                    {productPages > 1 && (
+                        <Pagination
+                            className="mt-6"
+                            page={productPage}
+                            pages={productPages}
+                            onPageChange={setProductPage}
+                        />
                     )}
                 </section>
             )}

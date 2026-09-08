@@ -7,7 +7,7 @@ import { notificationText } from "../../../lib/render";
 import { toast } from "sonner";
 import { Check, CheckCheck, Loader2 } from "lucide-react";
 import { Link } from "@/core/sdk/navigation";
-import { Button, Card, CardContent } from "@/core/sdk/ui";
+import { Button, Card, CardContent, Pagination, usePagedRows } from "@/core/sdk/ui";
 import { PageFrame } from "@/core/sdk/layout";
 import { useRelativeTime } from "@/core/sdk/ui";
 
@@ -85,6 +85,8 @@ export default function NotificationsPage() {
     };
 
     const filtered = filter === "unread" ? items.filter(n => !n.isRead) : items;
+
+    const paged = usePagedRows(filtered, 15);
     const unreadCount = items.filter(n => !n.isRead).length;
 
     return (
@@ -127,7 +129,7 @@ export default function NotificationsPage() {
             ) : (
                 <Card>
                     <CardContent className="p-0 divide-y divide-border">
-                        {filtered.map(n => {
+                        {paged.rows.map(n => {
                             const said = notificationText(n, t);
                             const body = (
                                 <div className="flex items-start gap-3 p-4">
@@ -159,6 +161,9 @@ export default function NotificationsPage() {
                                 <div key={n.id} className="hover:bg-muted/30">{body}</div>
                             );
                         })}
+                        {paged.pages > 1 && (
+                            <Pagination className="p-4" page={paged.page} pages={paged.pages} total={paged.total} onPageChange={paged.setPage} />
+                        )}
                     </CardContent>
                 </Card>
             )}

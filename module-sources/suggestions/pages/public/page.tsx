@@ -5,7 +5,7 @@ import { useSession } from "next-auth/react";
 import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 import { useRouter } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, Input, LoadFailed, Textarea, NativeSelect } from "@/core/sdk/ui";
+import { Button, Card, CardContent, Input, LoadFailed, NativeSelect, Pagination, Textarea, usePagedRows } from "@/core/sdk/ui";
 import { PageFrame } from "@/core/sdk/layout";
 import { stripHtmlTags } from "@/core/sdk";
 import { useLocalDate } from "@/core/sdk/ui";
@@ -73,6 +73,7 @@ export default function SuggestionsPage() {
     const [filter, setFilter] = useState("");
     const [sort, setSort] = useState("newest");
     const [votedIds, setVotedIds] = useState<Set<string>>(new Set());
+    const paged = usePagedRows(suggestions, 10);
 
     const fetchSuggestions = () => {
         const params = new URLSearchParams({ sort });
@@ -188,7 +189,7 @@ export default function SuggestionsPage() {
                 </CardContent></Card>
             ) : (
                 <div className="space-y-3">
-                    {suggestions.map((s) => (
+                    {paged.rows.map((s) => (
                         <Card key={s.id}>
                             <CardContent className="p-4">
                                 <div className="flex gap-4">
@@ -218,6 +219,9 @@ export default function SuggestionsPage() {
                             </CardContent>
                         </Card>
                     ))}
+                    {paged.pages > 1 && (
+                        <Pagination page={paged.page} pages={paged.pages} total={paged.total} onPageChange={paged.setPage} />
+                    )}
                 </div>
             )}
         </PageFrame>

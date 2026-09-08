@@ -88,7 +88,11 @@ describe("HTML a person wrote", () => {
         // switches modes with [data-mode="dark"].
         const offenders: string[] = [];
         for (const file of MODULE_FILES) {
-            const source = fs.readFileSync(file, "utf8");
+            // Comments are prose about prose: a note explaining why a column
+            // of text is the width it is used to fail this.
+            const source = fs.readFileSync(file, "utf8")
+                .replace(/\/\*[\s\S]*?\*\//g, "")
+                .replace(/\/\/[^\n]*/g, "");
             if (/\bprose(?:-[a-z]+)?\b/.test(source)) offenders.push(`${rel(file)}: prose`);
             if (/\bdark:[a-z]/.test(source)) offenders.push(`${rel(file)}: dark:`);
         }

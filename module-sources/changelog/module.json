@@ -2,7 +2,7 @@
   "id": "changelog",
   "name": "Changelog",
   "description": "Release notes and update history",
-  "version": "1.0.17",
+  "version": "1.0.19",
   "coreVersion": "^1.29.0",
   "category": "community",
   "author": "uxwVend",
@@ -67,7 +67,6 @@
         "adm_field3Label": "Content",
         "adm_field3Placeholder": "What changed in this version?",
         "adm_field4Label": "Type",
-        "adm_field4Placeholder": "update, feature, fix, breaking",
         "adm_subtitle": "Manage changelog entries",
         "adm_title": "Changelog",
         "category": "Category",
@@ -88,7 +87,13 @@
         "title": "Changelog",
         "updated": "Changelog entry updated successfully",
         "version": "Version",
-        "viewAll": "View All Changes"
+        "viewAll": "View All Changes",
+        "type_feature": "New",
+        "type_improvement": "Improved",
+        "type_fix": "Fixed",
+        "type_security": "Security",
+        "type_removed": "Removed",
+        "type_breaking": "Breaking"
       },
       "admin": {
         "menu_changelog": "Changelog",
@@ -117,7 +122,6 @@
         "adm_field3Label": "İçerik",
         "adm_field3Placeholder": "Bu versiyonda neler değişti?",
         "adm_field4Label": "Tür",
-        "adm_field4Placeholder": "güncelleme, özellik, düzeltme, kırıcı",
         "adm_subtitle": "Değişiklik günlüğü girişlerini yönetin",
         "adm_title": "Değişiklik Günlüğü",
         "category": "Kategori",
@@ -138,7 +142,13 @@
         "title": "Sürüm Notları",
         "updated": "Değişiklik günlüğü girdisi başarıyla güncellendi",
         "version": "Sürüm",
-        "viewAll": "Tüm Değişiklikleri Gör"
+        "viewAll": "Tüm Değişiklikleri Gör",
+        "type_feature": "Yeni",
+        "type_improvement": "İyileştirme",
+        "type_fix": "Düzeltme",
+        "type_security": "Güvenlik",
+        "type_removed": "Kaldırıldı",
+        "type_breaking": "Kırıcı"
       },
       "admin": {
         "menu_changelog": "Değişiklik Günlüğü",

@@ -41,9 +41,9 @@ export default function StaffPage() {
             ) : failed ? (
                 <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
             ) : members.length === 0 ? (
-                <Card className="max-w-4xl mx-auto"><CardContent className="py-12 text-center text-muted-foreground">{t('empty')}</CardContent></Card>
+                <Card><CardContent className="py-12 text-center text-muted-foreground">{t('empty')}</CardContent></Card>
             ) : (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-4xl mx-auto">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 xl:grid-cols-6 gap-6">
                     {members.map((member) => {
                         const avatarUrl = member.avatar || member.user?.avatar;
                         const initial = member.name[0].toUpperCase();

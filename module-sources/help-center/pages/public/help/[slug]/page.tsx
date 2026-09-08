@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, use } from "react";
-import { RichContent } from "@/core/sdk/ui";
+import { LoadFailed, RichContent } from "@/core/sdk/ui";
 import { Link } from "@/core/sdk/navigation";
 import { useTranslations } from "next-intl";
 import { ThumbsUp, ThumbsDown } from "lucide-react";
@@ -32,6 +32,13 @@ export default function HelpArticlePage({ params }: PageProps) {
     const [article, setArticle] = useState<Article | null>(null);
     const [loading, setLoading] = useState(true);
     const [feedbackGiven, setFeedbackGiven] = useState(false);
+    // The other articles in this category. They are what turns an article
+    // into somewhere you can read on from, and they give the text beside them
+    // a line length somebody can read - the page used to be one column of
+    // prose with the right half of the screen empty.
+    const [neighbours, setNeighbours] = useState<{ id: string; slug: string; title: string }[]>([]);
+    const [neighboursFailed, setNeighboursFailed] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
 
     useEffect(() => {
         let cancelled = false;
@@ -44,13 +51,25 @@ export default function HelpArticlePage({ params }: PageProps) {
                 if (cancelled) return;
                 setArticle(data);
                 setLoading(false);
+                return data?.category?.id as string | undefined;
+            })
+            .then((categoryId) => {
+                if (cancelled || !categoryId) return;
+                return fetch(`/api/v1/help/articles?categoryId=${categoryId}`)
+                    .then((res) => { if (!res.ok) throw new Error("load failed"); return res.json(); })
+                    .then((rows: { id: string; slug: string; title: string }[]) => {
+                        if (cancelled) return;
+                        setNeighbours(Array.isArray(rows) ? rows : []);
+                        setNeighboursFailed(false);
+                    })
+                    .catch(() => { if (!cancelled) setNeighboursFailed(true); });
             })
             .catch(() => {
                 if (cancelled) return;
                 setLoading(false);
             });
         return () => { cancelled = true; };
-    }, [slug]);
+    }, [slug, reloadKey]);
 
     const submitFeedback = async (helpful: boolean) => {
         if (feedbackGiven) return;
@@ -77,6 +96,32 @@ export default function HelpArticlePage({ params }: PageProps) {
                     ? [{ label: article.category.name, href: `/help/category/${article.category.slug}` }]
                     : []),
             ]}
+            sidebar={article ? (
+                <nav aria-label={t("inThisCategory")} className="bg-card rounded-xl border border-border p-5">
+                    <h2 className="font-bold text-foreground mb-4">{t("inThisCategory")}</h2>
+                    {neighboursFailed ? (
+                        <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
+                    ) : (
+                        <ul className="space-y-2">
+                            {neighbours.map((entry) => (
+                                <li key={entry.id}>
+                                    <Link
+                                        href={`/help/${entry.slug}`}
+                                        aria-current={entry.slug === slug ? "page" : undefined}
+                                        className={`block rounded-lg px-3 py-2 text-sm transition-colors ${
+                                            entry.slug === slug
+                                                ? "bg-muted font-medium text-foreground"
+                                                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                                        }`}
+                                    >
+                                        {entry.title}
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    )}
+                </nav>
+            ) : null}
         >
             {loading ? (
                 <div className="bg-card rounded-xl p-8 text-center">
@@ -91,7 +136,7 @@ export default function HelpArticlePage({ params }: PageProps) {
                     </Link>
                 </div>
             ) : (
-                <div className="max-w-3xl">
+                <div>
                     <div className="bg-card rounded-xl border border-border p-8">
                         <div className="flex items-center gap-4 text-sm text-muted-foreground mb-6 pb-6 border-b">
                             <span>{t("articleCategory", { name: article.category.name })}</span>

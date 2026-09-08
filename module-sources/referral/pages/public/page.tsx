@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { useSession } from "next-auth/react";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, LoadFailed } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, LoadFailed, Pagination, usePagedRows } from "@/core/sdk/ui";
 import { PageFrame } from "@/core/sdk/layout";
 import { Loader2, UserPlus, Users, Coins, Clock, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
@@ -41,6 +41,7 @@ export default function ReferralPage() {
     const [applying, setApplying] = useState(false);
     const [failed, setFailed] = useState(false);
     const [reloadKey, setReloadKey] = useState(0);
+    const paged = usePagedRows(data?.referrals ?? [], 10);
 
     useEffect(() => {
         let cancelled = false;
@@ -245,7 +246,7 @@ export default function ReferralPage() {
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {data.referrals.map(ref => (
+                                            {paged.rows.map(ref => (
                                                 <tr key={ref.id} className="border-b border-border last:border-0">
                                                     <td className="py-3 px-2 font-medium">{ref.username || t("unknownUser")}</td>
                                                     <td className="py-3 px-2">
@@ -261,6 +262,9 @@ export default function ReferralPage() {
                                             ))}
                                         </tbody>
                                     </table>
+                                    {paged.pages > 1 && (
+                                        <Pagination className="mt-4" page={paged.page} pages={paged.pages} total={paged.total} onPageChange={paged.setPage} />
+                                    )}
                                 </div>
                             )}
                         </CardContent>

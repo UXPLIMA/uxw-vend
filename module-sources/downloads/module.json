@@ -2,7 +2,7 @@
   "id": "downloads",
   "name": "Downloads",
   "description": "File download center for resources and mods",
-  "version": "1.0.17",
+  "version": "1.0.18",
   "coreVersion": "^1.29.0",
   "category": "gaming",
   "author": "uxwVend",

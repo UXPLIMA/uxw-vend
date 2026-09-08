@@ -92,7 +92,10 @@ export const seed: ModuleSeed = {
                 const author = fromStaff && staff.length ? ctx.pick(staff) : member;
                 await ctx.create("ticketMessage", () => ctx.prisma.ticketMessage.create({
                     data: {
-                        content: m === 0 ? ctx.html(1) : `<p>${ctx.pick(fromStaff ? STAFF_LINES : MEMBER_LINES)}</p>`,
+                        // Plain text: the thread renders what it is given and
+                        // the reply box is a textarea, so markup written here
+                        // reaches the reader as markup.
+                        content: m === 0 ? `${ctx.sentence()} ${ctx.sentence()}` : ctx.pick(fromStaff ? STAFF_LINES : MEMBER_LINES),
                         isStaffReply: fromStaff,
                         ticketId: ticket.id,
                         userId: author.id,

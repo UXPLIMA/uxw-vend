@@ -2,9 +2,10 @@
 
 import { useState, useEffect, use } from "react";
 import { Link } from "@/core/sdk/navigation";
+import { Eye } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { PageFrame } from "@/core/sdk/layout";
-import { LoadFailed } from "@/core/sdk/ui";
+import { LoadFailed, Pagination, usePagedRows } from "@/core/sdk/ui";
 
 interface Article {
     id: string;
@@ -32,6 +33,7 @@ export default function HelpCategoryPage({ params }: PageProps) {
     const [loading, setLoading] = useState(true);
     const [failed, setFailed] = useState(false);
     const [reloadKey, setReloadKey] = useState(0);
+    const paged = usePagedRows(articles, 12);
 
     useEffect(() => {
         let cancelled = false;
@@ -90,22 +92,38 @@ export default function HelpCategoryPage({ params }: PageProps) {
                     {failed ? (
                         <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
                     ) : articles.length > 0 ? (
-                        <div className="bg-card rounded-xl border border-border divide-y">
-                            {articles.map((article) => (
-                                <Link
-                                    key={article.id}
-                                    href={`/help/${article.slug}`}
-                                    className="block p-4 hover:bg-muted transition-colors"
-                                >
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-primary hover:underline font-medium">
+                        <>
+                            {/* One card per article rather than a stack of
+                                links: a row that only carries a title reads as
+                                a list of the same thing, and a category with
+                                thirty of them had no way to stop scrolling. */}
+                            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                                {paged.rows.map((article) => (
+                                    <Link
+                                        key={article.id}
+                                        href={`/help/${article.slug}`}
+                                        className="group flex flex-col justify-between rounded-xl border border-border bg-card p-5 transition-colors hover:border-primary/40 hover:bg-muted"
+                                    >
+                                        <span className="font-medium text-foreground group-hover:text-primary transition-colors">
                                             {article.title}
                                         </span>
-                                        <span className="text-xs text-muted-foreground">{t("views", { count: article.views })}</span>
-                                    </div>
-                                </Link>
-                            ))}
-                        </div>
+                                        <span className="mt-4 flex items-center gap-2 text-xs text-muted-foreground">
+                                            <Eye className="w-3 h-3" aria-hidden="true" />
+                                            {t("views", { count: article.views })}
+                                        </span>
+                                    </Link>
+                                ))}
+                            </div>
+                            {paged.pages > 1 && (
+                                <Pagination
+                                    className="mt-6"
+                                    page={paged.page}
+                                    pages={paged.pages}
+                                    total={paged.total}
+                                    onPageChange={paged.setPage}
+                                />
+                            )}
+                        </>
                     ) : (
                         <div className="bg-card rounded-xl p-8 text-center">
                             <p className="text-muted-foreground">{t("noArticlesInCategory")}</p>

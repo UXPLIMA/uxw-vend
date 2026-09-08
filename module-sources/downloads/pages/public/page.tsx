@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { Button, Card, CardContent, LoadFailed } from "@/core/sdk/ui";
+import { Button, Card, CardContent, LoadFailed, Pagination, usePagedRows } from "@/core/sdk/ui";
 import { PageFrame } from "@/core/sdk/layout";
 import { Loader2, Download, FileText } from "lucide-react";
 
@@ -28,6 +28,7 @@ export default function DownloadsPage() {
     const [downloads, setDownloads] = useState<DownloadItem[]>([]);
     const [failed, setFailed] = useState(false);
     const [reloadKey, setReloadKey] = useState(0);
+    const paged = usePagedRows(downloads, 10);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -62,7 +63,7 @@ export default function DownloadsPage() {
                 <Card><CardContent className="py-12 text-center text-muted-foreground">{t('empty')}</CardContent></Card>
             ) : (
                 <div className="space-y-3">
-                    {downloads.map((dl) => (
+                    {paged.rows.map((dl) => (
                         <Card key={dl.id} className="hover:shadow-md transition-shadow">
                             <CardContent className="p-4 flex items-center gap-4">
                                 <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center flex-shrink-0">
@@ -83,6 +84,9 @@ export default function DownloadsPage() {
                             </CardContent>
                         </Card>
                     ))}
+                    {paged.pages > 1 && (
+                        <Pagination page={paged.page} pages={paged.pages} total={paged.total} onPageChange={paged.setPage} />
+                    )}
                 </div>
             )}
         </PageFrame>

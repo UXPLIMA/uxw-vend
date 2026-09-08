@@ -110,6 +110,17 @@ export default function HomePage() {
           // widget renders null.
           const sidebarContent = enabledWidgets.length > 0 ? (
             <>
+              {/*
+                A section in the content column is a heading and then its
+                cards; a widget is a card with its heading inside. Left to
+                themselves the two columns start at the same y, which puts
+                every widget card a heading's height above the cards it sits
+                beside - the thing that reads as crooked on every screenshot
+                of this page. The spacer is that heading's line and margin,
+                and `a-column-starts-where-the-one-beside-it-does` holds the
+                two numbers together.
+              */}
+              <div aria-hidden="true" className="hidden lg:block uxw-heading-spacer" />
               {enabledWidgets.map((w) => {
                 const WidgetComponent = WidgetComponentRegistry[w.id];
                 return (

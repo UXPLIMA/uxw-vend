@@ -142,7 +142,7 @@ export default function ForumPage() {
                 </div>
 
                 {/* Topics List */}
-                <div className="lg:col-span-4 min-w-0 space-y-3">
+                <div className="lg:col-span-4 min-w-0 space-y-4">
                     {loading ? (
                         // Drawn to the measurements of the card that
                         // replaces it. A line of text stood 120px tall

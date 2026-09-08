@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "@/core/sdk/navigation";
 import { useSession } from "next-auth/react";
-import { LoadFailed, buttonClassName } from "@/core/sdk/ui";
+import { LoadFailed, Pagination, buttonClassName, usePagedRows } from "@/core/sdk/ui";
 import { PageFrame } from "@/core/sdk/layout";
 import { useRelativeTime } from "@/core/sdk/ui";
 import { labelFor, PRIORITY_KEYS, STATUS_KEYS } from "../../../lib/status-labels";
@@ -44,6 +44,7 @@ export default function SupportPage() {
     const [tickets, setTickets] = useState<Ticket[]>([]);
     const [failed, setFailed] = useState(false);
     const [reloadKey, setReloadKey] = useState(0);
+    const paged = usePagedRows(tickets, 15);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -107,7 +108,7 @@ export default function SupportPage() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-border">
-                            {tickets.map((ticket) => (
+                            {paged.rows.map((ticket) => (
                                 <tr key={ticket.id} className="hover:bg-muted">
                                     <td className="px-4 py-4">
                                         <Link href={`/support/${ticket.id}`} className="text-primary hover:underline font-medium">
@@ -137,6 +138,9 @@ export default function SupportPage() {
                             ))}
                         </tbody>
                     </table>
+                    {paged.pages > 1 && (
+                        <Pagination className="p-4" page={paged.page} pages={paged.pages} total={paged.total} onPageChange={paged.setPage} />
+                    )}
                 </div>
             )}
         </PageFrame>

@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import { Card, CardContent, LoadFailed, RichContent } from "@/core/sdk/ui";
+import { changelogTone, changelogTypeLabel } from "../../lib/types";
+import { Badge, Card, CardContent, LoadFailed, Pagination, RichContent, usePagedRows } from "@/core/sdk/ui";
 import { PageFrame } from "@/core/sdk/layout";
 import { useLocalDate } from "@/core/sdk/ui";
 import { Loader2 } from "lucide-react";
@@ -23,6 +24,7 @@ export default function ChangelogPage() {
     const [entries, setEntries] = useState<Entry[]>([]);
     const [failed, setFailed] = useState(false);
     const [reloadKey, setReloadKey] = useState(0);
+    const paged = usePagedRows(entries, 10);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -49,21 +51,23 @@ export default function ChangelogPage() {
                 <div className="relative">
                     <div className="absolute left-[19px] top-0 bottom-0 w-0.5 bg-border" />
                     <div className="space-y-6">
-                        {entries.map((entry) => {
+                        {paged.rows.map((entry) => {
                             return (
                                 <div key={entry.id} className="relative pl-12">
+                                    {/* The marker read "v" on every release,
+                                        which told a reader nothing the shape of
+                                        the page had not already said. */}
                                     <div className="absolute left-0 top-1 w-10 h-10 rounded-full bg-card border-2 border-border flex items-center justify-center z-10">
-                                        <span className="text-xs font-bold text-muted-foreground">v</span>
+                                        <span className="text-[11px] font-bold text-foreground tabular-nums">
+                                            {entry.version.split(".").slice(0, 2).join(".")}
+                                        </span>
                                     </div>
                                     <Card>
                                         <CardContent className="p-5">
                                             <div className="flex items-center gap-2 mb-2">
-                                                <span
-                                                    className="text-xs px-2 py-0.5 rounded font-medium text-white"
-                                                    style={{ backgroundColor: entry.color || "#3b82f6" }}
-                                                >
-                                                    {entry.type}
-                                                </span>
+                                                <Badge tone={changelogTone(entry.type)}>
+                                                    {changelogTypeLabel(t, entry.type)}
+                                                </Badge>
                                                 <span className="text-xs bg-muted text-muted-foreground px-2 py-0.5 rounded font-mono">
                                                     v{entry.version}
                                                 </span>
@@ -82,6 +86,9 @@ export default function ChangelogPage() {
                             );
                         })}
                     </div>
+                    {paged.pages > 1 && (
+                        <Pagination className="mt-6" page={paged.page} pages={paged.pages} total={paged.total} onPageChange={paged.setPage} />
+                    )}
                 </div>
             )}
         </PageFrame>
