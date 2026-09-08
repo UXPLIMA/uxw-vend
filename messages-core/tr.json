@@ -106,7 +106,14 @@
     "switchToDark": "Karanlık moda geç",
     "switchToLight": "Açık moda geç",
     "tickets": "Destek",
-    "trophies": "Kupalar"
+    "trophies": "Kupalar",
+    "more": "Daha fazla",
+    "leaderboard": "Sıralama",
+    "staff": "Ekip",
+    "downloads": "İndirmeler",
+    "vote": "Oy Ver",
+    "wheel": "Çark",
+    "referral": "Davetler"
   },
   "hero": {},
   "admin": {

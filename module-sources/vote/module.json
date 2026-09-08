@@ -2,7 +2,7 @@
   "id": "vote",
   "name": "Vote Sites",
   "description": "Send players to the server listings you are ranked on, and count who voted",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "coreVersion": "^1.28.0",
   "category": "commerce",
   "author": "uxwVend",
@@ -102,6 +102,9 @@
       },
       "pageTitles": {
         "vote": "Vote"
+      },
+      "nav": {
+        "vote": "Vote"
       }
     },
     "tr": {
@@ -146,6 +149,9 @@
       },
       "pageTitles": {
         "vote": "Oy Ver"
+      },
+      "nav": {
+        "vote": "Oy Ver"
       }
     }
   },
@@ -155,6 +161,15 @@
       "key": "vote.logs",
       "column": "userId",
       "erasure": "retain"
+    }
+  ],
+  "navLinks": [
+    {
+      "label": "Vote",
+      "labelKey": "vote",
+      "href": "/vote",
+      "icon": "Vote",
+      "position": 120
     }
   ]
 }

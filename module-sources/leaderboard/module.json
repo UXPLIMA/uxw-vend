@@ -2,7 +2,7 @@
   "id": "leaderboard",
   "name": "Leaderboard",
   "description": "Player rankings by purchases, votes, and activity",
-  "version": "1.1.12",
+  "version": "1.1.13",
   "coreVersion": "^1.28.0",
   "category": "commerce",
   "author": "uxwVend",
@@ -51,6 +51,9 @@
       "admin": {
         "module_leaderboard_name": "Leaderboard",
         "module_leaderboard_description": "Player rankings by purchases, votes, and activity"
+      },
+      "nav": {
+        "leaderboard": "Leaderboard"
       }
     },
     "tr": {
@@ -79,6 +82,9 @@
       "admin": {
         "module_leaderboard_name": "Liderlik Tablosu",
         "module_leaderboard_description": "Satın alma, oy ve etkinliğe göre oyuncu sıralamaları"
+      },
+      "nav": {
+        "leaderboard": "Sıralama"
       }
     }
   },
@@ -87,6 +93,15 @@
       "id": "LeaderboardTop",
       "category": "Leaderboard",
       "component": "blocks/LeaderboardTop.tsx"
+    }
+  ],
+  "navLinks": [
+    {
+      "label": "Leaderboard",
+      "labelKey": "leaderboard",
+      "href": "/leaderboard",
+      "icon": "Medal",
+      "position": 90
     }
   ]
 }

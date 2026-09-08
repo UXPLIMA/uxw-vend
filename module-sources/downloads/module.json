@@ -2,7 +2,7 @@
   "id": "downloads",
   "name": "Downloads",
   "description": "File download center for resources and mods",
-  "version": "1.0.15",
+  "version": "1.0.16",
   "coreVersion": "^1.28.0",
   "category": "gaming",
   "author": "uxwVend",
@@ -103,6 +103,9 @@
       },
       "pageTitles": {
         "downloads": "Downloads"
+      },
+      "nav": {
+        "downloads": "Downloads"
       }
     },
     "tr": {
@@ -158,6 +161,9 @@
       },
       "pageTitles": {
         "downloads": "İndirmeler"
+      },
+      "nav": {
+        "downloads": "İndirmeler"
       }
     }
   },
@@ -166,6 +172,15 @@
       "type": "downloads.file.downloaded",
       "prefix": "Downloaded ",
       "key": "fileDownloaded"
+    }
+  ],
+  "navLinks": [
+    {
+      "label": "Downloads",
+      "labelKey": "downloads",
+      "href": "/downloads",
+      "icon": "Download",
+      "position": 110
     }
   ]
 }

@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-08",
-  "updatedAt": "2026-09-08T15:13:55Z",
+  "updatedAt": "2026-09-08T16:37:09Z",
   "modules": [
     {
       "id": "announcements",
@@ -698,13 +698,13 @@
           "description": "Kaynaklar ve modlar için dosya indirme merkezi"
         }
       },
-      "version": "1.0.15",
+      "version": "1.0.16",
       "coreVersion": "^1.28.0",
       "author": "uxwVend",
       "icon": "Download",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-08T15:13:55Z",
+      "updatedAt": "2026-09-08T16:37:09Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -1249,13 +1249,13 @@
           "description": "Satın alma, oy ve etkinliğe göre oyuncu sıralamaları"
         }
       },
-      "version": "1.1.12",
+      "version": "1.1.13",
       "coreVersion": "^1.28.0",
       "author": "uxwVend",
       "icon": "Trophy",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-08T15:13:55Z",
+      "updatedAt": "2026-09-08T16:37:09Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2118,13 +2118,13 @@
           "description": "Yeni kullanıcı davet ederek kredi kazanın"
         }
       },
-      "version": "1.1.1",
+      "version": "1.1.2",
       "coreVersion": "^1.28.0",
       "author": "uxwVend",
       "icon": "UserPlus",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-08T15:13:55Z",
+      "updatedAt": "2026-09-08T16:37:09Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -2371,13 +2371,13 @@
           "description": "Ekip üyesi listesi ve başvurular"
         }
       },
-      "version": "1.1.1",
+      "version": "1.1.2",
       "coreVersion": "^1.28.0",
       "author": "uxwVend",
       "icon": "Users",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-08T15:13:55Z",
+      "updatedAt": "2026-09-08T16:37:09Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -2801,13 +2801,13 @@
           "description": "Oyuncuları sıralamada yer aldığınız sunucu listelerine yönlendirin ve kimin oy verdiğini sayın"
         }
       },
-      "version": "1.2.1",
+      "version": "1.2.2",
       "coreVersion": "^1.28.0",
       "author": "uxwVend",
       "icon": "Vote",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-08T15:13:55Z",
+      "updatedAt": "2026-09-08T16:37:09Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2873,13 +2873,13 @@
           "description": "Yapılandırılabilir ödüller ve bekleme süreleriyle çevir-kazan oyunu"
         }
       },
-      "version": "1.1.1",
+      "version": "1.1.2",
       "coreVersion": "^1.28.0",
       "author": "uxwVend",
       "icon": "Dices",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-08T15:13:55Z",
+      "updatedAt": "2026-09-08T16:37:09Z",
       "screenshots": [],
       "tags": [
         "commerce"

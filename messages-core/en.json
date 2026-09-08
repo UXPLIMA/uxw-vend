@@ -106,7 +106,14 @@
     "switchToDark": "Switch to dark mode",
     "switchToLight": "Switch to light mode",
     "tickets": "Support",
-    "trophies": "Trophies"
+    "trophies": "Trophies",
+    "more": "More",
+    "leaderboard": "Leaderboard",
+    "staff": "Staff",
+    "downloads": "Downloads",
+    "vote": "Vote",
+    "wheel": "Wheel",
+    "referral": "Referrals"
   },
   "hero": {},
   "admin": {

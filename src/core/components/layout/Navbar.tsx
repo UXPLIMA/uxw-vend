@@ -15,6 +15,16 @@ import { ModuleNavLinks, ModuleRoutes, ModuleNavbarComponents, NavbarComponentRe
 import { ModuleErrorBoundary } from "@/core/components/ModuleErrorBoundary";
 import { Slot } from "@/core/components/Slot";
 
+/**
+ * How many links the bar draws before it folds the rest away.
+ *
+ * By count, not by measurement: a number renders the same on the server as in
+ * the browser, while anything measured is known only after paint - which puts
+ * a layout shift in the header of every page. Eight is what fits beside the
+ * account controls at the width the bar started wrapping.
+ */
+export const INLINE_NAV_LINKS = 8;
+
 function DefaultNavbar() {
     const pathname = usePathname();
     const t = useTranslations('nav');
@@ -111,6 +121,25 @@ function DefaultNavbar() {
         })
         .filter(Boolean) as typeof rawNavLinks;
 
+    // A bar the admin arranged is drawn as arranged - they put the dropdowns
+    // where they wanted them. The bar the site ships with grows by one link
+    // per module installed, so it folds its own overflow.
+    const shownLinks = (!adminConfigured && navLinks.length > INLINE_NAV_LINKS)
+        ? [
+            ...navLinks.slice(0, INLINE_NAV_LINKS),
+            {
+                label: t('more'),
+                href: "#",
+                icon: "MoreHorizontal",
+                children: navLinks.slice(INLINE_NAV_LINKS).map((link) => ({
+                    label: link.label,
+                    href: link.href,
+                    icon: link.icon,
+                })),
+            },
+        ]
+        : navLinks;
+
     const menuRef = useRef<HTMLDivElement>(null);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -143,7 +172,7 @@ function DefaultNavbar() {
                     </Link>
                     <nav className="hidden sm:flex items-center gap-1 min-w-0 flex-1 flex-wrap" aria-label={t('primary')}>
                         <Slot name="navbar.start" />
-                        {navLinks.map((link) => {
+                        {shownLinks.map((link) => {
                             // Dropdown menu
                             if (link.children && link.children.length > 0) {
                                 return (
@@ -155,6 +184,18 @@ function DefaultNavbar() {
                                             type="button"
                                             aria-haspopup="menu"
                                             aria-expanded={navDropdown === link.label}
+                                            onClick={() => setNavDropdown(navDropdown === link.label ? null : link.label)}
+                                            onKeyDown={(e) => {
+                                                // Hover was the only way in, so the trigger took
+                                                // focus and did nothing: every folded link was
+                                                // unreachable without a mouse.
+                                                if (e.key === "Enter" || e.key === " ") {
+                                                    e.preventDefault();
+                                                    setNavDropdown(navDropdown === link.label ? null : link.label);
+                                                } else if (e.key === "Escape") {
+                                                    setNavDropdown(null);
+                                                }
+                                            }}
                                             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-colors ${navDropdown === link.label ? "text-primary bg-muted" : "text-muted-foreground hover:text-foreground hover:bg-muted"}`}
                                         >
                                             <NavIcon name={link.icon} className="w-4 h-4" />

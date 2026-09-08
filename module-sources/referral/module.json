@@ -2,7 +2,7 @@
   "id": "referral",
   "name": "Referral System",
   "description": "Earn credits by referring new users",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "coreVersion": "^1.28.0",
   "category": "community",
   "author": "uxwVend",
@@ -143,6 +143,9 @@
       },
       "profile": {
         "notificationType_referral_referral_used": "Somebody used your referral code"
+      },
+      "nav": {
+        "referral": "Referrals"
       }
     },
     "tr": {
@@ -227,6 +230,9 @@
       },
       "profile": {
         "notificationType_referral_referral_used": "Biri davet kodunuzu kullandı"
+      },
+      "nav": {
+        "referral": "Davetler"
       }
     }
   },
@@ -252,6 +258,15 @@
       "channels": [
         "inapp"
       ]
+    }
+  ],
+  "navLinks": [
+    {
+      "label": "Referrals",
+      "labelKey": "referral",
+      "href": "/referral",
+      "icon": "UserPlus",
+      "position": 140
     }
   ]
 }

@@ -2,7 +2,7 @@
   "id": "wheel",
   "name": "Wheel of Fortune",
   "description": "Spin-to-win game with configurable prizes and cooldowns",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "coreVersion": "^1.28.0",
   "category": "commerce",
   "author": "uxwVend",
@@ -126,6 +126,9 @@
       },
       "profile": {
         "notificationType_wheel_prize_won": "A prize you won"
+      },
+      "nav": {
+        "wheel": "Wheel"
       }
     },
     "tr": {
@@ -176,6 +179,9 @@
       },
       "profile": {
         "notificationType_wheel_prize_won": "Kazandığınız ödül"
+      },
+      "nav": {
+        "wheel": "Çark"
       }
     }
   },
@@ -194,6 +200,15 @@
       "channels": [
         "inapp"
       ]
+    }
+  ],
+  "navLinks": [
+    {
+      "label": "Wheel",
+      "labelKey": "wheel",
+      "href": "/wheel",
+      "icon": "Dices",
+      "position": 130
     }
   ]
 }

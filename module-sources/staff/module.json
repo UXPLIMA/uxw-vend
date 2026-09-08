@@ -2,7 +2,7 @@
   "id": "staff",
   "name": "Staff",
   "description": "Staff member listing and applications",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "coreVersion": "^1.28.0",
   "category": "management",
   "author": "uxwVend",
@@ -157,6 +157,9 @@
       },
       "pageTitles": {
         "staff": "Staff"
+      },
+      "nav": {
+        "staff": "Staff"
       }
     },
     "tr": {
@@ -242,6 +245,9 @@
       },
       "pageTitles": {
         "staff": "Ekip"
+      },
+      "nav": {
+        "staff": "Ekip"
       }
     }
   },
@@ -265,6 +271,15 @@
       "key": "staff.profile",
       "column": "userId",
       "erasure": "retain"
+    }
+  ],
+  "navLinks": [
+    {
+      "label": "Staff",
+      "labelKey": "staff",
+      "href": "/staff",
+      "icon": "Users",
+      "position": 100
     }
   ]
 }
