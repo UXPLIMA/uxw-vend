@@ -12,6 +12,12 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.30.0 - `NavIcon` joins `@/core/sdk/ui`. Modules store an icon as a Lucide
+ * name - a forum category, a help category, a nav link - and had no way to
+ * draw one, so the forum printed the name beside the category ("MessageSquare
+ * General" in every install's sidebar) and the help centre hand-rolled a map
+ * of the six icons its author thought of. An addition.
+ *
  * 1.29.0 - `@/core/sdk/seed` carries the types for `seed.ts`, the file a
  * module may ship beside its manifest to fill an install with data worth
  * looking at. An empty site answers every question with "nothing here yet",
@@ -203,4 +209,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.29.0";
+export const CORE_API_VERSION = "1.30.0";

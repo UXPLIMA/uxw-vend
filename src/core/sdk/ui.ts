@@ -11,6 +11,14 @@
  */
 export { Button, buttonClassName } from "@/core/components/ui/button";
 export { Badge, badgeClassName } from "@/core/components/ui/badge";
+/**
+ * A Lucide icon named by a string, which is how every module stores one: a
+ * forum category, a help category, a nav link. Printed straight the name is
+ * what a reader sees - "MessageSquare General" sat in the forum sidebar of
+ * every install - and a module hand-rolling its own map covers the six icons
+ * its author thought of.
+ */
+export { NavIcon } from "@/core/components/ui/NavIcon";
 export type { BadgeTone } from "@/core/components/ui/badge";
 export { Card, CardHeader, CardTitle, CardContent } from "@/core/components/ui/card";
 export { Checkbox, CheckboxField } from "@/core/components/ui/checkbox";

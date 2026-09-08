@@ -62,17 +62,25 @@ export const seed: ModuleSeed = {
         }
 
         const staff = ctx.users.filter((u) => u.rolePriority > 0);
-        const howMany = Math.min(TOPICS.length * 3, 5 * ctx.scale);
+        // Past one page of the forum's own default, so the pager is a thing a
+        // reader can see rather than a branch nobody reaches.
+        const howMany = Math.min(TOPICS.length * 4, 9 * ctx.scale);
         let posts = 0;
 
         for (let i = 0; i < howMany; i++) {
             const base = TOPICS[i % TOPICS.length];
             const title = i < TOPICS.length ? base : `${base} (${Math.floor(i / TOPICS.length) + 1})`;
             const createdAt = ctx.daysAgo(120);
+            const slug = `${title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}-${i + 1}`;
+            // A rerun finds its own topics rather than colliding with them:
+            // the slug is unique, so writing the same one twice is an error
+            // that takes the rest of the seed down with it.
+            const already = await ctx.prisma.forumTopic.findUnique({ where: { slug }, select: { id: true } });
+            if (already) continue;
             const topic = await ctx.create("forumTopic", () => ctx.prisma.forumTopic.create({
                 data: {
                     title,
-                    slug: `${title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}-${i + 1}`,
+                    slug,
                     content: ctx.html(ctx.int(1, 3)),
                     categoryId: ctx.pick(categories).id,
                     authorId: ctx.pick(ctx.users).id,

@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Link } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, Input, LoadFailed, Skeleton, buttonClassName } from "@/core/sdk/ui";
+import { Button, Card, CardContent, Input, LoadFailed, NavIcon, Skeleton, buttonClassName } from "@/core/sdk/ui";
 import { PageFrame } from "@/core/sdk/layout";
 import { MessageSquare, Eye, ThumbsUp, Pin, Lock, Plus, Search } from "lucide-react";
 import { useRelativeTime } from "@/core/sdk/ui";
@@ -130,7 +130,11 @@ export default function ForumPage() {
                                         className={`w-full text-left px-3 py-2 rounded-lg text-sm transition-colors flex items-center justify-between ${selectedCategory === cat.id ? "bg-primary/10 text-primary font-medium" : "text-muted-foreground hover:bg-muted"}`}
                                     >
                                         <span className="flex items-center gap-2">
-                                            {cat.icon && <span>{cat.icon}</span>}
+                                            {/* The column holds a Lucide name.
+                                                Printed straight it read as
+                                                "MessageSquare General" in the
+                                                sidebar of every forum. */}
+                                            <NavIcon name={cat.icon} className="w-4 h-4" />
                                             {cat.name}
                                         </span>
                                         <span className="text-xs text-muted-foreground">{cat._count.topics}</span>
@@ -142,7 +146,12 @@ export default function ForumPage() {
                 </div>
 
                 {/* Topics List */}
-                <div className="lg:col-span-4 min-w-0 space-y-4">
+                {/* `flex flex-col gap-4` rather than `space-y-4`: the rows are
+                    <Link>s, anchors are inline, and a vertical margin on an
+                    inline box does nothing - which is why the list read as one
+                    solid block however the spacing was written. A flex column
+                    blockifies its children, so the gap is a gap. */}
+                <div className="lg:col-span-4 min-w-0 flex flex-col gap-4">
                     {loading ? (
                         // Drawn to the measurements of the card that
                         // replaces it. A line of text stood 120px tall
