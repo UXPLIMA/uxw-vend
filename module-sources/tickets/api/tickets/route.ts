@@ -1,4 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
+import { answersFor } from "../../lib/fields";
+import { fieldsOf, mayOpenIn } from "../../lib/departments";
 import { pageParams, enumParam, isAdmin, prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { TICKET_STATUSES, ticketSchema } from "../../lib/validations";
@@ -106,12 +109,45 @@ export async function POST(request: NextRequest) {
         );
     }
 
+    // Not found rather than forbidden: a department this member may not open
+    // is one they should not learn is there, and the picker in front of this
+    // never offered it.
+    if (!(await mayOpenIn(departmentId, session.user.role ?? null))) {
+        return NextResponse.json({ error: "Department not found" }, { status: 404 });
+    }
+
+    /*
+     * The extra questions this department asks, answered. Checked here rather
+     * than trusted from the form: a form posts keys and a request is not a
+     * form, so an answer to a question this department does not ask is
+     * dropped and a required one that is missing stops the ticket by name.
+     */
+    const asked = await fieldsOf(departmentId);
+    const answered = answersFor(asked, (validation.data.fields ?? {}) as Record<string, unknown>);
+    if ("missing" in answered) {
+        return NextResponse.json(
+            { error: "Some answers are missing", code: "ticket_fields_missing", missing: answered.missing },
+            { status: 400 },
+        );
+    }
+    if ("notOnTheList" in answered) {
+        return NextResponse.json(
+            { error: "That is not one of the answers", code: "ticket_field_not_on_list", field: answered.notOnTheList },
+            { status: 400 },
+        );
+    }
+
     // Create ticket with initial message
     const ticket = await prisma.ticket.create({
         data: {
             subject,
             priority: priority || "MEDIUM",
             departmentId,
+            // With the label each question had when it was asked, so renaming
+            // or deleting a field later does not rewrite an old ticket.
+            fieldAnswers: answered.answers.length > 0
+                ? (answered.answers as unknown as Prisma.InputJsonValue)
+                : Prisma.JsonNull,
             userId: session.user.id,
             messages: {
                 create: {

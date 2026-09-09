@@ -17,6 +17,12 @@ export const ticketSchema = z.object({
     subject: z.string().min(3, "Subject must be at least 3 characters").max(200),
     departmentId: z.string().min(1, "Department is required"),
     priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]).optional(),
+    /**
+     * Answers to the extra questions this department asks. Bounded here and
+     * matched against the questions themselves in lib/fields.ts: which keys
+     * are allowed depends on the department, which a schema cannot know.
+     */
+    fields: z.record(z.string().max(64), z.string().max(2000)).optional(),
     message: z.string().min(10, "Message must be at least 10 characters").max(20_000),
 });
 

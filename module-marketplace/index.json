@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-09",
-  "updatedAt": "2026-09-09T20:34:10Z",
+  "updatedAt": "2026-09-09T21:02:47Z",
   "modules": [
     {
       "id": "announcements",
@@ -2848,13 +2848,13 @@
           "description": "Departmanlı ve öncelik seviyeli müşteri destek talebi sistemi"
         }
       },
-      "version": "1.0.43",
-      "coreVersion": "^1.29.0",
+      "version": "1.1.0",
+      "coreVersion": "^1.36.0",
       "author": "uxwVend Team",
       "icon": "Ticket",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-08T17:49:04Z",
+      "updatedAt": "2026-09-09T21:02:47Z",
       "screenshots": [],
       "tags": [
         "management"

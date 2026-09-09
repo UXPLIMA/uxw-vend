@@ -20,6 +20,48 @@ model TicketDepartment {
   updatedAt   DateTime @updatedAt
 
   tickets Ticket[]
+  fields      TicketDepartmentField[]
+  permissions TicketDepartmentPermission[]
+}
+
+/// An extra question on the form for one department.
+///
+/// The answers are stored with the label as it was asked; see lib/fields.ts
+/// for why looking the label up later loses old tickets their questions.
+model TicketDepartmentField {
+  id           String @id @default(cuid())
+  departmentId String
+  department   TicketDepartment @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  /// What the form posts. Stable; the label is what changes.
+  key          String
+  label        String
+  /// text | select. Anything else is read as text.
+  type         String  @default("text")
+  required     Boolean @default(false)
+  /// For a select. The list is the question.
+  options      String[] @default([])
+  order        Int      @default(0)
+
+  @@unique([departmentId, key])
+  @@index([departmentId, order])
+}
+
+/// Which roles may open a ticket in a department.
+///
+/// A department with no rows is open to everybody; one with rows that do not
+/// name a role is shut to it. The two silences mean opposite things on
+/// purpose, and the argument is in the SDK rather than here.
+model TicketDepartmentPermission {
+  id           String @id @default(cuid())
+  departmentId String
+  department   TicketDepartment @relation(fields: [departmentId], references: [id], onDelete: Cascade)
+  roleId       String
+  canView      Boolean @default(true)
+  canPost      Boolean @default(true)
+  canReply     Boolean @default(true)
+
+  @@unique([departmentId, roleId])
+  @@index([roleId])
 }
 
 model Ticket {
@@ -30,6 +72,9 @@ model Ticket {
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
   closedAt    DateTime?
+
+  /// The extra questions, answered, with the label each one had at the time.
+  fieldAnswers Json?
 
   departmentId String
   department   TicketDepartment @relation(fields: [departmentId], references: [id])

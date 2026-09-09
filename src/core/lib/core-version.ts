@@ -12,6 +12,13 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.36.0 - `accessByRole` joins `@/core/sdk`. Which roles may read, write and
+ * reply in a container, with two silences that mean opposite things and a
+ * child that is never more open than its parent. The forum needed it first and
+ * the support desk needs the same answer about its departments; a second copy
+ * of those rules is a second thing to fix, and the lines that would drift are
+ * the ones deciding who gets in. The modules keep their own tables. Additive.
+ *
  * 1.35.0 - `routing.redirects` and `resolveRedirect`. A page that moved has to
  * be answered before anything renders, which is the proxy, which is core - and
  * a module cannot reach in there. So core asks for the rules through a filter
@@ -242,4 +249,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.35.0";
+export const CORE_API_VERSION = "1.36.0";

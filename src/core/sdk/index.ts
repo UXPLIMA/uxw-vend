@@ -115,3 +115,9 @@ export type {
 // in the proxy before anything renders.
 export { resolveRedirect } from "@/core/lib/redirect-resolve";
 export type { RedirectRule } from "@/core/lib/redirect-resolve";
+
+// Who may read, write and reply in a container: a forum category, a support
+// department, whatever has sections next. Two silences that mean opposite
+// things, and a child that is never more open than its parent.
+export { accessByRole } from "@/core/lib/access-by-role";
+export type { AccessNode, AccessRule, Access } from "@/core/lib/access-by-role";
