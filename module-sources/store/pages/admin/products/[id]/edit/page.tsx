@@ -9,6 +9,8 @@ import {
     timeFromMinutes,
     type AvailabilityValue,
 } from "../../_fields/AvailabilityFields";
+import { GrantFields } from "../../_fields/GrantFields";
+import { EMPTY_GRANT, grantPayload, type GrantValue } from "../../_fields/grant-payload";
 import { instantToWallClock } from "@/core/sdk";
 import { useState, useEffect, use } from "react";
 import Image from "next/image";
@@ -42,6 +44,7 @@ export default function EditProductPage(props: PageProps) {
     const [error, setError] = useState<string | null>(null);
     const [categories, setCategories] = useState<Category[]>([]);
     const [availability, setAvailability] = useState<AvailabilityValue>(EMPTY_AVAILABILITY);
+    const [grant, setGrant] = useState<GrantValue>(EMPTY_GRANT);
     // The zone the hours are read in, shown beside them: "18:00" with no zone
     // next to it is what makes somebody schedule a sale three hours out.
     const { settings } = useSiteSettings();
@@ -120,6 +123,10 @@ export default function EditProductPage(props: PageProps) {
                     saleFrom: p.saleFrom ? instantToWallClock(new Date(p.saleFrom), where) : "",
                     saleUntil: p.saleUntil ? instantToWallClock(new Date(p.saleUntil), where) : "",
                 });
+                setGrant({
+                    durationDays: p.durationDays ? String(p.durationDays) : "",
+                    grantsRoleId: p.grantsRoleId ?? "",
+                });
             }
             setFailed(false);
             setLoading(false);
@@ -152,6 +159,7 @@ export default function EditProductPage(props: PageProps) {
                 subscriptionInterval: form.type === "SUBSCRIPTION" ? form.subscriptionInterval : null,
                 subscriptionIntervalCount: form.type === "SUBSCRIPTION" ? parseInt(form.subscriptionIntervalCount) || 1 : null,
                 ...availabilityPayload(availability),
+                ...grantPayload(grant),
             };
 
             const res = await fetch(`/api/v1/store/products/${productId}`, {
@@ -399,7 +407,9 @@ export default function EditProductPage(props: PageProps) {
                             </CardContent>
                         </Card>
 
-                        <AvailabilityFields value={availability} onChange={setAvailability} timeZone={timeZone} />
+                        <GrantFields value={grant} onChange={setGrant} />
+
+                    <AvailabilityFields value={availability} onChange={setAvailability} timeZone={timeZone} />
 
                         <Card>
                             <CardHeader>

@@ -8,6 +8,8 @@ import {
     availabilityPayload,
     type AvailabilityValue,
 } from "../_fields/AvailabilityFields";
+import { GrantFields } from "../_fields/GrantFields";
+import { EMPTY_GRANT, grantPayload, type GrantValue } from "../_fields/grant-payload";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "@/core/sdk/navigation";
@@ -31,6 +33,7 @@ export default function NewProductPage() {
     const [error, setError] = useState<string | null>(null);
     const [categories, setCategories] = useState<Category[]>([]);
     const [availability, setAvailability] = useState<AvailabilityValue>(EMPTY_AVAILABILITY);
+    const [grant, setGrant] = useState<GrantValue>(EMPTY_GRANT);
     // The zone the hours are read in, shown beside them: "18:00" with no zone
     // next to it is what makes somebody schedule a sale three hours out.
     const { settings } = useSiteSettings();
@@ -80,6 +83,7 @@ export default function NewProductPage() {
                 subscriptionInterval: form.type === "SUBSCRIPTION" ? form.subscriptionInterval : null,
                 subscriptionIntervalCount: form.type === "SUBSCRIPTION" ? parseInt(form.subscriptionIntervalCount) || 1 : null,
                 ...availabilityPayload(availability),
+                ...grantPayload(grant),
             };
 
             const res = await fetch("/api/v1/store/products", {
@@ -291,7 +295,9 @@ export default function NewProductPage() {
                             </CardContent>
                         </Card>
 
-                        <AvailabilityFields value={availability} onChange={setAvailability} timeZone={timeZone} />
+                        <GrantFields value={grant} onChange={setGrant} />
+
+                    <AvailabilityFields value={availability} onChange={setAvailability} timeZone={timeZone} />
 
                         <Card>
                             <CardHeader>

@@ -2,7 +2,7 @@
   "id": "store",
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
-  "version": "2.6.0",
+  "version": "2.6.1",
   "coreVersion": "^1.31.0",
   "category": "commerce",
   "author": "uxwVend Team",
@@ -923,7 +923,15 @@
         "adm_whoMayBuy_everyone": "Anyone",
         "adm_whoMayBuyHint": "A product for one rank is listed to everybody with a badge, because the person who cannot buy it is the person who might buy the rank.",
         "state_wrong_role": "For certain ranks only",
-        "onlyLeft": "Only {count} left"
+        "onlyLeft": "Only {count} left",
+        "adm_whatItGrants": "What buying it gives",
+        "adm_whatItGrantsHint": "Separate from who may buy it: this is what the buyer walks away with.",
+        "adm_durationDays": "How long it lasts (days)",
+        "adm_durationForever": "Owned outright",
+        "adm_durationHint": "Leave empty to sell it outright. Buying again adds to whatever is left.",
+        "adm_grantsRole": "Role the buyer is given",
+        "adm_grantsNoRole": "No role",
+        "adm_grantsRoleHint": "Where one order grants two roles, the higher priority one wins."
       },
       "cart": {
         "title": "Shopping Cart",
@@ -1507,7 +1515,15 @@
         "adm_whoMayBuy_everyone": "Herkes",
         "adm_whoMayBuyHint": "Tek bir rütbeye özel ürün herkese rozetle gösterilir - alamayan kişi, rütbeyi alabilecek kişidir.",
         "state_wrong_role": "Yalnızca belirli rütbeler",
-        "onlyLeft": "Son {count} tane"
+        "onlyLeft": "Son {count} tane",
+        "adm_whatItGrants": "Satın alan ne kazanır",
+        "adm_whatItGrantsHint": "Kimin alabileceğinden ayrı bir soru: bu, alıcının eline ne geçtiğidir.",
+        "adm_durationDays": "Ne kadar sürer (gün)",
+        "adm_durationForever": "Süresiz",
+        "adm_durationHint": "Boş bırakırsan süresiz satılır. Tekrar alındığında kalan süreye eklenir.",
+        "adm_grantsRole": "Alıcıya verilen rol",
+        "adm_grantsNoRole": "Rol verme",
+        "adm_grantsRoleHint": "Bir sipariş iki rol verirse önceliği yüksek olan kazanır."
       },
       "cart": {
         "title": "Alışveriş Sepeti",

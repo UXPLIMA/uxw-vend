@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle, Input, Label, NativeSelect } from "@/core/sdk/ui";
+import { useRoles } from "./use-roles";
 
 /**
  * When a product is for sale, on one card, on both product forms.
@@ -88,23 +88,10 @@ interface Props {
     timeZone: string;
 }
 
-interface Role {
-    id: string;
-    name: string;
-    displayName?: string | null;
-}
-
 export function AvailabilityFields({ value, onChange, timeZone }: Props) {
     const t = useTranslations("store");
     const set = (patch: Partial<AvailabilityValue>) => onChange({ ...value, ...patch });
-    const [roles, setRoles] = useState<Role[]>([]);
-
-    useEffect(() => {
-        fetch("/api/v1/roles")
-            .then((res) => { if (!res.ok) throw new Error("load failed"); return res.json(); })
-            .then((data) => setRoles(data.roles ?? []))
-            .catch(() => { /* no roles offered: the product is for everyone, which is the default */ });
-    }, []);
+    const roles = useRoles();
 
     const days = [0, 1, 2, 3, 4, 5, 6];
     const toggleDay = (day: number) =>
