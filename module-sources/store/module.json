@@ -2,8 +2,8 @@
   "id": "store",
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
-  "version": "2.16.0",
-  "coreVersion": "^1.33.0",
+  "version": "2.17.0",
+  "coreVersion": "^1.34.0",
   "category": "commerce",
   "author": "uxwVend Team",
   "icon": "ShoppingBag",
@@ -302,6 +302,11 @@
       "path": "/store/admin/products/[id]",
       "handler": "api/admin/products/[id]/route.ts",
       "description": "Read a single product as an operator, including one switched off (admin)."
+    },
+    {
+      "path": "/store/admin/products/[id]/copy",
+      "handler": "api/admin/products/[id]/copy/route.ts",
+      "description": "Copy a product, switched off and having sold nothing (admin)."
     },
     {
       "path": "/store/products/[id]",
@@ -1030,7 +1035,11 @@
         "adm_manualOrderFailed": "The order could not be created.",
         "err": {
           "manual_order_bad_line": "One of the lines has a price or a quantity that cannot be used."
-        }
+        },
+        "adm_productCopy": "Duplicate",
+        "adm_productCopySuffix": "{name} (copy)",
+        "adm_productCopied": "Copied. The new one is switched off until you are ready.",
+        "adm_productCopyFailed": "That product could not be copied."
       },
       "cart": {
         "title": "Shopping Cart",
@@ -1681,7 +1690,11 @@
         "adm_manualOrderFailed": "Sipariş oluşturulamadı.",
         "err": {
           "manual_order_bad_line": "Satırlardan birinin fiyatı veya adedi kullanılamıyor."
-        }
+        },
+        "adm_productCopy": "Çoğalt",
+        "adm_productCopySuffix": "{name} (kopya)",
+        "adm_productCopied": "Kopyalandı. Yenisi siz hazır olana kadar kapalı.",
+        "adm_productCopyFailed": "Ürün kopyalanamadı."
       },
       "cart": {
         "title": "Alışveriş Sepeti",

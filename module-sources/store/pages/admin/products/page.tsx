@@ -6,8 +6,10 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Link } from "@/core/sdk/navigation";
 import { Button, Card, CardContent, CardHeader, CardTitle, useSiteCurrency, buttonClassName } from "@/core/sdk/ui";
-import { Loader2, ChevronLeft, ChevronRight, Package, Plus } from "lucide-react";
+import { Loader2, ChevronLeft, ChevronRight, Copy, Package, Plus } from "lucide-react";
 import { AdminPageHeader } from "@/core/sdk/admin";
+import { errorMessage } from "@/core/sdk";
+import { toast } from "sonner";
 
 interface Product {
     id: string;
@@ -31,6 +33,7 @@ export default function AdminProductsPage() {
     const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [total, setTotal] = useState(0);
+    const [copying, setCopying] = useState<string | null>(null);
 
     const fetchProducts = async () => {
         setLoading(true);
@@ -54,6 +57,31 @@ export default function AdminProductsPage() {
         fetchProducts();
     }, [page]);
     /* eslint-enable react-hooks/exhaustive-deps */
+
+    // The copy's name is sent from here rather than made by the endpoint: it
+    // is a row a visitor reads, and this is the only place that knows which
+    // language the operator is working in.
+    const copyProduct = async (product: Product) => {
+        setCopying(product.id);
+        try {
+            const res = await fetch(`/api/v1/store/admin/products/${product.id}/copy`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ name: t("adm_productCopySuffix", { name: product.name }) }),
+            });
+            if (!res.ok) {
+                toast.error(errorMessage(await res.json().catch(() => null), t("adm_productCopyFailed"), t));
+                return;
+            }
+            toast.success(t("adm_productCopied"));
+            setPage(1);
+            await fetchProducts();
+        } catch {
+            toast.error(commonT("somethingWentWrong"));
+        } finally {
+            setCopying(null);
+        }
+    };
 
     return (
         <>
@@ -139,6 +167,17 @@ export default function AdminProductsPage() {
                                                     )}
                                                 </td>
                                                 <td className="py-3 px-4 text-right">
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="sm"
+                                                        aria-label={`${t("adm_productCopy")}: ${product.name}`}
+                                                        disabled={copying !== null}
+                                                        onClick={() => copyProduct(product)}
+                                                    >
+                                                        {copying === product.id
+                                                            ? <Loader2 className="w-4 h-4 animate-spin" />
+                                                            : <Copy className="w-4 h-4" aria-hidden="true" />}
+                                                    </Button>
                                                     <Link href={`/admin/store/products/${product.id}/edit`} className={buttonClassName("ghost", "sm")}>{t("adm_edit")}</Link>
                                                 </td>
                                             </tr>

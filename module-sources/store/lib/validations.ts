@@ -81,6 +81,11 @@ export const manualOrderSchema = z.object({
     })).min(1).max(50),
 });
 
+/** A copy's only choice is what it is called. Everything else is the original's. */
+export const copyProductSchema = z.object({
+    name: z.string().min(1).max(200).optional(),
+});
+
 export const campaignSchema = z.object({
     name: z.string().min(1, "Name is required").max(100),
     isActive: z.boolean().optional(),
