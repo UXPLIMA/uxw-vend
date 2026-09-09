@@ -18,6 +18,7 @@ import {
     Legend,
 } from "chart.js";
 import { Bar, Line } from "react-chartjs-2";
+import { ALL_TAB, analyticsTabs, type TabDeclaration } from "@/core/lib/analytics-tabs";
 import { isEnabledIn } from "@/core/lib/module-enabled";
 import { dateLocaleTag } from "@/core/lib/utils";
 import { useSiteCurrency } from "@/core/components/currency/site-currency";
@@ -63,6 +64,8 @@ interface ChartSeries {
     type?: ChartKind;
     format?: "currency" | "number";
     source?: string;
+    /** The tab its module filed it under. Unknown groups stay under All. */
+    group?: string;
 }
 
 interface RankingItem {
@@ -81,6 +84,7 @@ interface RankingSeries {
     color?: string;
     format?: "currency" | "number";
     source?: string;
+    group?: string;
 }
 
 interface CoreStatsResponse {
@@ -125,12 +129,15 @@ export default function AnalyticsPage() {
     const [period, setPeriod] = useState<string>("30");
     const [charts, setCharts] = useState<ChartSeries[]>([]);
     const [rankings, setRankings] = useState<RankingSeries[]>([]);
+    const [declaredTabs, setDeclaredTabs] = useState<TabDeclaration[]>([]);
+    const [openTab, setOpenTab] = useState<string>(ALL_TAB);
     const [loading, setLoading] = useState(true);
 
     const fetchAll = useCallback(async () => {
         setLoading(true);
         const collected: ChartSeries[] = [];
         const collectedRankings: RankingSeries[] = [];
+        const collectedTabs: TabDeclaration[] = [];
         try {
 
             // Core users chart
@@ -178,6 +185,11 @@ export default function AnalyticsPage() {
                                     }
                                 }
                             }
+                            if (Array.isArray(body.tabs)) {
+                                for (const tab of body.tabs) {
+                                    if (tab?.id && tab?.label) collectedTabs.push(tab);
+                                }
+                            }
                         } catch { /* skip */ }
                     });
                     await Promise.all(fetches);
@@ -186,6 +198,7 @@ export default function AnalyticsPage() {
 
             setCharts(collected);
             setRankings(collectedRankings);
+            setDeclaredTabs(collectedTabs);
             // In a `finally` rather than trailing the body: it reads as
             // unconditional only if you have checked that every `try` above it
             // still has a `catch`, and a spinner that never stops is not a thing
@@ -198,6 +211,12 @@ export default function AnalyticsPage() {
     useEffect(() => {
         void fetchAll();
     }, [fetchAll]);
+
+    const tabs = analyticsTabs(declaredTabs, charts, rankings);
+    // A tab can vanish when the period changes and its module returns nothing
+    // for the new window, which would otherwise leave the screen showing a tab
+    // nobody can see and no panels at all.
+    const shown = tabs.find((tab) => tab.id === openTab) ?? tabs[0];
 
     const translateLabel = (raw: string, key?: string): string => {
         if (!key) return raw;
@@ -245,6 +264,31 @@ export default function AnalyticsPage() {
                 </>}
             />
 
+            {/* One tab is not a choice, so the strip appears only once a
+                module has filled a second one. */}
+            {!loading && tabs.length > 1 && (
+                <div role="tablist" aria-label={t("analytics_reports")} className="flex gap-2 flex-wrap border-b border-border">
+                    {tabs.map((tab) => (
+                        <button
+                            key={tab.id}
+                            type="button"
+                            role="tab"
+                            aria-selected={tab.id === shown.id}
+                            onClick={() => setOpenTab(tab.id)}
+                            className={`px-3 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${
+                                tab.id === shown.id
+                                    ? "border-primary text-foreground"
+                                    : "border-transparent text-muted-foreground hover:text-foreground"
+                            }`}
+                        >
+                            {tab.id === ALL_TAB
+                                ? t("analytics_tabAll")
+                                : translateLabel(tab.label ?? tab.id, tab.labelKey ?? undefined)}
+                        </button>
+                    ))}
+                </div>
+            )}
+
             {loading ? (
                 <div className="flex items-center justify-center py-24">
                     <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -252,7 +296,7 @@ export default function AnalyticsPage() {
                         {t("analytics_loading")}
                     </div>
                 </div>
-            ) : charts.length === 0 && rankings.length === 0 ? (
+            ) : shown.charts.length === 0 && shown.rankings.length === 0 ? (
                 <Card>
                     <CardContent className="py-12 text-center text-muted-foreground text-sm">
                         {t("analytics_noCharts")}
@@ -260,7 +304,7 @@ export default function AnalyticsPage() {
                 </Card>
             ) : (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                    {charts.map((chart) => {
+                    {shown.charts.map((chart) => {
                         const color = chart.color ?? "#6366f1";
                         const total = sum(chart.data);
                         const kind: ChartKind = chart.type ?? "area";
@@ -353,7 +397,7 @@ export default function AnalyticsPage() {
                         );
                     })}
 
-                    {rankings.map((ranking) => {
+                    {shown.rankings.map((ranking) => {
                         const color = ranking.color ?? "#6366f1";
                         const top = ranking.items.slice(0, 8);
                         const peak = Math.max(...top.map((item) => item.value), 0);
