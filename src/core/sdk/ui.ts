@@ -21,6 +21,17 @@ export { Badge, badgeClassName } from "@/core/components/ui/badge";
 export { NavIcon } from "@/core/components/ui/NavIcon";
 
 /**
+ * The other half of that: choosing the name in the first place.
+ *
+ * A module storing a lucide name had no way to offer one, so the admin side
+ * of every icon field was a free text box - and the forum's shipped an emoji
+ * as its placeholder, which `NavIcon` renders as nothing at all. A picker and
+ * a renderer that agree on what a name is have to be reachable from the same
+ * place.
+ */
+export { IconPicker } from "@/core/components/ui/icon-picker";
+
+/**
  * The site's public settings, fetched once per page however many components
  * ask. A module reaching for `/api/v1/public-settings` directly is what this
  * replaces: the allow-list is core's, so the module would be reading a

@@ -6,7 +6,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Button, Card, CardContent, FileUpload, Input, Label, RichTextEditor, useConfirm, useFormRoute, NativeSelect, buttonClassName } from "@/core/sdk/ui";
 import { Link } from "@/core/sdk/navigation";
-import { ArrowLeft, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, FolderOpen, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { writeError, errorMessage } from "@/core/sdk";
 import { AdminPageHeader } from "@/core/sdk/admin";
@@ -271,7 +271,9 @@ export default function AdminStoreCategoriesPage() {
                                         {cat.image ? (
                                             <Image src={cat.image} alt={cat.name} width={40} height={40} className="w-10 h-10 rounded-lg object-cover" />
                                         ) : (
-                                            <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center text-lg">📁</div>
+                                            <div className="w-10 h-10 bg-muted rounded-lg flex items-center justify-center">
+                                                <FolderOpen className="w-5 h-5 text-muted-foreground" aria-hidden="true" />
+                                            </div>
                                         )}
                                         <div>
                                             <p className="font-medium">{cat.name}</p>

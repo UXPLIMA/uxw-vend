@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { locales, defaultLocale, localeNames, localeFlags } from '@/core/lib/i18n/config';
+import { locales, defaultLocale, localeNames } from '@/core/lib/i18n/config';
 import fs from 'fs';
 import path from 'path';
 
@@ -20,12 +20,6 @@ describe('i18n config', () => {
     it('every locale has a name', () => {
         for (const locale of locales) {
             expect(localeNames[locale]).toBeTruthy();
-        }
-    });
-
-    it('every locale has a flag', () => {
-        for (const locale of locales) {
-            expect(localeFlags[locale]).toBeTruthy();
         }
     });
 

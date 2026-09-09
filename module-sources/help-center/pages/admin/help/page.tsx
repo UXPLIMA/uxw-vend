@@ -5,8 +5,9 @@ import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import { Button, Card, CardContent, CardHeader, CardTitle, FileUpload, Input, Label, RichTextEditor, Textarea, NativeSelect, useFormRoute, buttonClassName } from "@/core/sdk/ui";
 import { Link } from "@/core/sdk/navigation";
-import { ArrowLeft, Loader2, Plus } from "lucide-react";
+import { ArrowLeft, Loader2, Plus, ThumbsDown, ThumbsUp } from "lucide-react";
 import { writeError } from "@/core/sdk";
+import { helpfulness, type Verdict } from "../../../lib/helpfulness";
 import { AdminPageHeader } from "@/core/sdk/admin";
 
 interface HelpCategory {
@@ -31,6 +32,40 @@ interface HelpArticle {
     category: { id: string; name: string } | null;
 }
 
+const VERDICT_TONE: Record<Verdict, string> = {
+    helping: "bg-success/10 text-success",
+    mixed: "bg-warning/10 text-warning",
+    failing: "bg-destructive/10 text-destructive",
+    unrated: "bg-muted text-muted-foreground",
+};
+
+/**
+ * What the votes on one article say, in the order an operator reads it: the
+ * share first, because that is the number they came for, then the verdict,
+ * then the counts the share was worked out from.
+ */
+function Helpfulness({ article }: { article: HelpArticle }) {
+    const t = useTranslations("helpCenter");
+    const read = helpfulness(article.helpful, article.notHelpful);
+
+    return (
+        <div className="flex items-center gap-2 flex-wrap">
+            <span className="tabular-nums font-medium">
+                {read.ratio === null ? "-" : `${Math.round(read.ratio * 100)}%`}
+            </span>
+            <span className={`text-xs px-2 py-0.5 rounded ${VERDICT_TONE[read.verdict]}`}>
+                {t(`adm_verdict_${read.verdict}`)}
+            </span>
+            <span className="text-xs text-muted-foreground inline-flex items-center gap-1">
+                <ThumbsUp className="w-3 h-3" aria-hidden="true" />
+                {article.helpful}
+                <ThumbsDown className="w-3 h-3 ml-1" aria-hidden="true" />
+                {article.notHelpful}
+            </span>
+        </div>
+    );
+}
+
 export default function AdminHelpCenterPage() {
     const t = useTranslations("helpCenter");
     const commonT = useTranslations("common");
@@ -38,6 +73,22 @@ export default function AdminHelpCenterPage() {
     const [articles, setArticles] = useState<HelpArticle[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState<"articles" | "categories">("articles");
+    /**
+     * Which end of the helpfulness list is on top. The default is the order
+     * the endpoint sent, because an operator arriving here is usually looking
+     * for one article by name rather than reading a league table.
+     */
+    const [byHelpfulness, setByHelpfulness] = useState<"off" | "worst" | "best">("off");
+
+    // Sorted on a copy: `articles` is what the endpoint sent, and reordering
+    // it in place would make "off" unreachable without another request.
+    const orderedArticles = byHelpfulness === "off"
+        ? articles
+        : [...articles].sort((a, b) => {
+            const left = helpfulness(a.helpful, a.notHelpful).score;
+            const right = helpfulness(b.helpful, b.notHelpful).score;
+            return byHelpfulness === "worst" ? left - right : right - left;
+        });
 
     // Both forms are screens of their own rather than cards above the tab
     // they belong to. There are two of them here, so the parameter names
@@ -341,12 +392,23 @@ export default function AdminHelpCenterPage() {
                                                 <th className="text-left py-3 px-4 font-medium text-muted-foreground">{t("adm_title")}</th>
                                                 <th className="text-left py-3 px-4 font-medium text-muted-foreground">{t("adm_category")}</th>
                                                 <th className="text-left py-3 px-4 font-medium text-muted-foreground">{t("adm_views")}</th>
-                                                <th className="text-left py-3 px-4 font-medium text-muted-foreground">{t("adm_feedback")}</th>
+                                                <th className="text-left py-3 px-4 font-medium text-muted-foreground">
+                                                    <button
+                                                        type="button"
+                                                        className="font-medium hover:text-foreground"
+                                                        onClick={() => setByHelpfulness(
+                                                            byHelpfulness === "worst" ? "best" : byHelpfulness === "best" ? "off" : "worst",
+                                                        )}
+                                                    >
+                                                        {t("adm_helpfulness")}
+                                                        {byHelpfulness === "worst" ? " \u2193" : byHelpfulness === "best" ? " \u2191" : ""}
+                                                    </button>
+                                                </th>
                                                 <th className="text-left py-3 px-4 font-medium text-muted-foreground">{t("adm_status")}</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {articles.map((article) => (
+                                            {orderedArticles.map((article) => (
                                                 <tr key={article.id} className="hover:bg-muted/50 border-b last:border-0">
                                                     <td className="py-3 px-4">
                                                         <p className="font-medium">{article.title}</p>
@@ -357,9 +419,7 @@ export default function AdminHelpCenterPage() {
                                                     </td>
                                                     <td className="py-3 px-4 text-sm">{article.views}</td>
                                                     <td className="py-3 px-4 text-sm">
-                                                        <span className="text-success">👍 {article.helpful}</span>
-                                                        {" / "}
-                                                        <span className="text-destructive">👎 {article.notHelpful}</span>
+                                                        <Helpfulness article={article} />
                                                     </td>
                                                     <td className="py-3 px-4">
                                                         <span className={`text-xs px-2 py-1 rounded ${

@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-09",
-  "updatedAt": "2026-09-09T22:07:36Z",
+  "updatedAt": "2026-09-09T23:42:41Z",
   "modules": [
     {
       "id": "announcements",
@@ -977,13 +977,13 @@
           "description": "Kategoriler, konular ve yanıtlarla topluluk tartışma forumu"
         }
       },
-      "version": "1.2.1",
+      "version": "1.2.2",
       "coreVersion": "^1.37.0",
       "author": "uxwVend Team",
       "icon": "MessageSquare",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-09T21:32:07Z",
+      "updatedAt": "2026-09-09T23:42:41Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -1124,13 +1124,13 @@
           "description": "Kategorili ve aranabilir makalelerden oluşan bilgi bankası"
         }
       },
-      "version": "1.2.5",
+      "version": "1.2.6",
       "coreVersion": "^1.32.0",
       "author": "uxwVend Team",
       "icon": "HelpCircle",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-09T09:58:07Z",
+      "updatedAt": "2026-09-09T23:42:41Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -2678,13 +2678,13 @@
           "description": "Ürün, kategori, sepet ve siparişleriyle eksiksiz e-ticaret"
         }
       },
-      "version": "2.22.0",
+      "version": "2.22.1",
       "coreVersion": "^1.38.0",
       "author": "uxwVend Team",
       "icon": "ShoppingBag",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-09T22:07:36Z",
+      "updatedAt": "2026-09-09T23:42:41Z",
       "screenshots": [],
       "tags": [
         "commerce"

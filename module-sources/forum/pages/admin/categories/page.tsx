@@ -3,7 +3,7 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Label, RichTextEditor, useFormRoute, buttonClassName } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, IconPicker, Input, Label, NavIcon, RichTextEditor, useFormRoute, buttonClassName } from "@/core/sdk/ui";
 import { Link } from "@/core/sdk/navigation";
 import { ArrowLeft, Loader2, Plus } from "lucide-react";
 import { writeError } from "@/core/sdk";
@@ -123,12 +123,18 @@ export default function AdminForumCategoriesPage() {
                                     />
                                 </div>
                                 <div>
-                                    <Label>{t("adm_icon")}</Label>
-                                    <Input
-                                        aria-label={t("adm_icon")}
+                                    {/* The public board draws this through
+                                        `NavIcon`, which knows lucide names and
+                                        nothing else. A free text box with an
+                                        emoji in its placeholder was teaching
+                                        operators to pick an icon the board
+                                        would never render. */}
+                                    <Label htmlFor="forum-category-icon">{t("adm_icon")}</Label>
+                                    <IconPicker
+                                        id="forum-category-icon"
                                         value={form.icon}
-                                        onChange={(e) => setForm({ ...form, icon: e.target.value })}
-                                        placeholder="💬"
+                                        placeholder={t("adm_icon")}
+                                        onChange={(icon) => setForm({ ...form, icon })}
                                     />
                                 </div>
                             </div>
@@ -204,7 +210,7 @@ export default function AdminForumCategoriesPage() {
                         <Card key={cat.id}>
                             <CardHeader>
                                 <CardTitle className="flex items-center gap-2">
-                                    {cat.icon && <span>{cat.icon}</span>}
+                                    <NavIcon name={cat.icon} className="w-5 h-5" />
                                     <span style={{ color: cat.color || undefined }}>{cat.name}</span>
                                 </CardTitle>
                             </CardHeader>

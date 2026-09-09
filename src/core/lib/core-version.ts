@@ -12,6 +12,12 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.39.0 - `IconPicker` joins `@/core/sdk/ui`, beside the `NavIcon` that draws
+ * what it picks. A module that stores a lucide icon name could render one and
+ * not choose one, so every icon field in a module admin was a free text box;
+ * the forum's offered an emoji as its placeholder and the public board drew
+ * nothing for it. Additive.
+ *
  * 1.38.0 - `admin.customer.panels` and `readUserAgent`. An operator opening one
  * member needs what is spread across everything installed - what they bought,
  * what they are owed, what they have asked for - and core cannot gather that
@@ -270,4 +276,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.38.0";
+export const CORE_API_VERSION = "1.39.0";
