@@ -19,6 +19,7 @@ interface CampaignReader {
                 untilMinute: true;
                 entries: { select: { productId: true; price: true; stock: true } };
             };
+            take: number;
         }): Promise<{
             isActive: boolean;
             days: number[];
@@ -43,6 +44,11 @@ export async function runningCampaignEntries(
 ): Promise<CampaignEntry[]> {
     const campaigns = await db.campaign.findMany({
         where: { isActive: true },
+        // On the hot path: every product listing asks this. Switched-on
+        // campaigns are few by nature, and a shop that has left fifty running
+        // has a different problem - but the listing must not get slower with
+        // every one an operator forgot to switch off.
+        take: 50,
         select: {
             isActive: true,
             days: true,

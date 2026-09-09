@@ -2,7 +2,7 @@
   "id": "store",
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
-  "version": "2.14.0",
+  "version": "2.15.0",
   "coreVersion": "^1.33.0",
   "category": "commerce",
   "author": "uxwVend Team",
@@ -258,6 +258,10 @@
     {
       "path": "/gift-codes",
       "component": "pages/admin/gift-codes/page.tsx"
+    },
+    {
+      "path": "/store-campaigns",
+      "component": "pages/admin/campaigns/page.tsx"
     }
   ],
   "seoRoutes": {
@@ -474,6 +478,16 @@
       "handler": "api/payment-providers/route.ts",
       "method": "GET",
       "description": "The payment gateways installed and configured on this site."
+    },
+    {
+      "path": "/store/campaigns",
+      "handler": "api/campaigns/route.ts",
+      "description": "List campaigns, or create one (admin)."
+    },
+    {
+      "path": "/store/campaigns/[id]",
+      "handler": "api/campaigns/[id]/route.ts",
+      "description": "Update or delete a single campaign (admin)."
     }
   ],
   "dashboardCards": [
@@ -960,7 +974,34 @@
         "adm_editCategory": "Edit category",
         "adm_saveCategory": "Save changes",
         "adm_shelfGate": "Who sees this shelf",
-        "adm_shelfGateHint": "Pick nothing to show it to everybody. Pick products and only somebody who owns one of them sees it, along with everything under it."
+        "adm_shelfGateHint": "Pick nothing to show it to everybody. Pick products and only somebody who owns one of them sees it, along with everything under it.",
+        "adm_campaigns": "Campaigns",
+        "adm_campaignsSubtitle": "One price change across many products, opening and closing on a clock.",
+        "adm_campaignsNone": "No campaigns yet.",
+        "adm_campaignNew": "New campaign",
+        "adm_campaignEdit": "Edit campaign",
+        "adm_campaignName": "Name",
+        "adm_campaignActive": "Switched on",
+        "adm_campaignActiveHint": "Off, it never runs, whatever its hours say.",
+        "adm_campaignDays": "Days it runs",
+        "adm_campaignDaysHint": "Pick none to run every day.",
+        "adm_campaignFrom": "From",
+        "adm_campaignUntil": "Until",
+        "adm_campaignHint": "Hours are the site's own clock ({zone}). An end before the start runs past midnight.",
+        "adm_campaignProducts": "What is in it",
+        "adm_campaignProductsHint": "Fill a price to put a product in the campaign. Leave it empty and the product is not in it.",
+        "adm_campaignPricePlaceholder": "Price",
+        "adm_campaignStockPlaceholder": "Limit",
+        "adm_campaignPriceFor": "Campaign price for {product}",
+        "adm_campaignStockFor": "Campaign limit for {product}",
+        "adm_campaignCreate": "Create campaign",
+        "adm_campaignSave": "Save changes",
+        "adm_campaignSaveFailed": "The campaign could not be saved.",
+        "adm_campaignDeleteTitle": "Delete campaign",
+        "adm_campaignDeleteConfirm": "The prices go back to normal at once.",
+        "adm_campaignDeleted": "Campaign deleted.",
+        "adm_campaignSummary": "{count} products, {from} to {until}",
+        "adm_campaignAllDay": "all day"
       },
       "cart": {
         "title": "Shopping Cart",
@@ -1560,7 +1601,34 @@
         "adm_editCategory": "Kategoriyi düzenle",
         "adm_saveCategory": "Değişiklikleri kaydet",
         "adm_shelfGate": "Bu rafı kimler görür",
-        "adm_shelfGateHint": "Hiçbir şey seçmezsen herkes görür. Ürün seçersen rafı ve altındaki her şeyi yalnızca o ürünlerden birine sahip olan görür."
+        "adm_shelfGateHint": "Hiçbir şey seçmezsen herkes görür. Ürün seçersen rafı ve altındaki her şeyi yalnızca o ürünlerden birine sahip olan görür.",
+        "adm_campaigns": "Kampanyalar",
+        "adm_campaignsSubtitle": "Tek fiyat değişikliği, çok ürün; saatine göre kendi açılır kapanır.",
+        "adm_campaignsNone": "Henüz kampanya yok.",
+        "adm_campaignNew": "Yeni kampanya",
+        "adm_campaignEdit": "Kampanyayı düzenle",
+        "adm_campaignName": "Ad",
+        "adm_campaignActive": "Açık",
+        "adm_campaignActiveHint": "Kapalıyken saati ne derse desin çalışmaz.",
+        "adm_campaignDays": "Çalıştığı günler",
+        "adm_campaignDaysHint": "Hiçbirini seçmezsen her gün çalışır.",
+        "adm_campaignFrom": "Başlangıç",
+        "adm_campaignUntil": "Bitiş",
+        "adm_campaignHint": "Saatler sitenin kendi saati ({zone}). Bitiş başlangıçtan önceyse gece yarısını aşar.",
+        "adm_campaignProducts": "İçindekiler",
+        "adm_campaignProductsHint": "Fiyat yazdığın ürün kampanyaya girer. Boş bırakırsan girmez.",
+        "adm_campaignPricePlaceholder": "Fiyat",
+        "adm_campaignStockPlaceholder": "Adet",
+        "adm_campaignPriceFor": "{product} için kampanya fiyatı",
+        "adm_campaignStockFor": "{product} için kampanya adedi",
+        "adm_campaignCreate": "Kampanya oluştur",
+        "adm_campaignSave": "Değişiklikleri kaydet",
+        "adm_campaignSaveFailed": "Kampanya kaydedilemedi.",
+        "adm_campaignDeleteTitle": "Kampanyayı sil",
+        "adm_campaignDeleteConfirm": "Fiyatlar anında normale döner.",
+        "adm_campaignDeleted": "Kampanya silindi.",
+        "adm_campaignSummary": "{count} ürün, {from} - {until}",
+        "adm_campaignAllDay": "tüm gün"
       },
       "cart": {
         "title": "Alışveriş Sepeti",

@@ -6,9 +6,9 @@ import {
     AvailabilityFields,
     EMPTY_AVAILABILITY,
     availabilityPayload,
-    timeFromMinutes,
     type AvailabilityValue,
 } from "../../_fields/AvailabilityFields";
+import { timeFromMinutes } from "../../_fields/time-of-day";
 import { GrantFields } from "../../_fields/GrantFields";
 import { EMPTY_GRANT, grantPayload, type GrantValue } from "../../_fields/grant-payload";
 import { RequirementFields } from "../../_fields/RequirementFields";

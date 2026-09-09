@@ -67,6 +67,24 @@ export const categorySchema = z.object({
     isActive: z.boolean().optional(),
 });
 
+export const campaignSchema = z.object({
+    name: z.string().min(1, "Name is required").max(100),
+    isActive: z.boolean().optional(),
+    days: z.array(z.number().int().min(0).max(6)).max(7).optional(),
+    fromMinute: z.number().int().min(0).max(1439).optional().nullable(),
+    untilMinute: z.number().int().min(0).max(1439).optional().nullable(),
+    /**
+     * What is in it. A price of zero is allowed - an operator can mean free -
+     * but a negative one is not, and the form never sends a row whose price
+     * box was left empty.
+     */
+    entries: z.array(z.object({
+        productId: z.string().min(1).max(64),
+        price: z.number().min(0),
+        stock: z.number().int().min(1).max(1_000_000).optional().nullable(),
+    })).max(200).optional(),
+});
+
 export const couponSchema = z.object({
     code: z.string().min(3).max(50).toUpperCase(),
     description: z.string().optional(),

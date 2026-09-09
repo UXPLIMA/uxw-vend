@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle, Input, Label, NativeSelect } from "@/core/sdk/ui";
 import { useRoles } from "./use-roles";
+import { minutesFromTime } from "./time-of-day";
 
 /**
  * When a product is for sale, on one card, on both product forms.
@@ -47,19 +48,6 @@ export const EMPTY_AVAILABILITY: AvailabilityValue = {
     saleFrom: "",
     saleUntil: "",
 };
-
-/** "18:30" to minutes past midnight, and back. */
-export function minutesFromTime(value: string): number | null {
-    if (!value) return null;
-    const [hours, minutes] = value.split(":").map(Number);
-    if (!Number.isFinite(hours) || !Number.isFinite(minutes)) return null;
-    return hours * 60 + minutes;
-}
-
-export function timeFromMinutes(minutes: number | null | undefined): string {
-    if (minutes === null || minutes === undefined) return "";
-    return `${String(Math.floor(minutes / 60)).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`;
-}
 
 /** What the form sends. Empty means "no rule", never zero. */
 export function availabilityPayload(value: AvailabilityValue) {
