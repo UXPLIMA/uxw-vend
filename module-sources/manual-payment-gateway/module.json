@@ -1,0 +1,96 @@
+{
+  "id": "manual-payment-gateway",
+  "name": "Pay by Hand",
+  "description": "Take a payment nobody processes: a bank transfer, cash at the counter, an invoice settled later. The order waits unpaid until an operator confirms the money arrived.",
+  "version": "1.0.0",
+  "coreVersion": "^1.34.0",
+  "category": "commerce",
+  "author": "uxwVend",
+  "icon": "Landmark",
+  "dependencies": [
+    "store@^2.18.0"
+  ],
+  "hookListeners": [
+    {
+      "hook": "payment.providers",
+      "type": "filter",
+      "handler": "hooks/on-payment-providers.ts"
+    },
+    {
+      "hook": "payment.session",
+      "type": "filter",
+      "handler": "hooks/on-payment-session.ts"
+    }
+  ],
+  "adminRoutes": [
+    {
+      "path": "/settings/manual-payment",
+      "component": "pages/admin/page.tsx"
+    }
+  ],
+  "settingsCards": [
+    {
+      "title": "Pay by Hand",
+      "description": "Where to send the money, and which currencies you take.",
+      "href": "/settings/manual-payment",
+      "icon": "Landmark",
+      "color": "text-amber-500"
+    }
+  ],
+  "routes": [
+    {
+      "path": "/payment-instructions",
+      "component": "pages/public/instructions/page.tsx",
+      "noindex": true,
+      "titleKey": "pageTitles.paymentInstructions"
+    }
+  ],
+  "api": [
+    {
+      "path": "/manual-payment/instructions",
+      "handler": "api/instructions/route.ts",
+      "method": "GET",
+      "description": "Where to send the money, as the operator wrote it."
+    }
+  ],
+  "translations": {
+    "en": {
+      "pageTitles": {
+        "paymentInstructions": "How to pay"
+      },
+      "manualPaymentGateway": {
+        "title": "How to pay",
+        "subtitle": "Your order is waiting. It is yours as soon as we see the money.",
+        "quoteThis": "Write this on the transfer",
+        "thenWhat": "We confirm by hand, so it can take until the next working day.",
+        "myOrders": "My orders",
+        "adm_title": "Pay by hand",
+        "adm_subtitle": "For money that arrives outside a processor: a bank transfer, cash, an invoice settled later.",
+        "adm_instructions": "How to pay",
+        "adm_instructionsPlaceholder": "Account name, IBAN, and anything the buyer should write on the transfer.",
+        "adm_instructionsDesc": "Shown to the buyer after checkout. Leave it empty and this way of paying is not offered at all.",
+        "adm_currencies": "Currencies you take",
+        "adm_currenciesDesc": "Three letter codes, separated however you like. Leave it empty to take whatever the shop prices in."
+      }
+    },
+    "tr": {
+      "pageTitles": {
+        "paymentInstructions": "Nasıl ödenir"
+      },
+      "manualPaymentGateway": {
+        "title": "Nasıl ödenir",
+        "subtitle": "Siparişiniz bekliyor. Parayı gördüğümüz anda sizin olacak.",
+        "quoteThis": "Havale açıklamasına bunu yazın",
+        "thenWhat": "Onayı elle yapıyoruz, bu yüzden ertesi iş gününü bulabilir.",
+        "myOrders": "Siparişlerim",
+        "adm_title": "Elden ödeme",
+        "adm_subtitle": "Bir sağlayıcı üzerinden gelmeyen para için: havale, nakit, sonradan ödenen fatura.",
+        "adm_instructions": "Nasıl ödenir",
+        "adm_instructionsPlaceholder": "Hesap adı, IBAN ve alıcının açıklamaya yazması gerekenler.",
+        "adm_instructionsDesc": "Ödeme adımından sonra alıcıya gösterilir. Boş bırakırsanız bu ödeme yöntemi hiç sunulmaz.",
+        "adm_currencies": "Kabul ettiğiniz para birimleri",
+        "adm_currenciesDesc": "Üç harfli kodlar, aralarına ne koyarsanız koyun. Boş bırakırsanız mağazanın fiyatladığı her para birimi kabul edilir."
+      }
+    }
+  }
+}

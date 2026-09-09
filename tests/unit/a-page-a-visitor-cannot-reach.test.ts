@@ -31,6 +31,7 @@ interface Manifest {
 const NOT_A_DESTINATION: Record<string, string> = {
     "/notifications": "One reader's own notifications, opened from the bell that counts them. A link on the public bar would read as a section of the site.",
     "/auth/steam": "The screen a Steam sign-in returns through. Nobody navigates to it; it hands off to a redirect.",
+    "/payment-instructions": "The last step of a checkout that is paid by hand, reached by the redirect that ends it. It says what to write on a transfer for one order, so a visitor arriving without one has nothing to read.",
 };
 
 function manifests(): Manifest[] {

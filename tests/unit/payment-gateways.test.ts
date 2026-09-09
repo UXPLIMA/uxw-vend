@@ -54,6 +54,20 @@ function answeredIds(source: string): string[] {
     return Array.from(source.matchAll(/request\.provider\s*!==\s*"([a-z0-9-]+)"/g)).map((match) => match[1]);
 }
 
+/**
+ * Gateways that report no money because they take none.
+ *
+ * The rule below defends one thing: money that arrives has to reach the store,
+ * or the order stays pending for ever. A gateway that never takes money
+ * automatically cannot break it - there is nothing to report - and something
+ * else settles the order. Naming them here rather than dropping the rule keeps
+ * a real gateway from forgetting to wire itself up.
+ */
+const SETTLED_ELSEWHERE: Record<string, string> = {
+    "manual-payment-gateway":
+        "Takes no money at all: the buyer sends a transfer and an operator marks the order paid on the store's own order screen, which settles it down the same path a callback would.",
+};
+
 const gateways = loadGateways();
 
 describe("the payment gateway catalog", () => {
@@ -98,6 +112,13 @@ describe("the payment gateway catalog", () => {
 
     it.each(gateways.map((g) => [g.id, g] as const))("%s reports money it takes", (_id, gateway) => {
         const emitted = (gateway.manifest.hooksEmitted ?? []).map((h) => h.hook);
+        if (SETTLED_ELSEWHERE[gateway.id]) {
+            // The exemption is for a gateway that takes nothing, so it has to
+            // take nothing: one that reports a settlement is a real gateway
+            // and belongs under the rule.
+            expect(emitted).not.toContain("payment.settled");
+            return;
+        }
         // A gateway that never fires payment.settled can take money and never
         // tell the store, which is an order that stays pending forever.
         expect(emitted).toContain("payment.settled");
