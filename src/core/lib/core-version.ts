@@ -12,6 +12,19 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.37.0 - `restrictedFrom`, `SITE_WIDE`, `isRestrictedFrom`, `safeRoleCss` and
+ * `RoleName`. Two additions that both belong to a member rather than a module.
+ *
+ * A restriction keeps somebody out of one part of the site rather than all of
+ * it; the scope is the asking module's own word and core never interprets it,
+ * so `tickets` and `comments` do not become names core knows. The whole site
+ * covers every part of it, and a lapsed one does not bite.
+ *
+ * A role can carry declarations an operator wrote, judged as a browser reads
+ * them: escapes and comments are folded before the text is judged, and a brace
+ * is refused because it ends the rule this site wrote and starts one of
+ * theirs. Additive.
+ *
  * 1.36.0 - `accessByRole` joins `@/core/sdk`. Which roles may read, write and
  * reply in a container, with two silences that mean opposite things and a
  * child that is never more open than its parent. The forum needed it first and
@@ -249,4 +262,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.36.0";
+export const CORE_API_VERSION = "1.37.0";

@@ -121,3 +121,11 @@ export type { RedirectRule } from "@/core/lib/redirect-resolve";
 // things, and a child that is never more open than its parent.
 export { accessByRole } from "@/core/lib/access-by-role";
 export type { AccessNode, AccessRule, Access } from "@/core/lib/access-by-role";
+
+// Keeping a member out of one part of the site rather than all of it. The
+// scope is the asking module's own word; core never interprets it.
+export { restrictedFrom, SITE_WIDE } from "@/core/lib/restrictions";
+export type { Restriction } from "@/core/lib/restrictions";
+
+// Declarations an operator wrote for a role, judged as a browser reads them.
+export { safeRoleCss } from "@/core/lib/role-css";

@@ -2,8 +2,8 @@
   "id": "forum",
   "name": "Forum Module",
   "description": "Community discussion forum with categories, topics, and replies",
-  "version": "1.2.0",
-  "coreVersion": "^1.35.0",
+  "version": "1.2.1",
+  "coreVersion": "^1.37.0",
   "category": "community",
   "author": "uxwVend Team",
   "icon": "MessageSquare",
@@ -260,7 +260,10 @@
         "signIn": "Sign in",
         "adm_writeFailed": "That did not go through. Please try again.",
         "pinned": "Pinned",
-        "locked": "Locked"
+        "locked": "Locked",
+        "err": {
+          "restricted_from_forum": "You cannot post at the moment."
+        }
       },
       "admin": {
         "menu_forum": "Forum",
@@ -394,7 +397,10 @@
         "signIn": "Giriş yap",
         "adm_writeFailed": "İşlem tamamlanmadı. Lütfen tekrar deneyin.",
         "pinned": "Sabitlenmiş",
-        "locked": "Kilitli"
+        "locked": "Kilitli",
+        "err": {
+          "restricted_from_forum": "Şu anda gönderi paylaşamazsınız."
+        }
       },
       "admin": {
         "menu_forum": "Forum",

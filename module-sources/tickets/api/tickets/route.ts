@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@prisma/client";
 import { answersFor } from "../../lib/fields";
 import { fieldsOf, mayOpenIn } from "../../lib/departments";
+import { isRestrictedFrom } from "@/core/sdk/server";
 import { pageParams, enumParam, isAdmin, prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { TICKET_STATUSES, ticketSchema } from "../../lib/validations";
@@ -106,6 +107,15 @@ export async function POST(request: NextRequest) {
         return NextResponse.json(
             { error: "Department not found" },
             { status: 404 }
+        );
+    }
+
+    // Kept out of the support desk, without being kept off the site. Asked
+    // by this module's own word: core stores the scope and never reads it.
+    if (await isRestrictedFrom(session.user.id, "tickets")) {
+        return NextResponse.json(
+            { error: "You cannot open a ticket at the moment", code: "restricted_from_tickets" },
+            { status: 403 },
         );
     }
 

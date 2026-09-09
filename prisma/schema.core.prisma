@@ -50,6 +50,7 @@ model User {
   mediaItems       MediaItem[]
   revisions        Revision[]         @relation("RevisionAuthor")
   activityFeed     ActivityFeedItem[] @relation("ActivityActor")
+  restrictions     UserRestriction[]  @relation("UserRestrictions")
   warnings         UserWarning[]      @relation("UserWarnings")
   warningsIssued   UserWarning[]      @relation("WarningIssuer")
   notifPrefs       NotificationPreference[] @relation("UserNotifPrefs")
@@ -112,6 +113,11 @@ model Role {
   name        String       @unique
   displayName String
   color       String?
+  /// Declarations an operator wrote, rendered beside every name wearing this
+  /// role. Checked by lib/role-css.ts on the way in and again on the way out:
+  /// a closing brace ends the rule this site wrote and starts one of theirs.
+  nameCss     String?
+  badgeCss    String?
   priority    Int          @default(0)
   isDefault   Boolean      @default(false)
   createdAt   DateTime     @default(now())
@@ -284,6 +290,27 @@ model Revision {
 // User warnings issued by moderators. Configurable point values; when
 // a user accumulates enough points, automatic actions can fire (mute,
 // ban, etc.) via hook listeners.
+/// Keeping a member out of one part of the site rather than all of it.
+///
+/// `scope` is a word this table never interprets. `site` is the one core
+/// names, because it is not a module; everything else is whatever module is
+/// asking about its own room. See lib/restrictions.ts.
+model UserRestriction {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation("UserRestrictions", fields: [userId], references: [id], onDelete: Cascade)
+  scope     String
+  reason    String?
+  /// Null never runs out. The clock is why an operator reaches for this
+  /// instead of a ban.
+  expiresAt DateTime?
+  issuedById String?
+  createdAt DateTime  @default(now())
+
+  @@index([userId, scope])
+  @@index([expiresAt])
+}
+
 model UserWarning {
   id          String   @id @default(cuid())
   userId      String

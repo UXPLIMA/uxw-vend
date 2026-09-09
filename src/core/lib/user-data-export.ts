@@ -50,6 +50,15 @@ export const CORE_TABLES: CoreTable[] = [
         select: { id: true, type: true, title: true, body: true, href: true, icon: true, isPublic: true, createdAt: true },
     },
     {
+        key: "restrictions",
+        model: "userRestriction",
+        column: "userId",
+        // Which parts of the site they were kept out of, why, and until when.
+        // Theirs to have: it is a decision made about them, and the reason is
+        // what they would ask about first.
+        select: { id: true, scope: true, reason: true, expiresAt: true, createdAt: true },
+    },
+    {
         key: "timedRoles",
         model: "timedRoleGrant",
         column: "userId",
@@ -312,6 +321,8 @@ Contents
   user             Your profile row (password hash and 2FA secrets
                    are intentionally omitted).
   activityFeed     Public activity feed entries you generated.
+  restrictions     Parts of the site you were kept out of, why, and
+                   until when.
   timedRoles       Roles you hold for a fixed period, and when each
                    one lapses.
   sessions         Login sessions (device, IP, last-active timestamp).

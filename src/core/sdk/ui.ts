@@ -100,3 +100,8 @@ export { usePrompt, type PromptOptions } from "@/core/components/ui/confirm-dial
 // be here.
 export { useLocalDate } from "@/core/hooks/useLocalDate";
 export { useRelativeTime } from "@/core/hooks/useRelativeTime";
+
+// A member's name wearing its role's style. The declarations an operator wrote
+// are judged here as well as when they were saved: a row edited in the
+// database still has to render safely.
+export { RoleName } from "@/core/components/ui/RoleName";

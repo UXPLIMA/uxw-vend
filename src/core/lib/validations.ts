@@ -76,6 +76,14 @@ export const roleSchema = z.object({
     color: z.string().optional(),
     priority: z.number().int().optional(),
     permissions: z.array(z.string()).optional(),
+    /**
+     * Declarations an operator writes for this role's name and badge. Bounded
+     * here and judged by `safeRoleCss`: which characters are dangerous is not
+     * a thing a schema can say, because it depends on how a browser folds
+     * escapes and comments before it reads them.
+     */
+    nameCss: z.string().max(2000).nullable().optional(),
+    badgeCss: z.string().max(2000).nullable().optional(),
 });
 
 // ==================== SETTINGS SCHEMAS ====================

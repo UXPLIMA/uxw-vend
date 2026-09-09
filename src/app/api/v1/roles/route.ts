@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { safeRoleCss } from "@/core/lib/role-css";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
@@ -52,7 +53,27 @@ export async function POST(request: NextRequest) {
         );
     }
 
-    const { name, displayName, color, priority, permissions } = validation.data;
+
+    /*
+     * A style is either safe to render or it is not stored. Refused rather
+     * than quietly stripped: an operator who wrote a gradient and got a plain
+     * name back would spend the afternoon wondering which browser was wrong.
+     */
+    for (const key of ["nameCss", "badgeCss"] as const) {
+        const written = (validation.data as Record<string, unknown>)[key];
+        if (typeof written === "string" && written.trim() !== "" && !safeRoleCss(written)) {
+            return NextResponse.json(
+                {
+                    error: "That style cannot be used: it leaves the rule it is written in, or fetches something",
+                    code: "role_css_unsafe",
+                    field: key,
+                },
+                { status: 400 },
+            );
+        }
+    }
+
+    const { name, displayName, color, priority, permissions, nameCss, badgeCss } = validation.data;
 
     const existing = await prisma.role.findUnique({ where: { name } });
     if (existing) {
@@ -63,6 +84,8 @@ export async function POST(request: NextRequest) {
         data: {
             name,
             displayName,
+            nameCss: nameCss ?? null,
+            badgeCss: badgeCss ?? null,
             color,
             priority: priority || 0,
             permissions: permissions?.length

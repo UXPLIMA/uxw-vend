@@ -144,3 +144,7 @@ export { resolveAppUrl, resolveAppName } from "@/core/lib/app-url";
  * cannot call a hook, so it awaits these instead.
  */
 export { siteCurrency, formatSiteCurrency } from "@/core/lib/site-currency";
+
+// Whether a member is kept out of a part of the site. The scope is the asking
+// module's own word; see @/core/sdk for the decision behind it.
+export { isRestrictedFrom, restrictionsOn } from "@/core/lib/restrictions-server";

@@ -2,8 +2,8 @@
   "id": "tickets",
   "name": "Support Tickets",
   "description": "Customer support ticket system with departments and priority levels",
-  "version": "1.1.0",
-  "coreVersion": "^1.36.0",
+  "version": "1.1.1",
+  "coreVersion": "^1.37.0",
   "category": "management",
   "author": "uxwVend Team",
   "icon": "Ticket",
@@ -230,7 +230,8 @@
         "adm_writeFailed": "That did not go through. Please try again.",
         "err": {
           "ticket_fields_missing": "Some answers are missing. Fill in the marked boxes.",
-          "ticket_field_not_on_list": "One of the answers is not on the list."
+          "ticket_field_not_on_list": "One of the answers is not on the list.",
+          "restricted_from_tickets": "You cannot open a ticket at the moment."
         }
       },
       "admin": {
@@ -379,7 +380,8 @@
         "adm_writeFailed": "İşlem tamamlanmadı. Lütfen tekrar deneyin.",
         "err": {
           "ticket_fields_missing": "Bazı cevaplar eksik. İşaretli kutuları doldurun.",
-          "ticket_field_not_on_list": "Cevaplardan biri listede yok."
+          "ticket_field_not_on_list": "Cevaplardan biri listede yok.",
+          "restricted_from_tickets": "Şu anda destek kaydı açamazsınız."
         }
       },
       "admin": {

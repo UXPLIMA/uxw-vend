@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { isRestrictedFrom } from "@/core/sdk/server";
 import { accessToCategory } from "../../../lib/visible-categories";
 import { pageParams, isAdmin, moduleSettings, prisma, rateLimitForRole, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
@@ -137,6 +138,15 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     const mode = await getModerationMode("forum_posts");
     const moderationState = mode === "manual" ? "PENDING" : "APPROVED";
+
+    // Kept out of the forum without being kept off the site. Asked by this
+    // module's own word: core stores the scope and never reads it.
+    if (await isRestrictedFrom(session.user.id, "forum")) {
+        return NextResponse.json(
+            { error: "You cannot reply at the moment", code: "restricted_from_forum" },
+            { status: 403 },
+        );
+    }
 
     const post = await prisma.forumPost.create({
         data: {
