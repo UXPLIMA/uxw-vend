@@ -55,6 +55,17 @@ declare global {
          * amount is not.
          */
         "currency.rate": number | null;
+        /**
+         * Whether anything installed here will need a legal identity for this
+         * sale.
+         *
+         * False by default, and a shop with nothing issuing invoices keeps the
+         * checkout it had: a tax number in front of every buyer is a longer
+         * form for a field nobody reads. An invoicing module answers true, and
+         * the details become required - which has to be asked before the money
+         * moves, since afterwards they cannot be asked for at all.
+         */
+        "store.billing.required": boolean;
     }
 
     /** The other half of the same six filters: what each one is asked about. */
@@ -72,6 +83,11 @@ declare global {
         "subscription.changed": SubscriptionChange;
         /** ISO 4217, uppercase, both of them. */
         "currency.rate": { from: string; to: string };
+        /**
+         * What is being bought, so a module can require an identity only where
+         * it has to - above a threshold, or in the currency it files in.
+         */
+        "store.billing.required": { currency: string; total: number };
     }
 
     /**

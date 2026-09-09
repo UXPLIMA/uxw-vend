@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { BillingFields, EMPTY_BILLING } from "./BillingFields";
+import type { BillingDetails } from "../../../lib/billing";
 import Image from "next/image";
 import { Link, useRouter } from "@/core/sdk/navigation";
 import { Button, Card, CardContent, CardHeader, CardTitle, Input, Skeleton, useConfirm, useSiteCurrency, buttonClassName } from "@/core/sdk/ui";
@@ -77,6 +79,11 @@ export default function CartPage() {
     const [providers, setProviders] = useState<PaymentProvider[]>([]);
     const [creditsAvailable, setCreditsAvailable] = useState(false);
     const [creditBalance, setCreditBalance] = useState<number>(0);
+    const [billingRequired, setBillingRequired] = useState(false);
+    const [billing, setBilling] = useState<BillingDetails>(EMPTY_BILLING);
+    // Which boxes the endpoint named, so the form marks them rather than
+    // saying "something is missing" over a page of fields.
+    const [billingMissing, setBillingMissing] = useState<string[]>([]);
 
     useEffect(() => {
         fetchCart();
@@ -85,6 +92,7 @@ export default function CartPage() {
         fetch("/api/v1/store/payment-providers")
             .then(r => r.ok ? r.json() : null)
             .then(data => {
+                setBillingRequired(data?.billingRequired === true);
                 const list: PaymentProvider[] = Array.isArray(data?.providers) ? data.providers : [];
                 setProviders(list);
                 setPaymentMethod(prev => prev || list[0]?.id || "");
@@ -227,6 +235,7 @@ export default function CartPage() {
                         quantity: item.quantity,
                     })),
                     playerName: playerName.trim(),
+                    ...(billingRequired ? { billingDetails: billing } : {}),
                     couponCode: couponApplied || undefined,
                     creatorCode: creatorApplied?.code || undefined,
                     paymentMethod,
@@ -236,6 +245,7 @@ export default function CartPage() {
             const data = await res.json();
 
             if (!res.ok) {
+                setBillingMissing(Array.isArray(data?.missing) ? data.missing : []);
                 setCheckoutError(errorMessage(data, t("err_checkoutFailed"), t));
                 return;
             }
@@ -447,6 +457,14 @@ export default function CartPage() {
                                     />
                                     <p className="text-xs text-muted-foreground">{t('playerNameHelp')}</p>
                                 </div>
+
+                                {billingRequired && (
+                                    <BillingFields
+                                        value={billing}
+                                        onChange={(next) => { setBilling(next); setBillingMissing([]); }}
+                                        missing={billingMissing}
+                                    />
+                                )}
 
                                 {couponDiscount > 0 && (
                                     <div className="flex justify-between text-success">

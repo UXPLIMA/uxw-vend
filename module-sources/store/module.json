@@ -2,7 +2,7 @@
   "id": "store",
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
-  "version": "2.19.0",
+  "version": "2.20.0",
   "coreVersion": "^1.34.0",
   "category": "commerce",
   "author": "uxwVend Team",
@@ -598,6 +598,10 @@
     {
       "hook": "currency.rate",
       "type": "filter"
+    },
+    {
+      "hook": "store.billing.required",
+      "type": "filter"
     }
   ],
   "translations": {
@@ -1036,7 +1040,8 @@
         "err": {
           "manual_order_bad_line": "One of the lines has a price or a quantity that cannot be used.",
           "chest_needs_player_name": "Tell us which player to deliver to.",
-          "order_no_payment": "That order has no payment to refund. Cancel it instead."
+          "order_no_payment": "That order has no payment to refund. Cancel it instead.",
+          "billing_details_missing": "Some invoice details are missing. Fill in the marked boxes."
         },
         "adm_productCopy": "Duplicate",
         "adm_productCopySuffix": "{name} (copy)",
@@ -1049,7 +1054,25 @@
         "tab_chest_giftMessage": "{name} leaves your chest and appears in theirs. You cannot take it back.",
         "tab_chest_giftPlaceholder": "Their username",
         "tab_chest_gifted": "Sent to {name}.",
-        "tab_chest_giftError": "That could not be given away."
+        "tab_chest_giftError": "That could not be given away.",
+        "billing_title": "Invoice details",
+        "billing_hint": "We issue a legal invoice for this sale, so we need who it is made out to.",
+        "billing_individual": "A person",
+        "billing_company": "A company",
+        "billing_name": "Full name",
+        "billing_companyName": "Registered name",
+        "billing_taxNumber": "Tax number",
+        "billing_taxOffice": "Tax office",
+        "billing_address": "Address",
+        "billing_city": "City",
+        "billing_country": "Country",
+        "billing_pickCountry": "Pick a country",
+        "billing_country_TR": "Turkiye",
+        "billing_country_GB": "United Kingdom",
+        "billing_country_DE": "Germany",
+        "billing_country_FR": "France",
+        "billing_country_NL": "Netherlands",
+        "billing_country_US": "United States"
       },
       "cart": {
         "title": "Shopping Cart",
@@ -1701,7 +1724,8 @@
         "err": {
           "manual_order_bad_line": "Satırlardan birinin fiyatı veya adedi kullanılamıyor.",
           "chest_needs_player_name": "Hangi oyuncuya teslim edileceğini söyleyin.",
-          "order_no_payment": "Bu siparişin iade edilecek bir ödemesi yok. Bunun yerine iptal edin."
+          "order_no_payment": "Bu siparişin iade edilecek bir ödemesi yok. Bunun yerine iptal edin.",
+          "billing_details_missing": "Bazı fatura bilgileri eksik. İşaretli kutuları doldurun."
         },
         "adm_productCopy": "Çoğalt",
         "adm_productCopySuffix": "{name} (kopya)",
@@ -1714,7 +1738,25 @@
         "tab_chest_giftMessage": "{name} sandığınızdan çıkıp onunkine geçer. Geri alamazsınız.",
         "tab_chest_giftPlaceholder": "Kullanıcı adı",
         "tab_chest_gifted": "{name} kişisine gönderildi.",
-        "tab_chest_giftError": "Hediye edilemedi."
+        "tab_chest_giftError": "Hediye edilemedi.",
+        "billing_title": "Fatura bilgileri",
+        "billing_hint": "Bu satış için yasal fatura kesiyoruz, faturanın kime kesileceğini bilmemiz gerekiyor.",
+        "billing_individual": "Bireysel",
+        "billing_company": "Kurumsal",
+        "billing_name": "Ad soyad",
+        "billing_companyName": "Ünvan",
+        "billing_taxNumber": "Vergi numarası",
+        "billing_taxOffice": "Vergi dairesi",
+        "billing_address": "Adres",
+        "billing_city": "Şehir",
+        "billing_country": "Ülke",
+        "billing_pickCountry": "Ülke seçin",
+        "billing_country_TR": "Türkiye",
+        "billing_country_GB": "Birleşik Krallık",
+        "billing_country_DE": "Almanya",
+        "billing_country_FR": "Fransa",
+        "billing_country_NL": "Hollanda",
+        "billing_country_US": "Amerika Birleşik Devletleri"
       },
       "cart": {
         "title": "Alışveriş Sepeti",

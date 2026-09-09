@@ -158,6 +158,15 @@ model Order {
   paymentId     String?
   notes         String?
   metadata      Json?
+  /**
+   * Who the invoice is made out to, when anything here issues one.
+   *
+   * Null on a shop that issues none, which is most of them: asking every
+   * buyer for a tax number is a longer checkout for a field nobody reads.
+   * JSON rather than columns because what a tax authority wants differs by
+   * country, and the module talking to one is the only thing that knows.
+   */
+  billingDetails Json?
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
 

@@ -12,6 +12,7 @@ import { convertedCharge, resolveCurrency } from "../../lib/currency";
 import { startPaymentSession, listPaymentProviders } from "../../lib/payments";
 import { announceOrderCreated, announceOrderCompleted } from "../../lib/order-events";
 import { recordedVariables } from "../../lib/chest";
+import { billingRefusal, type BillingDetails } from "../../lib/billing";
 import {
     computeOrderPricing,
     computeCouponDiscount,
@@ -72,6 +73,19 @@ const checkoutSchema = z.object({
     // a list written here: the whole point of the payment contract is that
     // this file does not know which gateways exist.
     paymentMethod: z.string().min(1).max(32).default("stripe"),
+    /**
+     * Who to make the invoice out to. Bounded here and checked for
+     * completeness below, once the store knows whether anything reads it.
+     */
+    billingDetails: z.object({
+        kind: z.enum(["individual", "company"]),
+        name: z.string().max(200),
+        taxNumber: z.string().max(40),
+        taxOffice: z.string().max(120),
+        address: z.string().max(300),
+        city: z.string().max(120),
+        country: z.string().max(60),
+    }).optional(),
 });
 
 // POST /api/v1/store/checkout - Create checkout session
@@ -102,6 +116,7 @@ export async function POST(request: NextRequest) {
         }
 
         const { items, playerName, couponCode, creatorCode, variables, notes, paymentMethod } = validation.data;
+        const sentBilling = validation.data.billingDetails as BillingDetails | undefined;
 
         // ── Fetch products ──
         const productIds = items.map((i) => i.productId);
@@ -307,6 +322,29 @@ export async function POST(request: NextRequest) {
             taxIncluded,
         });
 
+        // Who the invoice is made out to, if anything here issues one. Asked
+        // before the money moves: afterwards these cannot be asked for at all.
+        const needsBilling = await applyFiltersAsync("store.billing.required", false, {
+            currency: currency.toUpperCase(),
+            total,
+        });
+        const billingAnswer = billingRefusal(needsBilling, sentBilling);
+        if ("missing" in billingAnswer) {
+            return NextResponse.json(
+                {
+                    error: "Some invoice details are missing",
+                    code: "billing_details_missing",
+                    missing: billingAnswer.missing,
+                },
+                { status: 400 },
+            );
+        }
+        // Prisma reads a JSON column as one type and writes it as another:
+        // what comes back as null goes in as JsonNull.
+        const billingDetails = billingAnswer.billing
+            ? (billingAnswer.billing as unknown as Prisma.InputJsonValue)
+            : Prisma.JsonNull;
+
         // ── Credits payment ──
         if (paymentMethod === "credits") {
             const user = await prisma.user.findUnique({ where: { id: session.user.id }, select: { creditBalance: true } });
@@ -368,6 +406,7 @@ export async function POST(request: NextRequest) {
                         status: "COMPLETED",
                         subtotal,
                         discount: totalDiscount,
+                        billingDetails,
                         tax,
                         total,
                         currency: currency.toUpperCase(),
@@ -482,6 +521,7 @@ export async function POST(request: NextRequest) {
                 tax,
                 total,
                 currency: currency.toUpperCase(),
+                billingDetails,
                 notes,
                 paymentMethod,
                 metadata: { playerName, variables: variables || {}, creatorCode: creatorCodeRecord?.code || null },
