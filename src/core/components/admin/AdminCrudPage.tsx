@@ -21,6 +21,7 @@ import { Pagination, usePagedRows } from "@/core/components/ui/pagination";
 import { Link } from "@/core/lib/i18n/navigation";
 import { useFormRoute } from "@/core/hooks/useFormRoute";
 import { Checkbox, CheckboxField } from "@/core/components/ui/checkbox";
+import { headerState, narrowTo, pickAll, pickNone, togglePick, type Selection } from "@/core/lib/bulk-selection";
 
 export interface CrudField {
     key: string;
@@ -73,7 +74,7 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [form, setForm] = useState<Record<string, string>>({});
-    const [selected, setSelected] = useState<Set<string>>(new Set());
+    const [selected, setSelected] = useState<Selection>(new Set());
     const { confirm } = useConfirm();
 
     // `?form=new` creates, `?form=<id>` edits, absent shows the list.
@@ -159,11 +160,7 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
         }
     };
 
-    const toggleSelect = (id: string) => {
-        const next = new Set(selected);
-        if (next.has(id)) { next.delete(id); } else { next.add(id); }
-        setSelected(next);
-    };
+    const toggleSelect = (id: string) => setSelected(togglePick(selected, id));
 
     const bulkDelete = async () => {
         const ok = await confirm({ title: ct("crud_deleteItems"), message: ct("crud_deleteItemsConfirm", { count: selected.size }), variant: "danger", confirmText: ct("crud_delete") });
@@ -176,7 +173,7 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
             if (!(await writeError(res, ct("crud_deleteFailed"), ct))) deleted++;
         }
         const total = selected.size;
-        setSelected(new Set());
+        setSelected(pickNone());
         fetchItems();
         if (deleted === total) toast.success(ct("crud_deleted"));
         else if (deleted === 0) toast.error(ct("crud_deleteFailed"));
@@ -237,6 +234,17 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
 
     const paged = usePagedRows(items);
 
+    /**
+     * The selection follows the listing. Paging on, or a refetch that removed
+     * a row, used to leave ids behind and the destructive button counted them:
+     * "Delete 8" while three rows were on screen. Narrowing here means the
+     * number is always the number of rows the operator can see.
+     */
+    const listedIds = paged.rows.map((row) => row.id as string);
+    const narrowed = narrowTo(selected, listedIds);
+    if (narrowed !== selected) setSelected(narrowed);
+    const header = headerState(narrowed, listedIds);
+
     if (loading) return <div className="flex justify-center py-12"><Loader2 className="w-8 h-8 animate-spin text-muted-foreground" /></div>;
 
     if (showForm) {
@@ -284,9 +292,9 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
                 title={title}
                 description={subtitle}
                 actions={<>
-                    {selected.size > 0 && (
+                    {narrowed.size > 0 && (
                         <Button variant="destructive" onClick={bulkDelete}>
-                            <Trash2 className="w-4 h-4" /> {ct("crud_delete")} {selected.size}
+                            <Trash2 className="w-4 h-4" /> {ct("crud_delete")} {narrowed.size}
                         </Button>
                     )}
                     <Link href={formHref()} className={buttonClassName("default", "default")}>
@@ -301,10 +309,25 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
                         <p className="text-muted-foreground text-center py-8">{ct("crud_noItems")}</p>
                     ) : (
                         <div className="divide-y">
+                            {/* Two hundred rows and no select-all is two
+                                hundred clicks, and the box that does it has
+                                to say "some" while some are unticked or its
+                                next click clears the lot. */}
+                            <div className="flex items-center gap-3 px-4 py-2 bg-muted/50">
+                                <Checkbox
+                                    checked={header === "all"}
+                                    indeterminate={header === "some"}
+                                    onChange={() => setSelected(header === "all" ? pickNone() : pickAll(narrowed, listedIds))}
+                                    aria-label={ct("crud_selectAll")}
+                                />
+                                <span className="text-sm text-muted-foreground">
+                                    {narrowed.size > 0 ? ct("crud_selectedCount", { count: narrowed.size }) : ct("crud_selectAll")}
+                                </span>
+                            </div>
                             {paged.rows.map((item) => (
                                 <div key={item.id as string} className="flex items-center gap-3 p-4 hover:bg-muted/50">
                                     <Checkbox
-                                        checked={selected.has(item.id as string)}
+                                        checked={narrowed.has(item.id as string)}
                                         onChange={() => toggleSelect(item.id as string)}
                                         aria-label={ct("common_selectRow")}
                                     />

@@ -13,9 +13,13 @@ const PUBLIC_KEYS = [
     "site_description",
     "site_email",
     "site_discord_url",
-    // Rendered by the footer. Core no longer hardcodes a legal column, so an
-    // install's legal links live entirely in these two settings.
+    // Rendered by the footer. Core hardcodes no column at all: the headings,
+    // the links and which module section each column adopts are the
+    // operator's, in `footer_columns`. The two older keys stay on the list
+    // because they still hold the footer of every install that has not opened
+    // the editor, and the footer reads them when `footer_columns` is absent.
     "footer_about_text",
+    "footer_columns",
     "footer_quick_links",
     "footer_legal_links",
     "footer_copyright",

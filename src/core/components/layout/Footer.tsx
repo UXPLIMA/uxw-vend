@@ -11,21 +11,40 @@ import { ModuleFooterLinks, ModuleNavLinks, ModuleRoutes, ModuleFooterComponents
 import { ModuleErrorBoundary } from "@/core/components/ModuleErrorBoundary";
 import { FooterDropdown } from "@/core/components/ui/footer-dropdown";
 import { Slot } from "@/core/components/Slot";
-import { parseFooterLinks, type FooterLink } from "@/core/lib/footer-links";
+import { NavIcon } from "@/core/components/ui/NavIcon";
+import { legacyColumns, parseFooterColumns, placeModuleLinks, withHomeLink, type FooterColumnLink } from "@/core/lib/footer-columns";
 
 
 const FOOTER_LINK_CLASS = "text-muted-foreground hover:text-foreground transition-colors";
 
+/** Indexed by column count. Literal, because Tailwind scans for the string. */
+const GRID_COLUMNS = [
+    "md:grid-cols-1",
+    "md:grid-cols-1",
+    "md:grid-cols-2",
+    "md:grid-cols-3",
+    "md:grid-cols-4",
+    "md:grid-cols-5",
+    "md:grid-cols-6",
+] as const;
+
 /** Internal links go through next-intl's locale-aware Link; external ones don't. */
-function FooterLinkItem({ link }: { link: FooterLink }) {
+function FooterLinkItem({ link }: { link: FooterColumnLink }) {
+    const inside = (
+        <>
+            <NavIcon name={link.icon} className="w-4 h-4 shrink-0" />
+            {link.label}
+        </>
+    );
+    const className = `${FOOTER_LINK_CLASS} inline-flex items-center gap-2`;
     if (link.external) {
         return (
-            <a href={link.href} target="_blank" rel="noopener noreferrer" className={FOOTER_LINK_CLASS}>
-                {link.label}
+            <a href={link.href} target="_blank" rel="noopener noreferrer" className={className}>
+                {inside}
             </a>
         );
     }
-    return <Link href={link.href} className={FOOTER_LINK_CLASS}>{link.label}</Link>;
+    return <Link href={link.href} className={className}>{inside}</Link>;
 }
 
 function DefaultFooter() {
@@ -84,23 +103,31 @@ function DefaultFooter() {
     // Same as the navbar: the module's own name in the footer follows the
     // locale when the manifest declares a key, and falls back to the manifest
     // label when it does not. Links the admin typed have no key and stay put.
-    const toLink = (fl: { label: string; labelKey?: string; href: string }): FooterLink => ({
-        ...fl,
+    const named = enabledFooterLinks.map((fl) => ({
         label: fl.labelKey && navT.has(fl.labelKey) ? navT(fl.labelKey) : fl.label,
-        external: false,
-    });
-    const legalLinks: FooterLink[] = [
-        ...parseFooterLinks(settings.footer_legal_links),
-        ...enabledFooterLinks.filter((fl) => fl.section === "legal").map(toLink),
-    ];
-    const quickLinks: FooterLink[] = [
-        ...parseFooterLinks(settings.footer_quick_links),
-        ...enabledFooterLinks.filter((fl) => fl.section !== "legal").map(toLink),
-    ];
+        href: fl.href,
+        section: fl.section ?? null,
+        icon: null,
+    }));
 
-    // The legal column only exists when something fills it, so the remaining
-    // columns keep an even split instead of leaving a hole in the grid.
-    const columnClass = legalLinks.length > 0 ? "md:grid-cols-4" : "md:grid-cols-3";
+    // An install that has never opened the footer editor keeps the two
+    // columns it had, read out of the settings that still hold them.
+    const saved = parseFooterColumns(settings.footer_columns);
+    const columns = withHomeLink(
+        placeModuleLinks(
+            saved ?? legacyColumns(settings.footer_quick_links, settings.footer_legal_links),
+            named,
+        ),
+        commonT('home'),
+    );
+    const filled = columns.filter((column) => column.links.length > 0);
+
+    // Brand, the operator's columns, and settings. An empty column would
+    // leave a hole in the grid rather than a narrower one, so it is dropped
+    // above and the grid narrows to match. The classes are written out because
+    // Tailwind reads this file as text: an interpolated `grid-cols-${n}` is a
+    // class it never generates and the grid silently collapses to one column.
+    const columnClass = GRID_COLUMNS[Math.min(filled.length + 2, GRID_COLUMNS.length - 1)];
 
     const handleLocaleChange = (newLocale: string) => {
         router.replace(pathname, { locale: newLocale });
@@ -149,29 +176,20 @@ function DefaultFooter() {
                         </ul>
                     </div>
 
-                    {/* Quick Links */}
-                    <div>
-                        <h2 className="font-semibold text-foreground mb-4">{t('quickLinks')}</h2>
-                        <ul className="space-y-2 text-sm">
-                            <li><Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">{commonT('home')}</Link></li>
-                            {quickLinks.map(fl => (
-                                <li key={fl.href}><FooterLinkItem link={fl} /></li>
-                            ))}
-                        </ul>
-                    </div>
-
-                    {/* Legal - admin-authored links plus anything modules contribute.
-                        Core names no legal page of its own. */}
-                    {legalLinks.length > 0 && (
-                        <div>
-                            <h2 className="font-semibold text-foreground mb-4">{t('legal')}</h2>
+                    {/* The operator's columns, plus whatever modules contributed
+                        to each. Core names no page and no section of its own. */}
+                    {filled.map((column, index) => (
+                        <div key={column.title ?? column.titleKey ?? index}>
+                            <h2 className="font-semibold text-foreground mb-4">
+                                {column.titleKey && t.has(column.titleKey) ? t(column.titleKey) : column.title}
+                            </h2>
                             <ul className="space-y-2 text-sm">
-                                {legalLinks.map(fl => (
+                                {column.links.map(fl => (
                                     <li key={fl.href}><FooterLinkItem link={fl} /></li>
                                 ))}
                             </ul>
                         </div>
-                    )}
+                    ))}
 
                     {/* Settings */}
                     <div>

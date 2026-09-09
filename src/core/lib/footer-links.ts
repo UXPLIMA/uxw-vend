@@ -1,13 +1,17 @@
 /**
  * Admin-authored footer links.
  *
- * `footer_quick_links` and `footer_legal_links` are free-form JSON settings
- * edited in Admin > Settings > Footer. They are the reason core no longer
- * hardcodes a legal column: which pages an install considers "legal" is a
- * per-site decision, not something core can know.
+ * `footer_quick_links` and `footer_legal_links` are free-form JSON settings.
+ * They are the reason core no longer hardcodes a legal column: which pages an
+ * install considers "legal" is a per-site decision, not something core can
+ * know. The footer editor has moved past them to `footer_columns`, where the
+ * headings are the operator's too, but they still hold the live footer of
+ * every install that has not opened that screen and are read as columns
+ * rather than migrated.
  *
  * The value is admin-supplied and rendered as an anchor, so every href is
- * checked here rather than at the render site.
+ * checked here rather than at the render site. `footer-columns.ts` builds on
+ * that check rather than repeating it.
  */
 
 export interface FooterLink {

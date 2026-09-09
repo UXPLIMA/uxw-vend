@@ -29,6 +29,7 @@ const PER_KEY_STRING_LIMITS: Record<string, number> = {
     site_email: 254,
     site_discord_url: 500,
     footer_about_text: 2_000,
+    footer_columns: 24_000,
     footer_quick_links: 8_000,
     footer_legal_links: 8_000,
     footer_copyright: 300,
