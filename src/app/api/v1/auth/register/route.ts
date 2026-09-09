@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { ensureHooks } from "@/core/lib/hooks-bootstrap";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/core/lib/db";
 import { registerSchema } from "@/core/lib/validations";
@@ -27,6 +28,7 @@ function detectLocale(request: NextRequest): string {
 }
 
 export async function POST(request: NextRequest) {
+    await ensureHooks();
     // Rate limit: 10 requests per minute per IP
     const ip = getClientIP(request.headers);
     const rl = await rateLimit(`register:${ip}`, rateLimits.auth);

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { ensureHooks } from "@/core/lib/hooks-bootstrap";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
@@ -23,6 +24,7 @@ type RouteParams = { params: Promise<{ id: string }> };
 
 // GET /api/v1/users/[id]
 export async function GET(request: NextRequest, { params }: RouteParams) {
+    await ensureHooks();
     const session = await auth();
     if (!session?.user?.id) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -59,6 +61,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
 
 // PATCH /api/v1/users/[id] - Update user (admin)
 export async function PATCH(request: NextRequest, { params }: RouteParams) {
+    await ensureHooks();
     const session = await auth();
     if (!session?.user?.id) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

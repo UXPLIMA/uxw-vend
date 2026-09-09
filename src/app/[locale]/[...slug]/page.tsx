@@ -1,5 +1,6 @@
 
 import { cache } from "react";
+import { ensureHooks } from "@/core/lib/hooks-bootstrap";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ModuleRegistry } from "@/core/generated/module-page-registry";
@@ -101,6 +102,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 }
 
 export default async function DynamicModulePage(props: PageProps) {
+    // Every module page is rendered through here, so the bus is filled once
+    // for all of them. `instrumentation.ts` bootstraps a different module
+    // graph: without this a page asks a question no listener answers, and
+    // gets its own input back with no error to show for it.
+    await ensureHooks();
     const { params } = props;
     const { slug } = await params;
 

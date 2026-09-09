@@ -1,5 +1,6 @@
 
 import { notFound } from "next/navigation";
+import { ensureHooks } from "@/core/lib/hooks-bootstrap";
 import { redirect } from "@/core/lib/i18n/navigation";
 import { ModuleRegistry } from "@/core/generated/module-page-registry";
 import { matchModuleRoute } from "@/core/lib/route-matcher";
@@ -18,6 +19,11 @@ interface PageProps {
 }
 
 export default async function DynamicAdminModulePage(props: PageProps) {
+    // Every module page is rendered through here, so the bus is filled once
+    // for all of them. `instrumentation.ts` bootstraps a different module
+    // graph: without this a page asks a question no listener answers, and
+    // gets its own input back with no error to show for it.
+    await ensureHooks();
     const session = await getSession();
     const locale = await getLocale();
     if (!session?.user) {

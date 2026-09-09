@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { ensureHooks } from "@/core/lib/hooks-bootstrap";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { rateLimit } from "@/core/lib/rate-limit";
@@ -11,6 +12,7 @@ import { z } from "zod";
 
 // GET /api/v1/auth/profile
 export async function GET() {
+    await ensureHooks();
     const session = await auth();
     if (!session?.user?.id) {
         return NextResponse.json({ error: "Unauthorized", code: "unauthorized" }, { status: 401 });
@@ -35,6 +37,7 @@ export async function GET() {
 
 // PATCH /api/v1/auth/profile - Update profile
 export async function PATCH(request: NextRequest) {
+    await ensureHooks();
     const session = await auth();
     if (!session?.user?.id) {
         return NextResponse.json({ error: "Unauthorized", code: "unauthorized" }, { status: 401 });

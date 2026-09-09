@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { ensureHooks } from "@/core/lib/hooks-bootstrap";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
@@ -49,6 +50,7 @@ function score(text: string, query: string): number {
 
 // GET /api/v1/admin/search?q=... - Cross-module spotlight search
 export async function GET(request: NextRequest) {
+    await ensureHooks();
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     if (!(await isAdmin(session.user.id))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });

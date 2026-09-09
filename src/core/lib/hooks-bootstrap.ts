@@ -30,6 +30,25 @@ import { errorText, log } from "./logger";
  * are skipped. Disabled modules' listeners are removed when status changes
  * (via removeModuleHooks).
  */
+/**
+ * Make sure this module graph's hook bus holds the module listeners.
+ *
+ * `instrumentation.ts` bootstraps once per process, but it runs in its own
+ * module graph: the registry it fills is not the one a route handler reads.
+ * Measured against a production build - a cold server logged 56 listeners
+ * registered and then served an empty payment gateway list in three
+ * milliseconds without a query, because `applyFiltersAsync` in the app's
+ * graph found no listeners and returned its input. No error, no log line.
+ *
+ * So anything about to ask a module a question calls this first. After the
+ * first call in a graph it is a boolean comparison, which is what makes it
+ * safe on a per-request path.
+ */
+export async function ensureHooks(): Promise<void> {
+    if (isBootstrapped()) return;
+    await bootstrapHooks();
+}
+
 export async function bootstrapHooks(): Promise<void> {
     if (isBootstrapped()) return;
     markBootstrapped();

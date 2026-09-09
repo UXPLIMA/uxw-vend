@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { ensureHooks } from "@/core/lib/hooks-bootstrap";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
@@ -71,6 +72,7 @@ function isNewerVersion(current: string, latest: string): boolean {
 
 // GET /api/v1/modules - Get all modules with their status (admin only)
 export async function GET() {
+    await ensureHooks();
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     if (!(await isAdmin(session.user.id))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
@@ -102,6 +104,7 @@ export async function GET() {
 
 // PATCH /api/v1/modules - Update module status
 export async function PATCH(request: NextRequest) {
+    await ensureHooks();
     const session = await auth();
 
     if (!session?.user?.id) {

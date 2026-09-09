@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { ensureHooks } from "@/core/lib/hooks-bootstrap";
 import { z } from "zod";
 import { readJsonBody } from "@/core/lib/api-body";
 import { prisma } from "@/core/lib/db";
@@ -24,6 +25,7 @@ const resetPasswordSchema = z.object({
 
 // POST /api/v1/auth/reset-password
 export async function POST(request: NextRequest) {
+    await ensureHooks();
     try {
         const ip = getClientIP(request.headers);
         const rl = await rateLimit(`reset:${ip}`, { maxRequests: 10, windowMs: 3600000 });

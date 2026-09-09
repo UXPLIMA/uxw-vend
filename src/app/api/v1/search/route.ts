@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { ensureHooks } from "@/core/lib/hooks-bootstrap";
 import { ModuleSearchProviders } from "@/core/generated/module-search";
 import { apiError, withRateLimit } from "@/core/lib/api-utils";
 import { SEARCH_QUERY_MAX_LENGTH } from "@/core/lib/constants";
@@ -39,6 +40,7 @@ interface ResultGroup {
  * the caller did not ask for are a wrong answer dressed as a real one.
  */
 export const GET = withRateLimit("search", async (request: NextRequest) => {
+    await ensureHooks();
     const { searchParams } = new URL(request.url);
     const q = searchParams.get("q")?.trim() || "";
     if (q.length < 2) {

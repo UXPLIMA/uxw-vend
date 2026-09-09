@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { ensureHooks } from "@/core/lib/hooks-bootstrap";
 import { ModuleApiRegistry } from "@/core/generated/module-api-registry";
 import { matchApiRoute, type ApiRouteMatch } from "@/core/lib/api-matcher";
 import { logRequest } from "@/core/lib/logger";
@@ -83,6 +84,11 @@ function methodNotAllowed(method: string, match: ApiRouteMatch, exports?: string
 }
 
 async function handleRequest(req: NextRequest, paramsPromise: Promise<{ path: string[] }>, method: string) {
+    // Every module API on the site is served through here, so the bus is
+    // filled once for all of them. `instrumentation.ts` bootstraps a
+    // different module graph, and without this a handler asks a question no
+    // listener is registered to answer.
+    await ensureHooks();
     const { path } = await paramsPromise;
     const fullPath = `/api/v1/${path.join("/")}`;
     const requestStart = Date.now();

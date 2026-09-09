@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { ensureHooks } from "@/core/lib/hooks-bootstrap";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { EMAIL_VERIFY_EXPIRY, getDurationMs } from "@/core/lib/security-settings";
@@ -14,6 +15,7 @@ function hashToken(token: string): string {
 // POST /api/v1/auth/verify-email - Send verification email
 
 export async function POST(_request: NextRequest) {
+    await ensureHooks();
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized", code: "unauthorized" }, { status: 401 });
 
@@ -61,6 +63,7 @@ export async function POST(_request: NextRequest) {
 
 // GET /api/v1/auth/verify-email?token=...&email=... - Verify
 export async function GET(request: NextRequest) {
+    await ensureHooks();
     const token = request.nextUrl.searchParams.get("token");
     const email = request.nextUrl.searchParams.get("email");
 

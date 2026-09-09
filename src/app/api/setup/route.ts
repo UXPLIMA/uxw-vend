@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { ensureHooks } from "@/core/lib/hooks-bootstrap";
 import { z } from "zod";
 import bcrypt from "bcryptjs";
 import fs from "fs/promises";
@@ -62,6 +63,7 @@ const MARKETPLACE_DIR = path.join(process.cwd(), "module-marketplace");
 const MAX_MODULE_SIZE = 50 * 1024 * 1024; // 50MB
 
 export async function POST(request: NextRequest) {
+    await ensureHooks();
     // Early rejection: if anyone already exists, reply without reading the
     // body. This is a fast path only - the real race protection is the
     // advisory-locked transaction below.
