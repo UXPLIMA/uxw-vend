@@ -1,4 +1,5 @@
 import { siteTimeZone } from "@/core/sdk/server";
+import { stillOwnedWhere } from "./ownership";
 import {
     availabilityOf,
     effectivePrice,
@@ -22,6 +23,8 @@ export interface ProductRow {
     id: string;
     isActive: boolean;
     roleIds: string[];
+    requiresProductIds: string[];
+    requiresAny: boolean;
     stock: number | null;
     price: unknown;
     availableFrom: Date | null;
@@ -45,6 +48,8 @@ export function rulesOf(row: ProductRow): ProductRules {
     return {
         isActive: row.isActive,
         roleIds: row.roleIds ?? [],
+        requiresProductIds: row.requiresProductIds ?? [],
+        requiresAny: row.requiresAny ?? false,
         availableFrom: row.availableFrom,
         availableUntil: row.availableUntil,
         availableDays: row.availableDays ?? [],
@@ -105,12 +110,13 @@ export function onTheShelfWhere(now: Date) {
 export function hideShut<T extends ProductRow>(rows: T[], now: Date, zone: string): T[] {
     return rows.filter((row) => {
         if (row.outsideWindow !== "hidden") return true;
-        // Nobody in particular, so a rank-gated product is judged on its
-        // hours alone here. The list is shared-cached and cannot vary by who
-        // is reading; a rank is advertised rather than hidden, which is also
-        // how somebody learns the rank is worth buying.
+        // Nobody in particular, so a product gated by a rank or by owning
+        // something else is judged on its hours alone here. The list is
+        // shared-cached and cannot vary by who is reading; both gates are
+        // advertised rather than hidden, which is also how somebody learns
+        // the rank - or the tier below - is worth buying.
         const state = availabilityOf(
-            { ...rulesOf(row), roleIds: [] },
+            { ...rulesOf(row), roleIds: [], requiresProductIds: [] },
             { boughtByPerson: 0, soldInPeriod: 0 },
             now,
             zone,
@@ -122,6 +128,12 @@ export function hideShut<T extends ProductRow>(rows: T[], now: Date, zone: strin
 interface CountReader {
     user?: {
         findUnique(args: { where: { id: string }; select: { roleId: true } }): Promise<{ roleId: string | null } | null>;
+    };
+    ownedProduct?: {
+        findMany(args: {
+            where: Record<string, unknown>;
+            select: { productId: true };
+        }): Promise<{ productId: string }[]>;
     };
     orderItem: {
         aggregate(args: {
@@ -187,7 +199,7 @@ export async function availabilityFor(
 ): Promise<Availability & { price: number; was: number | null; onSale: boolean }> {
     const rules = rulesOf(row);
     const where = zone ?? (await siteTimeZone());
-    const [counts, buyer] = await Promise.all([
+    const [counts, buyer, owned] = await Promise.all([
         countsFor(db, row.id, userId, rules, now),
         // Only asked when the product names a rank: an extra read on every
         // product page for a rule almost no product uses is a read nobody
@@ -195,9 +207,29 @@ export async function availabilityFor(
         rules.roleIds.length > 0 && userId && db.user
             ? db.user.findUnique({ where: { id: userId }, select: { roleId: true } })
             : Promise.resolve(null),
+        // Same reason, and the same shape: only a product that names a
+        // prerequisite pays for the read that answers it.
+        rules.requiresProductIds.length > 0 && userId && db.ownedProduct
+            ? db.ownedProduct.findMany({
+                where: {
+                    ...stillOwnedWhere(userId, now),
+                    productId: { in: rules.requiresProductIds },
+                },
+                select: { productId: true },
+            })
+            : Promise.resolve([]),
     ]);
     return {
-        ...availabilityOf(rules, { ...counts, roleId: buyer?.roleId ?? null }, now, where),
+        ...availabilityOf(
+            rules,
+            {
+                ...counts,
+                roleId: buyer?.roleId ?? null,
+                ownedProductIds: new Set(owned.map((row) => row.productId)),
+            },
+            now,
+            where,
+        ),
         ...effectivePrice(rules, now),
     };
 }

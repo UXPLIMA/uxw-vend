@@ -11,6 +11,8 @@ import {
 } from "../../_fields/AvailabilityFields";
 import { GrantFields } from "../../_fields/GrantFields";
 import { EMPTY_GRANT, grantPayload, type GrantValue } from "../../_fields/grant-payload";
+import { RequirementFields } from "../../_fields/RequirementFields";
+import { EMPTY_REQUIREMENT, requirementPayload, type RequirementValue } from "../../_fields/requirement-payload";
 import { instantToWallClock } from "@/core/sdk";
 import { useState, useEffect, use } from "react";
 import Image from "next/image";
@@ -45,6 +47,7 @@ export default function EditProductPage(props: PageProps) {
     const [categories, setCategories] = useState<Category[]>([]);
     const [availability, setAvailability] = useState<AvailabilityValue>(EMPTY_AVAILABILITY);
     const [grant, setGrant] = useState<GrantValue>(EMPTY_GRANT);
+    const [requires, setRequires] = useState<RequirementValue>(EMPTY_REQUIREMENT);
     // The zone the hours are read in, shown beside them: "18:00" with no zone
     // next to it is what makes somebody schedule a sale three hours out.
     const { settings } = useSiteSettings();
@@ -127,6 +130,10 @@ export default function EditProductPage(props: PageProps) {
                     durationDays: p.durationDays ? String(p.durationDays) : "",
                     grantsRoleId: p.grantsRoleId ?? "",
                 });
+                setRequires({
+                    requiresProductIds: p.requiresProductIds ?? [],
+                    requiresAny: p.requiresAny ?? false,
+                });
             }
             setFailed(false);
             setLoading(false);
@@ -160,6 +167,7 @@ export default function EditProductPage(props: PageProps) {
                 subscriptionIntervalCount: form.type === "SUBSCRIPTION" ? parseInt(form.subscriptionIntervalCount) || 1 : null,
                 ...availabilityPayload(availability),
                 ...grantPayload(grant),
+                ...requirementPayload(requires),
             };
 
             const res = await fetch(`/api/v1/store/products/${productId}`, {
@@ -408,6 +416,8 @@ export default function EditProductPage(props: PageProps) {
                         </Card>
 
                         <GrantFields value={grant} onChange={setGrant} />
+
+                        <RequirementFields value={requires} onChange={setRequires} selfId={productId} />
 
                     <AvailabilityFields value={availability} onChange={setAvailability} timeZone={timeZone} />
 

@@ -46,6 +46,10 @@ export const productSchema = z.object({
     durationDays: z.number().int().min(1).max(3650).optional().nullable(),
     /** The role a purchase grants. A different question from `roleId`. */
     grantsRoleId: z.string().max(64).optional().nullable(),
+    /** Products the buyer must already own. Empty asks for nothing. */
+    requiresProductIds: z.array(z.string().max(64)).max(20).optional(),
+    /** Own any one of the list rather than all of it. */
+    requiresAny: z.boolean().optional(),
     salePrice: z.number().min(0).optional().nullable(),
     saleFrom: z.string().max(32).optional().nullable(),
     saleUntil: z.string().max(32).optional().nullable(),

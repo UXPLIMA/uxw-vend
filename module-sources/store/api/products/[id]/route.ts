@@ -116,7 +116,7 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
         // The schedule arrives as wall-clock strings; the column holds
         // instants. Splitting them out keeps the string fields off the update.
-        const scheduled = await availabilityData(data);
+        const scheduled = await availabilityData(data, id);
         for (const key of Object.keys(scheduled)) {
             delete (data as Record<string, unknown>)[key];
         }

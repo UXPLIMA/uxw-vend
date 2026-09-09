@@ -33,6 +33,16 @@ export interface ProductRules {
     isActive: boolean;
     /** Role ids that may buy it. Empty means anyone. */
     roleIds: string[];
+    /**
+     * Products the buyer must already own. Empty asks for nothing.
+     *
+     * Every upgrade path has this shape: the tier above is for people already
+     * on the tier below. Without it the rule can only be written in the
+     * product's description and enforced by refunding whoever did not read it.
+     */
+    requiresProductIds: string[];
+    /** Own any one of the list rather than all of it. */
+    requiresAny: boolean;
     /** The run: absolute instants, so they mean the same thing everywhere. */
     availableFrom: Date | null;
     availableUntil: Date | null;
@@ -58,6 +68,8 @@ export interface ProductRules {
 export interface Counts {
     /** The buyer's role, for a product sold to certain ranks. */
     roleId?: string | null;
+    /** What this person already owns, for a product that needs another first. */
+    ownedProductIds?: Set<string>;
     /** Paid units this person already has, inside the per-person period. */
     boughtByPerson: number;
     /** Paid units everyone has, inside the refilling period. */
@@ -68,6 +80,7 @@ export type AvailabilityState =
     | "open"
     | "off"
     | "wrong_role"
+    | "needs_product"
     | "early"
     | "ended"
     | "closed"
@@ -202,6 +215,17 @@ export function availabilityOf(
     // and telling them to come back on Friday wastes their Friday.
     if (rules.roleIds.length > 0 && (!counts.roleId || !rules.roleIds.includes(counts.roleId))) {
         return answer("wrong_role");
+    }
+
+    // Before the clock, after the rank. A rank is the one refusal nobody can
+    // act on, so it is said first; this one they can act on, and telling them
+    // to come back on Friday for something they cannot buy wastes their Friday.
+    if (rules.requiresProductIds.length > 0) {
+        const owned = counts.ownedProductIds ?? new Set<string>();
+        const enough = rules.requiresAny
+            ? rules.requiresProductIds.some((id) => owned.has(id))
+            : rules.requiresProductIds.every((id) => owned.has(id));
+        if (!enough) return answer("needs_product");
     }
 
     if (rules.availableFrom && now < rules.availableFrom) {

@@ -2,7 +2,7 @@
   "id": "store",
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
-  "version": "2.7.0",
+  "version": "2.8.0",
   "coreVersion": "^1.33.0",
   "category": "commerce",
   "author": "uxwVend Team",
@@ -931,7 +931,13 @@
         "adm_durationHint": "Leave empty to sell it outright. Buying again adds to whatever is left.",
         "adm_grantsRole": "Role the buyer is given",
         "adm_grantsNoRole": "No role",
-        "adm_grantsRoleHint": "Where one order grants two roles, the higher priority one wins."
+        "adm_grantsRoleHint": "Where one order grants two roles, the higher priority one wins.",
+        "adm_requires": "What has to be bought first",
+        "adm_requiresHint": "Only somebody who already owns these may buy this one.",
+        "adm_requiresAny": "Any one of them is enough",
+        "adm_requiresAnyHint": "Off, the buyer needs all of them. On, one will do.",
+        "adm_requiresNothingToPick": "There is nothing else in the shop to require yet.",
+        "state_needs_product": "Buy what it needs first"
       },
       "cart": {
         "title": "Shopping Cart",
@@ -1523,7 +1529,13 @@
         "adm_durationHint": "Boş bırakırsan süresiz satılır. Tekrar alındığında kalan süreye eklenir.",
         "adm_grantsRole": "Alıcıya verilen rol",
         "adm_grantsNoRole": "Rol verme",
-        "adm_grantsRoleHint": "Bir sipariş iki rol verirse önceliği yüksek olan kazanır."
+        "adm_grantsRoleHint": "Bir sipariş iki rol verirse önceliği yüksek olan kazanır.",
+        "adm_requires": "Önce ne alınmış olmalı",
+        "adm_requiresHint": "Bunu yalnızca bunlara zaten sahip olan alabilir.",
+        "adm_requiresAny": "Herhangi biri yeterli",
+        "adm_requiresAnyHint": "Kapalıyken hepsine sahip olmak gerekir. Açıkken biri yeter.",
+        "adm_requiresNothingToPick": "Mağazada koşul olarak seçilebilecek başka ürün yok.",
+        "state_needs_product": "Önce gerekeni al"
       },
       "cart": {
         "title": "Alışveriş Sepeti",

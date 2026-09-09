@@ -31,6 +31,8 @@ const TUESDAY_MORNING = new Date("2026-09-08T07:00:00Z");
 const always: ProductRules = {
     isActive: true,
     roleIds: [],
+    requiresProductIds: [],
+    requiresAny: false,
     availableFrom: null,
     availableUntil: null,
     availableDays: [],

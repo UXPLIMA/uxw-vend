@@ -14,7 +14,11 @@ import type { ProductInput } from "./validations";
  * An absent field is left alone; an empty string clears the schedule, which
  * is how a form removes one.
  */
-export async function availabilityData(input: Partial<ProductInput>): Promise<Record<string, unknown>> {
+export async function availabilityData(
+    input: Partial<ProductInput>,
+    /** The product being edited, so it cannot be made to require itself. */
+    selfId?: string,
+): Promise<Record<string, unknown>> {
     const zone = await siteTimeZone();
     const data: Record<string, unknown> = {};
 
@@ -44,6 +48,13 @@ export async function availabilityData(input: Partial<ProductInput>): Promise<Re
     // them all and none is forgotten by the next one added.
     set("durationDays", input.durationDays);
     set("grantsRoleId", input.grantsRoleId === "" ? null : input.grantsRoleId);
+    // A product cannot require itself: the form offers every product and the
+    // one being edited is in that list, so a stray click would make it
+    // unbuyable by anybody, for ever, with nothing on screen saying why.
+    if (input.requiresProductIds !== undefined) {
+        data.requiresProductIds = input.requiresProductIds.filter((id) => id !== selfId);
+    }
+    set("requiresAny", input.requiresAny);
     set("salePrice", input.salePrice);
     set("saleFrom", instant(input.saleFrom));
     set("saleUntil", instant(input.saleUntil));

@@ -98,6 +98,15 @@ model Product {
   durationDays         Int?
   /** A role the buyer is given on purchase. Null grants nothing. */
   grantsRoleId         String?
+  /**
+   * Products the buyer must already own. Empty asks for nothing.
+   *
+   * The shape every upgrade path has: the tier above is for people already on
+   * the tier below.
+   */
+  requiresProductIds   String[]  @default([])
+  /** Own any one of the list rather than all of it. */
+  requiresAny          Boolean   @default(false)
 
   /** A sale with a start and an end, rather than a price somebody remembers. */
   salePrice            Decimal?  @db.Decimal(10, 2)
