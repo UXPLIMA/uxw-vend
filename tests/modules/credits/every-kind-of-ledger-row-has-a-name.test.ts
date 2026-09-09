@@ -18,7 +18,7 @@
 import { describe, it, expect } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
-import { creditTypeKey } from "@/modules/credits/lib/ledger-types";
+import { creditTypeKey, labelKeyFor } from "@/modules/credits/lib/ledger-types";
 
 const ROOT = process.cwd();
 
@@ -65,6 +65,19 @@ describe("the words a credit history is written in", () => {
             }
         }
         expect(missing).toEqual([]);
+    });
+});
+
+describe("a kind of row nobody planned for", () => {
+    it("is named by the screen rather than shown as a key", () => {
+        // The award door takes a reason from whoever calls it, so a module
+        // added next year writes a word this catalogue has never seen. The
+        // scan above cannot find it - it is a variable, not a literal - so
+        // the screen has to cope rather than print `credits.typeForum_post`
+        // at a member.
+        const known = catalogue.translations.en.credits as Record<string, unknown>;
+        expect(labelKeyFor("forum_post", (key) => key in known)).toBe("typeUnknown");
+        expect(labelKeyFor("cashback", (key) => key in known)).toBe("typeCashback");
     });
 });
 

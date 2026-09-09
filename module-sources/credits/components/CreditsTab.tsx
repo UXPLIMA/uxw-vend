@@ -5,7 +5,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle, LoadFailed } from "@/core/sdk/ui";
 import { Coins, Loader2, ArrowDownLeft, ArrowUpRight, ShoppingBag, Send } from "lucide-react";
 import { dateLocaleTag } from "@/core/sdk";
-import { creditTypeKey } from "../lib/ledger-types";
+import { labelKeyFor } from "../lib/ledger-types";
 import { CreditPackages } from "./CreditPackages";
 import { SendCredits } from "./SendCredits";
 
@@ -52,8 +52,10 @@ export default function CreditsTab() {
     }, [reloadKey]);
 
     // The rule lives beside the catalogue it has to agree with; a gate holds
-    // the two together, because a missing key here renders as the key itself.
-    const typeLabel = (type: string) => t(creditTypeKey(type));
+    // the two together for every word written as a literal, and `labelKeyFor`
+    // covers the rest - the award door takes a reason from whoever calls it,
+    // and a missing key renders as the key itself.
+    const typeLabel = (type: string) => t(labelKeyFor(type, (key) => t.has(key)));
 
     return (
         <div className="space-y-6">

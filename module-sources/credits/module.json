@@ -2,7 +2,7 @@
   "id": "credits",
   "name": "Credit System",
   "description": "Virtual currency wallet for users",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "coreVersion": "^1.34.0",
   "category": "commerce",
   "author": "uxwVend",
@@ -38,6 +38,10 @@
     {
       "hook": "credits.credit.added",
       "type": "action"
+    },
+    {
+      "hook": "credits.award",
+      "type": "filter"
     }
   ],
   "translations": {
@@ -90,7 +94,12 @@
         "typeUnknown": "Adjustment",
         "typeReferral_reward": "Referral reward",
         "typeWheel_prize": "Wheel prize",
-        "typeWheel_spin": "Wheel spin"
+        "typeWheel_spin": "Wheel spin",
+        "adm_title": "Credits",
+        "adm_subtitle": "What a purchase earns back. Anything else on the site that rewards credits comes in through the same door.",
+        "adm_cashback": "Cashback percent",
+        "adm_cashbackDesc": "A percentage of what was actually paid in money. An order settled from the wallet earns nothing, or the balance would climb on its own. Empty or zero switches it off.",
+        "typeCashback": "Cashback"
       },
       "admin": {
         "module_credits_name": "Credit System",
@@ -149,7 +158,12 @@
         "typeUnknown": "Düzeltme",
         "typeReferral_reward": "Davet ödülü",
         "typeWheel_prize": "Çark ödülü",
-        "typeWheel_spin": "Çark çevirme"
+        "typeWheel_spin": "Çark çevirme",
+        "adm_title": "Krediler",
+        "adm_subtitle": "Bir alışverişin ne kadarının geri döndüğü. Sitede kredi ödüllendiren her şey aynı kapıdan geçer.",
+        "adm_cashback": "İade yüzdesi",
+        "adm_cashbackDesc": "Gerçekten parayla ödenen tutarın yüzdesi. Cüzdandan kapatılan sipariş hiçbir şey kazandırmaz, yoksa bakiye kendi kendine artar. Boş veya sıfır bırakmak kapatır.",
+        "typeCashback": "İade"
       },
       "admin": {
         "module_credits_name": "Kredi Sistemi",
@@ -167,6 +181,33 @@
       "channels": [
         "inapp"
       ]
+    }
+  ],
+  "hookListeners": [
+    {
+      "hook": "credits.award",
+      "type": "filter",
+      "handler": "hooks/on-credits-award.ts"
+    },
+    {
+      "hook": "store.order.completed",
+      "type": "action",
+      "handler": "hooks/on-order-completed.ts"
+    }
+  ],
+  "adminRoutes": [
+    {
+      "path": "/settings/credits",
+      "component": "pages/admin/page.tsx"
+    }
+  ],
+  "settingsCards": [
+    {
+      "title": "Credits",
+      "description": "How much of a purchase comes back as credits.",
+      "href": "/settings/credits",
+      "icon": "Coins",
+      "color": "text-amber-500"
     }
   ]
 }

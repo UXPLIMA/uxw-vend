@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-09",
-  "updatedAt": "2026-09-09T18:22:10Z",
+  "updatedAt": "2026-09-09T18:36:31Z",
   "modules": [
     {
       "id": "announcements",
@@ -434,13 +434,13 @@
           "description": "Kullanıcılar için sanal para cüzdanı"
         }
       },
-      "version": "1.1.0",
+      "version": "1.2.0",
       "coreVersion": "^1.34.0",
       "author": "uxwVend",
       "icon": "Coins",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-09T18:22:10Z",
+      "updatedAt": "2026-09-09T18:36:31Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -452,13 +452,17 @@
       "conflicts": [],
       "hooks": {
         "emits": [
-          "credits.credit.added"
+          "credits.credit.added",
+          "credits.award"
         ],
-        "listens": []
+        "listens": [
+          "credits.award",
+          "store.order.completed"
+        ]
       },
       "stats": {
         "publicRoutes": 0,
-        "adminRoutes": 0,
+        "adminRoutes": 1,
         "apiRoutes": 2,
         "widgets": 0
       }
