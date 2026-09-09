@@ -12,9 +12,13 @@ import { auth } from "@/core/sdk/auth";
 import { z } from "zod";
 import { startPaymentSession, isPaymentProviderAvailable, listPaymentProviders } from "../../../lib/payments";
 import { resolveCurrency } from "../../../lib/currency";
+import { buyableNow, packageSnapshot } from "../../../lib/credit-packages";
 
 const buyCreditsSchema = z.object({
-    amount: z.number().int().min(1, "Minimum 1 credit").max(100000, "Maximum 100,000 credits"),
+    /** A loose amount, for a shop that sells credits by the unit. */
+    amount: z.number().int().min(1, "Minimum 1 credit").max(100000, "Maximum 100,000 credits").optional(),
+    /** Or a package, which decides both numbers itself. */
+    packageId: z.string().min(1).max(64).optional(),
     provider: z.string().min(1).max(32).optional(),
 });
 
@@ -44,22 +48,50 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: validation.error.issues[0].message }, { status: 400 });
         }
 
-        const { amount } = validation.data;
-
-        // A module setting rather than a `credits_price_per_unit` row, which is
-        // what this read before. Nothing wrote that row - no screen, no API, no
-        // manifest default - so every site sold credits at exactly the fallback
-        // and no operator could change it.
-        const { creditsPricePerUnit } = await moduleSettings<{ creditsPricePerUnit: number }>("store");
-        const pricePerCredit = creditsPricePerUnit;
-
         const currSetting = await prisma.setting.findUnique({ where: { key: "default_currency" } });
         const currency = resolveCurrency(currSetting?.value as string);
 
-        // A per-credit price is a fraction by nature (0.013 a credit), so the
-        // product of it is almost never a whole cent. Rounded here, because
-        // what the gateway charges is rounded whether we do it or not.
-        const totalAmount = Math.round(amount * pricePerCredit * 100) / 100;
+        // Two ways to buy, and the package is the one that decides both
+        // numbers for itself. What the buyer is charged and what lands in
+        // their balance are read off the row here and carried with the
+        // payment, because a gateway settles minutes later - days later for a
+        // transfer confirmed by hand - and an operator editing the package in
+        // between must not change what somebody already bought.
+        let amount: number;
+        let totalAmount: number;
+        let description: string;
+
+        if (validation.data.packageId) {
+            const pack = await prisma.creditPackage.findUnique({
+                where: { id: validation.data.packageId },
+            });
+            if (!pack || !buyableNow(pack)) {
+                return NextResponse.json(
+                    { error: "That package is not for sale", code: "credit_package_unavailable" },
+                    { status: 400 },
+                );
+            }
+            const sold = packageSnapshot(pack);
+            amount = sold.credits;
+            totalAmount = sold.price;
+            description = sold.name;
+        } else if (validation.data.amount) {
+            // A module setting rather than a `credits_price_per_unit` row, which
+            // is what this read before. Nothing wrote that row - no screen, no
+            // API, no manifest default - so every site sold credits at exactly
+            // the fallback and no operator could change it.
+            const { creditsPricePerUnit } = await moduleSettings<{ creditsPricePerUnit: number }>("store");
+
+            amount = validation.data.amount;
+            // A per-credit price is a fraction by nature (0.013 a credit), so
+            // the product of it is almost never a whole cent. Rounded here,
+            // because what the gateway charges is rounded whether we do it or
+            // not.
+            totalAmount = Math.round(amount * creditsPricePerUnit * 100) / 100;
+            description = `${amount} credits`;
+        } else {
+            return NextResponse.json({ error: "Choose a package or an amount" }, { status: 400 });
+        }
         if (Math.round(totalAmount * 100) < 50) {
             return NextResponse.json({ error: "Minimum purchase amount is $0.50" }, { status: 400 });
         }
@@ -93,8 +125,8 @@ export async function POST(request: NextRequest) {
             reference: session.user.id,
             amount: totalAmount,
             currency,
-            description: `${amount} credits`,
-            lines: [{ name: `${amount} Credits`, quantity: 1, unitAmount: totalAmount }],
+            description,
+            lines: [{ name: description, quantity: 1, unitAmount: totalAmount }],
             customer: { userId: session.user.id, email: buyer?.email ?? null, name: buyer?.username ?? null },
             metadata: {
                 type: "credit_purchase",

@@ -457,3 +457,24 @@ model Subscription {
   @@index([userId])
   @@index([productId])
 }
+
+/// Credits sold in a bundle, with a bonus for buying more.
+///
+/// The shop sold credits by the unit, which sells nothing: there is no reason
+/// to buy a thousand rather than a hundred. The bonus is a second number and
+/// never part of the price - a gateway is asked for `price` and the buyer
+/// receives `credits + bonusCredits`.
+model CreditPackage {
+  id           String   @id @default(cuid())
+  name         String
+  credits      Int
+  /// Given on top. Never reaches the charge.
+  bonusCredits Int      @default(0)
+  price        Decimal  @db.Decimal(10, 2)
+  isActive     Boolean  @default(true)
+  order        Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([isActive, order])
+}

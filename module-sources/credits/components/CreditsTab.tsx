@@ -5,6 +5,9 @@ import { useTranslations, useLocale } from "next-intl";
 import { Card, CardContent, CardHeader, CardTitle, LoadFailed } from "@/core/sdk/ui";
 import { Coins, Loader2, ArrowDownLeft, ArrowUpRight, ShoppingBag, Send } from "lucide-react";
 import { dateLocaleTag } from "@/core/sdk";
+import { creditTypeKey } from "../lib/ledger-types";
+import { CreditPackages } from "./CreditPackages";
+import { SendCredits } from "./SendCredits";
 
 interface Transaction {
     id: string;
@@ -48,10 +51,9 @@ export default function CreditsTab() {
         return () => { cancelled = true; };
     }, [reloadKey]);
 
-    const typeLabel = (type: string) => {
-        const key = `type${type.charAt(0).toUpperCase() + type.slice(1).toLowerCase()}`;
-        try { return t(key); } catch { return type; }
-    };
+    // The rule lives beside the catalogue it has to agree with; a gate holds
+    // the two together, because a missing key here renders as the key itself.
+    const typeLabel = (type: string) => t(creditTypeKey(type));
 
     return (
         <div className="space-y-6">
@@ -69,6 +71,10 @@ export default function CreditsTab() {
                     )}
                 </CardContent>
             </Card>
+
+            <CreditPackages onBought={() => setReloadKey((k) => k + 1)} />
+
+            <SendCredits balance={balance} onSent={() => setReloadKey((k) => k + 1)} />
 
             <Card>
                 <CardHeader>

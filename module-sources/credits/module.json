@@ -2,8 +2,8 @@
   "id": "credits",
   "name": "Credit System",
   "description": "Virtual currency wallet for users",
-  "version": "1.0.13",
-  "coreVersion": "^1.0.0",
+  "version": "1.1.0",
+  "coreVersion": "^1.34.0",
   "category": "commerce",
   "author": "uxwVend",
   "icon": "Coins",
@@ -32,7 +32,7 @@
     }
   ],
   "dependencies": [
-    "store"
+    "store@^2.21.0"
   ],
   "hooksEmitted": [
     {
@@ -58,7 +58,39 @@
         "typeCredit": "Credit",
         "typeDebit": "Debit",
         "typePurchase": "Purchase",
-        "typeTransfer": "Transfer"
+        "typeTransfer": "Transfer",
+        "buy_title": "Buy credits",
+        "buy_bonus": "+{count} bonus",
+        "buy_buy": "Buy",
+        "buy_failed": "That purchase could not be started.",
+        "send_title": "Send credits",
+        "send_hint": "You have {balance} to send. It cannot be taken back.",
+        "send_to": "To",
+        "send_toPlaceholder": "Their username",
+        "send_amount": "How many",
+        "send_send": "Send",
+        "send_fillItIn": "Say who it is for and how many.",
+        "send_confirmTitle": "Send credits?",
+        "send_confirmMessage": "{amount} credits go to {name} and cannot be taken back.",
+        "send_sent": "{amount} credits sent to {name}.",
+        "send_failed": "Those credits could not be sent.",
+        "err": {
+          "credits_no_recipient": "No account by that name.",
+          "credits_same_account": "That is your own account.",
+          "credits_amount_not_positive": "Send a whole number of credits, at least one.",
+          "credits_insufficient_balance": "You do not have that many credits.",
+          "credit_package_unavailable": "That package is not for sale any more."
+        },
+        "typeAdmin_grant": "Granted by an admin",
+        "typeCredit_purchase": "Bought",
+        "typeCreator_commission": "Creator commission",
+        "typeGift_redeem": "Gift code",
+        "typeTransfer_in": "Received",
+        "typeTransfer_out": "Sent",
+        "typeUnknown": "Adjustment",
+        "typeReferral_reward": "Referral reward",
+        "typeWheel_prize": "Wheel prize",
+        "typeWheel_spin": "Wheel spin"
       },
       "admin": {
         "module_credits_name": "Credit System",
@@ -85,7 +117,39 @@
         "typeCredit": "Alacak",
         "typeDebit": "Borç",
         "typePurchase": "Satın Alma",
-        "typeTransfer": "Transfer"
+        "typeTransfer": "Transfer",
+        "buy_title": "Kredi satın al",
+        "buy_bonus": "+{count} bonus",
+        "buy_buy": "Satın al",
+        "buy_failed": "Satın alma başlatılamadı.",
+        "send_title": "Kredi gönder",
+        "send_hint": "Gönderebileceğiniz {balance} krediniz var. Geri alınamaz.",
+        "send_to": "Kime",
+        "send_toPlaceholder": "Kullanıcı adı",
+        "send_amount": "Ne kadar",
+        "send_send": "Gönder",
+        "send_fillItIn": "Kime ve ne kadar göndereceğinizi yazın.",
+        "send_confirmTitle": "Kredi gönderilsin mi?",
+        "send_confirmMessage": "{amount} kredi {name} kişisine gider ve geri alınamaz.",
+        "send_sent": "{amount} kredi {name} kişisine gönderildi.",
+        "send_failed": "Krediler gönderilemedi.",
+        "err": {
+          "credits_no_recipient": "Bu adda bir hesap yok.",
+          "credits_same_account": "Burası kendi hesabınız.",
+          "credits_amount_not_positive": "En az bir olmak üzere tam sayı kadar kredi gönderin.",
+          "credits_insufficient_balance": "Bu kadar krediniz yok.",
+          "credit_package_unavailable": "Bu paket artık satışta değil."
+        },
+        "typeAdmin_grant": "Yönetici tarafından verildi",
+        "typeCredit_purchase": "Satın alındı",
+        "typeCreator_commission": "Üretici komisyonu",
+        "typeGift_redeem": "Hediye kodu",
+        "typeTransfer_in": "Alındı",
+        "typeTransfer_out": "Gönderildi",
+        "typeUnknown": "Düzeltme",
+        "typeReferral_reward": "Davet ödülü",
+        "typeWheel_prize": "Çark ödülü",
+        "typeWheel_spin": "Çark çevirme"
       },
       "admin": {
         "module_credits_name": "Kredi Sistemi",

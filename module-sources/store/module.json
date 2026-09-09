@@ -2,7 +2,7 @@
   "id": "store",
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
-  "version": "2.20.0",
+  "version": "2.21.0",
   "coreVersion": "^1.34.0",
   "category": "commerce",
   "author": "uxwVend Team",
@@ -498,6 +498,26 @@
       "path": "/store/admin/orders",
       "handler": "api/admin/orders/route.ts",
       "description": "Enter an order by hand for a sale that happened elsewhere (admin)."
+    },
+    {
+      "path": "/store/credit-packages",
+      "handler": "api/credit-packages/route.ts",
+      "description": "The credit packages on sale, and what each one gives."
+    },
+    {
+      "path": "/store/credits/transfer",
+      "handler": "api/credits/transfer/route.ts",
+      "description": "Send credits to another member."
+    },
+    {
+      "path": "/store/admin/credit-packages",
+      "handler": "api/admin/credit-packages/route.ts",
+      "description": "List and create credit packages (admin)."
+    },
+    {
+      "path": "/store/admin/credit-packages/[id]",
+      "handler": "api/admin/credit-packages/[id]/route.ts",
+      "description": "Edit a credit package, or take it off sale (admin)."
     }
   ],
   "dashboardCards": [

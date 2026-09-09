@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-09",
-  "updatedAt": "2026-09-09T18:07:05Z",
+  "updatedAt": "2026-09-09T18:22:10Z",
   "modules": [
     {
       "id": "announcements",
@@ -434,20 +434,20 @@
           "description": "Kullanıcılar için sanal para cüzdanı"
         }
       },
-      "version": "1.0.13",
-      "coreVersion": "^1.0.0",
+      "version": "1.1.0",
+      "coreVersion": "^1.34.0",
       "author": "uxwVend",
       "icon": "Coins",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-06T04:07:41Z",
+      "updatedAt": "2026-09-09T18:22:10Z",
       "screenshots": [],
       "tags": [
         "commerce"
       ],
       "zip": "credits.zip",
       "dependencies": [
-        "store"
+        "store@^2.21.0"
       ],
       "conflicts": [],
       "hooks": {
@@ -2549,13 +2549,13 @@
           "description": "Ürün, kategori, sepet ve siparişleriyle eksiksiz e-ticaret"
         }
       },
-      "version": "2.20.0",
+      "version": "2.21.0",
       "coreVersion": "^1.34.0",
       "author": "uxwVend Team",
       "icon": "ShoppingBag",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-09T17:00:59Z",
+      "updatedAt": "2026-09-09T18:22:10Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2588,7 +2588,7 @@
       "stats": {
         "publicRoutes": 5,
         "adminRoutes": 13,
-        "apiRoutes": 46,
+        "apiRoutes": 50,
         "widgets": 6
       }
     },

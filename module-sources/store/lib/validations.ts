@@ -86,6 +86,16 @@ export const copyProductSchema = z.object({
     name: z.string().min(1).max(200).optional(),
 });
 
+/** A package of credits. The bonus is what the buyer receives, never what they pay. */
+export const creditPackageSchema = z.object({
+    name: z.string().min(1, "Name is required").max(100),
+    credits: z.number().int().min(1).max(10_000_000),
+    bonusCredits: z.number().int().min(0).max(10_000_000).default(0),
+    price: z.number().min(0.01).max(1_000_000),
+    isActive: z.boolean().default(true),
+    order: z.number().int().min(0).max(9999).default(0),
+});
+
 export const campaignSchema = z.object({
     name: z.string().min(1, "Name is required").max(100),
     isActive: z.boolean().optional(),
