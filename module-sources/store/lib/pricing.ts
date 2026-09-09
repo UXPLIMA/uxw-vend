@@ -248,3 +248,37 @@ export function computeTotals(params: {
     const tax = cents((discounted * taxRate) / 100);
     return { totalDiscount, taxableAmount: discounted, tax, total: cents(discounted + tax) };
 }
+
+/** A processor's cut, as an operator enters it. */
+export interface ProcessorFee {
+    /** Percentage of the charge. */
+    percent: number;
+    /** Flat amount per transaction, in the order's currency. */
+    fixed: number;
+}
+
+/**
+ * What to charge so the shop is left with what it asked for.
+ *
+ * The obvious way to pass a fee on is to add the percentage to the total, and
+ * it is wrong: the processor takes its cut of the larger amount too. A shop
+ * adding 2.9 per cent to a 100 charge is paid 102.90 and keeps 99.92 - short
+ * by almost exactly the fee it was trying not to pay.
+ *
+ * So it divides rather than multiplies, and the fixed part goes inside the
+ * division because the processor takes its percentage of the whole charge,
+ * including the part covering its own flat fee.
+ *
+ * A percentage that would eat the entire payment is a number somebody typed,
+ * not a fee. 100 divides by zero and anything above it goes negative, so the
+ * charge is left alone rather than turned into infinity.
+ */
+export function grossUpForFee(net: number, fee: ProcessorFee): { charged: number; surcharge: number } {
+    const percent = Number.isFinite(fee.percent) ? fee.percent : 0;
+    const fixed = Number.isFinite(fee.fixed) ? fee.fixed : 0;
+    if (net <= 0 || percent < 0 || percent >= 100 || (percent === 0 && fixed <= 0)) {
+        return { charged: cents(Math.max(0, net)), surcharge: 0 };
+    }
+    const charged = cents((net + Math.max(0, fixed)) / (1 - percent / 100));
+    return { charged, surcharge: cents(charged - net) };
+}

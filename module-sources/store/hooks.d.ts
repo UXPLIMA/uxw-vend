@@ -75,6 +75,16 @@ declare global {
         description?: string;
         /** A Lucide icon name, rendered by the checkout page. */
         icon?: string;
+        /**
+         * What this gateway costs, when the operator has chosen to pass it on.
+         *
+         * Declared by the gateway rather than by the store, because a gateway
+         * is the only thing that knows its own rates, and left out entirely by
+         * one that does not offer the choice. The store grosses the charge up
+         * so that what survives the cut is what the order was worth; see
+         * `grossUpForFee`.
+         */
+        passOnFee?: { percent: number; fixed: number };
     }
 
     interface PaymentSessionRequest {

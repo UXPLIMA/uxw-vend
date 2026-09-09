@@ -1,4 +1,5 @@
 import Stripe from "stripe";
+import { passOnFeeFrom } from "./fee";
 import { prisma } from "@/core/sdk/server";
 
 // Stripe client + enabled flag. Credentials are resolved from the
@@ -99,3 +100,23 @@ export const stripe = new Proxy({} as Stripe, {
         return (cached.stripe as unknown as Record<string | symbol, unknown>)[prop];
     },
 });
+
+/**
+ * The fee this gateway offers to pass on to the buyer, or nothing.
+ *
+ * Read here rather than cached with the credentials: it is asked once per
+ * checkout, not per API call, and an operator changing the rate should see it
+ * on the next order rather than in half a minute.
+ */
+export async function getPassOnFee(): Promise<{ percent: number; fixed: number } | undefined> {
+    const rows = await prisma.setting.findMany({
+        where: { key: { in: ["stripe_fee_pass", "stripe_fee_percent", "stripe_fee_fixed"] } },
+    });
+    const map: Record<string, unknown> = {};
+    for (const row of rows) map[row.key] = row.value;
+    return passOnFeeFrom({
+        pass: map.stripe_fee_pass === true || map.stripe_fee_pass === "true",
+        percent: Number(map.stripe_fee_percent),
+        fixed: Number(map.stripe_fee_fixed),
+    });
+}

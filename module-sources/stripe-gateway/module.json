@@ -2,7 +2,7 @@
   "id": "stripe-gateway",
   "name": "Stripe Payment Gateway",
   "description": "Take card, Apple Pay and Google Pay payments through Stripe, including subscriptions",
-  "version": "2.0.7",
+  "version": "2.1.0",
   "coreVersion": "^1.3.0",
   "category": "commerce",
   "author": "uxwVend",
@@ -55,7 +55,15 @@
         "adm_field2Label": "Secret Key",
         "adm_field2Desc": "Stripe secret API key (sk_...)",
         "adm_field3Label": "Webhook Secret",
-        "adm_field3Desc": "Stripe webhook signing secret (whsec_...)"
+        "adm_field3Desc": "Stripe webhook signing secret (whsec_...)",
+        "adm_feePassLabel": "Pass the processing fee to the buyer",
+        "adm_feePassDesc": "On, the buyer is charged enough that the order is worth its full amount after the fee. Off, the shop absorbs it.",
+        "adm_feePercentLabel": "Percentage fee (%)",
+        "adm_feePercentDesc": "The percentage the processor keeps. Check your own pricing; it differs by country and card.",
+        "adm_feeFixedLabel": "Fixed fee per transaction",
+        "adm_feeFixedDesc": "The flat amount the processor keeps on every charge, in the shop's currency.",
+        "adm_feePassOff": "The shop absorbs it",
+        "adm_feePassOn": "The buyer pays it"
       },
       "admin": {
         "menu_stripe-gateway": "Stripe Gateway",
@@ -87,7 +95,15 @@
         "adm_field2Label": "Gizli Anahtar",
         "adm_field2Desc": "Stripe gizli API anahtarı (sk_...)",
         "adm_field3Label": "Webhook Sırrı",
-        "adm_field3Desc": "Stripe webhook imzalama sırrı (whsec_...)"
+        "adm_field3Desc": "Stripe webhook imzalama sırrı (whsec_...)",
+        "adm_feePassLabel": "İşlem ücretini alıcıya yansıt",
+        "adm_feePassDesc": "Açıkken alıcıdan, ücret düşüldükten sonra sipariş tam tutarında kalacak kadar tahsil edilir. Kapalıyken ücreti dükkân üstlenir.",
+        "adm_feePercentLabel": "Yüzde ücret (%)",
+        "adm_feePercentDesc": "Sağlayıcının aldığı yüzde. Kendi fiyatlandırmana bak; ülkeye ve karta göre değişir.",
+        "adm_feeFixedLabel": "İşlem başına sabit ücret",
+        "adm_feeFixedDesc": "Sağlayıcının her tahsilatta aldığı sabit tutar, dükkânın para biriminde.",
+        "adm_feePassOff": "Ücreti dükkân üstlenir",
+        "adm_feePassOn": "Ücreti alıcı öder"
       },
       "admin": {
         "menu_stripe-gateway": "Stripe Ayarları",

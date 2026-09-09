@@ -4,7 +4,7 @@
  * fails after the buyer clicks it is worse than no button.
  */
 import type { HookHandlerFor } from "@/core/sdk";
-import { getStripeEnabled } from "../lib/stripe";
+import { getPassOnFee, getStripeEnabled } from "../lib/stripe";
 
 const onPaymentProviders: HookHandlerFor<"payment.providers", "filter"> = async (providers) => {
     if (!(await getStripeEnabled())) return providers;
@@ -15,6 +15,10 @@ const onPaymentProviders: HookHandlerFor<"payment.providers", "filter"> = async 
             label: "Card",
             description: "Credit and debit cards, Apple Pay and Google Pay",
             icon: "CreditCard",
+            // Left out unless the operator asked for it. The store grosses the
+            // charge up from this rather than adding it, because Stripe takes
+            // its cut of the larger amount too.
+            passOnFee: await getPassOnFee(),
         },
     ];
 };

@@ -8,7 +8,7 @@ import { effectivePrice } from "../../lib/availability";
 import { availabilityFor, rulesOf, type ProductRow } from "../../lib/availability-server";
 import { countSales } from "../../lib/popularity";
 import { resolveCurrency } from "../../lib/currency";
-import { startPaymentSession, isPaymentProviderAvailable } from "../../lib/payments";
+import { startPaymentSession, listPaymentProviders } from "../../lib/payments";
 import { announceOrderCreated, announceOrderCompleted } from "../../lib/order-events";
 import {
     computeOrderPricing,
@@ -16,6 +16,7 @@ import {
     computeCreatorDiscount,
     computeCreatorCommission,
     computeTotals,
+    grossUpForFee,
 } from "../../lib/pricing";
 import { stillOwnedWhere } from "../../lib/ownership";
 import { z } from "zod";
@@ -538,7 +539,8 @@ export async function POST(request: NextRequest) {
 
         // A paid order whose gateway is not installed or not configured stays
         // PENDING, and nothing is granted.
-        if (!(await isPaymentProviderAvailable(paymentMethod, currency))) {
+        const chosen = (await listPaymentProviders(currency)).find((p) => p.id === paymentMethod);
+        if (!chosen) {
             return NextResponse.json(
                 {
                     error: "That payment method is not available. Ask an administrator to set up a payment gateway.",
@@ -567,13 +569,31 @@ export async function POST(request: NextRequest) {
             }
         }
 
+        // What a gateway costs, when its operator chose to pass it on. Grossed
+        // up rather than added: the processor takes its cut of the larger
+        // amount too, so adding the percentage leaves the shop short by almost
+        // exactly the fee it was avoiding. See `grossUpForFee`.
+        const { charged, surcharge } = chosen.passOnFee
+            ? grossUpForFee(total, chosen.passOnFee)
+            : { charged: total, surcharge: 0 };
+        if (surcharge > 0) {
+            // Named rather than folded into the total: a charge a buyer cannot
+            // account for is a chargeback waiting.
+            //
+            // English, like the tax line above it. These are handed to a
+            // processor to print on its own checkout, not rendered by us, and
+            // they travel with no locale; translating one of the two would
+            // leave a receipt reading half in each.
+            lines.push({ name: "Payment processing fee", quantity: 1, unitAmount: surcharge });
+        }
+
         const subProduct = isSubscriptionCheckout ? subscriptionProducts[0] : null;
 
         const payment = await startPaymentSession({
             provider: paymentMethod,
             kind: subProduct ? "subscription" : "order",
             reference: order.id,
-            amount: total,
+            amount: charged,
             currency,
             description: `Order ${order.orderNumber}`,
             lines,
