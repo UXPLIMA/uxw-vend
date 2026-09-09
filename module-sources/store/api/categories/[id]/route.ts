@@ -56,6 +56,23 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
 
     const data: Record<string, unknown> = { ...validation.data };
 
+    // A shelf cannot be unlocked by something standing on it. Gating a
+    // category behind a product inside it makes it visible only to somebody
+    // who already bought from a shelf they cannot see, and nothing on the
+    // page would say why it never appears.
+    const gates = validation.data.visibleAfterProductIds;
+    if (gates && gates.length > 0) {
+        const inside = await prisma.product.count({
+            where: { id: { in: gates }, categoryId: id },
+        });
+        if (inside > 0) {
+            return NextResponse.json(
+                { error: "A category cannot be unlocked by a product inside it" },
+                { status: 400 },
+            );
+        }
+    }
+
     if (typeof data.description === "string") {
         data.description = sanitizeHtml(data.description);
     }

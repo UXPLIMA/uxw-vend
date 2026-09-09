@@ -3,8 +3,18 @@ import { slugify } from "@/core/sdk";
 import { isAdmin, log, prisma, readJsonBody, sanitizeHtml } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { categorySchema } from "../../lib/validations";
+import { anyCategoryGated, gateProductIds, visibleCategories } from "../../lib/category-visibility";
+import { stillOwnedWhere } from "../../lib/ownership";
 
-// GET /api/v1/store/categories - List categories
+/**
+ * GET /api/v1/store/categories - the shelves a reader may see.
+ *
+ * Shared by everybody until an operator gates a shelf, and only then per
+ * reader. A shop that gates nothing - which is nearly all of them - keeps an
+ * answer any cache in front of the site can hold; a shop that gates one shelf
+ * pays for it with an answer nothing may keep, because keeping it would serve
+ * one member's shelves to the next visitor.
+ */
 export async function GET() {
     try {
         const categories = await prisma.category.findMany({
@@ -21,7 +31,35 @@ export async function GET() {
             orderBy: { order: "asc" },
         });
 
-        return NextResponse.json({ categories });
+        if (!anyCategoryGated(categories)) {
+            return NextResponse.json({ categories });
+        }
+
+        const session = await auth();
+        const userId = session?.user?.id ?? null;
+        const owned = userId
+            ? await prisma.ownedProduct.findMany({
+                where: {
+                    ...stillOwnedWhere(userId, new Date()),
+                    productId: { in: gateProductIds(categories) },
+                },
+                select: { productId: true },
+            })
+            : [];
+
+        const visible = visibleCategories(categories, new Set(owned.map((row) => row.productId)));
+        // A shelf hidden from the parent list must not come back as somebody
+        // else's child.
+        const shownIds = new Set(visible.map((category) => category.id));
+        return NextResponse.json(
+            {
+                categories: visible.map((category) => ({
+                    ...category,
+                    children: category.children.filter((child) => shownIds.has(child.id)),
+                })),
+            },
+            { headers: { "Cache-Control": "private, no-store" } },
+        );
     } catch (error) {
         log.error("List categories error", { error: error instanceof Error ? error.message : String(error) });
         return NextResponse.json(
@@ -76,6 +114,7 @@ export async function POST(request: NextRequest) {
                 parentId: data.parentId,
                 order: data.order ?? 0,
                 isActive: data.isActive ?? true,
+                visibleAfterProductIds: data.visibleAfterProductIds ?? [],
             },
         });
 

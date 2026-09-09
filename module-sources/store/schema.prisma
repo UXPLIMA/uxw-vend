@@ -26,6 +26,13 @@ model Category {
   slug        String    @unique
   description String?
   image       String?
+  /**
+   * Own any one of these products to see this shelf. Empty shows it to all.
+   *
+   * The one gate in the store that really hides: a product's prerequisite is
+   * told to the shopper on purpose, a category kept back is kept back.
+   */
+  visibleAfterProductIds String[] @default([])
   parentId    String?
   parent      Category? @relation("CategoryChildren", fields: [parentId], references: [id])
   children    Category[] @relation("CategoryChildren")

@@ -57,6 +57,8 @@ export const productSchema = z.object({
 
 export const categorySchema = z.object({
     name: z.string().min(1, "Name is required").max(100),
+    /** Own any one of these products to see this shelf. Empty shows it to all. */
+    visibleAfterProductIds: z.array(z.string().max(64)).max(20).optional(),
     slug: z.string().min(1).optional(),
     description: z.string().max(500).optional(),
     image: z.string().url().optional().nullable(),
