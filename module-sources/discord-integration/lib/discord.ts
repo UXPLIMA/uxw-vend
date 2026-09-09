@@ -73,16 +73,47 @@ export async function sendDiscordWebhook(
         return;
     }
 
+    const sent = await postToWebhook(url, payload);
+    if (!sent.ok) {
+        // `fetch` does not throw on a 400, so this used to be silent: an embed
+        // the service refused looked exactly like one it took, and an operator
+        // found out by noticing the messages had stopped.
+        log.error("[Discord Webhook] Refused", { eventType, status: sent.status, detail: sent.detail });
+    }
+}
+
+/**
+ * One POST, with the answer read.
+ *
+ * The service refuses a message it cannot take with a status and a body
+ * naming the part it did not like, and that body is the only useful thing
+ * anybody gets when a message does not arrive.
+ */
+export async function postToWebhook(
+    url: string,
+    payload: WebhookPayload,
+): Promise<{ ok: boolean; status: number; detail: string | null }> {
     try {
-        await fetch(url, {
+        const res = await fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                ...payload,
-                username: payload.username || "uxwVend",
-            }),
+            body: JSON.stringify({ ...payload, username: payload.username || "uxwVend" }),
         });
+        if (res.ok) return { ok: true, status: res.status, detail: null };
+        const detail = await res.text().catch(() => "");
+        return { ok: false, status: res.status, detail: detail.slice(0, 300) || null };
     } catch (err) {
         log.error("[Discord Webhook] Failed to send", { error: err instanceof Error ? err.message : String(err) });
+        return { ok: false, status: 0, detail: null };
+    }
+}
+
+/** Whether a URL is one of the service's own webhook addresses. */
+export function isDiscordWebhook(url: string): boolean {
+    try {
+        const host = new URL(url).hostname.toLowerCase().replace(/\.$/, "");
+        return ["discord.com", "discordapp.com"].some((d) => host === d || host.endsWith("." + d));
+    } catch {
+        return false;
     }
 }

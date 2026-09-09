@@ -1,0 +1,26 @@
+// Discord Integration Module - Database Models
+// These models are merged into prisma/schema.prisma by merge-schemas.ts
+
+/// The message an operator designed for one event.
+///
+/// One row per event that has been given a message; an event with no row keeps
+/// the wording the module ships, so installing this changes nothing until
+/// somebody edits something.
+model DiscordEventMessage {
+  id        String  @id @default(cuid())
+  /// The hook name, as the module listens for it.
+  event     String  @unique
+  isActive  Boolean @default(true)
+  /// Where it goes. Empty means the general webhook.
+  webhookUrl String?
+  /// The parts of the embed, with `{placeholders}` in them.
+  title       String?
+  description String?
+  /// A decimal colour, as the service takes it.
+  color       Int?
+  footer      String?
+  /// `[{ name, value, inline }]`, each with placeholders of its own.
+  fields      Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

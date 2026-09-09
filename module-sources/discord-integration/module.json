@@ -2,8 +2,8 @@
   "id": "discord-integration",
   "name": "Discord Integration",
   "description": "Discord webhook notifications and settings",
-  "version": "1.1.0",
-  "coreVersion": "^1.20.0",
+  "version": "1.2.0",
+  "coreVersion": "^1.37.0",
   "category": "integration",
   "author": "uxwVend",
   "icon": "MessageSquare",
@@ -114,7 +114,26 @@
         "adm_evt_forumTopic_desc": "When a new forum topic is created",
         "testBlocked": "Your browser blocked the test call. The server sends the real notifications, so this does not mean the webhook is broken.",
         "adm_evt_blogArticle": "Blog Article",
-        "adm_evt_blogArticle_desc": "When a new blog article is published"
+        "adm_evt_blogArticle_desc": "When a new blog article is published",
+        "event_user_registered": "Somebody registered",
+        "event_blog_article": "An article was published",
+        "event_forum_topic": "A topic was opened",
+        "event_ticket_opened": "A ticket was opened",
+        "event_order_created": "An order was placed",
+        "event_order_completed": "An order was paid",
+        "adm_events": "Events",
+        "adm_eventsSubtitle": "The message sent for each. An event with nothing written for it keeps the wording this module ships.",
+        "adm_testSend": "Send a test",
+        "adm_testSent": "Sent. Look in the channel.",
+        "adm_placeholders": "You can write: {names}",
+        "err": {
+          "discord_unknown_event": "Nothing here listens for that event.",
+          "discord_no_message": "Nothing has been written for that event yet.",
+          "discord_embed_too_long": "That message is too long for the service to take.",
+          "discord_bad_webhook": "That address is not one of the service's own.",
+          "discord_no_webhook": "No webhook address is set up yet.",
+          "discord_refused": "The service refused it."
+        }
       },
       "admin": {
         "menu_discord-integration": "Discord Integration",
@@ -164,7 +183,26 @@
         "adm_evt_forumTopic_desc": "Yeni bir forum konusu oluşturulduğunda",
         "testBlocked": "Tarayıcı test çağrısını engelledi. Gerçek bildirimleri sunucu gönderir, bu yüzden webhook bozuk demek değil.",
         "adm_evt_blogArticle": "Blog Yazısı",
-        "adm_evt_blogArticle_desc": "Yeni bir blog yazısı yayınlandığında"
+        "adm_evt_blogArticle_desc": "Yeni bir blog yazısı yayınlandığında",
+        "event_user_registered": "Biri kayıt oldu",
+        "event_blog_article": "Bir yazı yayınlandı",
+        "event_forum_topic": "Bir konu açıldı",
+        "event_ticket_opened": "Bir destek kaydı açıldı",
+        "event_order_created": "Bir sipariş verildi",
+        "event_order_completed": "Bir sipariş ödendi",
+        "adm_events": "Olaylar",
+        "adm_eventsSubtitle": "Her biri için gönderilen mesaj. Hakkında bir şey yazılmamış olay, modülün getirdiği metni kullanmaya devam eder.",
+        "adm_testSend": "Test gönder",
+        "adm_testSent": "Gönderildi. Kanala bakın.",
+        "adm_placeholders": "Yazabilecekleriniz: {names}",
+        "err": {
+          "discord_unknown_event": "Burada bu olayı dinleyen bir şey yok.",
+          "discord_no_message": "Bu olay için henüz bir şey yazılmamış.",
+          "discord_embed_too_long": "Bu mesaj servisin kabul edemeyeceği kadar uzun.",
+          "discord_bad_webhook": "Bu adres servisin kendi adreslerinden biri değil.",
+          "discord_no_webhook": "Henüz bir webhook adresi ayarlanmamış.",
+          "discord_refused": "Servis kabul etmedi."
+        }
       },
       "admin": {
         "menu_discord-integration": "Discord Entegrasyonu",
@@ -175,5 +213,18 @@
         "module_discord-integration_description": "Discord webhook bildirimleri ve ayarları"
       }
     }
-  }
+  },
+  "api": [
+    {
+      "path": "/discord/events",
+      "handler": "api/events/route.ts",
+      "description": "The events and the message designed for each (admin)."
+    },
+    {
+      "path": "/discord/test-send",
+      "handler": "api/test-send/route.ts",
+      "method": "POST",
+      "description": "Send the message an operator is designing, and say what the service answered (admin)."
+    }
+  ]
 }
