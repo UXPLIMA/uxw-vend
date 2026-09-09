@@ -55,6 +55,7 @@ import {
     KeyRound,
     FileJson,
     ImageIcon,
+    Languages,
     Navigation,
     PanelBottom,
     LayoutGrid,
@@ -169,7 +170,7 @@ export const CORE_NAV_GROUPS: NavGroup[] = [
         icon: Palette,
         label: "Design",
         labelKey: "sidebar_design",
-        pathPrefix: ["/admin/settings/navbar", "/admin/settings/footer", "/admin/settings/widgets", "/admin/settings/css", "/admin/media"],
+        pathPrefix: ["/admin/settings/navbar", "/admin/settings/footer", "/admin/settings/widgets", "/admin/settings/css", "/admin/media", "/admin/translations"],
         sections: [
             {
                 header: "Appearance",
@@ -193,6 +194,13 @@ export const CORE_NAV_GROUPS: NavGroup[] = [
                 headerKey: "sidebar_media",
                 items: [
                     { href: "/admin/media", label: "Media Library", labelKey: "sidebar_mediaLibrary", icon: ImageIcon },
+                ],
+            },
+            {
+                header: "Wording",
+                headerKey: "sidebar_wording",
+                items: [
+                    { href: "/admin/translations", label: "Translations", labelKey: "sidebar_translations", icon: Languages },
                 ],
             },
         ],

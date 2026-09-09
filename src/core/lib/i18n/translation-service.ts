@@ -11,43 +11,10 @@
  * This replaces the build-time `clean-translations.ts` merge.
  */
 
-import fs from "node:fs";
-import path from "node:path";
 import { prisma } from "@/core/lib/db";
+import { shippedMessages } from "@/core/lib/i18n/shipped-messages";
 import { cacheGet, cacheSet, cacheDel } from "@/core/lib/redis";
 import { isUnsafeKey, emptyRecord } from "@/core/lib/safe-object";
-
-/**
- * The catalogue this version ships, read once per process and per locale.
- *
- * The table is the source of truth for anything an operator edited and for
- * every module, and a seeder copies these files into it on each boot. Between
- * a release and that seeder is a window where a string exists in the code and
- * not in the table, and every screen using one renders the key: the update
- * screen shipped reading `admin.updates_title` to anybody who opened it.
- *
- * Starting from the file closes that window. Rows are laid over the top, so a
- * customised string is still the customised string and a module's strings
- * still come only from the table.
- */
-const shipped = new Map<string, Record<string, Record<string, unknown>>>();
-
-function shippedMessages(locale: string): Record<string, Record<string, unknown>> {
-    const cached = shipped.get(locale);
-    if (cached) return cached;
-
-    let parsed: Record<string, Record<string, unknown>> = {};
-    try {
-        const file = path.join(process.cwd(), "messages-core", `${locale}.json`);
-        parsed = JSON.parse(fs.readFileSync(file, "utf8")) as Record<string, Record<string, unknown>>;
-    } catch {
-        // A locale core ships no catalogue for is a module's business, and an
-        // unreadable file is not a reason to serve no strings at all.
-        parsed = {};
-    }
-    shipped.set(locale, parsed);
-    return parsed;
-}
 
 const CACHE_PREFIX = "uxw:translations:";
 const CACHE_TTL_SECONDS = 120;
