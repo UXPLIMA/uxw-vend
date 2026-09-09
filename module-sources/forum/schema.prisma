@@ -22,7 +22,35 @@ model ForumCategory {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  /// A section inside a section. A child is never more open than its parent;
+  /// see lib/permissions.ts for why that rule is worth more than the rest.
+  parentId String?
+  parent   ForumCategory?  @relation("ForumCategoryTree", fields: [parentId], references: [id], onDelete: SetNull)
+  children ForumCategory[] @relation("ForumCategoryTree")
+
+  permissions ForumCategoryPermission[]
+
   topics ForumTopic[]
+
+  @@index([parentId])
+}
+
+/// One line of the matrix: what a role may do in a category.
+///
+/// A category with no lines at all is open to everybody. A category with lines
+/// that do not name a role is shut to it. The two silences mean opposite
+/// things on purpose; lib/permissions.ts is where that is argued.
+model ForumCategoryPermission {
+  id         String        @id @default(cuid())
+  categoryId String
+  category   ForumCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  roleId     String
+  canView    Boolean       @default(true)
+  canPost    Boolean       @default(true)
+  canReply   Boolean       @default(true)
+
+  @@unique([categoryId, roleId])
+  @@index([roleId])
 }
 
 model ForumTopic {

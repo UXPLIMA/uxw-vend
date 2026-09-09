@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { accessToCategory } from "../../../../lib/visible-categories";
 import { prisma, rateLimitForRoleAsync } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 
@@ -22,8 +23,18 @@ export async function POST(_request: NextRequest, { params }: RouteParams) {
 
     const { id } = await params;
 
-    const topic = await prisma.forumTopic.findUnique({ where: { id }, select: { id: true } });
+    const topic = await prisma.forumTopic.findUnique({
+        where: { id },
+        select: { id: true, categoryId: true },
+    });
     if (!topic) {
+        return NextResponse.json({ error: "Topic not found" }, { status: 404 });
+    }
+
+    // Liking is a write into a section, and a reader who cannot open it has
+    // no business leaving a mark in it - nor learning it is there.
+    const mayRead = await accessToCategory(topic.categoryId, session.user.role ?? null);
+    if (!mayRead.view) {
         return NextResponse.json({ error: "Topic not found" }, { status: 404 });
     }
 

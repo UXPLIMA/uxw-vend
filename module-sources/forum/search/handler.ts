@@ -1,4 +1,6 @@
 import { log, prisma } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
+import { visibleCategoryIds } from "../lib/visible-categories";
 import { mayViewForum } from "../lib/guest-view";
 
 interface SearchResult {
@@ -36,12 +38,27 @@ export default async function search(q: string): Promise<SearchResult[]> {
     // cannot be shown is a query worth not running.
     if (!(await mayViewForum())) return [];
 
+    /*
+     * Which sections this reader may open. Read once, before either query,
+     * because there are two of them - a full-text path and a fallback - and
+     * narrowing one of them looks exactly like narrowing the search. That was
+     * measured on a running site: the categories endpoint and the sitemap both
+     * hid a staff-only section while the search handed a signed-out visitor
+     * the title and opening line of every topic in it.
+     */
+    const reader = await auth();
+    const readable = await visibleCategoryIds(reader?.user?.role ?? null);
+    if (!readable.everything && readable.categoryIds.length === 0) return [];
+    const categoryIds = readable.categoryIds;
+    const narrow = !readable.everything;
+
     try {
         // Full-text path
         const rows = await prisma.$queryRaw<Array<{ title: string; slug: string; content: string }>>`
             SELECT title, slug, content
             FROM "ForumTopic"
             WHERE "moderationState" = 'APPROVED'
+              AND (${!narrow} OR "categoryId" = ANY(${categoryIds}::text[]))
               AND to_tsvector('english', coalesce(title, '') || ' ' || coalesce(content, ''))
                   @@ plainto_tsquery('english', ${q})
             ORDER BY ts_rank(
@@ -61,10 +78,12 @@ export default async function search(q: string): Promise<SearchResult[]> {
         log.warn("[forum-search] FTS failed, falling back to ILIKE", {
             error: err instanceof Error ? err.message : String(err),
         });
+
         const rows = await prisma.forumTopic.findMany({
             where: {
                 AND: [
                     { moderationState: "APPROVED" },
+                    ...(readable.everything ? [] : [{ categoryId: { in: readable.categoryIds } }]),
                     {
                         OR: [
                             { title: { contains: q, mode: "insensitive" } },

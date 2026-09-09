@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { visibleCategoryIds } from "../../lib/visible-categories";
 import { generateSlug } from "@/core/sdk";
 import { pageParams, isAdmin, moduleSettings, prisma, rateLimitForRole, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
@@ -39,9 +40,17 @@ export async function GET(request: NextRequest) {
     if (search) where.title = { contains: search, mode: "insensitive" };
     if (!adminCheck) where.moderationState = "APPROVED";
 
+    // Narrowed to what this reader may open. Without it a private section's
+    // titles are listed by anyone who asks the endpoint directly, whatever the
+    // page in front of it draws.
+    const readable = await visibleCategoryIds(session?.user?.role ?? null);
+    const onlyReadable = readable.everything
+        ? where
+        : { AND: [where, { categoryId: { in: readable.categoryIds } }] };
+
     const [topics, total] = await Promise.all([
         prisma.forumTopic.findMany({
-            where,
+            where: onlyReadable,
             include: {
                 author: { select: { id: true, username: true, avatar: true } },
                 category: { select: { id: true, name: true, slug: true, color: true } },
@@ -51,7 +60,7 @@ export async function GET(request: NextRequest) {
             take,
             orderBy: [{ isPinned: "desc" }, { createdAt: "desc" }],
         }),
-        prisma.forumTopic.count({ where }),
+        prisma.forumTopic.count({ where: onlyReadable }),
     ]);
 
     return NextResponse.json({

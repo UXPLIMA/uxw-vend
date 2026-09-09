@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { visibleCategoryIds } from "../../lib/visible-categories";
 import { generateSlug } from "@/core/sdk";
 import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
@@ -10,8 +11,14 @@ export async function GET() {
     const denied = await denyGuestView();
     if (denied) return denied;
 
+    // A private category has more than one door, and this is the front one.
+    const reader = await auth();
+    const readable = await visibleCategoryIds(reader?.user?.role ?? null);
     const categories = await prisma.forumCategory.findMany({
-        where: { isActive: true },
+        where: {
+            isActive: true,
+            ...(readable.everything ? {} : { id: { in: readable.categoryIds } }),
+        },
         orderBy: { order: "asc" },
         include: {
             _count: { select: { topics: true } },

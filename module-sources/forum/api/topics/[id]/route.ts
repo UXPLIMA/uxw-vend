@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { accessToCategory } from "../../../lib/visible-categories";
 import { pageParams, isAdmin, moduleSettings, prisma, rateLimitForRole, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { forumPostSchema, forumTopicUpdateSchema } from "../../../lib/validations";
@@ -40,6 +41,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     );
     const postWhere = adminCheckGet ? undefined : { moderationState: "APPROVED" as const };
 
+    const reader = await auth();
     const topic = await prisma.forumTopic.findFirst({
         where: { OR: [{ id }, { slug: id }, ...(isNaN(Number(id)) ? [] : [{ number: Number(id) }])] },
         include: {
@@ -60,6 +62,13 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
     });
 
     if (!topic) {
+        return NextResponse.json({ error: "Topic not found" }, { status: 404 });
+    }
+
+    // Not found rather than forbidden: a 403 confirms that a topic with that
+    // address exists, which is half of what a private section is hiding.
+    const mayRead = await accessToCategory(topic.categoryId, reader?.user?.role ?? null);
+    if (!mayRead.view) {
         return NextResponse.json({ error: "Topic not found" }, { status: 404 });
     }
 

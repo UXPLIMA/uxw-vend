@@ -2,8 +2,8 @@
   "id": "forum",
   "name": "Forum Module",
   "description": "Community discussion forum with categories, topics, and replies",
-  "version": "1.1.32",
-  "coreVersion": "^1.30.0",
+  "version": "1.2.0",
+  "coreVersion": "^1.35.0",
   "category": "community",
   "author": "uxwVend Team",
   "icon": "MessageSquare",
@@ -121,6 +121,11 @@
       "path": "/forum/stats",
       "handler": "api/stats/route.ts",
       "description": "Get aggregate forum statistics for the admin dashboard."
+    },
+    {
+      "path": "/forum/categories/permissions",
+      "handler": "api/categories/permissions/route.ts",
+      "description": "Which roles may read, post and reply in a category (admin)."
     }
   ],
   "dashboardCards": [

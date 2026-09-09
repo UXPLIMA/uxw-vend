@@ -30,7 +30,14 @@ const queryRaw = vi.fn(async () => [
 ]);
 
 vi.mock("@/core/sdk/server", () => ({
-    prisma: { $queryRaw: (...args: unknown[]) => queryRaw(...(args as [])) },
+    prisma: {
+        $queryRaw: (...args: unknown[]) => queryRaw(...(args as [])),
+        // Read before the query, to narrow it to the sections this reader may
+        // open. Empty here: this file is about the other visibility rule, and
+        // a site with no matrix hides nothing.
+        forumCategory: { findMany: async () => [] },
+        forumCategoryPermission: { findMany: async () => [] },
+    },
     log: { error: vi.fn(), warn: vi.fn(), info: vi.fn(), debug: vi.fn() },
     moduleSettings: async () => ({ allowGuestView }),
 }));

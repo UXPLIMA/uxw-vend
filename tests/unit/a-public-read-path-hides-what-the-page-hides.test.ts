@@ -51,6 +51,10 @@ vi.mock("@/core/sdk/server", () => ({
         }),
         blogArticle: delegate("blogArticle"),
         forumTopic: delegate("forumTopic"),
+        // Read by the forum's visibility helper before it reads topics: a
+        // site with no matrix hides nothing, which is what these answer.
+        forumCategory: delegate("forumCategory"),
+        forumCategoryPermission: delegate("forumCategoryPermission"),
         helpArticle: delegate("helpArticle"),
         product: delegate("product"),
     },
