@@ -2,8 +2,8 @@
   "id": "store",
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
-  "version": "2.21.1",
-  "coreVersion": "^1.34.0",
+  "version": "2.22.0",
+  "coreVersion": "^1.38.0",
   "category": "commerce",
   "author": "uxwVend Team",
   "icon": "ShoppingBag",
@@ -41,6 +41,11 @@
       "hook": "subscription.changed",
       "type": "filter",
       "handler": "hooks/on-subscription-changed.ts"
+    },
+    {
+      "hook": "admin.customer.panels",
+      "type": "filter",
+      "handler": "hooks/on-customer-panels.ts"
     }
   ],
   "settings": [
@@ -1094,7 +1099,11 @@
         "billing_country_NL": "Netherlands",
         "billing_country_US": "United States",
         "vip_notStated": "not stated",
-        "vip_notStatedNote": "A dash means nothing was said either way, not that it is missing."
+        "vip_notStatedNote": "A dash means nothing was said either way, not that it is missing.",
+        "adm_customerPanel": "In the shop",
+        "adm_customerOrders": "Orders",
+        "adm_customerSpent": "Paid in total",
+        "adm_customerCredits": "Credit balance"
       },
       "cart": {
         "title": "Shopping Cart",
@@ -1780,7 +1789,11 @@
         "billing_country_NL": "Hollanda",
         "billing_country_US": "Amerika Birleşik Devletleri",
         "vip_notStated": "belirtilmemiş",
-        "vip_notStatedNote": "Tire, bu konuda bir şey söylenmediği anlamına gelir; yok demek değildir."
+        "vip_notStatedNote": "Tire, bu konuda bir şey söylenmediği anlamına gelir; yok demek değildir.",
+        "adm_customerPanel": "Mağazada",
+        "adm_customerOrders": "Sipariş",
+        "adm_customerSpent": "Toplam ödediği",
+        "adm_customerCredits": "Kredi bakiyesi"
       },
       "cart": {
         "title": "Alışveriş Sepeti",

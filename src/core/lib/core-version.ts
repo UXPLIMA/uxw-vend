@@ -12,6 +12,14 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.38.0 - `admin.customer.panels` and `readUserAgent`. An operator opening one
+ * member needs what is spread across everything installed - what they bought,
+ * what they are owed, what they have asked for - and core cannot gather that
+ * without knowing which modules exist. So it asks and never learns who
+ * answered. `readUserAgent` turns a login's user agent into a browser and a
+ * system, and keeps the string when it fits nothing: an unfamiliar string
+ * serves "was this me" better than a confident wrong answer. Additive.
+ *
  * 1.37.0 - `restrictedFrom`, `SITE_WIDE`, `isRestrictedFrom`, `safeRoleCss` and
  * `RoleName`. Two additions that both belong to a member rather than a module.
  *
@@ -262,4 +270,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.37.0";
+export const CORE_API_VERSION = "1.38.0";

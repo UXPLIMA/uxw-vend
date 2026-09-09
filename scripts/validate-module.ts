@@ -775,9 +775,19 @@ function checkAdminKeyPrefix(modulePath: string): CheckResult {
                 continue;
             }
             if (!/\.tsx?$/.test(entry.name)) continue;
-            if (referencesAdminKey.test(fs.readFileSync(full, "utf8"))) {
-                offenders.push(path.relative(modulePath, full));
-            }
+            const source = fs.readFileSync(full, "utf8");
+            if (!referencesAdminKey.test(source)) continue;
+            /*
+             * The trim is on the catalogue handed to the client provider, so
+             * the rule is about what a public *client* screen renders. A file
+             * that imports a server-only module cannot be one: it would not
+             * compile into a browser bundle. The server catalogue is whole, so
+             * an admin key resolved there is neither a public screen nor a
+             * mistake - a hook assembling an admin panel's words is the case
+             * this clause exists for.
+             */
+            if (/from ["'](?:next-intl\/server|@\/core\/sdk\/server)["']/.test(source)) continue;
+            offenders.push(path.relative(modulePath, full));
         }
     };
     walk(modulePath);

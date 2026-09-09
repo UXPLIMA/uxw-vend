@@ -100,6 +100,38 @@ interface UxwVendFilterPayloads {
      * site should pay for a feature most of them never use.
      */
     "routing.redirects": RoutingRedirectRule[];
+
+    /**
+     * What each installed module knows about one member, for the screen an
+     * operator opens when somebody writes in.
+     *
+     * They are looking at one person and the answer is spread across
+     * everything installed: what they bought, what they are owed, what they
+     * have asked for, what has been done about them. Core cannot gather that
+     * without knowing which modules exist, so it asks and never learns who
+     * answered.
+     */
+    "admin.customer.panels": CustomerPanel[];
+}
+
+/**
+ * One module's answer about one member.
+ *
+ * The words arrive translated. A panel is assembled on the server, where the
+ * module can reach its own catalogue and the reader's language, and sending a
+ * key instead would mean the screen knowing which namespace each module keeps
+ * its words in - and would send admin-only words to every page, which is
+ * exactly what their prefix exists to prevent.
+ */
+interface CustomerPanel {
+    /** Unique across modules; the module's own id is the usual choice. */
+    key: string;
+    /** A heading, in the reader's language. */
+    label: string;
+    /** Read straight down: a label and what it says, both ready to draw. */
+    rows: { label: string; value: string }[];
+    /** Where an operator goes to do something about it. */
+    href?: string;
 }
 
 /** One moved page, as whatever manages them describes it. */
@@ -131,6 +163,16 @@ interface UxwVendFilterContexts {
      * with them afterwards.
      */
     "routing.redirects": Record<string, never>;
+
+    /**
+     * Which member is being looked at, and which language to answer in.
+     *
+     * The locale is passed rather than looked up: this is asked from an API
+     * route, where next-intl has no route segment to read one from, and a
+     * panel that answered in the wrong language would be worse than one that
+     * answered in keys.
+     */
+    "admin.customer.panels": { userId: string; locale: string };
 
     /**
      * What the visitor is trying to do, whatever the `auth.form.challenge`

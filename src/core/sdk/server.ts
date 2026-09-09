@@ -148,3 +148,7 @@ export { siteCurrency, formatSiteCurrency } from "@/core/lib/site-currency";
 // Whether a member is kept out of a part of the site. The scope is the asking
 // module's own word; see @/core/sdk for the decision behind it.
 export { isRestrictedFrom, restrictionsOn } from "@/core/lib/restrictions-server";
+
+// A module's own words on the server, outside a page. `getTranslations` needs
+// a route segment to find a locale in and an API route has none.
+export { moduleTranslator } from "@/core/lib/module-translator";
