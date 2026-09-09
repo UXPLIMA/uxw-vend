@@ -19,10 +19,26 @@
  * And a blocklist is worth what its spelling is worth. CSS lets an identifier
  * be escaped a character at a time - `\75 rl(` is `url(` - and a comment
  * splits a keyword in two. So the text is folded first and judged after.
+ *
+ * But only for the words. The characters that end the rule or the tag are
+ * judged on what was typed as well, because what is stored is what was typed:
+ * anything the folding removes is invisible to the judge and present in what
+ * renders. A closing tag inside a comment is the whole of it - an HTML parser
+ * does not know what a CSS comment is, so inside a `<style>` element it scans
+ * for `</style` and ends the element there, and the script after it is real.
  */
 
 /** Longer than any name style anybody writes by hand. */
 const MAX_LENGTH = 2000;
+
+/**
+ * Out of the rule, or out of the tag.
+ *
+ * A brace ends the rule this site wrote and starts one of the operator's own;
+ * an angle bracket ends the `<style>` element and what follows is markup.
+ * Neither needs a function, and neither is on the list anybody names first.
+ */
+const BREAKS_OUT = /[{}<>]/;
 
 /**
  * What a browser will read, with the disguises taken off.
@@ -50,11 +66,16 @@ export function safeRoleCss(css: string): string | null {
     const typed = css.trim();
     if (typed === "" || typed.length > MAX_LENGTH) return null;
 
+    // On what was typed, first. The folding is only safe to judge by for
+    // things a browser also folds; an HTML parser folds nothing, so a `<`
+    // inside a comment still closes the tag it is written into.
+    if (BREAKS_OUT.test(typed)) return null;
+
     const folded = asABrowserReadsIt(typed);
 
-    // Out of the rule, or out of the tag. Neither needs a function, and
-    // neither is on the list anybody thinks of first.
-    if (/[{}<>]/.test(folded)) return null;
+    // And again on the folded form, for the same characters written as an
+    // escape: `\3c` is `<`.
+    if (BREAKS_OUT.test(folded)) return null;
 
     // Every at-rule, not only the one that was named: `@import` fetches a
     // stylesheet, and the rest carry a block, which is a brace.

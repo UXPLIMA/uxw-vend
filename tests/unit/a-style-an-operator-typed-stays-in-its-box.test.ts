@@ -60,6 +60,38 @@ describe("breaking out of the rule", () => {
     });
 });
 
+describe("what the folding removes but the page still gets", () => {
+    /*
+     * The first version of this file folded the text to judge it - comments
+     * stripped, escapes resolved - and then stored what was typed. Anything
+     * the folding removed was invisible to the judge and present in what
+     * rendered, which is the whole bug in one sentence.
+     *
+     * An HTML parser does not know what a CSS comment is. Inside a `<style>`
+     * element it scans for `</style` and ends the element there, whatever CSS
+     * thinks is a comment. So a closing tag hidden in a comment passed the
+     * check and closed the tag anyway.
+     */
+    it("refuses a closing tag hidden in a comment", () => {
+        expect(safeRoleCss("color: red /* </style><script>alert(1)</script> */")).toBeNull();
+    });
+
+    it("refuses a brace hidden in a comment", () => {
+        expect(safeRoleCss("color: red /* } body { display:none */")).toBeNull();
+    });
+
+    it("refuses an unclosed comment carrying one", () => {
+        // A browser reading an unterminated comment swallows the rest of the
+        // sheet, and the tag still closes where the parser finds it.
+        expect(safeRoleCss("color: red /* </style>")).toBeNull();
+    });
+
+    it("still takes a comment that is only a comment", () => {
+        // Refusing every comment would be refusing something operators write.
+        expect(safeRoleCss("color: gold; /* the founder */")).toBe("color: gold; /* the founder */");
+    });
+});
+
 describe("the functions and rules that were named", () => {
     it("refuses a fetch of anything", () => {
         expect(safeRoleCss("background: url(https://evil.example/x.png)")).toBeNull();
