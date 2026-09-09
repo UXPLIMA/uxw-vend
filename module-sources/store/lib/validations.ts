@@ -67,6 +67,20 @@ export const categorySchema = z.object({
     isActive: z.boolean().optional(),
 });
 
+export const manualOrderSchema = z.object({
+    userId: z.string().min(1).max(64),
+    currency: z.string().length(3),
+    notes: z.string().max(500).optional(),
+    /** Whether it granted what it names, or is only a record of a sale. */
+    markPaid: z.boolean().default(false),
+    lines: z.array(z.object({
+        productId: z.string().min(1).max(64),
+        quantity: z.number().int().min(1).max(1000),
+        /** Zero is allowed: a replacement is worth nothing and still counts. */
+        unitAmount: z.number().min(0),
+    })).min(1).max(50),
+});
+
 export const campaignSchema = z.object({
     name: z.string().min(1, "Name is required").max(100),
     isActive: z.boolean().optional(),
