@@ -5,11 +5,12 @@ import { useTranslations, useLocale } from "next-intl";
 import { useState, useEffect } from "react";
 import { Link } from "@/core/sdk/navigation";
 import { formatDate } from "@/core/sdk";
-import { Button, Card, CardContent, CardHeader, CardTitle, useSiteCurrency, buttonClassName } from "@/core/sdk/ui";
-import { Loader2, ChevronLeft, ChevronRight, ShoppingCart } from "lucide-react";
+import { Button, Card, CardContent, CardHeader, CardTitle, useFormRoute, useSiteCurrency, buttonClassName } from "@/core/sdk/ui";
+import { Loader2, ChevronLeft, ChevronRight, Plus, ShoppingCart } from "lucide-react";
 import { dateLocaleTag } from "@/core/sdk";
 import { adminOrderStatusKeys, orderStatusLabel } from "../../../lib/order-status";
 import { AdminPageHeader } from "@/core/sdk/admin";
+import { NewOrderForm } from "./NewOrderForm";
 
 /** The admin catalogue's copy of the order status labels. */
 const ADMIN_ORDER_STATUS_KEYS = adminOrderStatusKeys("adm_orderStatus_");
@@ -39,6 +40,7 @@ export default function AdminOrdersPage() {
     const t = useTranslations("store");
     const commonT = useTranslations("common");
     const dateTag = dateLocaleTag(useLocale());
+    const { showForm, formHref, closeForm } = useFormRoute();
     const [orders, setOrders] = useState<Order[]>([]);
     const [loading, setLoading] = useState(true);
     const [activeStatus, setActiveStatus] = useState("ALL");
@@ -77,11 +79,29 @@ export default function AdminOrdersPage() {
         return acc;
     }, {} as Record<string, number>);
 
+    if (showForm) {
+        return (
+            <NewOrderForm
+                onCancel={closeForm}
+                onDone={() => {
+                    closeForm();
+                    setPage(1);
+                    fetchOrders();
+                }}
+            />
+        );
+    }
+
     return (
         <>
             <AdminPageHeader
                 title={t("adm_orders")}
                 description={t("adm_ordersTotal", { count: total })}
+                actions={
+                    <Link href={formHref()} className={buttonClassName("default", "default")}>
+                        <Plus className="h-4 w-4" aria-hidden="true" /> {t("adm_manualOrderNew")}
+                    </Link>
+                }
             />
 
             {/* Status Filter Tabs */}
