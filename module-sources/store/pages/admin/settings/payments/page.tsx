@@ -11,7 +11,6 @@ export default function PaymentSettingsPage() {
             subtitle={t("paymentsSubtitle")}
             fields={[
                 { key: "default_currency", label: t("paymentsDefaultCurrency"), placeholder: "usd", description: t("paymentsDefaultCurrencyDesc") },
-                { key: "tax_rate", label: t("paymentsTaxRate"), type: "number", placeholder: "0", description: t("paymentsTaxRateDesc") },
             ]}
         />
     );

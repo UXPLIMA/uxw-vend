@@ -215,11 +215,36 @@ export function computeTotals(params: {
     couponDiscount: number;
     creatorDiscount: number;
     taxRate: number;
+    /**
+     * Whether the prices already contain the tax.
+     *
+     * Adding tax on top is how a shop quotes a price in one part of the world
+     * and wrong in most of the rest: where a consumer price is quoted
+     * tax-inclusive by law, adding it at checkout charges more than the page
+     * said and puts the wrong figure on the invoice.
+     */
+    taxIncluded?: boolean;
 }): { totalDiscount: number; taxableAmount: number; tax: number; total: number } {
-    const { subtotal, couponDiscount, creatorDiscount, taxRate } = params;
+    const { subtotal, couponDiscount, creatorDiscount, taxRate, taxIncluded = false } = params;
     const totalDiscount = cents(couponDiscount + creatorDiscount);
-    const taxableAmount = cents(Math.max(0, subtotal - totalDiscount));
-    const tax = taxRate > 0 ? Math.round(taxableAmount * taxRate) / 100 : 0;
-    const total = cents(Math.max(0, taxableAmount + tax));
-    return { totalDiscount, taxableAmount, tax, total };
+    const discounted = cents(Math.max(0, subtotal - totalDiscount));
+
+    if (taxRate <= 0) {
+        return { totalDiscount, taxableAmount: discounted, tax: 0, total: discounted };
+    }
+
+    if (taxIncluded) {
+        // The tax inside a gross figure is not a percentage of it. At 20 per
+        // cent the tax inside 120 is 20, not 24, and the difference is what an
+        // invoice is checked against.
+        //
+        // The net is derived and the tax is the remainder, rather than both
+        // being rounded from the gross: rounding twice is how a line item
+        // comes out a penny short of what the customer was charged.
+        const net = cents(discounted / (1 + taxRate / 100));
+        return { totalDiscount, taxableAmount: net, tax: cents(discounted - net), total: discounted };
+    }
+
+    const tax = cents((discounted * taxRate) / 100);
+    return { totalDiscount, taxableAmount: discounted, tax, total: cents(discounted + tax) };
 }

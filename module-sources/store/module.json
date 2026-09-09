@@ -2,7 +2,7 @@
   "id": "store",
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
-  "version": "2.10.0",
+  "version": "2.11.0",
   "coreVersion": "^1.33.0",
   "category": "commerce",
   "author": "uxwVend Team",
@@ -103,6 +103,23 @@
       "max": 1000,
       "label": "Say \"only N left\" at",
       "description": "A limited product says how few are left once it drops to this many. Zero says nothing at all."
+    },
+    {
+      "key": "taxRate",
+      "type": "number",
+      "default": 0,
+      "min": 0,
+      "max": 100,
+      "step": 0.01,
+      "label": "Tax rate (%)",
+      "description": "Zero switches tax off entirely. Applied after any discount."
+    },
+    {
+      "key": "taxIncluded",
+      "type": "boolean",
+      "default": false,
+      "label": "Prices already include tax",
+      "description": "On, the price shown is what the customer pays and the tax is the part of it the invoice names. Off, the tax is added at checkout."
     }
   ],
   "navGroups": [
@@ -819,8 +836,6 @@
         "paymentsDefaultCurrency": "Default currency",
         "paymentsDefaultCurrencyDesc": "Three-letter ISO code (e.g. usd, eur, gbp).",
         "paymentsSubtitle": "Configure Stripe and tax for store checkout",
-        "paymentsTaxRate": "Tax rate (%)",
-        "paymentsTaxRateDesc": "Applied to every order. 0 disables tax.",
         "paymentsTitle": "Payment settings",
         "playerName": "Player Name",
         "playerNameHelp": "Items will be delivered to this player",
@@ -1421,8 +1436,6 @@
         "paymentsDefaultCurrency": "Varsayılan para birimi",
         "paymentsDefaultCurrencyDesc": "Üç harfli ISO kodu (örn. usd, eur, gbp).",
         "paymentsSubtitle": "Mağaza ödemesi için Stripe ve vergi ayarları",
-        "paymentsTaxRate": "Vergi oranı (%)",
-        "paymentsTaxRateDesc": "Her siparişe uygulanır. 0 vergi devre dışı.",
         "paymentsTitle": "Ödeme ayarları",
         "playerName": "Oyuncu Adı",
         "playerNameHelp": "Ürünler bu oyuncuya teslim edilecek",

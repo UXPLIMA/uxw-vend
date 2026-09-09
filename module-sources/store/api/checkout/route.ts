@@ -284,8 +284,15 @@ export async function POST(request: NextRequest) {
         }
 
         // ── Tax calculation ──
-        const taxSetting = await prisma.setting.findUnique({ where: { key: "tax_rate" } });
-        const taxRate = Number(taxSetting?.value) || 0;
+        // The rate is the store module's own setting now. It used to be a
+        // row among the site's settings, which is the wrong home for a shop's
+        // own figure and left the "prices already include tax" switch with
+        // nowhere to sit beside it - and an operator can set one of those
+        // without the other only by accident.
+        const { taxRate, taxIncluded } = await moduleSettings<{
+            taxRate: number;
+            taxIncluded: boolean;
+        }>("store");
         const currSetting = await prisma.setting.findUnique({ where: { key: "default_currency" } });
         const currency = resolveCurrency(currSetting?.value as string).toLowerCase();
 
@@ -294,6 +301,7 @@ export async function POST(request: NextRequest) {
             couponDiscount,
             creatorDiscount,
             taxRate,
+            taxIncluded,
         });
 
         // ── Credits payment ──
@@ -551,7 +559,12 @@ export async function POST(request: NextRequest) {
             unitAmount: item.price,
         }));
         if (tax > 0) {
-            lines.push({ name: `Tax (${taxRate}%)`, quantity: 1, unitAmount: tax });
+            // Only when it is added on top. Tax already inside the prices is
+            // inside the line amounts too, and sending it again would charge
+            // the buyer for it twice.
+            if (!taxIncluded) {
+                lines.push({ name: `Tax (${taxRate}%)`, quantity: 1, unitAmount: tax });
+            }
         }
 
         const subProduct = isSubscriptionCheckout ? subscriptionProducts[0] : null;
