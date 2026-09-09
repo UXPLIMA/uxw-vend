@@ -1,0 +1,102 @@
+import { NextRequest, NextResponse } from "next/server";
+import { applyFiltersAsync } from "@/core/sdk";
+import { logActivity, pageParams, prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
+import { auth } from "@/core/sdk/auth";
+import { z } from "zod";
+import { deliveryRefusal } from "../../lib/delivery";
+
+/**
+ * What is for sale, and putting something up.
+ *
+ * The listing carries a kind rather than a thing. Which kinds exist is asked
+ * of whatever is installed, both here - so a seller cannot offer something
+ * nothing can hand over - and again when it sells.
+ */
+const listingSchema = z.object({
+    title: z.string().min(1, "A title is required").max(120),
+    body: z.string().max(2000).optional(),
+    price: z.number().int().min(1, "A listing has to cost at least one credit").max(10_000_000),
+    kind: z.string().min(1).max(64),
+    payload: z.record(z.string(), z.string()).optional(),
+});
+
+export async function GET(request: NextRequest) {
+    // Through the shared reader rather than parsed here: it is the one place
+    // that bounds a page number, and a `?page=1e9` skipping a billion rows is
+    // a query nobody can serve.
+    const { page, skip, take } = pageParams(request.nextUrl.searchParams, { defaultLimit: 24 });
+
+    const [listings, total] = await Promise.all([
+        prisma.marketListing.findMany({
+            where: { isActive: true, isSold: false },
+            include: { seller: { select: { id: true, username: true, avatar: true } } },
+            orderBy: { createdAt: "desc" },
+            skip,
+            take,
+        }),
+        prisma.marketListing.count({ where: { isActive: true, isSold: false } }),
+    ]);
+
+    return NextResponse.json({
+        listings: listings.map((listing) => ({
+            id: listing.id,
+            title: listing.title,
+            body: listing.body,
+            price: listing.price,
+            kind: listing.kind,
+            seller: listing.seller,
+            createdAt: listing.createdAt,
+        })),
+        pagination: { page, pages: Math.max(1, Math.ceil(total / take)), total },
+    });
+}
+
+export async function POST(request: NextRequest) {
+    const session = await auth();
+    if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const rl = await rateLimitForRole(
+        `market-list:${session.user.id}`,
+        { maxRequests: 20, windowMs: 60 * 60 * 1000 },
+        session.user.role,
+    );
+    if (!rl.success) return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+
+    const body = await readJsonBody(request);
+    if (body instanceof NextResponse) return body;
+    const parsed = listingSchema.safeParse(body);
+    if (!parsed.success) {
+        return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
+    }
+
+    // Nothing can be listed that nothing can hand over. Checked again at the
+    // sale, because a module gets uninstalled and its listings outlive it.
+    const kinds = await applyFiltersAsync("marketplace.delivery.kinds", [], {});
+    if (deliveryRefusal(parsed.data.kind, kinds)) {
+        return NextResponse.json(
+            { error: "Nothing here can hand that over", code: "market_cannot_deliver" },
+            { status: 400 },
+        );
+    }
+
+    const listing = await prisma.marketListing.create({
+        data: {
+            sellerId: session.user.id,
+            title: parsed.data.title,
+            body: parsed.data.body ?? null,
+            price: parsed.data.price,
+            kind: parsed.data.kind,
+            payload: parsed.data.payload ?? {},
+        },
+    });
+
+    await logActivity({
+        userId: session.user.id,
+        action: "marketplace.listing.created",
+        entity: "market_listing",
+        entityId: listing.id,
+        metadata: { price: listing.price, kind: listing.kind },
+    }).catch(() => {});
+
+    return NextResponse.json({ listing }, { status: 201 });
+}

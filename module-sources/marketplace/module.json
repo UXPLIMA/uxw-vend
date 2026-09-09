@@ -1,0 +1,172 @@
+{
+  "id": "marketplace",
+  "name": "Marketplace",
+  "description": "Members sell to each other for credits and the site takes a cut. What is handed over is decided by whatever integration is installed.",
+  "version": "1.0.0",
+  "coreVersion": "^1.34.0",
+  "category": "commerce",
+  "author": "uxwVend",
+  "icon": "Store",
+  "dependencies": [
+    "store@^2.21.0"
+  ],
+  "hooksEmitted": [
+    {
+      "hook": "marketplace.delivery.kinds",
+      "type": "filter"
+    },
+    {
+      "hook": "marketplace.deliver",
+      "type": "filter"
+    }
+  ],
+  "routes": [
+    {
+      "path": "/marketplace",
+      "component": "pages/public/page.tsx",
+      "titleKey": "pageTitles.marketplace"
+    }
+  ],
+  "navLinks": [
+    {
+      "label": "Marketplace",
+      "labelKey": "marketplace",
+      "href": "/marketplace",
+      "icon": "Store",
+      "position": 95
+    }
+  ],
+  "adminRoutes": [
+    {
+      "path": "/settings/marketplace",
+      "component": "pages/admin/page.tsx"
+    }
+  ],
+  "settingsCards": [
+    {
+      "title": "Marketplace",
+      "description": "What the site keeps from a sale between members.",
+      "href": "/settings/marketplace",
+      "icon": "Store",
+      "color": "text-teal-500"
+    }
+  ],
+  "api": [
+    {
+      "path": "/marketplace/listings",
+      "handler": "api/listings/route.ts",
+      "description": "What is for sale, and putting something up."
+    },
+    {
+      "path": "/marketplace/listings/[id]",
+      "handler": "api/listings/[id]/route.ts",
+      "description": "Take a listing down."
+    },
+    {
+      "path": "/marketplace/listings/[id]/buy",
+      "handler": "api/listings/[id]/buy/route.ts",
+      "description": "Buy a listing with credits."
+    },
+    {
+      "path": "/marketplace/delivery-kinds",
+      "handler": "api/delivery-kinds/route.ts",
+      "description": "What can be handed over here, for a seller to pick from."
+    }
+  ],
+  "translations": {
+    "en": {
+      "pageTitles": {
+        "marketplace": "Marketplace"
+      },
+      "marketplace": {
+        "title": "Marketplace",
+        "subtitle": "What members are selling each other, paid for in credits.",
+        "empty": "Nothing is for sale right now.",
+        "by": "by {name}",
+        "buy": "Buy",
+        "list": "Put it up",
+        "listed": "It is up for sale.",
+        "listFailed": "That could not be listed.",
+        "bought": "Bought. It is on its way.",
+        "boughtNotDelivered": "Bought, but it could not be handed over. An operator has been told.",
+        "buyFailed": "That could not be bought.",
+        "buyConfirmTitle": "Buy this?",
+        "buyConfirmMessage": "{title} costs {price} credits and the sale is final.",
+        "formTitle": "What is it",
+        "formBody": "Anything else the buyer should know",
+        "formPrice": "Price in credits",
+        "formKind": "What gets handed over",
+        "formPickKind": "Pick one",
+        "adm_title": "Marketplace",
+        "adm_subtitle": "Members sell to each other in credits. This is what the site keeps.",
+        "adm_commission": "Commission percent",
+        "adm_commissionDesc": "Taken out of every sale before the seller is paid. Rounded down, so the odd credit goes to the seller. Empty or zero takes nothing.",
+        "err": {
+          "market_own_listing": "That is your own listing.",
+          "market_already_sold": "Somebody else got there first.",
+          "market_not_for_sale": "That is not for sale.",
+          "market_insufficient_balance": "You do not have enough credits.",
+          "market_cannot_deliver": "Nothing here can hand that over."
+        },
+        "sellUnavailable": "We could not check what can be sold right now."
+      },
+      "nav": {
+        "marketplace": "Marketplace"
+      }
+    },
+    "tr": {
+      "pageTitles": {
+        "marketplace": "Pazar"
+      },
+      "marketplace": {
+        "title": "Pazar",
+        "subtitle": "Üyelerin birbirine sattıkları, kredi ile ödenir.",
+        "empty": "Şu anda satılık bir şey yok.",
+        "by": "{name} tarafından",
+        "buy": "Satın al",
+        "list": "İlan ver",
+        "listed": "İlanınız yayında.",
+        "listFailed": "İlan verilemedi.",
+        "bought": "Alındı. Yola çıktı.",
+        "boughtNotDelivered": "Alındı ama teslim edilemedi. Yöneticiye bildirildi.",
+        "buyFailed": "Satın alınamadı.",
+        "buyConfirmTitle": "Satın alınsın mı?",
+        "buyConfirmMessage": "{title} {price} kredi tutuyor ve satış kesindir.",
+        "formTitle": "Ne satıyorsunuz",
+        "formBody": "Alıcının bilmesi gereken başka bir şey",
+        "formPrice": "Kredi cinsinden fiyat",
+        "formKind": "Ne teslim edilecek",
+        "formPickKind": "Birini seçin",
+        "adm_title": "Pazar",
+        "adm_subtitle": "Üyeler birbirine kredi ile satar. Sitenin aldığı pay burada.",
+        "adm_commission": "Komisyon yüzdesi",
+        "adm_commissionDesc": "Satıcıya ödenmeden önce her satıştan alınır. Aşağı yuvarlanır, artan kredi satıcıda kalır. Boş veya sıfır bırakmak komisyon almaz.",
+        "err": {
+          "market_own_listing": "Bu sizin kendi ilanınız.",
+          "market_already_sold": "Başkası daha önce aldı.",
+          "market_not_for_sale": "Bu satışta değil.",
+          "market_insufficient_balance": "Yeterli krediniz yok.",
+          "market_cannot_deliver": "Burada bunu teslim edebilecek bir şey yok."
+        },
+        "sellUnavailable": "Şu anda nelerin satılabileceğini kontrol edemedik."
+      },
+      "nav": {
+        "marketplace": "Pazar"
+      }
+    }
+  },
+  "userDataExport": [
+    {
+      "model": "marketListing",
+      "key": "marketplace.listings",
+      "column": "sellerId",
+      "erasure": "purge"
+    },
+    {
+      "model": "marketSale",
+      "key": "marketplace.purchases",
+      "column": "buyerId",
+      "erasure": "retain"
+    }
+  ]
+}

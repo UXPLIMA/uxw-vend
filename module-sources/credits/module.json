@@ -2,7 +2,7 @@
   "id": "credits",
   "name": "Credit System",
   "description": "Virtual currency wallet for users",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "coreVersion": "^1.34.0",
   "category": "commerce",
   "author": "uxwVend",
@@ -99,7 +99,10 @@
         "adm_subtitle": "What a purchase earns back. Anything else on the site that rewards credits comes in through the same door.",
         "adm_cashback": "Cashback percent",
         "adm_cashbackDesc": "A percentage of what was actually paid in money. An order settled from the wallet earns nothing, or the balance would climb on its own. Empty or zero switches it off.",
-        "typeCashback": "Cashback"
+        "typeCashback": "Cashback",
+        "typeMarket_purchase": "Bought from a member",
+        "typeMarket_sale": "Sold to a member",
+        "typeMarket_commission": "Marketplace commission"
       },
       "admin": {
         "module_credits_name": "Credit System",
@@ -163,7 +166,10 @@
         "adm_subtitle": "Bir alışverişin ne kadarının geri döndüğü. Sitede kredi ödüllendiren her şey aynı kapıdan geçer.",
         "adm_cashback": "İade yüzdesi",
         "adm_cashbackDesc": "Gerçekten parayla ödenen tutarın yüzdesi. Cüzdandan kapatılan sipariş hiçbir şey kazandırmaz, yoksa bakiye kendi kendine artar. Boş veya sıfır bırakmak kapatır.",
-        "typeCashback": "İade"
+        "typeCashback": "İade",
+        "typeMarket_purchase": "Üyeden satın alındı",
+        "typeMarket_sale": "Üyeye satıldı",
+        "typeMarket_commission": "Pazar komisyonu"
       },
       "admin": {
         "module_credits_name": "Kredi Sistemi",

@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-09",
-  "updatedAt": "2026-09-09T18:36:31Z",
+  "updatedAt": "2026-09-09T18:54:41Z",
   "modules": [
     {
       "id": "announcements",
@@ -434,13 +434,13 @@
           "description": "Kullanıcılar için sanal para cüzdanı"
         }
       },
-      "version": "1.2.0",
+      "version": "1.2.1",
       "coreVersion": "^1.34.0",
       "author": "uxwVend",
       "icon": "Coins",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-09T18:36:31Z",
+      "updatedAt": "2026-09-09T18:54:41Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1459,6 +1459,41 @@
         "publicRoutes": 1,
         "adminRoutes": 1,
         "apiRoutes": 1,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "marketplace",
+      "name": "Marketplace",
+      "description": "Members sell to each other for credits and the site takes a cut. What is handed over is decided by whatever integration is installed.",
+      "i18n": {},
+      "version": "1.0.0",
+      "coreVersion": "^1.34.0",
+      "author": "uxwVend",
+      "icon": "Store",
+      "category": "commerce",
+      "verified": true,
+      "updatedAt": "2026-09-09T18:54:41Z",
+      "screenshots": [],
+      "tags": [
+        "commerce"
+      ],
+      "zip": "marketplace.zip",
+      "dependencies": [
+        "store@^2.21.0"
+      ],
+      "conflicts": [],
+      "hooks": {
+        "emits": [
+          "marketplace.delivery.kinds",
+          "marketplace.deliver"
+        ],
+        "listens": []
+      },
+      "stats": {
+        "publicRoutes": 1,
+        "adminRoutes": 1,
+        "apiRoutes": 4,
         "widgets": 0
       }
     },
