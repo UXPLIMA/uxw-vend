@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { Prisma } from "@prisma/client";
 import { generateOrderNumber, applyFiltersAsync } from "@/core/sdk";
 import { log, logActivity, moduleSettings, prisma, rateLimitForRole, readJsonBody, siteTimeZone } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
@@ -10,6 +11,7 @@ import { countSales } from "../../lib/popularity";
 import { convertedCharge, resolveCurrency } from "../../lib/currency";
 import { startPaymentSession, listPaymentProviders } from "../../lib/payments";
 import { announceOrderCreated, announceOrderCompleted } from "../../lib/order-events";
+import { recordedVariables } from "../../lib/chest";
 import {
     computeOrderPricing,
     computeCouponDiscount,
@@ -386,6 +388,11 @@ export async function POST(request: NextRequest) {
                         productName: item.name,
                         quantity: item.quantity,
                         orderId: ord.id,
+                        // Claiming this later has no form to read from, and
+                        // the account's username is the one name the buyer
+                        // was deliberately not asked for.
+                        playerName,
+                        variables: recordedVariables(item.metadata) ?? Prisma.JsonNull,
                     })),
                 });
                 await tx.ownedProduct.createMany({
@@ -521,6 +528,8 @@ export async function POST(request: NextRequest) {
                         productName: item.name,
                         quantity: item.quantity,
                         orderId: order.id,
+                        playerName,
+                        variables: recordedVariables(item.metadata) ?? Prisma.JsonNull,
                     })),
                 });
                 await tx.ownedProduct.createMany({

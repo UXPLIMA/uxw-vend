@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { log, prisma, rateLimitForRole, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { deliverProduct } from "../../../lib/delivery";
+import { deliveryFor } from "../../../lib/chest";
 import { chestRedeemSchema } from "../../../lib/validations";
 
 type RouteParams = { params: Promise<{ id: string }> };
@@ -54,6 +55,28 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         return NextResponse.json({ message: `Gifted to ${target.username}` });
     }
 
+    const commands = await prisma.productCommand.findMany({
+        where: { productId: item.productId },
+        orderBy: { order: "asc" },
+    });
+
+    // Everything the request can be turned away for is settled before the
+    // claim, because a refusal after it spends the item: the screen asks for
+    // a name, the answer comes back, and the second attempt is told the item
+    // was already redeemed. It was, to nobody.
+    const delivery = commands.length > 0
+        ? deliveryFor(item, { playerName: fields.playerName })
+        : null;
+    if (delivery && "needsPlayerName" in delivery) {
+        // Nothing was recorded and nothing was typed. This used to fall back
+        // to the account's username, which is the one name checkout
+        // deliberately does not use, so the commands ran for the wrong person.
+        return NextResponse.json(
+            { error: "Tell us which player to deliver to", code: "chest_needs_player_name" },
+            { status: 400 },
+        );
+    }
+
     // Claim the item before delivering it, not after.
     //
     // The read above and the write below used to sit on either side of the
@@ -73,19 +96,13 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         return NextResponse.json({ error: "Already redeemed" }, { status: 400 });
     }
 
-    // Redeem: execute RCON commands
-    const commands = await prisma.productCommand.findMany({
-        where: { productId: item.productId },
-        orderBy: { order: "asc" },
-    });
-
-    if (commands.length > 0) {
-        const playerName = fields.playerName || session.user.name || "Player";
+    if (delivery && !("needsPlayerName" in delivery)) {
         await deliverProduct({
-            playerName,
-            productName: item.productName,
+            playerName: delivery.playerName,
+            productName: delivery.productName,
             commands: commands.map((c) => ({ command: c.command, serverId: c.serverId })),
-            quantity: item.quantity,
+            quantity: delivery.quantity,
+            variables: delivery.variables,
         }).catch((err: unknown) => log.error("[store] delivering a chest reward failed", { error: err instanceof Error ? err.message : String(err) }));
     }
 

@@ -3,8 +3,9 @@
 import { useState, useEffect } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { toast } from "sonner";
-import { Button, Card, CardContent, CardHeader, CardTitle, LoadFailed } from "@/core/sdk/ui";
-import { dateLocaleTag } from "@/core/sdk";
+import { Button, Card, CardContent, CardHeader, CardTitle, LoadFailed, usePrompt } from "@/core/sdk/ui";
+import { dateLocaleTag, errorMessage } from "@/core/sdk";
+import { Gift } from "lucide-react";
 
 interface ChestItem {
     id: string;
@@ -17,6 +18,8 @@ export function ProfileChestTab() {
     const __locale = useLocale();
     const __dateTag = dateLocaleTag(__locale);
     const t = useTranslations("store");
+    const commonT = useTranslations("common");
+    const ask = usePrompt();
     const [chestItems, setChestItems] = useState<ChestItem[]>([]);
     const [loading, setLoading] = useState(true);
     const [failed, setFailed] = useState(false);
@@ -32,17 +35,72 @@ export function ProfileChestTab() {
         return () => { cancelled = true; };
     }, [reloadKey]);
 
+    const claim = async (id: string, body: Record<string, string>) => {
+        const res = await fetch(`/api/v1/chest/${id}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+        });
+        if (res.ok) return { ok: true as const };
+        return { ok: false as const, body: await res.json().catch(() => null) };
+    };
+
+    /**
+     * Claiming asks for a name only when the item has none.
+     *
+     * Everything bought through checkout carries the name the buyer gave, so
+     * the common claim is one click. An item an operator put in a chest by
+     * hand was never bought and has nobody recorded, and that is the only
+     * case worth a dialog.
+     */
     const redeem = async (id: string) => {
         try {
-            const res = await fetch(`/api/v1/chest/${id}`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({}),
-            });
-            if (!res.ok) throw new Error("redeem failed");
+            let answer = await claim(id, {});
+            if (!answer.ok && answer.body?.code === "chest_needs_player_name") {
+                const playerName = await ask({
+                    title: t("tab_chest_whoTitle"),
+                    message: t("tab_chest_whoMessage"),
+                    placeholder: t("playerNamePlaceholder"),
+                    confirmText: t("tab_chest_redeem"),
+                    required: true,
+                });
+                if (!playerName) return;
+                answer = await claim(id, { playerName });
+            }
+            if (!answer.ok) {
+                toast.error(errorMessage(answer.body, t("tab_chest_redeemError"), t));
+                return;
+            }
             setChestItems(prev => prev.filter((c) => c.id !== id));
         } catch {
-            toast.error(t("tab_chest_redeemError"));
+            toast.error(commonT("somethingWentWrong"));
+        }
+    };
+
+    /**
+     * Giving an item away. The endpoint has always taken a recipient and no
+     * screen ever offered one, so the feature existed only for whoever read
+     * the source.
+     */
+    const gift = async (id: string, productName: string) => {
+        const giftTo = await ask({
+            title: t("tab_chest_giftTitle"),
+            message: t("tab_chest_giftMessage", { name: productName }),
+            placeholder: t("tab_chest_giftPlaceholder"),
+            confirmText: t("tab_chest_gift"),
+            required: true,
+        });
+        if (!giftTo) return;
+        try {
+            const answer = await claim(id, { giftTo });
+            if (!answer.ok) {
+                toast.error(errorMessage(answer.body, t("tab_chest_giftError"), t));
+                return;
+            }
+            setChestItems(prev => prev.filter((c) => c.id !== id));
+            toast.success(t("tab_chest_gifted", { name: giftTo }));
+        } catch {
+            toast.error(commonT("somethingWentWrong"));
         }
     };
 
@@ -73,6 +131,14 @@ export function ProfileChestTab() {
                                     <p className="text-xs text-muted-foreground">{t("tab_chest_qty")}: {item.quantity} · {new Date(item.createdAt).toLocaleDateString(__dateTag)}</p>
                                 </div>
                                 <div className="flex gap-2">
+                                    <Button
+                                        size="sm"
+                                        variant="outline"
+                                        aria-label={`${t("tab_chest_gift")}: ${item.productName}`}
+                                        onClick={() => gift(item.id, item.productName)}
+                                    >
+                                        <Gift className="w-4 h-4" aria-hidden="true" />
+                                    </Button>
                                     <Button size="sm" onClick={() => redeem(item.id)}>{t("tab_chest_redeem")}</Button>
                                 </div>
                             </div>

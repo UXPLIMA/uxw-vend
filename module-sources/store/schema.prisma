@@ -381,6 +381,18 @@ model ChestItem {
   productId   String
   productName String
   quantity    Int      @default(1)
+  /**
+   * The answers taken at checkout, kept until the item is claimed.
+   *
+   * Checkout asks for the name to deliver to separately from the name the
+   * buyer signed in with, because those differ on every site that delivers
+   * into a game. Without these two columns a claim ran the product's commands
+   * with the account's username and none of the fields the buyer filled in.
+   * Null on a row nobody bought - one an operator put there by hand - and the
+   * screen asks at claim time.
+   */
+  playerName  String?
+  variables   Json?
   isRedeemed  Boolean  @default(false)
   redeemedAt  DateTime?
   giftedToId  String?

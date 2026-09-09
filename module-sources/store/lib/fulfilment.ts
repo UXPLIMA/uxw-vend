@@ -7,6 +7,7 @@
  * record the payment, email the buyer, run the delivery commands, and tell the
  * rest of the site. A gateway only reports that money moved.
  */
+import { Prisma } from "@prisma/client";
 import { prisma, log } from "@/core/sdk/server";
 import { sendOrderConfirmationEmail } from "./order-email";
 import { deliverProduct } from "./delivery";
@@ -14,6 +15,7 @@ import { announceOrderCompleted } from "./order-events";
 import { claimStock, releaseStock, stockClaims } from "./stock";
 import { countSales, uncountSales } from "./popularity";
 import { extendedExpiry } from "./ownership";
+import { recordedPlayerName, recordedVariables } from "./chest";
 
 const OK: PaymentOutcome = { handled: true, duplicate: false, error: null };
 const ALREADY: PaymentOutcome = { handled: true, duplicate: true, error: null };
@@ -146,6 +148,10 @@ export async function settleOrder(settlement: PaymentSettlement): Promise<Paymen
         await countSales(tx, claims);
 
         if (buyerId && granted.length > 0) {
+            // The name and the answers travel with the item. Claiming it
+            // later has no form to read them from, and the account's username
+            // is the one name checkout deliberately did not use.
+            const deliverTo = recordedPlayerName(order.metadata);
             await tx.chestItem.createMany({
                 data: granted.map((item) => ({
                     userId: buyerId,
@@ -153,6 +159,8 @@ export async function settleOrder(settlement: PaymentSettlement): Promise<Paymen
                     productName: item.name,
                     quantity: item.quantity,
                     orderId: order.id,
+                    playerName: deliverTo,
+                    variables: recordedVariables(item.metadata) ?? Prisma.JsonNull,
                 })),
             });
 
