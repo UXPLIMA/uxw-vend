@@ -1,0 +1,105 @@
+{
+  "id": "showcase",
+  "name": "Showcase",
+  "description": "A grid of cards: a picture, a heading, a line of text and somewhere to go. What is being shown is the operator's business.",
+  "version": "1.0.0",
+  "coreVersion": "^1.35.0",
+  "category": "content",
+  "author": "uxwVend",
+  "icon": "LayoutGrid",
+  "routes": [
+    {
+      "path": "/showcase",
+      "component": "pages/public/page.tsx",
+      "titleKey": "pageTitles.showcase"
+    }
+  ],
+  "navLinks": [
+    {
+      "label": "Showcase",
+      "labelKey": "showcase",
+      "href": "/showcase",
+      "icon": "LayoutGrid",
+      "position": 100
+    }
+  ],
+  "adminRoutes": [
+    {
+      "path": "/settings/showcase",
+      "component": "pages/admin/page.tsx"
+    }
+  ],
+  "settingsCards": [
+    {
+      "title": "Showcase",
+      "description": "The cards on the showcase page.",
+      "href": "/settings/showcase",
+      "icon": "LayoutGrid",
+      "color": "text-pink-500"
+    }
+  ],
+  "api": [
+    {
+      "path": "/showcase/cards",
+      "handler": "api/cards/route.ts",
+      "description": "The cards on show, and adding one (admin)."
+    },
+    {
+      "path": "/showcase/cards/[id]",
+      "handler": "api/cards/[id]/route.ts",
+      "description": "Edit or remove one card (admin)."
+    }
+  ],
+  "translations": {
+    "en": {
+      "nav": {
+        "showcase": "Showcase"
+      },
+      "pageTitles": {
+        "showcase": "Showcase"
+      },
+      "showcase": {
+        "title": "Showcase",
+        "subtitle": "A few things worth looking at.",
+        "empty": "Nothing is on show yet.",
+        "adm_title": "Showcase",
+        "adm_subtitle": "The cards on the showcase page, in the order they are shown.",
+        "adm_cardTitle": "Heading",
+        "adm_cardBody": "A line about it",
+        "adm_cardImage": "Picture",
+        "adm_cardHref": "Where it goes",
+        "adm_cardOrder": "Order",
+        "err": {
+          "showcase_bad_link": "A link has to be a path on this site or a whole https address.",
+          "showcase_bad_image": "A picture has to be a path on this site or a whole https address."
+        },
+        "adm_subtitleWithHint": "The cards on the showcase page, in the order they are shown. A picture and a link are each a path on this site, like /store, or a whole https address; anything else is refused."
+      }
+    },
+    "tr": {
+      "nav": {
+        "showcase": "Vitrin"
+      },
+      "pageTitles": {
+        "showcase": "Vitrin"
+      },
+      "showcase": {
+        "title": "Vitrin",
+        "subtitle": "Bakmaya değer birkaç şey.",
+        "empty": "Henüz vitrinde bir şey yok.",
+        "adm_title": "Vitrin",
+        "adm_subtitle": "Vitrin sayfasındaki kartlar, gösterildikleri sırayla.",
+        "adm_cardTitle": "Başlık",
+        "adm_cardBody": "Hakkında bir satır",
+        "adm_cardImage": "Görsel",
+        "adm_cardHref": "Nereye gidiyor",
+        "adm_cardOrder": "Sıra",
+        "err": {
+          "showcase_bad_link": "Bağlantı, bu sitede bir yol ya da tam bir https adresi olmalı.",
+          "showcase_bad_image": "Görsel, bu sitede bir yol ya da tam bir https adresi olmalı."
+        },
+        "adm_subtitleWithHint": "Vitrin sayfasındaki kartlar, gösterildikleri sırayla. Görsel ve bağlantı, bu sitede bir yol (/store gibi) ya da tam bir https adresi olmalı; başka bir şey kabul edilmiyor."
+      }
+    }
+  }
+}

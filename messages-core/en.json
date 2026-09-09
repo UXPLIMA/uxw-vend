@@ -114,7 +114,8 @@
     "vote": "Vote",
     "wheel": "Wheel",
     "referral": "Referrals",
-    "marketplace": "Marketplace"
+    "marketplace": "Marketplace",
+    "showcase": "Showcase"
   },
   "hero": {},
   "admin": {

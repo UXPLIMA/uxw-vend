@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-09",
-  "updatedAt": "2026-09-09T19:55:15Z",
+  "updatedAt": "2026-09-09T20:19:32Z",
   "modules": [
     {
       "id": "announcements",
@@ -2495,6 +2495,36 @@
         "publicRoutes": 0,
         "adminRoutes": 1,
         "apiRoutes": 6,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "showcase",
+      "name": "Showcase",
+      "description": "A grid of cards: a picture, a heading, a line of text and somewhere to go. What is being shown is the operator's business.",
+      "i18n": {},
+      "version": "1.0.0",
+      "coreVersion": "^1.35.0",
+      "author": "uxwVend",
+      "icon": "LayoutGrid",
+      "category": "content",
+      "verified": true,
+      "updatedAt": "2026-09-09T20:19:32Z",
+      "screenshots": [],
+      "tags": [
+        "content"
+      ],
+      "zip": "showcase.zip",
+      "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
+      "stats": {
+        "publicRoutes": 1,
+        "adminRoutes": 1,
+        "apiRoutes": 2,
         "widgets": 0
       }
     },

@@ -1,0 +1,24 @@
+// Showcase Module - Database Models
+// These models are merged into prisma/schema.prisma by merge-schemas.ts
+
+/// A grid of cards: a picture, a heading, a line of text and somewhere to go.
+///
+/// Nothing here knows what is being shown. A shop shows what it sells, a
+/// community shows what it runs, a studio shows what it made.
+model ShowcaseCard {
+  id       String  @id @default(cuid())
+  title    String
+  body     String?
+  /// A path on this site or a whole https address. Anything else is dropped
+  /// when the card is drawn; see lib/card.ts for the two spellings that make
+  /// an address a hazard.
+  image    String?
+  href     String?
+  isActive Boolean @default(true)
+  order    Int     @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive, order])
+}
