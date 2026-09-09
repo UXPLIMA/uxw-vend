@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { Link } from "@/core/sdk/navigation";
 import { LoadFailed, useSiteCurrency, buttonClassName } from "@/core/sdk/ui";
 import { PageFrame } from "@/core/sdk/layout";
-import { Check, X, Crown, Loader2 } from "lucide-react";
+import { Check, Minus, Crown, Loader2 } from "lucide-react";
 
 interface Product {
     id: string;
@@ -20,8 +20,14 @@ interface Product {
     category: { name: string } | null;
 }
 
-// Parse features from description - format: "feature1|feature2|feature3"
-// or JSON array in deliveryData
+/**
+ * The lines an operator wrote in a product's description.
+ *
+ * This is a guess and it is treated as one below. A description is prose: a
+ * product whose description is a paragraph has one "feature", and a product
+ * that simply does not mention a line another product wrote has said nothing
+ * about it.
+ */
 function parseFeatures(product: Product): string[] {
     if (product.description) {
         // Try splitting by newlines or pipes
@@ -127,7 +133,19 @@ export default function VipTablePage() {
                                             {features.includes(feature) ? (
                                                 <Check className="w-5 h-5 text-success mx-auto" />
                                             ) : (
-                                                <X className="w-5 h-5 text-muted-foreground mx-auto" />
+                                                /*
+                                                 * A dash, not a cross. This table is
+                                                 * built by splitting descriptions on
+                                                 * newlines, so a product that does not
+                                                 * repeat another product's line has
+                                                 * said nothing about it - and a cross
+                                                 * told a buyer, in red, that it lacked
+                                                 * something nobody ever claimed. Where
+                                                 * an operator wants to state a no, the
+                                                 * comparison-table module is where they
+                                                 * can.
+                                                 */
+                                                <Minus className="w-5 h-5 text-muted-foreground/60 mx-auto" aria-label={t("vip_notStated")} />
                                             )}
                                         </td>
                                     ))}
@@ -147,6 +165,8 @@ export default function VipTablePage() {
                             </tr>
                         </tfoot>
                     </table>
+                    <p className="px-6 py-3 text-xs text-muted-foreground">{t("vip_notStatedNote")}</p>
+                    
                 </div>
             ) : (
                 /* Card layout when no feature comparison */

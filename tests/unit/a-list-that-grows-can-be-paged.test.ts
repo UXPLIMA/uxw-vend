@@ -37,6 +37,8 @@ const BOUNDED: Record<string, string> = {
         "One reader's cart, which they filled themselves.",
     "module-sources/store/pages/public/vip/page.tsx":
         "A comparison table of the VIP tiers, which is a handful by design.",
+    "module-sources/comparison-table/pages/public/[slug]/page.tsx":
+        "One comparison, read whole. Paging it is the thing that would break it: half a table answers no question, and an operator writing thirty features has written a long page on purpose.",
     "module-sources/player-profiles/pages/public/[username]/page.tsx":
         "One profile: its linked accounts and its trophies, both bounded per person.",
 };

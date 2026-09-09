@@ -1,0 +1,92 @@
+// Comparison Table Module - Database Models
+// These models are merged into prisma/schema.prisma by merge-schemas.ts
+
+/// One table comparing several things against a list of features.
+///
+/// Nothing here knows what is being compared: plans, ranks, packages, tools.
+/// A column may link somewhere, and that is the only relationship it has to
+/// the rest of the site.
+model ComparisonTable {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  description String?
+  isActive    Boolean  @default(true)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  columns ComparisonColumn[]
+  groups  ComparisonGroup[]
+  rows    ComparisonRow[]
+
+  @@index([isActive, order])
+}
+
+/// One thing being compared. A column of the table.
+model ComparisonColumn {
+  id       String @id @default(cuid())
+  tableId  String
+  table    ComparisonTable @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  label    String
+  subtitle String?
+  /// Where the reader goes to get it. Any URL, so this module never learns
+  /// what is on the other end.
+  href     String?
+  /// The one an operator wants the eye to land on.
+  highlight Boolean @default(false)
+  order    Int     @default(0)
+
+  cells ComparisonCell[]
+
+  @@index([tableId, order])
+}
+
+/// A heading over a run of rows.
+model ComparisonGroup {
+  id      String @id @default(cuid())
+  tableId String
+  table   ComparisonTable @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  label   String
+  order   Int    @default(0)
+
+  /// A deleted group leaves its rows behind on purpose: dropping them would
+  /// quietly remove a feature from a comparison somebody is reading.
+  rows ComparisonRow[]
+
+  @@index([tableId, order])
+}
+
+/// One feature, compared across every column.
+model ComparisonRow {
+  id      String @id @default(cuid())
+  tableId String
+  table   ComparisonTable @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  groupId String?
+  group   ComparisonGroup? @relation(fields: [groupId], references: [id], onDelete: SetNull)
+  label   String
+  order   Int    @default(0)
+
+  cells ComparisonCell[]
+
+  @@index([tableId, order])
+  @@index([groupId])
+}
+
+/// What one column says about one feature.
+///
+/// A row with no cell for a column is unstated, which is not the same as "no".
+/// There is deliberately no row meaning "unstated": it is the absence.
+model ComparisonCell {
+  id       String @id @default(cuid())
+  rowId    String
+  row      ComparisonRow @relation(fields: [rowId], references: [id], onDelete: Cascade)
+  columnId String
+  column   ComparisonColumn @relation(fields: [columnId], references: [id], onDelete: Cascade)
+  /// yes | no | value
+  kind     String
+  value    String?
+
+  @@unique([rowId, columnId])
+  @@index([columnId])
+}

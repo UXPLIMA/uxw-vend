@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-09",
-  "updatedAt": "2026-09-09T18:54:41Z",
+  "updatedAt": "2026-09-09T19:10:03Z",
   "modules": [
     {
       "id": "announcements",
@@ -384,6 +384,36 @@
       },
       "stats": {
         "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 1,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "comparison-table",
+      "name": "Comparison Table",
+      "description": "Compare several things feature by feature. A cell nobody filled in is left blank rather than marked as a no.",
+      "i18n": {},
+      "version": "1.0.0",
+      "coreVersion": "^1.34.0",
+      "author": "uxwVend",
+      "icon": "Table",
+      "category": "content",
+      "verified": true,
+      "updatedAt": "2026-09-09T19:10:03Z",
+      "screenshots": [],
+      "tags": [
+        "content"
+      ],
+      "zip": "comparison-table.zip",
+      "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
+      "stats": {
+        "publicRoutes": 1,
         "adminRoutes": 1,
         "apiRoutes": 1,
         "widgets": 0
@@ -2588,13 +2618,13 @@
           "description": "Ürün, kategori, sepet ve siparişleriyle eksiksiz e-ticaret"
         }
       },
-      "version": "2.21.0",
+      "version": "2.21.1",
       "coreVersion": "^1.34.0",
       "author": "uxwVend Team",
       "icon": "ShoppingBag",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-09T18:22:10Z",
+      "updatedAt": "2026-09-09T19:10:03Z",
       "screenshots": [],
       "tags": [
         "commerce"

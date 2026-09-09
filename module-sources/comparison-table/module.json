@@ -1,0 +1,81 @@
+{
+  "id": "comparison-table",
+  "name": "Comparison Table",
+  "description": "Compare several things feature by feature. A cell nobody filled in is left blank rather than marked as a no.",
+  "version": "1.0.0",
+  "coreVersion": "^1.34.0",
+  "category": "content",
+  "author": "uxwVend",
+  "icon": "Table",
+  "routes": [
+    {
+      "path": "/compare/[slug]",
+      "component": "pages/public/[slug]/page.tsx",
+      "resolver": "lib/route-exists.ts",
+      "titleKey": "pageTitles.compare"
+    }
+  ],
+  "adminRoutes": [
+    {
+      "path": "/settings/comparison-tables",
+      "component": "pages/admin/page.tsx"
+    }
+  ],
+  "settingsCards": [
+    {
+      "title": "Comparison tables",
+      "description": "Compare plans, ranks or packages feature by feature.",
+      "href": "/settings/comparison-tables",
+      "icon": "Table",
+      "color": "text-violet-500"
+    }
+  ],
+  "api": [
+    {
+      "path": "/comparison-tables",
+      "handler": "api/tables/route.ts",
+      "method": "GET",
+      "description": "One table ready to draw, or the list of them."
+    }
+  ],
+  "translations": {
+    "en": {
+      "pageTitles": {
+        "compare": "Compare"
+      },
+      "comparisonTable": {
+        "title": "Compare",
+        "notFound": "There is no such comparison.",
+        "feature": "Feature",
+        "choose": "Choose",
+        "unstatedNote": "A dash means we have not said either way, not that it is missing.",
+        "adm_title": "Comparison tables",
+        "adm_subtitle": "Compare plans, ranks or packages feature by feature. A cell left alone shows a dash rather than a cross: it says nobody has answered, which is not the same as no.",
+        "adm_hint": "Tables are edited through the API for now. Each one has columns for the things being compared, rows for the features, and groups to put the rows under headings.",
+        "mark_yes": "included",
+        "mark_no": "not included",
+        "mark_unstated": "not stated",
+        "mark_value": "value"
+      }
+    },
+    "tr": {
+      "pageTitles": {
+        "compare": "Karşılaştır"
+      },
+      "comparisonTable": {
+        "title": "Karşılaştır",
+        "notFound": "Böyle bir karşılaştırma yok.",
+        "feature": "Özellik",
+        "choose": "Seç",
+        "unstatedNote": "Tire, bu konuda bir şey söylemediğimiz anlamına gelir; yok demek değildir.",
+        "adm_title": "Karşılaştırma tabloları",
+        "adm_subtitle": "Paketleri, rütbeleri ya da planları özellik özellik karşılaştırın. Doldurulmayan hücre çarpı değil tire gösterir: kimse cevaplamadı demektir, yok demek değil.",
+        "adm_hint": "Tablolar şimdilik API üzerinden düzenleniyor. Her tabloda karşılaştırılan şeyler için sütunlar, özellikler için satırlar ve satırları başlık altında toplayan gruplar var.",
+        "mark_yes": "var",
+        "mark_no": "yok",
+        "mark_unstated": "belirtilmemiş",
+        "mark_value": "değer"
+      }
+    }
+  }
+}
