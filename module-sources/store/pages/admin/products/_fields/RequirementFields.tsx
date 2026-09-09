@@ -22,6 +22,15 @@ interface Props {
     onChange: (next: RequirementValue) => void;
     /** The product being edited, or undefined while it does not exist yet. */
     selfId?: string;
+    /**
+     * The card's own words. A shelf asks the same question as a product - own
+     * one of these first - and gets a different answer from a shopper, so it
+     * says it in its own words rather than borrowing the product's.
+     */
+    title?: string;
+    hint?: string;
+    /** A shelf opens on any one of the list; there is nothing to choose. */
+    hideAnySwitch?: boolean;
 }
 
 interface Choice {
@@ -29,7 +38,7 @@ interface Choice {
     name: string;
 }
 
-export function RequirementFields({ value, onChange, selfId }: Props) {
+export function RequirementFields({ value, onChange, selfId, title, hint, hideAnySwitch }: Props) {
     const t = useTranslations("store");
     const [products, setProducts] = useState<Choice[]>([]);
     const [failed, setFailed] = useState(false);
@@ -70,8 +79,8 @@ export function RequirementFields({ value, onChange, selfId }: Props) {
     return (
         <Card>
             <CardHeader>
-                <CardTitle>{t("adm_requires")}</CardTitle>
-                <p className="text-sm text-muted-foreground">{t("adm_requiresHint")}</p>
+                <CardTitle>{title ?? t("adm_requires")}</CardTitle>
+                <p className="text-sm text-muted-foreground">{hint ?? t("adm_requiresHint")}</p>
             </CardHeader>
             <CardContent className="space-y-4">
                 {failed ? (
@@ -93,13 +102,15 @@ export function RequirementFields({ value, onChange, selfId }: Props) {
                             ))}
                         </div>
 
-                        <CheckboxField
-                            id="requiresAny"
-                            label={t("adm_requiresAny")}
-                            description={t("adm_requiresAnyHint")}
-                            checked={value.requiresAny}
-                            onChange={(e) => set({ requiresAny: e.target.checked })}
-                        />
+                        {!hideAnySwitch && (
+                            <CheckboxField
+                                id="requiresAny"
+                                label={t("adm_requiresAny")}
+                                description={t("adm_requiresAnyHint")}
+                                checked={value.requiresAny}
+                                onChange={(e) => set({ requiresAny: e.target.checked })}
+                            />
+                        )}
                     </>
                 )}
             </CardContent>

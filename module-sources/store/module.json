@@ -2,7 +2,7 @@
   "id": "store",
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
-  "version": "2.9.0",
+  "version": "2.10.0",
   "coreVersion": "^1.33.0",
   "category": "commerce",
   "author": "uxwVend Team",
@@ -937,7 +937,11 @@
         "adm_requiresAny": "Any one of them is enough",
         "adm_requiresAnyHint": "Off, the buyer needs all of them. On, one will do.",
         "adm_requiresNothingToPick": "There is nothing else in the shop to require yet.",
-        "state_needs_product": "Buy what it needs first"
+        "state_needs_product": "Buy what it needs first",
+        "adm_editCategory": "Edit category",
+        "adm_saveCategory": "Save changes",
+        "adm_shelfGate": "Who sees this shelf",
+        "adm_shelfGateHint": "Pick nothing to show it to everybody. Pick products and only somebody who owns one of them sees it, along with everything under it."
       },
       "cart": {
         "title": "Shopping Cart",
@@ -1535,7 +1539,11 @@
         "adm_requiresAny": "Herhangi biri yeterli",
         "adm_requiresAnyHint": "Kapalıyken hepsine sahip olmak gerekir. Açıkken biri yeter.",
         "adm_requiresNothingToPick": "Mağazada koşul olarak seçilebilecek başka ürün yok.",
-        "state_needs_product": "Önce gerekeni al"
+        "state_needs_product": "Önce gerekeni al",
+        "adm_editCategory": "Kategoriyi düzenle",
+        "adm_saveCategory": "Değişiklikleri kaydet",
+        "adm_shelfGate": "Bu rafı kimler görür",
+        "adm_shelfGateHint": "Hiçbir şey seçmezsen herkes görür. Ürün seçersen rafı ve altındaki her şeyi yalnızca o ürünlerden birine sahip olan görür."
       },
       "cart": {
         "title": "Alışveriş Sepeti",

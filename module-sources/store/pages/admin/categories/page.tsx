@@ -6,10 +6,17 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Button, Card, CardContent, FileUpload, Input, Label, RichTextEditor, useConfirm, useFormRoute, NativeSelect, buttonClassName } from "@/core/sdk/ui";
 import { Link } from "@/core/sdk/navigation";
-import { ArrowLeft, Loader2, Plus, Trash2 } from "lucide-react";
+import { ArrowLeft, Loader2, Pencil, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { writeError, errorMessage } from "@/core/sdk";
 import { AdminPageHeader } from "@/core/sdk/admin";
+import {
+    EMPTY_CATEGORY,
+    categoryPayload,
+    categoryWriteTarget,
+    type CategoryFormValue,
+} from "./category-form";
+import { RequirementFields } from "../products/_fields/RequirementFields";
 
 interface Category {
     id: string;
@@ -20,6 +27,7 @@ interface Category {
     parentId: string | null;
     isActive: boolean;
     order: number;
+    visibleAfterProductIds?: string[];
     children?: Category[];
     _count?: { products: number };
 }
@@ -32,17 +40,10 @@ export default function AdminStoreCategoriesPage() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     // The form is a screen at `?form=new`, not a card above the tree.
-    const { showForm, formHref, closeForm } = useFormRoute();
+    const { showForm, formHref, editingId, closeForm } = useFormRoute();
     const [error, setError] = useState<string | null>(null);
 
-    const [form, setForm] = useState({
-        name: "",
-        description: "",
-        image: "",
-        parentId: "",
-        order: 0,
-        isActive: true,
-    });
+    const [form, setForm] = useState<CategoryFormValue>(EMPTY_CATEGORY);
 
     const fetchCategories = async () => {
         try {
@@ -62,19 +63,39 @@ export default function AdminStoreCategoriesPage() {
         fetchCategories();
     }, []);
 
+    // Opening the form on a row fills it from the tree already loaded, rather
+    // than fetching the row again; leaving edit clears it, so the next "new"
+    // does not start with somebody else's name in the box.
+    useEffect(() => {
+        if (!editingId) {
+            setForm(EMPTY_CATEGORY);
+            return;
+        }
+        const flat = categories.flatMap((c) => [c, ...(c.children ?? [])]);
+        const row = flat.find((c) => c.id === editingId);
+        if (!row) return;
+        setForm({
+            name: row.name,
+            description: row.description ?? "",
+            image: row.image ?? "",
+            parentId: row.parentId ?? "",
+            order: String(row.order ?? 0),
+            isActive: row.isActive,
+            visibleAfterProductIds: row.visibleAfterProductIds ?? [],
+        });
+    }, [editingId, categories]);
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setSaving(true);
         setError(null);
 
         try {
-            const res = await fetch("/api/v1/store/categories", {
-                method: "POST",
+            const target = categoryWriteTarget(editingId);
+            const res = await fetch(target.url, {
+                method: target.method,
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    ...form,
-                    parentId: form.parentId || null,
-                }),
+                body: JSON.stringify(categoryPayload(form)),
             });
 
             const failed = await writeError(res, t("adm_createCategoryFailed"), t);
@@ -83,7 +104,7 @@ export default function AdminStoreCategoriesPage() {
                 return;
             }
 
-            setForm({ name: "", description: "", image: "", parentId: "", order: 0, isActive: true });
+            setForm(EMPTY_CATEGORY);
             await fetchCategories();
             closeForm();
         } catch {
@@ -130,7 +151,7 @@ export default function AdminStoreCategoriesPage() {
         return (
             <>
                 <AdminPageHeader
-                    title={t("adm_newCategory")}
+                    title={editingId ? t("adm_editCategory") : t("adm_newCategory")}
                     description={t("adm_organizeProducts")}
                     onBack={closeForm}
                     backLabel={commonT("back")}
@@ -189,13 +210,28 @@ export default function AdminStoreCategoriesPage() {
                                         aria-label={t("adm_sortOrder")}
                                         type="number"
                                         value={form.order}
-                                        onChange={(e) => setForm({ ...form, order: parseInt(e.target.value) || 0 })}
+                                        onChange={(e) => setForm({ ...form, order: e.target.value })}
                                     />
                                 </div>
                             </div>
+                            <RequirementFields
+                                value={{
+                                    requiresProductIds: form.visibleAfterProductIds,
+                                    requiresAny: true,
+                                }}
+                                onChange={(next) =>
+                                    setForm({ ...form, visibleAfterProductIds: next.requiresProductIds })
+                                }
+                                hideAnySwitch
+                                title={t("adm_shelfGate")}
+                                hint={t("adm_shelfGateHint")}
+                            />
+
                             <div className="flex gap-2">
                                 <Button type="submit" disabled={saving}>
-                                    {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("adm_creating")}</> : t("adm_createCategory")}
+                                    {saving
+                                        ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("adm_creating")}</>
+                                        : editingId ? t("adm_saveCategory") : t("adm_createCategory")}
                                 </Button>
                                 <Button type="button" variant="outline" onClick={closeForm} disabled={saving}>
                                     {t("adm_cancel")}
@@ -248,6 +284,13 @@ export default function AdminStoreCategoriesPage() {
                                         <span className={`text-xs px-2 py-1 rounded ${cat.isActive ? "bg-success/10 text-success" : "bg-muted text-muted-foreground"}`}>
                                             {cat.isActive ? t("adm_active") : t("adm_inactive")}
                                         </span>
+                                        <Link
+                                            href={formHref(cat.id)}
+                                            aria-label={commonT("edit")}
+                                            className={buttonClassName("ghost", "sm")}
+                                        >
+                                            <Pencil className="w-4 h-4" aria-hidden="true" />
+                                        </Link>
                                         <Button
                                             aria-label={commonT("delete")}
                                             variant="ghost"
