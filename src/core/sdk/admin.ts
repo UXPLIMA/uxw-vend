@@ -31,3 +31,8 @@ export type { AuthProviderSetupProps } from "@/core/components/admin/AuthProvide
 // then writes them back over the settings it never read; see the hook.
 export { useSettingsLoad } from "@/core/hooks/useSettingsLoad";
 export { readJson, ReadFailed } from "@/core/lib/read-json";
+
+// "Which user?", typed and debounced. A module screen that asks for an
+// account had no way to reach this and would write the search a third time.
+export { UserPicker } from "@/core/components/admin/UserPicker";
+export type { PickedUser } from "@/core/components/admin/UserPicker";

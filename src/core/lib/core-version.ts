@@ -12,6 +12,11 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.34.0 - `UserPicker` joins `@/core/sdk/admin`. Two core screens ask "which
+ * account?" and share one debounced search; a module screen that had to ask
+ * the same question could not reach it, and the first one to try wrote the
+ * query, the debounce and the result list a third time. Additive.
+ *
  * 1.33.0 - `TimedRoleGrant`, and the sweep that acts on it. A member holds one
  * role, so handing one out for a while means remembering what they held before
  * and putting it back; nothing did, which made a rank sold by the month a rank
@@ -229,4 +234,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.33.0";
+export const CORE_API_VERSION = "1.34.0";
