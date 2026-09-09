@@ -18,6 +18,9 @@ import { runWithLogContext } from '@/core/lib/logger';
 import { getClientIP } from '@/core/lib/rate-limit';
 import { isStaticAsset } from '@/core/lib/proxy-paths';
 import { safeInternalPath } from '@/core/lib/safe-redirect';
+import { siteRedirects } from '@/core/lib/redirects';
+import { resolveRedirect } from '@/core/lib/redirect-resolve';
+import { ensureHooks } from '@/core/lib/hooks-bootstrap';
 
 const intlMiddleware = createIntlMiddleware({
     locales: locales,
@@ -316,6 +319,32 @@ async function proxyImpl(request: NextRequest, correlationId: string): Promise<N
         // /api/setup route answers 409 once a user exists.
         if (setupDone && isOnSetup) {
             return NextResponse.redirect(new URL(`/${locale}`, request.url));
+        }
+    }
+
+    // ===== Moved pages =====
+    // After the setup gate, so a half-built site is not redirected around its
+    // own wizard, and before everything else, because a page that has moved
+    // has moved for every visitor whatever else is true of them. Pages only:
+    // an API address is a contract, not a link somebody bookmarked.
+    if (!isStaticAsset(pathname) && !pathname.startsWith('/api/')) {
+        // The bus is bootstrapped per module graph, and the proxy is its own.
+        // Without this the filter finds no listeners and answers with the
+        // empty list it was given - no error, no log line, no redirects.
+        await ensureHooks();
+        const rules = await siteRedirects();
+        if (rules.length > 0) {
+            const locale = extractLocale(pathname);
+            const moved = resolveRedirect(pathname + request.nextUrl.search, locale, rules);
+            if (moved) {
+                return NextResponse.redirect(
+                    new URL(moved.to, request.url),
+                    // 308 and 307 rather than 301 and 302: both keep the
+                    // method, and a browser that cached a 301 keeps it for
+                    // ever, which is the wrong thing to be sure about.
+                    moved.permanent ? 308 : 307,
+                );
+            }
         }
     }
 

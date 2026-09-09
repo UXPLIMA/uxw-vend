@@ -109,3 +109,9 @@ export type {
     AssertHookHandler,
     Expect,
 } from "@/core/lib/hooks";
+
+// Where a moved page now lives. The rules come from whoever manages them; the
+// decision - a circle, an open redirect, the locale prefix - is core's, made
+// in the proxy before anything renders.
+export { resolveRedirect } from "@/core/lib/redirect-resolve";
+export type { RedirectRule } from "@/core/lib/redirect-resolve";

@@ -1,0 +1,26 @@
+// URL Redirects Module - Database Models
+// These models are merged into prisma/schema.prisma by merge-schemas.ts
+
+/// A sign on the door of a page that moved.
+///
+/// `from` is stored without a language prefix: an operator who moved
+/// `/pricing` meant it in every language the site serves.
+model UrlRedirect {
+  id        String   @id @default(cuid())
+  from      String   @unique
+  /// A path on this site, or a whole https address. Anything else is refused
+  /// when the rule is used; see core's redirect resolver for why.
+  to        String
+  /// 308 rather than 307, and a search engine forgets the old address.
+  permanent Boolean  @default(true)
+  isActive  Boolean  @default(true)
+  /// Deliberately no hit counter. Counting arrivals means a write inside the
+  /// proxy on every redirected request, which is the one place a write does
+  /// not belong, and a column nothing increments shows "0 arrivals" for ever -
+  /// which reads as "nobody used this" rather than "nobody counted".
+  note      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive])
+}

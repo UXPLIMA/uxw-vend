@@ -86,6 +86,30 @@ interface UxwVendFilterPayloads {
      * returns `{ ok: false, code }` to refuse. See core/lib/auth-challenge.ts.
      */
     "auth.challenge": { ok: boolean; code: string | null };
+
+    /**
+     * Where a moved page now lives.
+     *
+     * A redirect has to be decided before anything renders, which is the
+     * proxy, which is core. A module cannot reach in there and core must not
+     * know which module is answering, so core asks and whoever is installed
+     * replies with rules. Core names the question; it names nobody.
+     *
+     * The answer is asked for once and cached: this runs on every request that
+     * is not a static asset, and a database read per request is not a price a
+     * site should pay for a feature most of them never use.
+     */
+    "routing.redirects": RoutingRedirectRule[];
+}
+
+/** One moved page, as whatever manages them describes it. */
+interface RoutingRedirectRule {
+    /** The old path, without a locale prefix. */
+    from: string;
+    /** A path on this site, or a whole https address. */
+    to: string;
+    /** 308 rather than 307: a search engine should forget the old address. */
+    permanent: boolean;
 }
 
 /**
@@ -101,6 +125,13 @@ interface UxwVendFilterPayloads {
  * their context stays `unknown` as before.
  */
 interface UxwVendFilterContexts {
+    /**
+     * Nothing. The rules are the site's, not this request's: they are asked
+     * for once and kept, and deciding per request is what the resolver does
+     * with them afterwards.
+     */
+    "routing.redirects": Record<string, never>;
+
     /**
      * What the visitor is trying to do, whatever the `auth.form.challenge`
      * slot asked to be sent, and where the request came from.

@@ -12,6 +12,14 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.35.0 - `routing.redirects` and `resolveRedirect`. A page that moved has to
+ * be answered before anything renders, which is the proxy, which is core - and
+ * a module cannot reach in there. So core asks for the rules through a filter
+ * and never learns who answered, and the decisions that make a redirect safe
+ * rather than a hazard (a circle, an open redirect, the locale prefix) are
+ * made in one place. Additive: a site with nothing answering redirects
+ * nothing.
+ *
  * 1.34.0 - `UserPicker` joins `@/core/sdk/admin`. Two core screens ask "which
  * account?" and share one debounced search; a module screen that had to ask
  * the same question could not reach it, and the first one to try wrote the
@@ -234,4 +242,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.34.0";
+export const CORE_API_VERSION = "1.35.0";

@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-09",
-  "updatedAt": "2026-09-09T19:42:45Z",
+  "updatedAt": "2026-09-09T19:55:15Z",
   "modules": [
     {
       "id": "announcements",
@@ -2992,6 +2992,38 @@
         "publicRoutes": 0,
         "adminRoutes": 0,
         "apiRoutes": 8,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "url-redirects",
+      "name": "URL Redirects",
+      "description": "A sign on the door of a page that moved, so old links keep working.",
+      "i18n": {},
+      "version": "1.0.0",
+      "coreVersion": "^1.35.0",
+      "author": "uxwVend",
+      "icon": "Signpost",
+      "category": "content",
+      "verified": true,
+      "updatedAt": "2026-09-09T19:55:15Z",
+      "screenshots": [],
+      "tags": [
+        "content"
+      ],
+      "zip": "url-redirects.zip",
+      "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": [
+          "routing.redirects"
+        ]
+      },
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 1,
         "widgets": 0
       }
     },
