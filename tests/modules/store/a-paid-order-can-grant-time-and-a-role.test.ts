@@ -55,7 +55,11 @@ const db = {
         findMany: vi.fn(async () => [] as Record<string, unknown>[]),
         updateMany: vi.fn(async () => ({ count: 1 })),
     },
-    user: { update: vi.fn(async () => ({})), updateMany: vi.fn(async () => ({ count: 1 })) },
+    user: {
+        findUnique: vi.fn(async () => ({ roleId: "role-member" }) as { roleId: string | null } | null),
+        update: vi.fn(async () => ({})),
+        updateMany: vi.fn(async () => ({ count: 1 })),
+    },
     creditTransaction: { findUnique: vi.fn(async () => null), create: vi.fn(async () => ({})) },
     subscription: {
         findFirst: vi.fn(),
@@ -63,6 +67,7 @@ const db = {
         updateMany: vi.fn(async () => ({ count: 1 })),
     },
     timedRoleGrant: { upsert: vi.fn(async () => ({})), deleteMany: vi.fn(async () => ({})) },
+    role: { findMany: vi.fn(async () => [] as { id: string; priority: number }[]) },
 };
 
 /** Records every call and whether it went through the transaction client. */
@@ -140,6 +145,7 @@ beforeEach(() => {
     db.ownedProduct.findMany.mockResolvedValue([]);
     db.productCommand.findMany.mockResolvedValue([]);
     db.product.findMany.mockResolvedValue([product({})]);
+    db.user.findUnique.mockResolvedValue({ roleId: "role-member" });
 });
 
 describe("a product owned outright", () => {
@@ -214,5 +220,51 @@ describe("a product that names a role", () => {
     it("gives nothing when the product names none", async () => {
         await settleOrder(settlement);
         expect(db.user.updateMany).not.toHaveBeenCalled();
+    });
+});
+
+describe("a role given only for a while", () => {
+    it("records what to put back, and when", async () => {
+        db.product.findMany.mockResolvedValue([
+            product({ grantsRoleId: "role-vip", durationDays: 30 }),
+        ]);
+        const before = Date.now();
+
+        await settleOrder(settlement);
+
+        expect(db.timedRoleGrant.upsert).toHaveBeenCalledTimes(1);
+        const call = db.timedRoleGrant.upsert.mock.calls[0][0] as {
+            where: { userId_roleId: { userId: string; roleId: string } };
+            create: { previousRoleId: string | null; expiresAt: Date; source: string };
+            update: { expiresAt: Date };
+        };
+        expect(call.where.userId_roleId).toEqual({ userId: "user-1", roleId: "role-vip" });
+        // What they held before the purchase, so the sweep can put it back.
+        expect(call.create.previousRoleId).toBe("role-member");
+        expect(call.create.expiresAt.getTime()).toBeGreaterThanOrEqual(before + 30 * 86_400_000);
+        // A label, not a relation: the core sweeps these and must not know
+        // what kinds of thing grant a role.
+        expect(call.create.source).toBeTruthy();
+    });
+
+    it("records nothing when the role is given outright", async () => {
+        db.product.findMany.mockResolvedValue([product({ grantsRoleId: "role-vip" })]);
+        await settleOrder(settlement);
+        expect(db.user.updateMany).toHaveBeenCalled();
+        expect(db.timedRoleGrant.upsert).not.toHaveBeenCalled();
+    });
+
+    it("records nothing when the timed product grants no role", async () => {
+        db.product.findMany.mockResolvedValue([product({ durationDays: 30 })]);
+        await settleOrder(settlement);
+        expect(db.timedRoleGrant.upsert).not.toHaveBeenCalled();
+    });
+
+    it("writes it inside the transaction that took the money", async () => {
+        db.product.findMany.mockResolvedValue([
+            product({ grantsRoleId: "role-vip", durationDays: 30 }),
+        ]);
+        await settleOrder(settlement);
+        expect(calls.find((c) => c.op === "timedRoleGrant.upsert")?.viaTx).toBe(true);
     });
 });

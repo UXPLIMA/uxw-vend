@@ -12,6 +12,12 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.33.0 - `TimedRoleGrant`, and the sweep that acts on it. A member holds one
+ * role, so handing one out for a while means remembering what they held before
+ * and putting it back; nothing did, which made a rank sold by the month a rank
+ * sold once. Who granted it is a string the granter chooses, so the core still
+ * names nothing. Additive: a platform that writes no grant sweeps nothing.
+ *
  * 1.32.0 - `StandardSidebarLayout` takes a `heading`. A section in the content
  * column is a heading and then its cards; a widget is a card with its heading
  * inside, so a page that wrote the heading itself started every widget beside
@@ -223,4 +229,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.32.0";
+export const CORE_API_VERSION = "1.33.0";

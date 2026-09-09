@@ -213,6 +213,18 @@ export async function bootstrapScheduler(): Promise<void> {
     });
 
     registerCronJob({
+        key: "core:sweep-timed-roles",
+        schedule: "every-15-minutes",
+        handler: async () => {
+            const { sweepLapsedRoles } = await import("./timed-roles");
+            const reverted = await sweepLapsedRoles();
+            if (reverted > 0) {
+                log.info("cron: timed roles taken back", { job: "sweep-timed-roles", reverted });
+            }
+        },
+    });
+
+    registerCronJob({
         key: "core:process-broadcasts",
         schedule: "every-minute",
         handler: async () => {

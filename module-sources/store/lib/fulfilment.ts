@@ -61,19 +61,33 @@ interface RoleReader {
  */
 async function roleGrantedBy(
     client: RoleReader,
-    grants: { grantsRoleId: string | null }[],
-): Promise<string | null> {
-    const named = [...new Set(grants.map((p) => p.grantsRoleId).filter((id): id is string => Boolean(id)))];
-    if (named.length === 0) return null;
-    if (named.length === 1) return named[0];
+    grants: { grantsRoleId: string | null; durationDays: number | null }[],
+): Promise<{ roleId: string; durationDays: number | null } | null> {
+    const naming = grants.filter(
+        (p): p is { grantsRoleId: string; durationDays: number | null } => Boolean(p.grantsRoleId),
+    );
+    if (naming.length === 0) return null;
 
+    // The duration comes from the product that granted the role, not from
+    // whatever else was in the basket: a thirty-day rank bought alongside a
+    // permanent one must not become permanent.
+    const chosen = naming.length === 1 ? naming[0] : await highestPriority(client, naming);
+    return { roleId: chosen.grantsRoleId, durationDays: chosen.durationDays };
+}
+
+/** Of several products that each grant a role, the one that outranks the rest. */
+async function highestPriority<T extends { grantsRoleId: string }>(
+    client: RoleReader,
+    naming: T[],
+): Promise<T> {
     const ranked = await client.role.findMany({
-        where: { id: { in: named } },
+        where: { id: { in: [...new Set(naming.map((p) => p.grantsRoleId))] } },
         select: { id: true, priority: true },
         orderBy: { priority: "desc" },
         take: 1,
     });
-    return ranked[0]?.id ?? named[0];
+    const top = ranked[0]?.id;
+    return naming.find((p) => p.grantsRoleId === top) ?? naming[0];
 }
 
 export async function settleOrder(settlement: PaymentSettlement): Promise<PaymentOutcome> {
@@ -188,12 +202,40 @@ export async function settleOrder(settlement: PaymentSettlement): Promise<Paymen
                 }
             }
 
-            const roleId = await roleGrantedBy(tx, grants);
-            if (roleId) {
+            const granting = await roleGrantedBy(tx, grants);
+            if (granting) {
+                // Read before the write: putting the role back when it lapses
+                // needs to know what they held instead, and a moment later it
+                // is gone.
+                const held = await tx.user.findUnique({
+                    where: { id: buyerId },
+                    select: { roleId: true },
+                });
                 // `updateMany` rather than `update`: the account can be deleted
                 // between paying and the webhook landing, and a missing row
                 // must not throw and roll back an order somebody paid for.
-                await tx.user.updateMany({ where: { id: buyerId }, data: { roleId } });
+                await tx.user.updateMany({ where: { id: buyerId }, data: { roleId: granting.roleId } });
+
+                if (granting.durationDays !== null) {
+                    const until = extendedExpiry(null, granting.durationDays, now) as Date;
+                    // One live grant per role per member: buying the same rank
+                    // again pushes this row out rather than adding a second
+                    // that would revert them the moment the first lapses.
+                    await tx.timedRoleGrant.upsert({
+                        where: { userId_roleId: { userId: buyerId, roleId: granting.roleId } },
+                        create: {
+                            userId: buyerId,
+                            roleId: granting.roleId,
+                            // What they held before this order. Null when they
+                            // held nothing, which the sweep reads as "put back
+                            // the site default".
+                            previousRoleId: held?.roleId ?? null,
+                            expiresAt: until,
+                            source: "store:product",
+                        },
+                        update: { expiresAt: until },
+                    });
+                }
             }
         }
 

@@ -50,6 +50,14 @@ export const CORE_TABLES: CoreTable[] = [
         select: { id: true, type: true, title: true, body: true, href: true, icon: true, isPublic: true, createdAt: true },
     },
     {
+        key: "timedRoles",
+        model: "timedRoleGrant",
+        column: "userId",
+        // A role somebody paid to hold for a while, and when it lapses. Theirs
+        // to have: it is a record of something they bought.
+        select: { id: true, roleId: true, expiresAt: true, source: true, createdAt: true },
+    },
+    {
         // tokenId withheld: it is the live revocation key for the session.
         key: "sessions",
         model: "userSession",
@@ -304,6 +312,8 @@ Contents
   user             Your profile row (password hash and 2FA secrets
                    are intentionally omitted).
   activityFeed     Public activity feed entries you generated.
+  timedRoles       Roles you hold for a fixed period, and when each
+                   one lapses.
   sessions         Login sessions (device, IP, last-active timestamp).
   warnings         Moderation warnings issued against you.
   notificationPrefs

@@ -59,6 +59,7 @@ vi.mock("@/core/lib/logger", () => ({
 // on every tick. Stub what their handlers reach for so a tick stays a unit
 // test of the loop rather than of everything the loop can call.
 vi.mock("@/core/lib/revisions", () => ({ pruneOldRevisions: async () => 0 }));
+vi.mock("@/core/lib/timed-roles", () => ({ sweepLapsedRoles: async () => 0 }));
 vi.mock("@/core/lib/broadcasts", () => ({ processQueuedBroadcasts: async () => undefined }));
 vi.mock("@/core/lib/email", () => ({ processEmailQueue: async () => ({ sent: 0, failed: 0 }) }));
 /**
