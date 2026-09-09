@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { generateOrderNumber } from "@/core/sdk";
+import { generateOrderNumber, applyFiltersAsync } from "@/core/sdk";
 import { log, logActivity, moduleSettings, prisma, rateLimitForRole, readJsonBody, siteTimeZone } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { deliverProduct } from "../../lib/delivery";
@@ -7,7 +7,7 @@ import { claimStock, shortOfStock, stockClaims } from "../../lib/stock";
 import { effectivePrice } from "../../lib/availability";
 import { availabilityFor, rulesOf, type ProductRow } from "../../lib/availability-server";
 import { countSales } from "../../lib/popularity";
-import { resolveCurrency } from "../../lib/currency";
+import { convertedCharge, resolveCurrency } from "../../lib/currency";
 import { startPaymentSession, listPaymentProviders } from "../../lib/payments";
 import { announceOrderCreated, announceOrderCompleted } from "../../lib/order-events";
 import {
@@ -587,14 +587,40 @@ export async function POST(request: NextRequest) {
             lines.push({ name: "Payment processing fee", quantity: 1, unitAmount: surcharge });
         }
 
+        // A gateway that only settles in its own currency is handed a
+        // converted amount, or nothing at all. Charging its currency with the
+        // shop's number is the failure that looks like it worked: 100 becomes
+        // 100 in a currency worth a fraction of it, and the order is paid.
+        const settleIn = chosen.settlesIn ? resolveCurrency(chosen.settlesIn) : currency;
+        let settleAmount = charged;
+        if (settleIn !== currency) {
+            const rate = await applyFiltersAsync("currency.rate", null, {
+                from: currency,
+                to: settleIn,
+            });
+            const converted = convertedCharge(charged, rate);
+            if (converted === null) {
+                // The order keeps its PENDING row and nothing is granted, so
+                // an operator can fix the rate and the buyer can try again.
+                return NextResponse.json(
+                    {
+                        error: "That payment method cannot be used right now: the exchange rate is unavailable.",
+                        code: "exchange_rate_unavailable",
+                    },
+                    { status: 503 },
+                );
+            }
+            settleAmount = converted;
+        }
+
         const subProduct = isSubscriptionCheckout ? subscriptionProducts[0] : null;
 
         const payment = await startPaymentSession({
             provider: paymentMethod,
             kind: subProduct ? "subscription" : "order",
             reference: order.id,
-            amount: charged,
-            currency,
+            amount: settleAmount,
+            currency: settleIn,
             description: `Order ${order.orderNumber}`,
             lines,
             customer: {

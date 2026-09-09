@@ -24,3 +24,22 @@ export function resolveCurrency(...candidates: (string | null | undefined)[]): s
     }
     return FALLBACK_CURRENCY;
 }
+
+/**
+ * What to charge a gateway that settles in a currency the shop does not price
+ * in, or null when it cannot be worked out.
+ *
+ * Handing a processor the shop's number with a different currency code
+ * attached is the failure that looks like it worked: 100 USD becomes 100 TRY,
+ * the buyer pays a fraction of the price and the order is marked paid. So this
+ * refuses rather than guesses. A payment that cannot start leaves the order
+ * unpaid and somebody can fix the rate; an undercharge is money gone.
+ *
+ * Nothing needs no rate: an order of zero is zero in every currency, and
+ * asking for a rate to convert it would refuse a free order for no reason.
+ */
+export function convertedCharge(amount: number, rate: number | null): number | null {
+    if (amount <= 0) return 0;
+    if (rate === null || !Number.isFinite(rate) || rate <= 0) return null;
+    return Math.round(amount * rate * 100) / 100;
+}

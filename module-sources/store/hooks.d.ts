@@ -45,6 +45,16 @@ declare global {
         "payment.refunded": PaymentOutcome;
         /** Whether anybody recorded the change to the plan. */
         "subscription.changed": PaymentOutcome;
+        /**
+         * How many of one currency make one of another, or null when nobody
+         * can say.
+         *
+         * Asked when a gateway settles in a currency the shop does not price
+         * in. Null is an answer: the payment does not start and the order
+         * stays unpaid, which is recoverable in a way charging the wrong
+         * amount is not.
+         */
+        "currency.rate": number | null;
     }
 
     /** The other half of the same six filters: what each one is asked about. */
@@ -60,6 +70,8 @@ declare global {
          * store keeps the record, the gateway keeps the plan.
          */
         "subscription.changed": SubscriptionChange;
+        /** ISO 4217, uppercase, both of them. */
+        "currency.rate": { from: string; to: string };
     }
 
     /**
@@ -75,6 +87,15 @@ declare global {
         description?: string;
         /** A Lucide icon name, rendered by the checkout page. */
         icon?: string;
+        /**
+         * The currency this gateway settles in, when it is not the shop's.
+         *
+         * ISO 4217, uppercase. Left out by a gateway that takes whatever the
+         * shop prices in, which is nearly all of them. The store converts and
+         * refuses to start a payment it cannot convert, rather than handing a
+         * processor the shop's number with a different code attached.
+         */
+        settlesIn?: string;
         /**
          * What this gateway costs, when the operator has chosen to pass it on.
          *

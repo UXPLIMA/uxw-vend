@@ -2,7 +2,7 @@
   "id": "store",
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
-  "version": "2.12.0",
+  "version": "2.13.0",
   "coreVersion": "^1.33.0",
   "category": "commerce",
   "author": "uxwVend Team",
@@ -569,6 +569,10 @@
     },
     {
       "hook": "payment.session",
+      "type": "filter"
+    },
+    {
+      "hook": "currency.rate",
       "type": "filter"
     }
   ],
