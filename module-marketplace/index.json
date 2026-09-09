@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-09",
-  "updatedAt": "2026-09-09T19:10:03Z",
+  "updatedAt": "2026-09-09T19:29:58Z",
   "modules": [
     {
       "id": "announcements",
@@ -864,6 +864,36 @@
         "publicRoutes": 0,
         "adminRoutes": 1,
         "apiRoutes": 0,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "external-data",
+      "name": "External Data",
+      "description": "Read a list out of a database this site does not own: a game server, a billing system, an old forum. Read only, one bounded query, and the connection never reaches a page.",
+      "i18n": {},
+      "version": "1.0.0",
+      "coreVersion": "^1.34.0",
+      "author": "uxwVend",
+      "icon": "Database",
+      "category": "content",
+      "verified": true,
+      "updatedAt": "2026-09-09T19:29:58Z",
+      "screenshots": [],
+      "tags": [
+        "content"
+      ],
+      "zip": "external-data.zip",
+      "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 1,
         "widgets": 0
       }
     },

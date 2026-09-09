@@ -1,0 +1,32 @@
+// External Data Module - Database Models
+// These models are merged into prisma/schema.prisma by merge-schemas.ts
+
+/// A read-only list pulled out of a database this site does not own.
+///
+/// The connection string is a credential and is kept in `Setting`, not here:
+/// one connection per site, named by `settingKey`, so a source names which
+/// connection it uses without carrying the password around in a row that gets
+/// listed, exported and logged.
+model ExternalSource {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  title       String
+  /// Which stored connection to read through. Empty means the site's own,
+  /// under the name the settings screen writes to; see lib/connection.ts.
+  settingKey  String   @default("")
+  /// Names an operator typed. Refused unless they are plain names; see
+  /// lib/query.ts for why they cannot be bound like a value.
+  table       String
+  columns     String[]
+  orderBy     String   @default("")
+  descending  Boolean  @default(true)
+  rowLimit    Int      @default(20)
+  /// How long an answer may be reused. An external database is somebody
+  /// else's load as well as ours.
+  cacheSeconds Int     @default(60)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([isActive])
+}
