@@ -2,7 +2,7 @@
   "id": "store",
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
-  "version": "2.18.0",
+  "version": "2.19.0",
   "coreVersion": "^1.34.0",
   "category": "commerce",
   "author": "uxwVend Team",
@@ -1035,7 +1035,8 @@
         "adm_manualOrderFailed": "The order could not be created.",
         "err": {
           "manual_order_bad_line": "One of the lines has a price or a quantity that cannot be used.",
-          "chest_needs_player_name": "Tell us which player to deliver to."
+          "chest_needs_player_name": "Tell us which player to deliver to.",
+          "order_no_payment": "That order has no payment to refund. Cancel it instead."
         },
         "adm_productCopy": "Duplicate",
         "adm_productCopySuffix": "{name} (copy)",
@@ -1699,7 +1700,8 @@
         "adm_manualOrderFailed": "Sipariş oluşturulamadı.",
         "err": {
           "manual_order_bad_line": "Satırlardan birinin fiyatı veya adedi kullanılamıyor.",
-          "chest_needs_player_name": "Hangi oyuncuya teslim edileceğini söyleyin."
+          "chest_needs_player_name": "Hangi oyuncuya teslim edileceğini söyleyin.",
+          "order_no_payment": "Bu siparişin iade edilecek bir ödemesi yok. Bunun yerine iptal edin."
         },
         "adm_productCopy": "Çoğalt",
         "adm_productCopySuffix": "{name} (kopya)",

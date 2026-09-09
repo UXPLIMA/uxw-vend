@@ -641,6 +641,10 @@ export async function POST(request: NextRequest) {
             // gateways reject a negative amount outright.
             metadata: {
                 orderId: order.id,
+                // What the buyer sees on their confirmation. A gateway that
+                // puts a reference on a statement, or asks the buyer to quote
+                // one, needs the readable number rather than the row id.
+                orderNumber: order.orderNumber,
                 userId: session.user.id,
                 playerName,
                 ...(totalDiscount > 0 ? { discount: totalDiscount.toFixed(2) } : {}),

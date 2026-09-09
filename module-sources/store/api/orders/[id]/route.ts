@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, log, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { z } from "zod";
+import { settleOrder, voidOrder, refundPayment } from "../../../lib/fulfilment";
 
 const orderUpdateSchema = z.object({
     status: z.enum(["PENDING", "PROCESSING", "COMPLETED", "CANCELLED", "REFUNDED"]).optional(),
@@ -113,9 +114,61 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
             return NextResponse.json({ error: "Order not found" }, { status: 404 });
         }
 
+        // Three of the five statuses are not a column, they are a thing that
+        // happens to an order: what was bought is granted, or the stock goes
+        // back, or the money does. Writing the word and nothing else is how
+        // this screen used to confirm a bank transfer, and the buyer got
+        // nothing while the screen turned green.
+        //
+        // Each goes down the path a gateway's callback takes, so there is one
+        // implementation of each rather than two that drift. None of them is
+        // followed by a status write here: settlement claims the status
+        // itself, and a write beside the claim can only disagree with it.
+        const { status, ...rest } = validation.data;
+        const plain: { notes?: string; status?: typeof status } = rest;
+
+        if (status === "COMPLETED") {
+            const settled = await settleOrder({
+                kind: "order",
+                reference: existing.id,
+                provider: existing.paymentMethod || "manual",
+                // The order's own total. A number from the request would let
+                // a typo mark a 500 order paid at 5.
+                providerRef: existing.paymentId || `manual:${existing.id}`,
+                amount: Number(existing.total),
+                currency: existing.currency,
+            });
+            if (!settled.handled) {
+                log.error("Marking an order paid did not settle it", { id, error: settled.error });
+                return NextResponse.json({ error: "That order could not be marked paid" }, { status: 500 });
+            }
+        } else if (status === "CANCELLED") {
+            const voided = await voidOrder(existing.id);
+            if (!voided.handled) {
+                return NextResponse.json({ error: "That order could not be cancelled" }, { status: 500 });
+            }
+        } else if (status === "REFUNDED") {
+            if (!existing.paymentId) {
+                // Nothing was ever taken, so there is nothing to send back.
+                // Cancelling is what they mean.
+                return NextResponse.json(
+                    { error: "That order has no payment to refund", code: "order_no_payment" },
+                    { status: 400 },
+                );
+            }
+            const refunded = await refundPayment(existing.paymentMethod || "manual", existing.paymentId);
+            if (!refunded.handled) {
+                return NextResponse.json({ error: "That order could not be refunded" }, { status: 500 });
+            }
+        } else if (status) {
+            // PENDING and PROCESSING are notes an operator makes about where
+            // an order stands. Nothing is granted or taken back.
+            plain.status = status;
+        }
+
         const order = await prisma.order.update({
             where: { id },
-            data: validation.data,
+            data: plain,
             include: {
                 items: true,
                 user: {
