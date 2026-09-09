@@ -12,6 +12,13 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.32.0 - `StandardSidebarLayout` takes a `heading`. A section in the content
+ * column is a heading and then its cards; a widget is a card with its heading
+ * inside, so a page that wrote the heading itself started every widget beside
+ * it a heading's height too high. Passing it in lets one component draw the
+ * heading and the spacer that answers it. Optional, so a layout that passes
+ * none is unchanged.
+ *
  * 1.31.0 - the site's clock. `siteTimeZone()` joins `@/core/sdk/server` and
  * the pure readers - `zonedNow`, `weekdayIn`, `minutesInto`,
  * `wallClockToInstant`, `instantToWallClock` - join `@/core/sdk`. "Opens
@@ -216,4 +223,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.31.0";
+export const CORE_API_VERSION = "1.32.0";

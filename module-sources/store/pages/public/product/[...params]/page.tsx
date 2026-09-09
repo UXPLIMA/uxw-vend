@@ -24,11 +24,17 @@ interface Product {
     images?: string[];
     stock: number | null;
     isActive: boolean;
+    /**
+     * Nullable, because `Product.categoryId` is. A shop that does not sort
+     * its products into categories is a shop the platform supports, and a
+     * type that says otherwise is how an uncategorised product took its own
+     * page down.
+     */
     category: {
         id: string;
         name: string;
         slug: string;
-    };
+    } | null;
     availability?: AvailabilityInfo;
     was?: number | null;
     onSale?: boolean;
@@ -434,12 +440,13 @@ export default function ProductDetailPage() {
                             </Button>
                         </div>
 
-                        {/* Category */}
-                        <div className="mt-4 pt-4 border-t border-border">
-                            <div className="text-xs text-muted-foreground">
-                                {t('category')}: <span className="text-foreground">{product.category.name}</span>
+                        {product.category && (
+                            <div className="mt-4 pt-4 border-t border-border">
+                                <div className="text-xs text-muted-foreground">
+                                    {t('category')}: <span className="text-foreground">{product.category.name}</span>
+                                </div>
                             </div>
-                        </div>
+                        )}
                     </div>
                 </div>
             </div>

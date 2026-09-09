@@ -126,3 +126,38 @@ export function drawPrize<T extends { probability: number }>(
     }
     return prizes[prizes.length - 1] ?? null;
 }
+
+/**
+ * Which ink a prize name can be read in, on the colour of its own slice.
+ *
+ * Every label was white. Most of the palette the prize form offers is dark
+ * enough for that; the amber in it is not - white on #eab308 measures about
+ * 1.9:1, and the name of the prize is the one thing the wheel exists to say.
+ *
+ * White stays the wheel's ink wherever it can be read: black and white labels
+ * mixed across one wheel reads as an accident rather than a decision. It
+ * gives way only where white fails outright, which is 3:1 - AA for text this
+ * size - and on that palette it is the yellows, the ambers and the mid greens
+ * that fall below it.
+ *
+ * Choosing the better of two inks is not the same as passing AA: a mid grey
+ * fails against both, and the colour is the operator's. It is the best either
+ * choice can do.
+ *
+ * Anything that is not a hex colour gets white, which is what the wheel drew
+ * before this existed: the colour field takes free text, and a label that is
+ * hard to read beats a label that throws.
+ */
+export function inkFor(background: string): "light" | "dark" {
+    const hex = background.trim().replace(/^#/, "");
+    const full = hex.length === 3 ? hex.split("").map((digit) => digit + digit).join("") : hex;
+    if (!/^[0-9a-fA-F]{6}$/.test(full)) return "light";
+
+    const channel = (at: number) => {
+        const value = parseInt(full.slice(at, at + 2), 16) / 255;
+        return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+    };
+    const luminance = 0.2126 * channel(0) + 0.7152 * channel(2) + 0.0722 * channel(4);
+    const whiteOnIt = 1.05 / (luminance + 0.05);
+    return whiteOnIt < 3 ? "dark" : "light";
+}

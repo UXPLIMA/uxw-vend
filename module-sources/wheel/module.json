@@ -2,7 +2,7 @@
   "id": "wheel",
   "name": "Wheel of Fortune",
   "description": "Spin-to-win game with configurable prizes and cooldowns",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "coreVersion": "^1.29.0",
   "category": "commerce",
   "author": "uxwVend",

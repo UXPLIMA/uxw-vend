@@ -20,7 +20,14 @@ export default defineConfig({
     workers: 1,
     reporter: [['list']],
     use: {
-        baseURL: process.env.E2E_BASE_URL ?? 'http://127.0.0.1:3001',
+        // `localhost`, not `127.0.0.1`, even though they reach the same
+        // server. In dev, Next serves /_next/* only to the hosts in
+        // `allowedDevOrigins`, which next.config.ts derives from AUTH_URL,
+        // NEXTAUTH_URL and NEXT_PUBLIC_APP_URL - all of them `localhost` in
+        // .env.example. From 127.0.0.1 every client chunk is refused, so the
+        // page renders and never hydrates: a spec measuring anything a
+        // component fetches was measuring an empty frame and passing.
+        baseURL: process.env.E2E_BASE_URL ?? 'http://localhost:3001',
         trace: 'retain-on-failure',
         screenshot: 'only-on-failure',
         video: 'off',

@@ -154,10 +154,9 @@ export default function HelpCenterPage() {
                                     </Link>
                                 </div>
                             </div>
-                        )}>
+                        )} heading={t('browseCategories')}>
                     {(
                             <div>
-                                <h2 className="text-xl font-bold text-foreground mb-4">{t('browseCategories')}</h2>
                                 <div className="grid md:grid-cols-2 gap-4">
                                     {categories.map((category) => (
                                         <Link key={category.id} href={`/help/category/${category.slug}`}>

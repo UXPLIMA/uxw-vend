@@ -28,9 +28,12 @@ interface Product {
     price: number;
     comparePrice: number | null;
     image: string | null;
-    stock: number;
+    // Both nullable in the schema: a product need not be counted and need not
+    // be filed under anything. Declaring them otherwise is how the detail page
+    // came to read a category that was not there.
+    stock: number | null;
     isFeatured: boolean;
-    category: { slug: string; name: string };
+    category: { slug: string; name: string } | null;
     type: string;
     availability?: AvailabilityInfo;
     was?: number | null;
