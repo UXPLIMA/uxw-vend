@@ -39,6 +39,11 @@ export async function availabilityData(input: Partial<ProductInput>): Promise<Re
     set("perPersonPeriod", input.perPersonPeriod);
     set("periodStock", input.periodStock);
     set("periodStockWindow", input.periodStockWindow);
+    // What a purchase grants: how long it lasts and which role it gives.
+    // Carried here with the rest of the product's rules so one route writes
+    // them all and none is forgotten by the next one added.
+    set("durationDays", input.durationDays);
+    set("grantsRoleId", input.grantsRoleId === "" ? null : input.grantsRoleId);
     set("salePrice", input.salePrice);
     set("saleFrom", instant(input.saleFrom));
     set("saleUntil", instant(input.saleUntil));

@@ -248,6 +248,10 @@ describe("settleOrder", () => {
             "product.findMany",
             "product.updateMany",
             "chestItem.createMany",
+            // What each product grants beyond the row: a duration and a role.
+            // Its own read rather than columns added to the stock query above,
+            // which asks only about products the shop counts.
+            "product.findMany",
             "ownedProduct.createMany",
             "payment.create",
         ]);

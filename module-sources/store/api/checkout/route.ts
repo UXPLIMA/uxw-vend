@@ -17,6 +17,7 @@ import {
     computeCreatorCommission,
     computeTotals,
 } from "../../lib/pricing";
+import { stillOwnedWhere } from "../../lib/ownership";
 import { z } from "zod";
 
 /**
@@ -193,8 +194,11 @@ export async function POST(request: NextRequest) {
         });
 
         // ── Cumulative upgrade check ──
+        // A lapsed purchase stops crediting the upgrade it once paid for; see
+        // `stillOwnedWhere`.
         const ownedProducts = await prisma.ownedProduct.findMany({
-            where: { userId: session.user.id },
+            where: stillOwnedWhere(session.user.id, new Date()),
+            select: { productId: true },
         });
         const ownedIds = new Set(ownedProducts.map((o) => o.productId));
 

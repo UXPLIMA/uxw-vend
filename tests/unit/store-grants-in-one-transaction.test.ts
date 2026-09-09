@@ -56,9 +56,17 @@ describe("the store's other grant paths", () => {
                 /tx\.chestItem\.create\(/,
             );
             // The subscription grant is a single row, so an upsert is the
-            // right statement there; what it may not be is one per item.
+            // right statement there; what it may not be is one per line item.
+            //
+            // Line items, not any loop. A timed product's new end date depends
+            // on what is left of its old one, so each distinct timed product
+            // needs its own computed value and Prisma has no bulk upsert that
+            // takes one - that loop is over the products an order names, is
+            // bounded by them, and only runs for the rare product sold by the
+            // day. The defect this guards against was a write per line, which
+            // an order with the same product on six lines paid for six times.
             expect(source, `${rel} should not upsert ownership per line item`).not.toMatch(
-                /for\s*\([^)]*\)\s*\{[^}]*ownedProduct\.upsert\(/,
+                /for\s*\((?:const|let)\s+\w+\s+of\s+(?:\w+\.)?(?:items|granted|orderItems|lines)\b[^)]*\)\s*\{[^}]*ownedProduct\.upsert\(/,
             );
         }
     });

@@ -37,6 +37,15 @@ export const productSchema = z.object({
     perPersonPeriod: z.enum(["ever", "day", "week", "month"]).optional(),
     periodStock: z.number().int().min(1).max(1_000_000).optional().nullable(),
     periodStockWindow: z.enum(["day", "week", "month"]).optional(),
+    /**
+     * How long a purchase lasts, in days. Null is owned outright.
+     *
+     * Capped at ten years: the field is a number input and a slip of the hand
+     * on a "days" box is how somebody sells a lifetime by accident.
+     */
+    durationDays: z.number().int().min(1).max(3650).optional().nullable(),
+    /** The role a purchase grants. A different question from `roleId`. */
+    grantsRoleId: z.string().max(64).optional().nullable(),
     salePrice: z.number().min(0).optional().nullable(),
     saleFrom: z.string().max(32).optional().nullable(),
     saleUntil: z.string().max(32).optional().nullable(),

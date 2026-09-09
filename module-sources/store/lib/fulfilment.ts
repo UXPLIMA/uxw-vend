@@ -13,6 +13,7 @@ import { deliverProduct } from "./delivery";
 import { announceOrderCompleted } from "./order-events";
 import { claimStock, releaseStock, stockClaims } from "./stock";
 import { countSales, uncountSales } from "./popularity";
+import { extendedExpiry } from "./ownership";
 
 const OK: PaymentOutcome = { handled: true, duplicate: false, error: null };
 const ALREADY: PaymentOutcome = { handled: true, duplicate: true, error: null };
@@ -37,6 +38,44 @@ function creditLedgerId(provider: string, providerRef: string): string {
  * Ownership is granted here and nowhere earlier: an order is created PENDING
  * at checkout and stays that way until a gateway says it was paid for.
  */
+/** The part of the client `roleGrantedBy` needs, transaction or not. */
+interface RoleReader {
+    role: {
+        findMany(args: {
+            where: { id: { in: string[] } };
+            select: { id: true; priority: true };
+            orderBy: { priority: "desc" };
+            take: number;
+        }): Promise<{ id: string; priority: number }[]>;
+    };
+}
+
+/**
+ * The role a paid order grants, out of everything it bought.
+ *
+ * One product naming a role is the ordinary case and costs nothing to answer.
+ * Two is the case that goes wrong silently: a member holds one role here, so
+ * something has to lose, and "whichever line came last" would hand a buyer of
+ * VIP and VIP+ whichever the cart happened to sort first. The highest priority
+ * wins, which is the same order the rest of the platform ranks roles by.
+ */
+async function roleGrantedBy(
+    client: RoleReader,
+    grants: { grantsRoleId: string | null }[],
+): Promise<string | null> {
+    const named = [...new Set(grants.map((p) => p.grantsRoleId).filter((id): id is string => Boolean(id)))];
+    if (named.length === 0) return null;
+    if (named.length === 1) return named[0];
+
+    const ranked = await client.role.findMany({
+        where: { id: { in: named } },
+        select: { id: true, priority: true },
+        orderBy: { priority: "desc" },
+        take: 1,
+    });
+    return ranked[0]?.id ?? named[0];
+}
+
 export async function settleOrder(settlement: PaymentSettlement): Promise<PaymentOutcome> {
     const order = await prisma.order.findUnique({
         where: { id: settlement.reference },
@@ -68,6 +107,10 @@ export async function settleOrder(settlement: PaymentSettlement): Promise<Paymen
     // transaction does not close that on its own, exactly as it does not for
     // the credit balance at checkout; the condition in the `where` does, by
     // leaving the second one with nothing to update.
+    // One clock for the whole settlement: two products bought together should
+    // not end a millisecond apart because the loop took that long.
+    const now = new Date();
+
     const settled = await prisma.$transaction(async (tx) => {
         const claimed = await tx.order.updateMany({
             where: { id: order.id, status: { not: "COMPLETED" } },
@@ -98,12 +141,60 @@ export async function settleOrder(settlement: PaymentSettlement): Promise<Paymen
                     orderId: order.id,
                 })),
             });
+
+            // What each product grants beyond the row itself. Read here rather
+            // than added to the stock query above: that one asks only about
+            // products the shop counts, and widening it would make every
+            // settlement carry columns the shelf has no use for.
+            const grants = await tx.product.findMany({
+                where: { id: { in: productIds } },
+                select: { id: true, durationDays: true, grantsRoleId: true },
+            });
+            const timed = grants.filter((p) => p.durationDays !== null && p.durationDays > 0);
+            const timedIds = new Set(timed.map((p) => p.id));
+            const outright = productIds.filter((id) => !timedIds.has(id));
+
             // One row per product, however many of it was bought: the unique
             // key is (userId, productId), and owning it twice means nothing.
-            await tx.ownedProduct.createMany({
-                data: productIds.map((productId) => ({ userId: buyerId, productId, orderId: order.id })),
-                skipDuplicates: true,
-            });
+            // Still one statement for the whole order, because owning a thing
+            // outright is the common case and must not cost a query a line.
+            if (outright.length > 0) {
+                await tx.ownedProduct.createMany({
+                    data: outright.map((productId) => ({ userId: buyerId, productId, orderId: order.id })),
+                    skipDuplicates: true,
+                });
+            }
+
+            // A timed product has to be read before it is written: the new end
+            // date depends on what is left of the old one. See `ownership.ts`
+            // for why it extends rather than replaces.
+            if (timed.length > 0) {
+                const held = await tx.ownedProduct.findMany({
+                    where: { userId: buyerId, productId: { in: [...timedIds] } },
+                    select: { productId: true, expiresAt: true },
+                });
+                const endsAt = new Map(held.map((row) => [row.productId, row.expiresAt]));
+                for (const product of timed) {
+                    const expiresAt = extendedExpiry(
+                        endsAt.get(product.id) ?? null,
+                        product.durationDays,
+                        now,
+                    );
+                    await tx.ownedProduct.upsert({
+                        where: { userId_productId: { userId: buyerId, productId: product.id } },
+                        create: { userId: buyerId, productId: product.id, orderId: order.id, expiresAt },
+                        update: { expiresAt, orderId: order.id },
+                    });
+                }
+            }
+
+            const roleId = await roleGrantedBy(tx, grants);
+            if (roleId) {
+                // `updateMany` rather than `update`: the account can be deleted
+                // between paying and the webhook landing, and a missing row
+                // must not throw and roll back an order somebody paid for.
+                await tx.user.updateMany({ where: { id: buyerId }, data: { roleId } });
+            }
         }
 
         await tx.payment.create({

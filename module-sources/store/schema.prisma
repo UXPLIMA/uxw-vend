@@ -89,6 +89,16 @@ model Product {
   /** An allowance that refills: "ten a day" rather than "ten, ever". */
   periodStock          Int?
   periodStockWindow    String    @default("day")
+  /**
+   * How long a purchase lasts, in days. Null is owned outright.
+   *
+   * Lives on the product rather than on a processor's subscription, so a shop
+   * taking bank transfers can sell thirty days of something too.
+   */
+  durationDays         Int?
+  /** A role the buyer is given on purchase. Null grants nothing. */
+  grantsRoleId         String?
+
   /** A sale with a start and an end, rather than a price somebody remembers. */
   salePrice            Decimal?  @db.Decimal(10, 2)
   saleFrom             DateTime?
@@ -242,9 +252,13 @@ model OwnedProduct {
   user      User?    @relation("OwnedProducts", fields: [userId], references: [id], onDelete: SetNull)
   productId String
   orderId   String?
+  /** When it lapses. Null is owned outright, which no purchase can undo. */
+  expiresAt DateTime?
   createdAt DateTime @default(now())
 
   @@unique([userId, productId])
+  // The sweep asks for every ownership that has lapsed, newest schema first.
+  @@index([expiresAt])
 }
 
 model BulkDiscount {
