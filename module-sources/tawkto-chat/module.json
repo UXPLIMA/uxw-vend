@@ -1,0 +1,66 @@
+{
+  "id": "tawkto-chat",
+  "name": "Tawk.to Chat",
+  "description": "A live chat bubble on every page, served by Tawk.to. Nothing is loaded until the visitor has accepted cookies.",
+  "version": "1.0.0",
+  "coreVersion": "^1.34.0",
+  "category": "integration",
+  "author": "uxwVend",
+  "icon": "MessageCircle",
+  "csp": {
+    "script-src": [
+      "https://embed.tawk.to"
+    ]
+  },
+  "layoutComponents": [
+    {
+      "id": "TawktoChat",
+      "component": "components/ChatWidget"
+    }
+  ],
+  "adminRoutes": [
+    {
+      "path": "/settings/tawkto-chat",
+      "component": "pages/admin/page.tsx"
+    }
+  ],
+  "settingsCards": [
+    {
+      "title": "Live chat",
+      "description": "The chat bubble visitors talk to you through.",
+      "href": "/settings/tawkto-chat",
+      "icon": "MessageCircle",
+      "color": "text-green-500"
+    }
+  ],
+  "api": [
+    {
+      "path": "/tawkto-chat/config",
+      "handler": "api/config/route.ts",
+      "method": "GET",
+      "description": "The widget script URL, or nothing when it is not set up."
+    }
+  ],
+  "translations": {
+    "en": {
+      "tawktoChat": {
+        "adm_title": "Live chat",
+        "adm_subtitle": "The chat bubble on every page. It loads only after a visitor accepts cookies, because it sets its own.",
+        "adm_propertyId": "Property id",
+        "adm_propertyIdDesc": "From the widget code on your dashboard: the first of the two ids in the script address.",
+        "adm_widgetId": "Widget id",
+        "adm_widgetIdDesc": "The second one. Leave either empty and no chat is loaded at all."
+      }
+    },
+    "tr": {
+      "tawktoChat": {
+        "adm_title": "Canlı destek",
+        "adm_subtitle": "Her sayfadaki sohbet balonu. Kendi çerezlerini koyduğu için yalnızca ziyaretçi çerezleri kabul ettikten sonra yükleniyor.",
+        "adm_propertyId": "Property numarası",
+        "adm_propertyIdDesc": "Panelinizdeki widget kodundan: script adresindeki iki numaradan ilki.",
+        "adm_widgetId": "Widget numarası",
+        "adm_widgetIdDesc": "İkincisi. Herhangi birini boş bırakırsanız sohbet hiç yüklenmez."
+      }
+    }
+  }
+}

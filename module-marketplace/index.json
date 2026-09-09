@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-09",
-  "updatedAt": "2026-09-09T19:29:58Z",
+  "updatedAt": "2026-09-09T19:42:45Z",
   "modules": [
     {
       "id": "announcements",
@@ -2775,6 +2775,36 @@
         "publicRoutes": 2,
         "adminRoutes": 1,
         "apiRoutes": 5,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "tawkto-chat",
+      "name": "Tawk.to Chat",
+      "description": "A live chat bubble on every page, served by Tawk.to. Nothing is loaded until the visitor has accepted cookies.",
+      "i18n": {},
+      "version": "1.0.0",
+      "coreVersion": "^1.34.0",
+      "author": "uxwVend",
+      "icon": "MessageCircle",
+      "category": "integration",
+      "verified": true,
+      "updatedAt": "2026-09-09T19:42:45Z",
+      "screenshots": [],
+      "tags": [
+        "integration"
+      ],
+      "zip": "tawkto-chat.zip",
+      "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 1,
         "widgets": 0
       }
     },
