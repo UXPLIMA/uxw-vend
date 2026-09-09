@@ -6,6 +6,7 @@ import { productSchema } from "../../lib/validations";
 import { availabilityData } from "../../lib/availability-input";
 import { PUBLIC_PRODUCT } from "../../lib/public-product";
 import { availabilityOf, effectivePrice } from "../../lib/availability";
+import { pricedForCampaign, runningCampaignEntries } from "../../lib/campaign-server";
 import { hideShut, onTheShelfWhere, rulesOf, type ProductRow } from "../../lib/availability-server";
 import { siteTimeZone } from "@/core/sdk/server";
 
@@ -74,6 +75,9 @@ export async function GET(request: NextRequest) {
         // gone from the list; one set to count down is still listed, with the
         // state that says so.
         const zone = await siteTimeZone();
+        // Once for the whole page. A shop runs few campaigns and asking each
+        // product for its entry would be a query a line.
+        const campaignEntries = await runningCampaignEntries(prisma, now, zone);
         const { lowStockAt } = await moduleSettings<{ lowStockAt: number }>("store");
         const onShelf = hideShut(products as unknown as ProductRow[], now, zone);
         const annotated = onShelf.map((row) => {
@@ -102,7 +106,7 @@ export async function GET(request: NextRequest) {
                     // page, which knows the reader, says the rest.
                     restricted: row.roleIds.length > 0,
                 },
-                ...effectivePrice(rules, now),
+                ...pricedForCampaign(row.id, effectivePrice(rules, now), campaignEntries),
             };
         });
 

@@ -106,13 +106,17 @@ const DAY = 86_400_000;
 /**
  * True when this moment is inside the weekly window.
  *
+ * Exported because a campaign keeps the same kind of hours and must wrap past
+ * midnight the same way. Two implementations of that rule is one of them
+ * quietly shutting a shop in the middle of its own event.
+ *
  * The day and the hour cannot be asked separately, because a window may cross
  * midnight: "Fridays, 22:00 to 02:00" is open at half past midnight on
  * Saturday, and a check that reads Saturday against a Friday list shuts the
  * shop in the middle of its own opening. So a wrapped window's small hours
  * are matched against the day before.
  */
-function insideWeeklyWindow(
+export function insideWeeklyWindow(
     weekday: number,
     minutes: number,
     days: number[],

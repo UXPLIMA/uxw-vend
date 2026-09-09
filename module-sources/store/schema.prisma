@@ -129,6 +129,7 @@ model Product {
   orderItems OrderItem[]
   cartItems  CartItem[]
   subscriptions Subscription[]
+  campaignEntries CampaignEntry[]
 
   @@index([categoryId])
   @@index([isActive, isFeatured])
@@ -275,6 +276,48 @@ model OwnedProduct {
   @@unique([userId, productId])
   // The sweep asks for every ownership that has lapsed, newest schema first.
   @@index([expiresAt])
+}
+
+/**
+ * A price change an operator sets once and lets run on a clock.
+ *
+ * The rules are the ones a product already has - a weekly window, a price,
+ * an allowance - gathered under a name so ten products move together and come
+ * back together. Setting them ten times by hand is how a shop ends up with
+ * nine on offer and one missed, then nine that never came off.
+ */
+model Campaign {
+  id           String   @id @default(cuid())
+  name         String
+  isActive     Boolean  @default(true)
+  /** Weekdays it runs on, 0 is Sunday. Empty means every day. */
+  days         Int[]    @default([])
+  /** Minutes past midnight on the site's clock. Null means all day. */
+  fromMinute   Int?
+  untilMinute  Int?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  entries CampaignEntry[]
+
+  @@index([isActive])
+}
+
+model CampaignEntry {
+  id         String   @id @default(cuid())
+  campaignId String
+  campaign   Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  productId  String
+  product    Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  /** What the product costs while the campaign runs. */
+  price      Decimal  @db.Decimal(10, 2)
+  /** How many may go at that price before it stops. Null is no limit. */
+  stock      Int?
+
+  // One entry per product per campaign: two would be two prices with nothing
+  // to choose between them.
+  @@unique([campaignId, productId])
+  @@index([productId])
 }
 
 model BulkDiscount {
