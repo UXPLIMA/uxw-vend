@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-09",
-  "updatedAt": "2026-09-09T17:00:59Z",
+  "updatedAt": "2026-09-09T17:49:18Z",
   "modules": [
     {
       "id": "announcements",
@@ -1743,6 +1743,41 @@
         "listens": [
           "payment.providers",
           "payment.session"
+        ]
+      },
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 1,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "parasut-invoicing",
+      "name": "Parasut Invoicing",
+      "description": "Issues a sales invoice in Parasut for every paid order, using the invoice details the checkout collected.",
+      "i18n": {},
+      "version": "1.0.0",
+      "coreVersion": "^1.34.0",
+      "author": "uxwVend",
+      "icon": "FileText",
+      "category": "commerce",
+      "verified": true,
+      "updatedAt": "2026-09-09T17:49:18Z",
+      "screenshots": [],
+      "tags": [
+        "commerce"
+      ],
+      "zip": "parasut-invoicing.zip",
+      "dependencies": [
+        "store@^2.20.0"
+      ],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": [
+          "store.billing.required",
+          "store.order.completed"
         ]
       },
       "stats": {

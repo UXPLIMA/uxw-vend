@@ -1,0 +1,76 @@
+{
+  "id": "parasut-invoicing",
+  "name": "Parasut Invoicing",
+  "description": "Issues a sales invoice in Parasut for every paid order, using the invoice details the checkout collected.",
+  "version": "1.0.0",
+  "coreVersion": "^1.34.0",
+  "category": "commerce",
+  "author": "uxwVend",
+  "icon": "FileText",
+  "dependencies": [
+    "store@^2.20.0"
+  ],
+  "hookListeners": [
+    {
+      "hook": "store.billing.required",
+      "type": "filter",
+      "handler": "hooks/on-billing-required.ts"
+    },
+    {
+      "hook": "store.order.completed",
+      "type": "action",
+      "handler": "hooks/on-order-completed.ts"
+    }
+  ],
+  "adminRoutes": [
+    {
+      "path": "/settings/parasut-invoicing",
+      "component": "pages/admin/page.tsx"
+    }
+  ],
+  "settingsCards": [
+    {
+      "title": "Parasut Invoicing",
+      "description": "Credentials for issuing a sales invoice on every paid order.",
+      "href": "/settings/parasut-invoicing",
+      "icon": "FileText",
+      "color": "text-sky-500"
+    }
+  ],
+  "api": [
+    {
+      "path": "/parasut-invoicing/issue",
+      "handler": "api/issue/route.ts",
+      "method": "GET",
+      "description": "The sales that could not be invoiced, and why (admin)."
+    }
+  ],
+  "translations": {
+    "en": {
+      "parasutInvoicing": {
+        "adm_title": "Parasut invoicing",
+        "adm_subtitle": "Every paid order becomes a sales invoice. Until this is filled in, the checkout asks nobody for invoice details.",
+        "adm_companyId": "Company id",
+        "adm_companyIdDesc": "The number in the address bar when you are signed in to your company.",
+        "adm_clientId": "Application id",
+        "adm_clientSecret": "Application secret",
+        "adm_username": "Account email",
+        "adm_usernameDesc": "The account the invoices are issued by.",
+        "adm_password": "Account password"
+      }
+    },
+    "tr": {
+      "parasutInvoicing": {
+        "adm_title": "Paraşüt faturalama",
+        "adm_subtitle": "Ödenen her sipariş bir satış faturasına dönüşür. Burası doldurulmadan checkout kimseden fatura bilgisi istemez.",
+        "adm_companyId": "Firma numarası",
+        "adm_companyIdDesc": "Firmanızda oturum açtığınızda adres çubuğunda görünen numara.",
+        "adm_clientId": "Uygulama numarası",
+        "adm_clientSecret": "Uygulama gizli anahtarı",
+        "adm_username": "Hesap e-postası",
+        "adm_usernameDesc": "Faturaların kesileceği hesap.",
+        "adm_password": "Hesap parolası"
+      }
+    }
+  }
+}

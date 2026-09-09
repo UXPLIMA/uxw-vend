@@ -1,0 +1,29 @@
+/// One row per order this module has tried to invoice.
+///
+/// Written before the call, not after it. A legal invoice issued twice for
+/// one sale is a second entry in somebody's books and has to be cancelled by
+/// hand, and the trigger arrives more than once in normal operation: a
+/// gateway retries its callback, an operator marks an order paid that a
+/// webhook was already settling, a container restarts mid-request. The unique
+/// key on the order is what makes two racing completions produce one invoice.
+///
+/// A row that could not be issued keeps the reason rather than disappearing.
+/// An operator installed this because they have to issue invoices, so an
+/// order they cannot is the one thing they need to be shown.
+model IssuedInvoice {
+  id        String   @id @default(cuid())
+  orderId   String   @unique
+  /// pending while the call is in flight, then issued or failed.
+  status    String   @default("pending")
+  /// The service's own id and number, once it has answered.
+  remoteId     String?
+  remoteNumber String?
+  /// Why it could not be issued, in the words the operator needs.
+  reason    String?
+  attempts  Int      @default(0)
+  issuedAt  DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status])
+}
