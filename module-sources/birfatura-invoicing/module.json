@@ -1,0 +1,82 @@
+{
+  "id": "birfatura-invoicing",
+  "name": "BirFatura Invoicing",
+  "description": "Publishes this shop's paid orders for BirFatura to pull and invoice. The integrator calls in with a shared secret; nothing is sent out.",
+  "version": "1.0.0",
+  "coreVersion": "^1.34.0",
+  "category": "commerce",
+  "author": "uxwVend",
+  "icon": "FileText",
+  "dependencies": [
+    "store@^2.20.0"
+  ],
+  "hookListeners": [
+    {
+      "hook": "store.billing.required",
+      "type": "filter",
+      "handler": "hooks/on-billing-required.ts"
+    }
+  ],
+  "hooksEmitted": [
+    {
+      "hook": "payment.providers",
+      "type": "filter"
+    }
+  ],
+  "adminRoutes": [
+    {
+      "path": "/settings/birfatura-invoicing",
+      "component": "pages/admin/page.tsx"
+    }
+  ],
+  "settingsCards": [
+    {
+      "title": "BirFatura Invoicing",
+      "description": "The secret BirFatura signs in with to collect your orders.",
+      "href": "/settings/birfatura-invoicing",
+      "icon": "FileText",
+      "color": "text-indigo-500"
+    }
+  ],
+  "api": [
+    {
+      "path": "/birfatura/orders",
+      "handler": "api/orders/route.ts",
+      "method": "POST",
+      "providerCallback": true,
+      "description": "The paid orders in a window, with their lines, for the integrator that pulls them."
+    },
+    {
+      "path": "/birfatura/order-statuses",
+      "handler": "api/order-statuses/route.ts",
+      "method": "POST",
+      "providerCallback": true,
+      "description": "Which states an order can be in, so an operator can pick the one to invoice."
+    },
+    {
+      "path": "/birfatura/payment-methods",
+      "handler": "api/payment-methods/route.ts",
+      "method": "POST",
+      "providerCallback": true,
+      "description": "How this shop takes money, read from the orders themselves."
+    }
+  ],
+  "translations": {
+    "en": {
+      "birfaturaInvoicing": {
+        "adm_title": "BirFatura invoicing",
+        "adm_subtitle": "This service collects your orders rather than being sent them. Give it a secret here and the same one in its own store settings.",
+        "adm_token": "Shared secret",
+        "adm_tokenDesc": "A long random string of your own choosing. It is the only thing guarding your customers' addresses and tax numbers, so treat it as a password. Blank means nobody gets in."
+      }
+    },
+    "tr": {
+      "birfaturaInvoicing": {
+        "adm_title": "BirFatura faturalama",
+        "adm_subtitle": "Bu servis siparişleri kendisi toplar, biz göndermeyiz. Buraya bir gizli anahtar yazın ve aynısını onun mağaza ayarlarına girin.",
+        "adm_token": "Paylaşılan gizli anahtar",
+        "adm_tokenDesc": "Kendi seçeceğiniz uzun ve rastgele bir dizi. Müşterilerinizin adreslerini ve vergi numaralarını koruyan tek şey bu, parola gibi saklayın. Boş bırakılırsa kimse giremez."
+      }
+    }
+  }
+}

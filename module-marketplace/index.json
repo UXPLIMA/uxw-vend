@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-09",
-  "updatedAt": "2026-09-09T17:49:18Z",
+  "updatedAt": "2026-09-09T18:07:05Z",
   "modules": [
     {
       "id": "announcements",
@@ -109,6 +109,42 @@
         "publicRoutes": 0,
         "adminRoutes": 1,
         "apiRoutes": 0,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "birfatura-invoicing",
+      "name": "BirFatura Invoicing",
+      "description": "Publishes this shop's paid orders for BirFatura to pull and invoice. The integrator calls in with a shared secret; nothing is sent out.",
+      "i18n": {},
+      "version": "1.0.0",
+      "coreVersion": "^1.34.0",
+      "author": "uxwVend",
+      "icon": "FileText",
+      "category": "commerce",
+      "verified": true,
+      "updatedAt": "2026-09-09T18:07:05Z",
+      "screenshots": [],
+      "tags": [
+        "commerce"
+      ],
+      "zip": "birfatura-invoicing.zip",
+      "dependencies": [
+        "store@^2.20.0"
+      ],
+      "conflicts": [],
+      "hooks": {
+        "emits": [
+          "payment.providers"
+        ],
+        "listens": [
+          "store.billing.required"
+        ]
+      },
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 3,
         "widgets": 0
       }
     },

@@ -149,13 +149,20 @@ describe("every gateway callback", () => {
         }
     });
 
-    it("covers all twelve payment gateways", () => {
+    it("counts every route let past the CSRF gate", () => {
+        // A census, not a fact about the world: each of these is a POST an
+        // outside service makes without a session, so the number only moves
+        // when somebody decides it should.
         const declared = modules.flatMap(({ name, manifest }) =>
             (manifest.api ?? []).filter((e) => e.providerCallback).map(() => name),
         );
-        expect(declared.length).toBe(12);
+        // Twelve gateways report a payment. Three more belong to the
+        // integrator that collects orders rather than being sent them: it
+        // reads, it does not report, and it signs in with a shared secret.
+        expect(declared.length).toBe(15);
         expect(declared).toContain("stripe-gateway");
         expect(declared).toContain("mollie-gateway");
+        expect(declared.filter((name) => name === "birfatura-invoicing")).toHaveLength(3);
     });
 });
 
