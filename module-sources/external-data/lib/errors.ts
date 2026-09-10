@@ -13,6 +13,13 @@
  *
  * Nothing here is built from the error's text. The answers are written out,
  * which is the only way to be sure none of them carries a fragment of it.
+ *
+ * Two drivers write these sentences and they do not agree on the words. A
+ * missing table is "does not exist" in one and "doesn't exist" in the other; a
+ * query stopped by the clock is "canceling statement" in one and "execution
+ * time exceeded" in the other. A sentence nothing here recognises falls to
+ * "could not be read", which is the answer that wastes an operator's
+ * afternoon - so both sets of words are listed rather than one.
  */
 
 export type FailureCode = "unreachable" | "refused" | "no-such-table" | "timeout" | "failed";
@@ -40,10 +47,22 @@ function classify(raw: string): FailureCode {
     if (text.includes("authentication failed") || text.includes("password") || text.includes("permission denied")) {
         return "refused";
     }
-    if (text.includes("does not exist") || text.includes("unknown column") || text.includes("undefined table")) {
+    if (
+        text.includes("does not exist")
+        || text.includes("doesn't exist")
+        || text.includes("unknown column")
+        || text.includes("undefined table")
+        || text.includes("unknown table")
+    ) {
         return "no-such-table";
     }
-    if (text.includes("timeout") || text.includes("etimedout") || text.includes("canceling statement")) {
+    if (
+        text.includes("timeout")
+        || text.includes("etimedout")
+        || text.includes("canceling statement")
+        || text.includes("execution time exceeded")
+        || text.includes("query execution was interrupted")
+    ) {
         return "timeout";
     }
     return "failed";

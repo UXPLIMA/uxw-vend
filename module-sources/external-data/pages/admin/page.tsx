@@ -154,6 +154,7 @@ export default function ExternalDataSettingsPage() {
                         {/* Written and never read back: a field that returns a
                             credential puts it in the first screenshot somebody
                             attaches to a support thread. */}
+                        <p className="text-xs text-muted-foreground mt-1">{t("adm_connectionDialects")}</p>
                         <p className="text-xs text-muted-foreground mt-1">{t("adm_connectionWriteOnly")}</p>
                     </div>
                     <div className="flex justify-end">

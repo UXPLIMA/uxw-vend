@@ -15,7 +15,23 @@
  * So a name is refused unless it is a name, rather than escaped into one.
  * Escaping is a thing you can get subtly wrong; refusing is not. What is
  * accepted is quoted anyway, so a column called `order` still works.
+ *
+ * Two dialects are read and they quote differently: `"name"` in Postgres,
+ * `` `name` `` in MySQL. Only the quotes differ. The refusal is one decision
+ * shared by both, because a name one accepts and the other does not is a
+ * source that works on half the installs - and the next person to fix that
+ * reaches for an escape, which is the thing this file exists to avoid. Neither
+ * quote character can reach the inside of an identifier anyway: the pattern
+ * below allows letters, digits and underscores and nothing else.
  */
+
+import type { Dialect } from "./dialect";
+
+/** How each dialect wraps a name it has been given. */
+const QUOTE: Record<Dialect, [string, string]> = {
+    postgres: ['"', '"'],
+    mysql: ["`", "`"],
+};
 
 /** Letters, digits and underscores, starting with a letter. Nothing else. */
 const NAME = /^[A-Za-z][A-Za-z0-9_]*$/;
@@ -32,11 +48,12 @@ const MAX_ROWS = 1000;
  * The pattern is ASCII on purpose. A name that is only unicode which looks
  * like letters is not something somebody types by hand.
  */
-export function safeIdentifier(name: string): string | null {
+export function safeIdentifier(name: string, dialect: Dialect = "postgres"): string | null {
     const trimmed = name.trim();
     if (trimmed.length === 0 || trimmed.length > MAX_NAME) return null;
     if (!NAME.test(trimmed)) return null;
-    return `"${trimmed}"`;
+    const [open, close] = QUOTE[dialect];
+    return `${open}${trimmed}${close}`;
 }
 
 export interface ListSource {
@@ -53,15 +70,15 @@ export type BuiltQuery =
     | { refuse: "bad-identifier" | "no-columns" };
 
 /** The read, or a refusal. Never a query with an unchecked name in it. */
-export function buildListQuery(source: ListSource): BuiltQuery {
+export function buildListQuery(source: ListSource, dialect: Dialect = "postgres"): BuiltQuery {
     if (source.columns.length === 0) return { refuse: "no-columns" };
 
-    const table = safeIdentifier(source.table);
+    const table = safeIdentifier(source.table, dialect);
     if (!table) return { refuse: "bad-identifier" };
 
     const columns: string[] = [];
     for (const column of source.columns) {
-        const safe = safeIdentifier(column);
+        const safe = safeIdentifier(column, dialect);
         if (!safe) return { refuse: "bad-identifier" };
         columns.push(safe);
     }
@@ -72,7 +89,7 @@ export function buildListQuery(source: ListSource): BuiltQuery {
     let text = `SELECT ${columns.join(", ")} FROM ${table}`;
 
     if (source.orderBy.trim() !== "") {
-        const order = safeIdentifier(source.orderBy);
+        const order = safeIdentifier(source.orderBy, dialect);
         if (!order) return { refuse: "bad-identifier" };
         text += ` ORDER BY ${order} ${source.descending ? "DESC" : "ASC"}`;
     }
@@ -83,5 +100,9 @@ export function buildListQuery(source: ListSource): BuiltQuery {
         ? Math.min(MAX_ROWS, Math.max(1, Math.floor(source.limit)))
         : 1;
 
-    return { text: `${text} LIMIT $1`, values: [limit] };
+    // The placeholder is the driver's, not ours: `$1` in one, `?` in the
+    // other. It is still a bound value in both, which is the part that
+    // matters.
+    const placeholder = dialect === "mysql" ? "?" : "$1";
+    return { text: `${text} LIMIT ${placeholder}`, values: [limit] };
 }

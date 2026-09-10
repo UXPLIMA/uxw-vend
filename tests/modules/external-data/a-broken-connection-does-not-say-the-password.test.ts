@@ -64,3 +64,47 @@ describe("what comes back when the other database will not answer", () => {
         expect(readerSafeError(undefined).code).toBe("failed");
     });
 });
+
+/**
+ * The same failures, said by the other driver.
+ *
+ * The classifier was written against the sentences Postgres produces, and
+ * MySQL says the same things in different words: a missing table is "doesn't
+ * exist" rather than "does not exist", and a query stopped by the execution
+ * limit says so instead of "canceling statement". A sentence it does not
+ * recognise falls to "could not be read", which is the answer that wastes an
+ * operator's afternoon - and it would do it on the dialect most of the servers
+ * this module points at actually run.
+ */
+describe("what the other driver says", () => {
+    it("names a table that is not there", () => {
+        expect(readerSafeError(new Error("ER_NO_SUCH_TABLE: Table 'game.playres' doesn't exist")).code)
+            .toBe("no-such-table");
+    });
+
+    it("names a column that is not there", () => {
+        expect(readerSafeError(new Error("ER_BAD_FIELD_ERROR: Unknown column 'scoer' in 'field list'")).code)
+            .toBe("no-such-table");
+    });
+
+    it("names a sign-in it refused", () => {
+        expect(readerSafeError(new Error("ER_ACCESS_DENIED_ERROR: Access denied for user 'reader'@'10.0.0.1' (using password: YES)")).code)
+            .toBe("refused");
+    });
+
+    it("names a query it stopped for taking too long", () => {
+        expect(readerSafeError(new Error("Query execution was interrupted, maximum statement execution time exceeded")).code)
+            .toBe("timeout");
+    });
+
+    it("names a host that did not answer", () => {
+        expect(readerSafeError(new Error("connect ECONNREFUSED 10.0.0.1:3306")).code).toBe("unreachable");
+    });
+
+    it("still says none of it back to the reader", () => {
+        const said = readerSafeError(new Error("Access denied for user 'reader'@'10.0.0.1' (using password: YES)"));
+        expect(said.message).not.toContain("10.0.0.1");
+        expect(said.message).not.toContain("reader");
+        expect(said.message.toLowerCase()).not.toContain("password");
+    });
+});

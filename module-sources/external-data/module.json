@@ -2,7 +2,7 @@
   "id": "external-data",
   "name": "External Data",
   "description": "Read a list out of a database this site does not own: a game server, a billing system, an old forum. Read only, one bounded query, and the connection never reaches a page.",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "coreVersion": "^1.34.0",
   "category": "content",
   "author": "uxwVend",
@@ -38,6 +38,7 @@
   "translations": {
     "en": {
       "externalData": {
+        "adm_connectionDialects": "PostgreSQL and MySQL are read. The scheme in the address decides which: postgres://, postgresql://, mysql:// or mariadb://.",
         "adm_connectionSave": "Save connection",
         "adm_connectionSaved": "Connection saved.",
         "adm_connectionWriteOnly": "Written and never shown again. Leave it alone to keep the one already saved.",
@@ -52,6 +53,7 @@
         "adm_errNoColumns": "Name at least one column. Nothing is read without one.",
         "adm_errNoTitle": "Give the list a title.",
         "adm_errSlugTaken": "Another list already uses that address.",
+        "adm_errUnknownDialect": "That address names a database this cannot read.",
         "adm_newSource": "New list",
         "adm_noSources": "No lists yet. A connection on its own reads nothing.",
         "adm_saveFailed": "That could not be saved.",
@@ -92,6 +94,7 @@
     },
     "tr": {
       "externalData": {
+        "adm_connectionDialects": "PostgreSQL ve MySQL okunur. Hangisi olduğunu adresteki şema belirler: postgres://, postgresql://, mysql:// ya da mariadb://.",
         "adm_connectionSave": "Bağlantıyı kaydet",
         "adm_connectionSaved": "Bağlantı kaydedildi.",
         "adm_connectionWriteOnly": "Yazılır, bir daha gösterilmez. Kayıtlı olanı korumak için boş bırakın.",
@@ -106,6 +109,7 @@
         "adm_errNoColumns": "En az bir kolon adı yazın. Kolonsuz hiçbir şey okunmaz.",
         "adm_errNoTitle": "Listeye bir başlık verin.",
         "adm_errSlugTaken": "Bu adresi başka bir liste kullanıyor.",
+        "adm_errUnknownDialect": "Bu adres, buradan okunamayan bir veritabanını gösteriyor.",
         "adm_newSource": "Yeni liste",
         "adm_noSources": "Henüz liste yok. Tek başına bağlantı hiçbir şey okumaz.",
         "adm_saveFailed": "Kaydedilemedi.",

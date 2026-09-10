@@ -76,6 +76,7 @@
     "dotenv": "^17.4.2",
     "isomorphic-dompurify": "^4.1.0",
     "lucide-react": "^1.39.0",
+    "mysql2": "^3.22.0",
     "next": "^16.2.4",
     "next-auth": "5.0.0-beta.32",
     "next-intl": "^4.9.0",
