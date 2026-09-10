@@ -9,6 +9,7 @@ import { hashPassword, verifyPassword } from "@/core/lib/password-hash";
 import { getHashAlgorithm } from "@/core/lib/security-settings";
 import { readJsonBody } from "@/core/lib/api-body";
 import { z } from "zod";
+import { callerSessionTokenId, revokeSessionsFor } from "@/core/lib/session-registry";
 
 // GET /api/v1/auth/profile
 export async function GET() {
@@ -94,6 +95,12 @@ export async function PATCH(request: NextRequest) {
             where: { id: session.user.id },
             data: { password: hashedPassword },
         });
+
+        // Every other session ends. The one on this request survives, so a
+        // user who has just changed their own password is not thrown out of
+        // the page they did it on; anything else signed in with the old
+        // password stops working on its next recheck.
+        await revokeSessionsFor(session.user.id, await callerSessionTokenId(request));
 
         // Fire user.password.changed hook
         import("@/core/lib/hooks")

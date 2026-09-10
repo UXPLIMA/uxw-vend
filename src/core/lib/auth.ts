@@ -5,6 +5,8 @@ import Credentials from "next-auth/providers/credentials";
 import { impersonationRefusal } from "./impersonation";
 import { identifierLookup } from "./login-identifier";
 import { REFUSAL_CODE } from "./login-refusal";
+import { loginAllowedFrom, noteFailedLoginFrom } from "./login-throttle";
+import { SECURE_SESSION_COOKIES, SESSION_TOKEN_COOKIE } from "./session-cookie";
 import { SignInRefusal } from "./sign-in-refusal";
 import {
     REMEMBERED_MAX_AGE_SECONDS,
@@ -71,8 +73,7 @@ const oauthProviders = resolveAuthProviders(ModuleAuthProviders, {
 // dev/staging on an IP), setting these prefixes makes the browser drop
 // the cookie silently, which breaks CSRF verification and login.
 // Gate on the actual URL scheme instead of NODE_ENV.
-const AUTH_URL = process.env.AUTH_URL ?? process.env.NEXTAUTH_URL ?? "";
-const IS_PROD_COOKIE = AUTH_URL.startsWith("https://");
+const IS_PROD_COOKIE = SECURE_SESSION_COOKIES;
 
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -98,7 +99,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
     cookies: {
         sessionToken: {
-            name: IS_PROD_COOKIE ? "__Secure-authjs.session-token" : "authjs.session-token",
+            name: SESSION_TOKEN_COOKIE,
             options: {
                 httpOnly: true,
                 sameSite: "lax",
@@ -146,6 +147,19 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     return null;
                 }
 
+                // Before anything is looked up or hashed. The account lockout
+                // further down counts against one account, which is no defence
+                // at all against one password tried against every account: each
+                // one sees a single failure and no threshold is reached. This
+                // counts wrong passwords per address instead, and only wrong
+                // ones - a shared office address signing people in all day
+                // spends nothing.
+                const callerHeaders = (request as Request | undefined)?.headers;
+                const callerIp = callerHeaders ? getClientIP(callerHeaders) : "";
+                if (!(await loginAllowedFrom(callerIp))) {
+                    throw new SignInRefusal(REFUSAL_CODE.tooManyAttempts);
+                }
+
                 // Whatever module owns the auth.form.challenge slot gets to
                 // refuse before any account is looked up, so a failed
                 // challenge costs an attacker one round trip and tells them
@@ -173,6 +187,11 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                 });
 
                 if (!user || !user.password) {
+                    // An address that does not exist here is still a guess,
+                    // and enumerating addresses is what the per-address
+                    // ceiling is for. The account lockout has nothing to
+                    // count against, so this is the only place it lands.
+                    await noteFailedLoginFrom(callerIp);
                     return null;
                 }
 
@@ -193,12 +212,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     user.password
                 );
 
-                // Resolve caller IP once - reused across failure paths so
-                // TRUSTED_PROXY_IPS handling lives in one place (getClientIP).
-                const reqHeaders = (request as Request | undefined)?.headers;
-                const ip = reqHeaders ? getClientIP(reqHeaders) : undefined;
+                // Resolved once at the top of this function, where the
+                // per-address ceiling is checked, so TRUSTED_PROXY_IPS
+                // handling lives in one place (getClientIP).
+                const reqHeaders = callerHeaders;
+                const ip = callerIp === "" ? undefined : callerIp;
 
                 if (!isPasswordValid) {
+                    await noteFailedLoginFrom(callerIp);
                     // Bump the failure counter; when it crosses the
                     // threshold the account is automatically locked for
                     // ACCOUNT_LOCKOUT_MS (default 15m) and the user gets
@@ -269,6 +290,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                             // like a wrong password. Without this an attacker
                             // with a valid password could brute-force the
                             // 6-digit TOTP (~10^6 combos) unconstrained.
+                            await noteFailedLoginFrom(callerIp);
                             await registerFailedLogin(user.id, { ip });
                             throw new SignInRefusal(REFUSAL_CODE.invalidTwoFactor);
                         }

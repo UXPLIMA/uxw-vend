@@ -22,6 +22,8 @@ export const REFUSAL_CODE = {
     /** Auth.js's own code when `authorize` returns null. */
     badCredentials: "credentials",
     accountLocked: "account_locked",
+    /** Too much guessing from this address, whoever it was aimed at. */
+    tooManyAttempts: "too_many_attempts",
     banned: "banned",
     twoFactorRequired: "two_factor_required",
     invalidTwoFactor: "invalid_two_factor",
@@ -32,6 +34,7 @@ export const REFUSAL_CODE = {
 export type Refusal =
     | { kind: "bad-credentials" }
     | { kind: "account-locked" }
+    | { kind: "too-many-attempts" }
     | { kind: "banned" }
     | { kind: "two-factor-required" }
     | { kind: "invalid-two-factor" }
@@ -54,6 +57,7 @@ export function readRefusal(result: RefusalResult): Refusal {
 
     if (code === REFUSAL_CODE.badCredentials) return { kind: "bad-credentials" };
     if (code === REFUSAL_CODE.accountLocked) return { kind: "account-locked" };
+    if (code === REFUSAL_CODE.tooManyAttempts) return { kind: "too-many-attempts" };
     if (code === REFUSAL_CODE.banned) return { kind: "banned" };
     if (code === REFUSAL_CODE.twoFactorRequired) return { kind: "two-factor-required" };
     if (code === REFUSAL_CODE.invalidTwoFactor) return { kind: "invalid-two-factor" };

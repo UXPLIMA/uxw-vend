@@ -20,9 +20,9 @@ import path from "node:path";
  * path with no host on any install that had not set AUTH_URL.
  *
  * The variables themselves stay readable in the few places that need the raw
- * value for something other than an address: auth.ts decides the cookie's
- * `secure` flag from its scheme, csrf.ts collects the allowed origins, and
- * app-url.ts is the resolver.
+ * value for something other than an address: session-cookie.ts decides the
+ * cookie's `secure` flag and its name from the scheme, csrf.ts collects the
+ * allowed origins, and app-url.ts is the resolver.
  */
 
 const ROOT = path.resolve(__dirname, "../..");
@@ -32,6 +32,7 @@ const RESOLVERS = new Set([
     "src/core/lib/app-url.ts",   // the resolver itself
     "src/core/lib/auth.ts",      // cookie `secure` flag, from the scheme
     "src/core/lib/csrf.ts",      // allowed origins, not an address to link to
+    "src/core/lib/session-cookie.ts", // cookie `secure` flag and name, from the scheme
 ]);
 
 const VARIABLES = /process\.env\.(AUTH_URL|NEXTAUTH_URL|NEXT_PUBLIC_APP_URL|NEXT_PUBLIC_SITE_URL)\b/g;

@@ -1307,6 +1307,7 @@
   },
   "auth": {
     "accountLocked": "Too many failed attempts. Your account is temporarily locked. Check your email or try again in a few minutes.",
+    "tooManyAttempts": "Too many sign-in attempts from this connection. Wait a few minutes and try again.",
     "accountSuspended": "Your account has been suspended",
     "backToHome": "Back to home",
     "backToLogin": "Back to login",

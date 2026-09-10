@@ -18,6 +18,8 @@
 import { prisma } from "./db";
 import { log, errorText } from "./logger";
 
+import { SECURE_SESSION_COOKIES, SESSION_TOKEN_COOKIE } from "./session-cookie";
+
 /**
  * How many devices the sessions screen lists.
  *
@@ -92,3 +94,84 @@ export async function touchSession(tokenId: string, at: Date = new Date()): Prom
         log.error("[sessions] could not refresh a device's last activity", { error: errorText(err) });
     }
 }
+
+/**
+ * Which of a user's sessions a password change ends.
+ *
+ * Written as a `where` rather than performed here so the rule is one testable
+ * expression: two callers need it and both must mean the same thing by it.
+ * `spared` is the tokenId of the session making the change; a reset has none,
+ * because the person doing it is not signed in.
+ *
+ * An unnamed session is not spared. A token that would not decode is not
+ * evidence of anything, and sparing it on a guess costs the whole point of
+ * the change - where ending it costs one sign-in.
+ */
+export function sessionsToRevoke(
+    userId: string,
+    spared: string | null,
+): { userId: string; isRevoked: false; tokenId?: { not: string } } {
+    const base = { userId, isRevoked: false as const };
+    return spared ? { ...base, tokenId: { not: spared } } : base;
+}
+
+/**
+ * End every session this password was protecting, sparing the one changing it.
+ *
+ * Best effort by design, and logged as an error when it fails. The password is
+ * already written by the time this runs, so throwing would tell the user their
+ * change did not happen when it did - and leave them believing the old one
+ * still works. What is lost on a failure is the revocation, which "sign out
+ * everywhere" can still do by hand.
+ *
+ * It takes effect on the next session recheck rather than instantly, the same
+ * bound a ban has.
+ */
+export async function revokeSessionsFor(userId: string, spared: string | null): Promise<number> {
+    try {
+        const { count } = await prisma.userSession.updateMany({
+            where: sessionsToRevoke(userId, spared),
+            data: { isRevoked: true },
+        });
+        return count;
+    } catch (error) {
+        log.error("[sessions] could not revoke sessions after a password change", {
+            userId,
+            error: errorText(error),
+        });
+        return 0;
+    }
+}
+
+/**
+ * The tokenId of the session making this request, or null.
+ *
+ * The claim lives in the JWT and nowhere else: `auth()` returns the session
+ * object, which deliberately does not carry it, and the device list keeps it
+ * out of its response for the same reason - an identifier that answers "which
+ * session is this" is not something a browser needs handed back. So it is read
+ * from the cookie on the server, where it already is.
+ *
+ * The name comes from session-cookie.ts, which is also where auth.ts gets it,
+ * so the reader and the issuer cannot disagree about the prefix.
+ */
+export async function callerSessionTokenId(request: Request): Promise<string | null> {
+    try {
+        const { getToken } = await import("next-auth/jwt");
+        const token = await getToken({
+            // getToken reads `req.cookies` or the Cookie header; a Request has
+            // the header, which is what the app's own handlers receive.
+            req: request as unknown as Parameters<typeof getToken>[0]["req"],
+            secret: process.env.AUTH_SECRET ?? process.env.NEXTAUTH_SECRET,
+            secureCookie: SECURE_SESSION_COOKIES,
+            cookieName: SESSION_TOKEN_COOKIE,
+        });
+        const tokenId = (token as { tokenId?: unknown } | null)?.tokenId;
+        return typeof tokenId === "string" && tokenId !== "" ? tokenId : null;
+    } catch (error) {
+        // Unreadable is treated as unknown, which spares nothing.
+        log.warn("[sessions] could not read the caller's session id", { error: errorText(error) });
+        return null;
+    }
+}
+

@@ -1307,6 +1307,7 @@
   },
   "auth": {
     "accountLocked": "Çok fazla başarısız deneme. Hesabın geçici olarak kilitlendi. E-postanı kontrol et veya birkaç dakika sonra tekrar dene.",
+    "tooManyAttempts": "Bu bağlantıdan çok fazla giriş denemesi yapıldı. Birkaç dakika bekleyip tekrar deneyin.",
     "accountSuspended": "Hesabın askıya alındı",
     "backToHome": "Ana sayfaya dön",
     "backToLogin": "Girişe dön",

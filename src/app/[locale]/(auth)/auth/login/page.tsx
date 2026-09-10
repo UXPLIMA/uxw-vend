@@ -111,6 +111,8 @@ export default function LoginPage() {
                     setError(t('accountSuspended'));
                 } else if (refusal.kind === "account-locked") {
                     setError(t('accountLocked'));
+                } else if (refusal.kind === "too-many-attempts") {
+                    setError(t('tooManyAttempts'));
                 } else if (refusal.kind === "challenge-failed") {
                     // The challenge module names its own code; core looks it
                     // up the same way it does every other auth error and

@@ -11,6 +11,7 @@ import { logActivity } from "@/core/lib/activity-log";
 import { checkPasswordBreach } from "@/core/lib/password-breach";
 import { enforcePasswordPolicy } from "@/core/lib/security-settings";
 import { log } from "@/core/lib/logger";
+import { revokeSessionsFor } from "@/core/lib/session-registry";
 
 /**
  * The three fields a reset carries. `password` is bounded here only so an
@@ -97,6 +98,12 @@ export async function POST(request: NextRequest) {
         // so an attacker holding a second token can't use it after the
         // password changes. The winning token is already gone.
         await prisma.verificationToken.deleteMany({ where: { identifier: email } });
+
+        // A reset is what somebody does when they believe their account is
+        // compromised, and under the JWT strategy a cookie the intruder
+        // already holds is not asked about the password again. Nothing is
+        // spared: the person resetting is not signed in.
+        await revokeSessionsFor(user.id, null);
 
         await logActivity({ userId: user.id, action: "password.reset", entity: "user", entityId: user.id }).catch(() => {});
 

@@ -32,6 +32,16 @@ export interface RateLimitResult {
 export interface RateLimitBackend {
     readonly name: string;
     hit(identifier: string, config: RateLimitConfig): Promise<RateLimitResult>;
+    /**
+     * What `hit` would say, without spending anything.
+     *
+     * For a budget that is only spent by some outcomes: a login counts a wrong
+     * password and not a right one, so the check on the way in cannot be the
+     * thing that increments. Reading and incrementing separately is not atomic
+     * and does not need to be - two callers racing past a ceiling costs one
+     * extra guess, and the window is what bounds the attack.
+     */
+    peek(identifier: string, config: RateLimitConfig): Promise<RateLimitResult>;
 }
 
 interface RateLimitEntry {
@@ -68,10 +78,30 @@ function memoryHitSync(identifier: string, config: RateLimitConfig): RateLimitRe
     return { success: true, remaining: config.maxRequests - entry.count, resetAt: entry.resetAt };
 }
 
+function memoryPeekSync(identifier: string, config: RateLimitConfig): RateLimitResult {
+    const now = Date.now();
+    const entry = memoryStore.get(identifier);
+    if (!entry || entry.resetAt < now) {
+        return { success: true, remaining: config.maxRequests, resetAt: now + config.windowMs };
+    }
+    if (entry.count >= config.maxRequests) {
+        return { success: false, remaining: 0, resetAt: entry.resetAt };
+    }
+    return { success: true, remaining: config.maxRequests - entry.count, resetAt: entry.resetAt };
+}
+
+/** Test seam: the memory backend is process-global and outlives one test. */
+export function forgetMemoryRateLimits(): void {
+    memoryStore.clear();
+}
+
 const MemoryBackend: RateLimitBackend = {
     name: "memory",
     async hit(identifier, config) {
         return memoryHitSync(identifier, config);
+    },
+    async peek(identifier, config) {
+        return memoryPeekSync(identifier, config);
     },
 };
 
@@ -112,6 +142,15 @@ end
 return {count, ttl}
 `;
 
+// What `hit` would answer without spending anything. PTTL is negative for a
+// key with no expiry or no key at all; both mean there is nothing to wait for.
+const PEEK_SCRIPT = `
+local count = tonumber(redis.call('GET', KEYS[1])) or 0
+local ttl = redis.call('PTTL', KEYS[1])
+if ttl < 0 then ttl = 0 end
+return {count, ttl}
+`;
+
 export const RedisBackend: RateLimitBackend = {
     name: "redis",
     async hit(identifier, config) {
@@ -149,6 +188,36 @@ export const RedisBackend: RateLimitBackend = {
         } catch (err) {
             warnRedisFallback(err instanceof Error ? err.message : "unknown error");
             return memoryHitSync(identifier, config);
+        }
+    },
+
+    async peek(identifier, config) {
+        const redis = await getRedisClient();
+        if (!redis) {
+            warnRedisFallback("client not connected");
+            return memoryPeekSync(identifier, config);
+        }
+        try {
+            // One round trip, like the hit above, and for the same reason the
+            // file already reaches for Lua: two calls to read a counter and
+            // its expiry can straddle the window rolling over.
+            const raw = await redis.eval(PEEK_SCRIPT, { keys: [`rlc:${identifier}`] });
+            if (!Array.isArray(raw) || raw.length < 2) {
+                throw new Error("unexpected EVAL reply");
+            }
+            const count = Number(raw[0]);
+            const ttl = Number(raw[1]);
+            if (!Number.isFinite(count) || !Number.isFinite(ttl)) {
+                throw new Error("non-numeric EVAL reply");
+            }
+            const resetAt = Date.now() + Math.max(ttl, 0);
+            if (count >= config.maxRequests) {
+                return { success: false, remaining: 0, resetAt };
+            }
+            return { success: true, remaining: config.maxRequests - count, resetAt };
+        } catch (err) {
+            warnRedisFallback(err instanceof Error ? err.message : "unknown error");
+            return memoryPeekSync(identifier, config);
         }
     },
 };
@@ -210,6 +279,12 @@ const DenyAllBackend: RateLimitBackend = {
     async hit(_identifier, _config) {
         return { success: false, remaining: 0, resetAt: Date.now() + 60_000 };
     },
+    // Denies too. A production install with no Redis is already refusing
+    // every rate-limited request, and letting a peek answer "there is room"
+    // would open the one path that asks before it spends.
+    async peek(_identifier, _config) {
+        return { success: false, remaining: 0, resetAt: Date.now() + 60_000 };
+    },
 };
 
 /** True when REDIS_URL is set and the client is currently reachable. */
@@ -230,6 +305,19 @@ export async function rateLimit(
     config: RateLimitConfig = { maxRequests: 60, windowMs: 60000 }
 ): Promise<RateLimitResult> {
     return getActiveBackend().hit(identifier, config);
+}
+
+/**
+ * Whether `identifier` still has room, without taking any.
+ *
+ * For a budget spent by one outcome and checked on every attempt. See
+ * `RateLimitBackend.peek`.
+ */
+export async function rateLimitPeek(
+    identifier: string,
+    config: RateLimitConfig = { maxRequests: 60, windowMs: 60000 }
+): Promise<RateLimitResult> {
+    return getActiveBackend().peek(identifier, config);
 }
 
 // Comma-separated direct-peer IPs that may set forwarded headers.

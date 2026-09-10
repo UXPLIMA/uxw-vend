@@ -31,6 +31,30 @@ const SESSION_NAMES = new Set(
     PREFIXES.flatMap((prefix) => SESSION_COOKIE_NAMES.map((name) => prefix + name)),
 );
 
+/**
+ * Whether this deployment hands the browser prefixed, `Secure` cookies.
+ *
+ * Decided on the scheme the site is actually served over rather than on
+ * NODE_ENV, because a production install behind a plain-http reverse proxy
+ * would otherwise be given a cookie the browser drops without a word.
+ *
+ * It lives here rather than in auth.ts because two files need the answer and
+ * they must not be able to disagree: auth.ts sets the flag when it issues the
+ * cookie, and session-registry.ts reads the cookie back by name. A second copy
+ * that consulted one more environment variable would look for a cookie under
+ * a name nothing had issued, find nothing, and silently fail open on exactly
+ * the deployments that run over https.
+ */
+export const SECURE_SESSION_COOKIES =
+    (process.env.AUTH_URL ?? process.env.NEXTAUTH_URL ?? "").startsWith("https://");
+
+/** The name the session token is issued under, prefix and all. */
+export const SESSION_TOKEN_COOKIE = SECURE_SESSION_COOKIES
+    ? "__Secure-authjs.session-token"
+    : "authjs.session-token";
+
+
+
 export function carriesSessionCookie(cookieHeader: string | null | undefined): boolean {
     if (!cookieHeader) return false;
 
