@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isAdmin, prisma, rateLimitForRole, readJsonBody, rateLimitForRoleAsync } from "@/core/sdk/server";
+import { hasPermission, isAdmin, prisma, rateLimitForRole, readJsonBody, rateLimitForRoleAsync } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { ticketMessageSchema, ticketUpdateSchema } from "../../../lib/validations";
 import { canAccessTicket } from "../../../lib/can-access-ticket";
+import { ticketFieldsFor } from "../../../lib/ticket-edit-rights";
 
 interface RouteParams {
     params: Promise<{ id: string }>;
@@ -181,15 +182,49 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         );
     }
 
+    // Being allowed to touch the ticket is not being allowed to write every
+    // field on it. The owner passes the access check because they have to be
+    // able to close their own; the queue's priority and who is responsible for
+    // it are the support team's.
+    const isStaff =
+        (await isAdmin(session.user.id, session.user.role)) ||
+        (await hasPermission(session.user.id, "tickets.manage"));
+    const decision = ticketFieldsFor({ isStaff }, validation.data);
+
+    // An assignee has to actually be on the team. The column only requires a
+    // real user, so a ticket could be handed to somebody with no way to open
+    // it and no idea it was theirs.
+    if (decision.allowed.assignedToId) {
+        const assignee = decision.allowed.assignedToId;
+        const staffAssignee =
+            (await isAdmin(assignee)) || (await hasPermission(assignee, "tickets.manage"));
+        if (!staffAssignee) {
+            return NextResponse.json(
+                { error: "That person is not on the support team", code: "assignee_not_staff" },
+                { status: 400 },
+            );
+        }
+    }
+
+    // Nothing this caller may write, and something they asked for: say so
+    // rather than answering 200 to a change that did not happen. A screen that
+    // is told nothing shows the old value back and looks broken.
+    if (Object.keys(decision.allowed).length === 0 && decision.refused.length > 0) {
+        return NextResponse.json(
+            { error: "Those fields belong to the support team", code: "not_yours_to_set", fields: decision.refused },
+            { status: 403 },
+        );
+    }
+
     const updateData: Record<string, unknown> = {};
-    if (validation.data.status) updateData.status = validation.data.status;
-    if (validation.data.priority) updateData.priority = validation.data.priority;
-    if (validation.data.assignedToId !== undefined) {
-        updateData.assignedToId = validation.data.assignedToId;
+    if (decision.allowed.status) updateData.status = decision.allowed.status;
+    if (decision.allowed.priority) updateData.priority = decision.allowed.priority;
+    if (decision.allowed.assignedToId !== undefined) {
+        updateData.assignedToId = decision.allowed.assignedToId;
     }
 
     // Set closedAt if closing the ticket
-    if (validation.data.status === "CLOSED" || validation.data.status === "RESOLVED") {
+    if (decision.allowed.status === "CLOSED" || decision.allowed.status === "RESOLVED") {
         updateData.closedAt = new Date();
     }
 
@@ -207,11 +242,15 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     const { doActionAsync } = await import("@/core/sdk");
     await doActionAsync("tickets.ticket.updated", updated);
 
-    if (validation.data.status === "CLOSED" || validation.data.status === "RESOLVED") {
+    if (decision.allowed.status === "CLOSED" || decision.allowed.status === "RESOLVED") {
         await doActionAsync("tickets.ticket.closed", updated);
     }
 
-    return NextResponse.json(updated);
+    // A partial write says which fields were dropped, so a screen sending
+    // more than the caller owns can show what did not take.
+    return NextResponse.json(
+        decision.refused.length > 0 ? { ...updated, refused: decision.refused } : updated,
+    );
 }
 
 // DELETE /api/v1/tickets/[id] - Delete ticket (admin only).
