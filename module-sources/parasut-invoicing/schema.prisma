@@ -13,8 +13,17 @@
 model IssuedInvoice {
   id        String   @id @default(cuid())
   orderId   String   @unique
-  /// pending while the call is in flight, then issued or failed.
+  /// pending while the call is in flight, then recorded or failed.
+  ///
+  /// `recorded` means the sale is in the accounting service. It used to read
+  /// `issued`, which told an operator their invoicing obligation was met when
+  /// only half of it had been; see lib/invoice-state.ts.
   status    String   @default("pending")
+  /// Where the legal e-document stands. One value today, because nothing here
+  /// asks for one: the second call that turns a sales invoice into an
+  /// e-archive or an e-invoice is not made. Kept apart from `status` so the
+  /// day it is made, the answer has somewhere true to live.
+  legalDocument String @default("not_requested")
   /// The service's own id and number, once it has answered.
   remoteId     String?
   remoteNumber String?
@@ -26,4 +35,5 @@ model IssuedInvoice {
   updatedAt DateTime @updatedAt
 
   @@index([status])
+  @@index([legalDocument])
 }

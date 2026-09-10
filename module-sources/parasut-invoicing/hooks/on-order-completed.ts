@@ -15,6 +15,7 @@
 import type { HookHandlerFor } from "@/core/sdk";
 import { log, moduleSettings, prisma } from "@/core/sdk/server";
 import { whatToDoWith } from "../lib/decide";
+import type { InvoiceStatus } from "../lib/invoice-state";
 import { contactPayload, invoicePayload } from "../lib/invoice-payload";
 import { createRecord, isConfigured, ProviderError, withProvider } from "../lib/client";
 
@@ -43,7 +44,7 @@ const onOrderCompleted: HookHandlerFor<"store.order.completed", "action"> = asyn
     const existing = await prisma.issuedInvoice.findUnique({ where: { orderId: order.id } });
     const decision = whatToDoWith(
         { id: order.id, status: order.status, billingDetails: order.billingDetails, total: order.total },
-        existing ? { status: existing.status as "pending" | "issued" | "failed" } : null,
+        existing ? { status: existing.status as InvoiceStatus } : null,
     );
 
     if ("skip" in decision) return;
@@ -104,7 +105,11 @@ const onOrderCompleted: HookHandlerFor<"store.order.completed", "action"> = asyn
         await prisma.issuedInvoice.update({
             where: { orderId: order.id },
             data: {
-                status: "issued",
+                // What was done, not what it means: a sales invoice exists
+                // in the accounting service. The legal document is a second
+                // call this module does not make, and `legalDocument` says so
+                // rather than this word implying otherwise.
+                status: "recorded",
                 remoteId: remote.id,
                 remoteNumber: typeof remote.attributes.invoice_no === "string" ? remote.attributes.invoice_no : null,
                 issuedAt: new Date(),

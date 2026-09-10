@@ -13,10 +13,11 @@
  * what makes two racing completions produce one document.
  */
 import type { BillingIdentity } from "./invoice-payload";
+import type { InvoiceStatus } from "./invoice-state";
 
 /** What has already been attempted for this order, or null for nothing. */
 export interface IssuedRecord {
-    status: "pending" | "issued" | "failed";
+    status: InvoiceStatus;
 }
 
 /** The order, as much of it as this decision needs. */
