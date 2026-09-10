@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { wouldStrandTheSite } from "@/core/lib/last-administrator";
 import { ensureHooks } from "@/core/lib/hooks-bootstrap";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
@@ -89,6 +90,23 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         const existing = await prisma.user.findUnique({ where: { id } });
         if (!existing) {
             return NextResponse.json({ error: "User not found" }, { status: 404 });
+        }
+
+        // Ban and demotion are the two ways an account stops being able to
+        // administer the site, and on a single-admin install either one of
+        // them locks the installation out of its own panel with no way back
+        // through any screen this product ships.
+        const losesAuthority =
+            fields.isBanned === true ||
+            (fields.roleId !== undefined && fields.roleId !== existing.roleId);
+        if (losesAuthority && (await wouldStrandTheSite(id))) {
+            return NextResponse.json(
+                {
+                    error: "This is the only administrator who can still sign in. Make somebody else an administrator first.",
+                    code: "last_administrator",
+                },
+                { status: 400 },
+            );
         }
 
         const data: Record<string, unknown> = {};

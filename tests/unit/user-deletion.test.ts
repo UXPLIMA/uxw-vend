@@ -15,7 +15,9 @@ interface UserDataTable { model: string; key: string; column: string; erasure?: 
 let moduleTables: UserDataTable[];
 
 const deleteCalls: DeleteCall[] = [];
-let userRow: { id: string; isDeleted: boolean } | null;
+let userRow: { id: string; isDeleted: boolean; isBanned?: boolean; role?: { name: string } | null } | null;
+/** How many administrators the install has that can still sign in. */
+let usableAdmins: number;
 let updateArgs: { where: unknown; data: Record<string, unknown> } | null;
 let updateThrows: unknown = null;
 let findThrows: unknown = null;
@@ -63,6 +65,7 @@ vi.mock("@/core/lib/db", () => {
                 if (findThrows) throw findThrows;
                 return userRow;
             },
+            count: async () => usableAdmins,
             update: async (args: { where: unknown; data: Record<string, unknown> }) => {
                 if (updateThrows) throw updateThrows;
                 opLog.push("update:user");
@@ -123,6 +126,9 @@ const PUBLIC_RECORD_MODELS = [
 beforeEach(() => {
     deleteCalls.length = 0;
     userRow = { id: "usr_1", isDeleted: false };
+    // Two, so the last-administrator guard is not the thing under test in
+    // every other case here.
+    usableAdmins = 2;
     updateArgs = null;
     updateThrows = null;
     findThrows = null;
@@ -316,12 +322,43 @@ describe("softDeleteUser", () => {
         expect(firedHooks).toEqual([]);
     });
 
+    it("refuses to erase the only administrator who can still sign in", async () => {
+        // The setup wizard creates one administrator, so on a fresh install
+        // this account is the only way into the admin panel. Both delete
+        // paths - an administrator removing somebody and somebody removing
+        // themselves from the profile screen - land here, which is why the
+        // check lives on this side rather than in either route.
+        userRow = { id: "usr_1", isDeleted: false, isBanned: false, role: { name: "admin" } };
+        usableAdmins = 1;
+
+        const result = await softDeleteUser("usr_1");
+
+        expect(result.success).toBe(false);
+        expect(result.refused).toBe(true);
+        expect(result.error).toMatch(/only administrator/i);
+        // Nothing was purged and nothing was written: a refusal that had
+        // already deleted half the account would be the worst of both.
+        expect(deleteCalls).toHaveLength(0);
+        expect(updateArgs).toBeNull();
+    });
+
+    it("erases an administrator once somebody else can still get in", async () => {
+        userRow = { id: "usr_1", isDeleted: false, isBanned: false, role: { name: "admin" } };
+        usableAdmins = 2;
+
+        expect((await softDeleteUser("usr_1")).success).toBe(true);
+        expect(updateArgs).not.toBeNull();
+    });
+
     it("refuses an unknown user without touching anything", async () => {
         userRow = null;
 
         expect(await softDeleteUser("nope")).toEqual({
             success: false,
             error: "User not found",
+            // A decision this made and explained, not a server that broke:
+            // both callers used to answer every failure with a 500.
+            refused: true,
         });
         expect(deleteCalls).toHaveLength(0);
         expect(updateArgs).toBeNull();
@@ -333,6 +370,9 @@ describe("softDeleteUser", () => {
         expect(await softDeleteUser("usr_1")).toEqual({
             success: false,
             error: "User already deleted",
+            // A decision this made and explained, not a server that broke:
+            // both callers used to answer every failure with a 500.
+            refused: true,
         });
         // Re-running would rewrite deletedAt and lose the original erasure
         // timestamp, which is the one thing a regulator asks for.

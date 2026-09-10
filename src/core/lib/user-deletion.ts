@@ -1,4 +1,5 @@
 import { prisma } from "./db";
+import { wouldStrandTheSite } from "@/core/lib/last-administrator";
 import { ModuleUserDataTables } from "@/core/generated/module-registry";
 import { purgeUserPrincipalRows } from "./principal-rows";
 
@@ -30,6 +31,13 @@ import { purgeUserPrincipalRows } from "./principal-rows";
 export interface SoftDeleteResult {
     success: boolean;
     error?: string;
+    /**
+     * True when the deletion was declined rather than attempted and failed.
+     * Both callers answered every unsuccessful result with a 500, which told
+     * an operator the server had broken when it had in fact made a decision
+     * and explained it.
+     */
+    refused?: boolean;
 }
 
 interface DeleteManyDelegate {
@@ -112,10 +120,21 @@ export async function softDeleteUser(
             select: { id: true, isDeleted: true },
         });
         if (!existing) {
-            return { success: false, error: "User not found" };
+            return { success: false, error: "User not found", refused: true };
         }
         if (existing.isDeleted) {
-            return { success: false, error: "User already deleted" };
+            return { success: false, error: "User already deleted", refused: true };
+        }
+
+        // Both delete paths land here - an administrator removing somebody,
+        // and somebody removing themselves from the profile screen - so this
+        // is the one place that cannot be forgotten by either.
+        if (await wouldStrandTheSite(userId)) {
+            return {
+                success: false,
+                error: "This is the only administrator who can still sign in. Make somebody else an administrator first.",
+                refused: true,
+            };
         }
 
         // Purge private data first. Each delete is independently

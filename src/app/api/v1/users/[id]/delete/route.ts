@@ -69,7 +69,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
     if (!result.success) {
         return NextResponse.json(
             { error: result.error ?? "Failed to delete account" },
-            { status: 500 }
+            // A refusal is a decision this endpoint made and explained, not a
+            // server that broke.
+            { status: result.refused ? 400 : 500 }
         );
     }
 
