@@ -1,0 +1,34 @@
+{
+  "id": "role-delivery",
+  "name": "Rank Delivery",
+  "description": "Lets members sell a rank for a number of days in the market. The first thing anything here can hand over.",
+  "version": "1.0.0",
+  "coreVersion": "^1.42.0",
+  "category": "integration",
+  "author": "uxwVend",
+  "icon": "ShieldCheck",
+  "hookListeners": [
+    {
+      "hook": "marketplace.delivery.kinds",
+      "type": "filter",
+      "handler": "listeners/delivery-kinds.ts"
+    },
+    {
+      "hook": "marketplace.deliver",
+      "type": "filter",
+      "handler": "listeners/deliver.ts"
+    }
+  ],
+  "translations": {
+    "en": {
+      "roleDelivery": {
+        "kindLabel": "A rank, for a number of days"
+      }
+    },
+    "tr": {
+      "roleDelivery": {
+        "kindLabel": "Bir rütbe, gün sayısıyla"
+      }
+    }
+  }
+}

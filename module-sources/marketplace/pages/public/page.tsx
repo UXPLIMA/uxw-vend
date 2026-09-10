@@ -26,12 +26,16 @@ interface Listing {
 
 interface Kind {
     kind: string;
+    labelKey?: string;
     label: string;
 }
 
 export default function MarketplacePage() {
     const t = useTranslations("marketplace");
     const commonT = useTranslations("common");
+    // No namespace: a kind names its key in full, because the
+    // module that supplies it is not one this screen knows.
+    const anyT = useTranslations();
     const { confirm } = useConfirm();
     const [listings, setListings] = useState<Listing[]>([]);
     const [kinds, setKinds] = useState<Kind[] | null>(null);
@@ -147,7 +151,14 @@ export default function MarketplacePage() {
                                     <NativeSelect id="marketKind" value={kind} onChange={(e) => setKind(e.target.value)} required>
                                         <option value="">{t("formPickKind")}</option>
                                         {kinds.map((entry) => (
-                                            <option key={entry.kind} value={entry.kind}>{entry.label}</option>
+                                            <option key={entry.kind} value={entry.kind}>
+                                                {/* The module's own words in
+                                                    the reader's language when
+                                                    it declared a key, and its
+                                                    manifest label when it did
+                                                    not. */}
+                                                {entry.labelKey && anyT.has(entry.labelKey) ? anyT(entry.labelKey) : entry.label}
+                                            </option>
                                         ))}
                                     </NativeSelect>
                                 </div>

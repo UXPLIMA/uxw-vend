@@ -130,6 +130,16 @@ export type { MatrixRule } from "@/core/lib/permission-matrix";
 
 // Keeping a member out of one part of the site rather than all of it. The
 // scope is the asking module's own word; core never interprets it.
+/**
+ * A key that would reach the prototype chain rather than the object.
+ *
+ * Anything building an object out of keys that came from a request needs it,
+ * and a module that copies the three names is a module that will not hear
+ * about a fourth. The market's listing payload is one such object: written by
+ * a member, stored as JSON, read back by whichever module claims the kind.
+ */
+export { isUnsafeKey } from "@/core/lib/safe-object";
+
 export { restrictedFrom, SITE_WIDE } from "@/core/lib/restrictions";
 export type { Restriction } from "@/core/lib/restrictions";
 

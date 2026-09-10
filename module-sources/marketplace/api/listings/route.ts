@@ -4,6 +4,7 @@ import { logActivity, pageParams, prisma, rateLimitForRole, readJsonBody } from 
 import { auth } from "@/core/sdk/auth";
 import { z } from "zod";
 import { deliveryRefusal } from "../../lib/delivery";
+import { readListingPayload } from "../../lib/payload";
 
 /**
  * What is for sale, and putting something up.
@@ -17,7 +18,14 @@ const listingSchema = z.object({
     body: z.string().max(2000).optional(),
     price: z.number().int().min(1, "A listing has to cost at least one credit").max(10_000_000),
     kind: z.string().min(1).max(64),
-    payload: z.record(z.string(), z.string()).optional(),
+    /**
+     * Shaped by `lib/payload.ts` rather than here. A schema saying
+     * `Record<string, string>` was this module deciding the shape of
+     * something it says it knows nothing about, and the first provider ever
+     * built - a rank for a number of days - could not be listed because of
+     * it.
+     */
+    payload: z.unknown().optional(),
 });
 
 export async function GET(request: NextRequest) {
@@ -69,6 +77,14 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400 });
     }
 
+    const carried = readListingPayload(parsed.data.payload);
+    if ("refuse" in carried) {
+        return NextResponse.json(
+            { error: "That listing carries something this cannot store", code: "market_bad_payload" },
+            { status: 400 },
+        );
+    }
+
     // Nothing can be listed that nothing can hand over. Checked again at the
     // sale, because a module gets uninstalled and its listings outlive it.
     const kinds = await applyFiltersAsync("marketplace.delivery.kinds", [], {});
@@ -86,7 +102,10 @@ export async function POST(request: NextRequest) {
             body: parsed.data.body ?? null,
             price: parsed.data.price,
             kind: parsed.data.kind,
-            payload: parsed.data.payload ?? {},
+            // What the reader kept, not what arrived: the two differ
+            // wherever it dropped something, and storing the raw one
+            // would put back exactly what was refused.
+            payload: carried.payload ?? {},
         },
     });
 

@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-10",
-  "updatedAt": "2026-09-10T06:42:34Z",
+  "updatedAt": "2026-09-10T07:15:27Z",
   "modules": [
     {
       "id": "announcements",
@@ -1527,13 +1527,13 @@
       "name": "Marketplace",
       "description": "Members sell to each other for credits and the site takes a cut. What is handed over is decided by whatever integration is installed.",
       "i18n": {},
-      "version": "1.0.0",
+      "version": "1.1.0",
       "coreVersion": "^1.34.0",
       "author": "uxwVend",
       "icon": "Store",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-09T18:54:41Z",
+      "updatedAt": "2026-09-10T07:15:27Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2422,6 +2422,39 @@
       "stats": {
         "publicRoutes": 0,
         "adminRoutes": 1,
+        "apiRoutes": 0,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "role-delivery",
+      "name": "Rank Delivery",
+      "description": "Lets members sell a rank for a number of days in the market. The first thing anything here can hand over.",
+      "i18n": {},
+      "version": "1.0.0",
+      "coreVersion": "^1.42.0",
+      "author": "uxwVend",
+      "icon": "ShieldCheck",
+      "category": "integration",
+      "verified": true,
+      "updatedAt": "2026-09-10T07:15:27Z",
+      "screenshots": [],
+      "tags": [
+        "integration"
+      ],
+      "zip": "role-delivery.zip",
+      "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": [
+          "marketplace.delivery.kinds",
+          "marketplace.deliver"
+        ]
+      },
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 0,
         "apiRoutes": 0,
         "widgets": 0
       }

@@ -27,6 +27,14 @@ declare global {
         kind: string;
         /** What a seller reads when picking it. */
         label: string;
+        /**
+         * The same words as a translation key, when the module that supplies
+         * the kind has one. This filter carries no locale - it is asked once
+         * for the whole site - so the module cannot translate its own label
+         * and hands over both. The same bargain the navbar and the footer
+         * make with a module's links.
+         */
+        labelKey?: string;
     }
 
     interface MarketDelivery {

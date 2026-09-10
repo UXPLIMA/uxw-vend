@@ -12,6 +12,12 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.43.0 - `isUnsafeKey` joins `@/core/sdk`. A module building an object out of
+ * keys that came from a request needs the same three names core checks, and a
+ * module that copies them is one that will not hear about a fourth. The
+ * market's listing payload is written by a member, stored as JSON and read
+ * back by whichever module claims the kind. Additive.
+ *
  * 1.42.0 - `RoleBadge` joins `@/core/sdk/ui`, beside the `RoleName` that was
  * already there and which nothing rendered. The declarations an operator wrote
  * for a role had a writer and no readers: five screens drew a role out of
@@ -300,4 +306,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.42.0";
+export const CORE_API_VERSION = "1.43.0";

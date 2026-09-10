@@ -2,7 +2,7 @@
   "id": "marketplace",
   "name": "Marketplace",
   "description": "Members sell to each other for credits and the site takes a cut. What is handed over is decided by whatever integration is installed.",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "coreVersion": "^1.34.0",
   "category": "commerce",
   "author": "uxwVend",
@@ -106,7 +106,8 @@
           "market_already_sold": "Somebody else got there first.",
           "market_not_for_sale": "That is not for sale.",
           "market_insufficient_balance": "You do not have enough credits.",
-          "market_cannot_deliver": "Nothing here can hand that over."
+          "market_cannot_deliver": "Nothing here can hand that over.",
+          "market_bad_payload": "That listing carries something this cannot store."
         },
         "sellUnavailable": "We could not check what can be sold right now."
       },
@@ -146,7 +147,8 @@
           "market_already_sold": "Başkası daha önce aldı.",
           "market_not_for_sale": "Bu satışta değil.",
           "market_insufficient_balance": "Yeterli krediniz yok.",
-          "market_cannot_deliver": "Burada bunu teslim edebilecek bir şey yok."
+          "market_cannot_deliver": "Burada bunu teslim edebilecek bir şey yok.",
+          "market_bad_payload": "Bu ilan burada saklanamayacak bir şey taşıyor."
         },
         "sellUnavailable": "Şu anda nelerin satılabileceğini kontrol edemedik."
       },
