@@ -21,6 +21,7 @@ export default function CloudflareR2AdminPage() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [isActive, setIsActive] = useState(false);
+    const [secretStored, setSecretStored] = useState(false);
     const [setActive, setSetActive] = useState(false);
     const [config, setConfig] = useState<R2Config>({
         accountId: "",
@@ -36,7 +37,11 @@ export default function CloudflareR2AdminPage() {
             .then((r) => r.json())
             .then((d) => {
                 if (cancelled) return;
-                if (d.config) setConfig(d.config);
+                // The secret key is never in this response. It comes back as
+                // "one is stored" or nothing, and the field stays empty so a
+                // save that does not touch it keeps what is there.
+                if (d.config) setConfig({ ...d.config, secretKey: "" });
+                setSecretStored((d.secretsConfigured ?? []).length > 0);
                 setIsActive(!!d.isActive);
                 setSetActive(!!d.isActive);
             })
@@ -143,6 +148,9 @@ export default function CloudflareR2AdminPage() {
                             onChange={(e) => setConfig({ ...config, secretKey: e.target.value })}
                             placeholder="..."
                         />
+                        <p className="text-xs text-muted-foreground mt-1">
+                            {secretStored ? t("secretKeyStored") : t("secretKeyNotSet")}
+                        </p>
                     </div>
                     <div>
                         <Label>{t("publicUrl")}</Label>

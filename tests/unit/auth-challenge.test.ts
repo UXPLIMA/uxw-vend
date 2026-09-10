@@ -230,10 +230,12 @@ describe("the turnstile listener", () => {
 
     beforeEach(() => {
         settings.value = null;
+        // The secret key is encrypted at rest, so the widget reads its config
+        // through the SDK rather than off the row.
         vi.doMock("@/core/sdk/server", () => ({
-            prisma: {
-                setting: { findUnique: async () => (settings.value ? { value: settings.value } : null) },
-            },
+            readSettingValues: async () => ({
+                cloudflare_turnstile_config: settings.value ?? undefined,
+            }),
         }));
         vi.stubGlobal(
             "fetch",

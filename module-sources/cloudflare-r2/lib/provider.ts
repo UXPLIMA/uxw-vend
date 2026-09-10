@@ -1,6 +1,6 @@
 import crypto from "crypto";
 import path from "path";
-import { prisma, sanitizeFilename, type StorageProvider, type UploadResult } from "@/core/sdk/server";
+import { readSettingValues, sanitizeFilename, type StorageProvider, type UploadResult } from "@/core/sdk/server";
 
 declare const __webpack_require__: unknown;
 declare const __non_webpack_require__: (id: string) => Record<string, unknown>;
@@ -14,13 +14,15 @@ interface R2Config {
 }
 
 async function loadConfig(): Promise<R2Config | null> {
-    const setting = await prisma.setting.findUnique({
-        where: { key: "cloudflare_r2_config" },
-    });
-    if (!setting || !setting.value || typeof setting.value !== "object") {
+    // Through the SDK rather than off the row: `secretKey` is a declared
+    // credential, encrypted at rest, and signing a request with the ciphertext
+    // fails in a way that reads as a bad key rather than a bad read.
+    const values = await readSettingValues(["cloudflare_r2_config"]);
+    const stored = values.cloudflare_r2_config;
+    if (!stored || typeof stored !== "object") {
         return null;
     }
-    const v = setting.value as Partial<R2Config>;
+    const v = stored as Partial<R2Config>;
     if (!v.accountId || !v.bucket || !v.accessKey || !v.secretKey || !v.publicUrl) {
         return null;
     }

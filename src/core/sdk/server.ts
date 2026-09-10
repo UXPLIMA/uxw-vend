@@ -85,6 +85,22 @@ export { cached, invalidate } from "@/core/lib/cache";
 // --- At-rest secret encryption for module config ---
 export { encryptSecret, decryptSecret } from "@/core/lib/secret-storage";
 
+/**
+ * Reading the site settings store.
+ *
+ * A module declares its credentials in `secretSettings` and reads them
+ * through here. Pulling the row directly returns the ciphertext, which
+ * authenticates against nothing and looks exactly like a mistyped key.
+ */
+export { readSettingValues, readSettingStrings } from "@/core/lib/setting-values";
+
+/**
+ * For a module that keeps its whole configuration under one settings key and
+ * writes it through its own endpoint: seal declared credentials on the way in,
+ * and take them back out of anything headed for a browser.
+ */
+export { settingsForStorage, withoutSecrets } from "@/core/lib/secret-settings";
+
 // --- Audit trail ---
 export { logActivity } from "@/core/lib/activity-log";
 /**

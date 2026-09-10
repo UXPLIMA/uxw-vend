@@ -7,7 +7,7 @@
  * every call goes through `callIyzico`.
  */
 import crypto from "crypto";
-import { prisma } from "@/core/sdk/server";
+import { readSettingStrings } from "@/core/sdk/server";
 
 const PROD_URL = "https://api.iyzipay.com";
 const SANDBOX_URL = "https://sandbox-api.iyzipay.com";
@@ -19,15 +19,10 @@ export interface IyzicoConfig {
 }
 
 async function readSettings(): Promise<Record<string, string | null>> {
-    const rows = await prisma.setting.findMany({
-        where: { key: { in: ["iyzico_api_key", "iyzico_secret_key", "iyzico_sandbox"] } },
-    });
-    const map: Record<string, string | null> = {};
-    for (const row of rows) {
-        const value = row.value;
-        map[row.key] = typeof value === "string" && value.trim().length > 0 ? value.trim() : null;
-    }
-    return map;
+    // Through the SDK rather than off the row. The credentials among these
+    // keys are encrypted at rest, so a direct read returns ciphertext and
+    // the provider rejects it as if the operator had mistyped the key.
+    return readSettingStrings(["iyzico_api_key", "iyzico_secret_key", "iyzico_sandbox"]);
 }
 
 export async function getIyzicoConfig(): Promise<IyzicoConfig | null> {

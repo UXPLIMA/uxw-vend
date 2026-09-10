@@ -6,7 +6,7 @@
  * are in the smallest unit everywhere - paise for rupees - so they are
  * converted in exactly two places, here and back again in the webhook.
  */
-import { prisma } from "@/core/sdk/server";
+import { readSettingStrings } from "@/core/sdk/server";
 
 export const RAZORPAY_API = "https://api.razorpay.com/v1";
 
@@ -17,15 +17,10 @@ export interface RazorpayConfig {
 }
 
 async function readSettings(): Promise<Record<string, string | null>> {
-    const rows = await prisma.setting.findMany({
-        where: { key: { in: ["razorpay_key_id", "razorpay_key_secret", "razorpay_webhook_secret"] } },
-    });
-    const map: Record<string, string | null> = {};
-    for (const row of rows) {
-        const value = row.value;
-        map[row.key] = typeof value === "string" && value.trim().length > 0 ? value.trim() : null;
-    }
-    return map;
+    // Through the SDK rather than off the row. The credentials among these
+    // keys are encrypted at rest, so a direct read returns ciphertext and
+    // the provider rejects it as if the operator had mistyped the key.
+    return readSettingStrings(["razorpay_key_id", "razorpay_key_secret", "razorpay_webhook_secret"]);
 }
 
 export async function getRazorpayConfig(): Promise<RazorpayConfig | null> {

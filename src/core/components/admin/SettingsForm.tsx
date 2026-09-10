@@ -14,6 +14,7 @@ import { LoadFailed } from "@/core/components/ui/load-failed";
 import { useSettingsLoad } from "@/core/hooks/useSettingsLoad";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 import { Textarea } from "@/core/components/ui/textarea";
+import { useConfirm } from "@/core/components/ui/confirm-dialog";
 
 export interface SettingsField {
     key: string;
@@ -37,23 +38,44 @@ interface SettingsFormProps {
 /** The header's submit button points at the form by id; they are the same form. */
 const FORM_ID = "settings-form";
 
+/**
+ * A credential is never loaded back into this form.
+ *
+ * `GET /api/v1/settings` stopped returning the value of any key a module
+ * declared as a credential, so a password field starts empty on every visit
+ * and an empty one on save means "leave the stored value alone". That is what
+ * lets an operator change the sandbox flag on a gateway screen without
+ * retyping the merchant salt, and it is why clearing one needs its own button:
+ * with blank meaning "unchanged", there would otherwise be no way to say
+ * "remove it".
+ */
+function isSecretField(field: SettingsField): boolean {
+    return field.type === "password";
+}
+
 export function SettingsForm({ title, subtitle, fields, children }: SettingsFormProps) {
     const t = useTranslations("admin");
     const [saving, setSaving] = useState(false);
     const [saved, setSaved] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [values, setValues] = useState<Record<string, string>>({});
+    const [cleared, setCleared] = useState<Set<string>>(new Set());
+    const { confirm } = useConfirm();
 
     // Shared by every screen built out of this form, so the hole was shared
     // too: a failed read rendered the defaults and the save button under them
     // wrote the defaults back.
-    const { loading, failed, retry } = useSettingsLoad((s) => {
+    const { loading, failed, retry, secretsConfigured } = useSettingsLoad((s) => {
         const v: Record<string, string> = {};
         for (const field of fields) {
-            v[field.key] = (s[field.key] as string) || field.defaultValue || "";
+            v[field.key] = isSecretField(field)
+                ? ""
+                : (s[field.key] as string) || field.defaultValue || "";
         }
         setValues(v);
     });
+
+    const stored = new Set(secretsConfigured);
 
     const handleSave = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -62,12 +84,36 @@ export function SettingsForm({ title, subtitle, fields, children }: SettingsForm
         setSaved(false);
 
         try {
+            // A blank credential is omitted rather than sent: the endpoint
+            // only writes the keys it receives, so leaving one out is how the
+            // stored value survives a save of the fields beside it. A cleared
+            // one is sent as empty, which is the one way to remove it.
+            const payload: Record<string, string> = {};
+            for (const field of fields) {
+                const value = values[field.key] ?? "";
+                if (!isSecretField(field)) { payload[field.key] = value; continue; }
+                if (cleared.has(field.key)) { payload[field.key] = ""; continue; }
+                if (value !== "") payload[field.key] = value;
+            }
+
             const res = await fetch("/api/v1/settings", {
                 method: "PATCH",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(values),
+                body: JSON.stringify(payload),
             });
-            if (!res.ok) { setError(t("settingsForm_failedToSave")); return; }
+            if (!res.ok) {
+                // One refusal has an answer the operator can act on, and it is
+                // not "try again": the server has no key to encrypt a
+                // credential with. Left generic, it reads as a broken form.
+                const body = (await res.json().catch(() => ({}))) as { code?: string };
+                setError(
+                    body.code === "secret_key_missing"
+                        ? t("settingsForm_secretKeyMissing")
+                        : t("settingsForm_failedToSave"),
+                );
+                return;
+            }
+            setCleared(new Set());
             setSaved(true);
             setTimeout(() => setSaved(false), 3000);
         } catch {
@@ -156,11 +202,46 @@ export function SettingsForm({ title, subtitle, fields, children }: SettingsForm
                                         type={field.type || "text"}
                                         value={values[field.key] || ""}
                                         onChange={(e) => setValues({ ...values, [field.key]: e.target.value })}
-                                        placeholder={field.placeholder} aria-label={field.label}
+                                        placeholder={
+                                            isSecretField(field) && stored.has(field.key)
+                                                ? t("settingsForm_secretKept")
+                                                : field.placeholder
+                                        }
+                                        aria-label={field.label}
                                     />
                                 )}
                                 {field.description && (
                                     <p className="text-xs text-muted-foreground mt-1">{field.description}</p>
+                                )}
+                                {isSecretField(field) && (
+                                    <div className="flex items-center gap-2 mt-1">
+                                        <p className="text-xs text-muted-foreground">
+                                            {cleared.has(field.key)
+                                                ? t("settingsForm_secretRemoved")
+                                                : stored.has(field.key)
+                                                    ? t("settingsForm_secretStored")
+                                                    : t("settingsForm_secretNotSet")}
+                                        </p>
+                                        {stored.has(field.key) && !cleared.has(field.key) && (
+                                            <Button
+                                                type="button"
+                                                variant="ghost"
+                                                size="sm"
+                                                onClick={async () => {
+                                                    const ok = await confirm({
+                                                        title: t("settingsForm_secretRemoveTitle"),
+                                                        message: t("settingsForm_secretRemoveBody"),
+                                                        variant: "danger",
+                                                    });
+                                                    if (!ok) return;
+                                                    setValues({ ...values, [field.key]: "" });
+                                                    setCleared(new Set(cleared).add(field.key));
+                                                }}
+                                            >
+                                                {t("settingsForm_secretRemove")}
+                                            </Button>
+                                        )}
+                                    </div>
                                 )}
                             </div>
                         ))}

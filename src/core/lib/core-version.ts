@@ -12,6 +12,17 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.44.0 - `readSettingValues`, `readSettingStrings`, `settingsForStorage` and
+ * `withoutSecrets` join `@/core/sdk/server`, and the manifest gains
+ * `secretSettings` and `emailProvider`. A module's gateway keys were written to
+ * the settings store exactly as an operator typed them, which put every signing
+ * secret on the site in a JSON column and in the admin screen's own JSON
+ * response. Encrypting them only works if one place does it, so a module now
+ * declares which of its keys are credentials and reads them back through the
+ * SDK; reading the row directly returns ciphertext. `emailProvider` is the same
+ * move for the mailer: core owns it but the key's name was a module's, and core
+ * was reading that name literally. Additive.
+ *
  * 1.43.0 - `isUnsafeKey` joins `@/core/sdk`. A module building an object out of
  * keys that came from a request needs the same three names core checks, and a
  * module that copies them is one that will not hear about a fourth. The
@@ -306,4 +317,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.43.0";
+export const CORE_API_VERSION = "1.44.0";

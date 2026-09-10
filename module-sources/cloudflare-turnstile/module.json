@@ -2,8 +2,11 @@
   "id": "cloudflare-turnstile",
   "name": "Cloudflare Turnstile",
   "description": "Privacy-focused CAPTCHA alternative powered by Cloudflare",
-  "version": "1.4.0",
-  "coreVersion": "^1.25.0",
+  "version": "1.5.0",
+  "coreVersion": "^1.44.0",
+  "secretSettings": [
+    "cloudflare_turnstile_config.secretKey"
+  ],
   "category": "integration",
   "author": "uxwVend",
   "icon": "Shield",
@@ -55,7 +58,9 @@
         "enableOnRegisterDesc": "Require Turnstile challenge on the register page",
         "save": "Save",
         "saved": "Settings saved",
-        "saveError": "Failed to save settings"
+        "saveError": "Failed to save settings",
+        "secretKeyStored": "Saved. Type a new value to replace it.",
+        "secretKeyNotSet": "Not set"
       },
       "admin": {
         "menu_cloudflare-turnstile": "Cloudflare Turnstile",
@@ -80,7 +85,9 @@
         "enableOnRegisterDesc": "Kayıt sayfasında Turnstile doğrulaması iste",
         "save": "Kaydet",
         "saved": "Ayarlar kaydedildi",
-        "saveError": "Ayarlar kaydedilemedi"
+        "saveError": "Ayarlar kaydedilemedi",
+        "secretKeyStored": "Kayıtlı. Değiştirmek için yeni bir değer yazın.",
+        "secretKeyNotSet": "Ayarlanmadı"
       },
       "admin": {
         "menu_cloudflare-turnstile": "Cloudflare Turnstile",

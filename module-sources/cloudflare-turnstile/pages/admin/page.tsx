@@ -18,6 +18,7 @@ interface TurnstileConfig {
 export default function CloudflareTurnstileAdminPage() {
     const t = useTranslations("cloudflareTurnstile");
     const [loading, setLoading] = useState(true);
+    const [secretStored, setSecretStored] = useState(false);
     const [saving, setSaving] = useState(false);
     const [config, setConfig] = useState<TurnstileConfig>({
         siteKey: "",
@@ -32,12 +33,16 @@ export default function CloudflareTurnstileAdminPage() {
             .then((r) => r.json())
             .then((d) => {
                 if (cancelled) return;
+                // The secret key is never in this response. It comes back as
+                // "one is stored" or nothing, and the field stays empty so
+                // toggling a switch below cannot wipe the key.
                 setConfig({
                     siteKey: d.siteKey || "",
-                    secretKey: d.secretKey || "",
+                    secretKey: "",
                     enableOnLogin: !!d.enableOnLogin,
                     enableOnRegister: !!d.enableOnRegister,
                 });
+                setSecretStored((d.secretsConfigured ?? []).length > 0);
             })
             .catch(() => toast.error(t("saveError")))
             .finally(() => {
@@ -115,6 +120,9 @@ export default function CloudflareTurnstileAdminPage() {
                             onChange={(e) => setConfig({ ...config, secretKey: e.target.value })}
                             placeholder="0x..."
                         />
+                        <p className="text-xs text-muted-foreground mt-1">
+                            {secretStored ? t("secretKeyStored") : t("secretKeyNotSet")}
+                        </p>
                     </div>
                     <div className="space-y-3 pt-2 border-t border-border">
                         <CheckboxField

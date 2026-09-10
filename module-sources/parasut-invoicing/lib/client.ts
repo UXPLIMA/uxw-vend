@@ -12,7 +12,7 @@
  * `invoice-payload.ts`, which is where the tests are, because this half
  * cannot be exercised without a live account.
  */
-import { prisma } from "@/core/sdk/server";
+import { readSettingStrings } from "@/core/sdk/server";
 
 const HOST = "https://api.parasut.com";
 
@@ -34,11 +34,11 @@ const KEYS = [
 
 /** What an operator has set up, or null when anything is missing. */
 export async function providerConfig(): Promise<ProviderConfig | null> {
-    const rows = await prisma.setting.findMany({ where: { key: { in: [...KEYS] } } });
-    const map = new Map(
-        rows.map((row) => [row.key, typeof row.value === "string" ? row.value.trim() : ""]),
-    );
-    const read = (key: string) => map.get(key) ?? "";
+    // Through the SDK rather than off the row. The credentials among these
+    // keys are encrypted at rest, so a direct read returns ciphertext and
+    // the provider rejects it as if the operator had mistyped the key.
+    const values = await readSettingStrings([...KEYS]);
+    const read = (key: string) => values[key] ?? "";
 
     const config = {
         clientId: read("parasut_client_id"),

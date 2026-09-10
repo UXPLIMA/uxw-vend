@@ -1,4 +1,4 @@
-import { prisma } from "@/core/sdk/server";
+import { readSettingValues } from "@/core/sdk/server";
 
 interface TurnstileConfig {
     siteKey?: string;
@@ -10,11 +10,13 @@ interface TurnstileConfig {
 
 /** Load Turnstile config from settings. Returns null if not configured. */
 export async function getTurnstileConfig(): Promise<TurnstileConfig | null> {
-    const setting = await prisma.setting.findUnique({
-        where: { key: "cloudflare_turnstile_config" },
-    });
-    if (!setting?.value || typeof setting.value !== "object") return null;
-    return setting.value as TurnstileConfig;
+    // Through the SDK rather than off the row: `secretKey` is a declared
+    // credential and arrives encrypted. Verifying with the ciphertext would
+    // fail every challenge, which locks every visitor out of the login form.
+    const values = await readSettingValues(["cloudflare_turnstile_config"]);
+    const stored = values.cloudflare_turnstile_config;
+    if (!stored || typeof stored !== "object") return null;
+    return stored as TurnstileConfig;
 }
 
 /**

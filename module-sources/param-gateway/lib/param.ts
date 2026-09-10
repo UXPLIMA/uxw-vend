@@ -11,7 +11,7 @@
  * SHA-256 of concatenated fields in a fixed order, not an HMAC.
  */
 import crypto from "crypto";
-import { prisma } from "@/core/sdk/server";
+import { readSettingStrings } from "@/core/sdk/server";
 
 const PROD_URL = "https://posws.param.com.tr/turkpos.ws/service_turkpos_prod.asmx";
 const TEST_URL = "https://testposws.param.com.tr/turkpos.ws/service_turkpos_test.asmx";
@@ -25,25 +25,16 @@ export interface ParamConfig {
 }
 
 async function readSettings(): Promise<Record<string, string | null>> {
-    const rows = await prisma.setting.findMany({
-        where: {
-            key: {
-                in: [
-                    "param_client_code",
-                    "param_client_username",
-                    "param_client_password",
-                    "param_guid",
-                    "param_test_mode",
-                ],
-            },
-        },
-    });
-    const map: Record<string, string | null> = {};
-    for (const row of rows) {
-        const value = row.value;
-        map[row.key] = typeof value === "string" && value.trim().length > 0 ? value.trim() : null;
-    }
-    return map;
+    // Through the SDK rather than off the row. The credentials among these
+    // keys are encrypted at rest, so a direct read returns ciphertext and
+    // the provider rejects it as if the operator had mistyped the key.
+    return readSettingStrings([
+        "param_client_code",
+        "param_client_username",
+        "param_client_password",
+        "param_guid",
+        "param_test_mode",
+    ]);
 }
 
 export async function getParamConfig(): Promise<ParamConfig | null> {

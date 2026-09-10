@@ -17,6 +17,12 @@ import { readJson } from "@/core/lib/read-json";
  * when `failed` is true. It is read through a ref: a screen that passes an
  * inline closure would otherwise refetch on every render.
  *
+ * `secretsConfigured` names the credential keys that currently hold a value.
+ * The values themselves are not in the response and never will be, so this is
+ * the only way a screen can tell "no key has been set" from "a key is set and
+ * you are not being shown it" - a distinction an operator needs before they
+ * decide whether the gateway is configured.
+ *
  * `deps` is for a screen whose reading of the settings depends on something
  * that arrives after mount - the navbar editor seeds itself from the module
  * registry when there is no saved override, and which modules are enabled
@@ -29,6 +35,7 @@ export function useSettingsLoad(
     const [loading, setLoading] = useState(true);
     const [failed, setFailed] = useState(false);
     const [attempt, setAttempt] = useState(0);
+    const [secretsConfigured, setSecretsConfigured] = useState<string[]>([]);
 
     const applyRef = useRef(apply);
     applyRef.current = apply;
@@ -38,10 +45,11 @@ export function useSettingsLoad(
         setLoading(true);
         setFailed(false);
         fetch("/api/v1/settings")
-            .then(readJson<{ settings?: Record<string, unknown> }>)
+            .then(readJson<{ settings?: Record<string, unknown>; secretsConfigured?: string[] }>)
             .then((data) => {
                 if (cancelled) return;
                 applyRef.current(data.settings ?? {});
+                setSecretsConfigured(data.secretsConfigured ?? []);
                 setLoading(false);
             })
             .catch(() => {
@@ -54,5 +62,5 @@ export function useSettingsLoad(
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [attempt, ...deps]);
 
-    return { loading, failed, retry: () => setAttempt((a) => a + 1) };
+    return { loading, failed, secretsConfigured, retry: () => setAttempt((a) => a + 1) };
 }

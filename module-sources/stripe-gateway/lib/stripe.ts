@@ -1,6 +1,6 @@
 import Stripe from "stripe";
 import { passOnFeeFrom } from "./fee";
-import { prisma } from "@/core/sdk/server";
+import { prisma, readSettingStrings } from "@/core/sdk/server";
 
 // Stripe client + enabled flag. Credentials are resolved from the
 // `stripe_secret_key` / `stripe_public_key` Settings rows first (the
@@ -16,14 +16,14 @@ let cachedAt = 0;
 const CACHE_TTL_MS = 30_000;
 
 async function readCreds(): Promise<{ secret: string | null; publishable: string | null; webhookSecret: string | null }> {
-    const rows = await prisma.setting.findMany({
-        where: { key: { in: ["stripe_secret_key", "stripe_public_key", "stripe_webhook_secret"] } },
-    });
-    const map: Record<string, string | null> = {};
-    for (const r of rows) {
-        const v = r.value;
-        map[r.key] = typeof v === "string" && v.trim().length > 0 ? v.trim() : null;
-    }
+    // Through the SDK rather than off the row. The secret key and the webhook
+    // secret are encrypted at rest, so a direct read returns ciphertext and
+    // Stripe rejects it as if the operator had mistyped the key.
+    const map = await readSettingStrings([
+        "stripe_secret_key",
+        "stripe_public_key",
+        "stripe_webhook_secret",
+    ]);
     return {
         secret:        map.stripe_secret_key      ?? process.env.STRIPE_SECRET_KEY      ?? null,
         publishable:   map.stripe_public_key      ?? process.env.STRIPE_PUBLIC_KEY      ?? null,

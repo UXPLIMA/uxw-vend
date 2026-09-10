@@ -9,6 +9,8 @@ import { invalidate } from "@/core/lib/cache";
 import { invalidateEmailConfig } from "@/core/lib/email-config";
 import { sanitizeCustomCss, CSS_SANITIZED_SETTING_KEYS } from "@/core/lib/css-sanitizer";
 import { readJsonBody } from "@/core/lib/api-body";
+import { log } from "@/core/lib/logger";
+import { isSecretSetting, settingsForStorage, withoutSecrets } from "@/core/lib/secret-settings";
 
 const settingKeySchema = z.string().regex(/^[a-zA-Z0-9_]+$/, "Invalid setting key format");
 // Value is a Json column - accept any JSON-serializable value (string, number, boolean, array, object, null)
@@ -59,7 +61,15 @@ export async function GET() {
         settingsMap[s.key] = s.value;
     }
 
-    return NextResponse.json({ settings: settingsMap });
+    // A credential is never in this response. The screens that write one show
+    // a password input, which hides the value from somebody standing behind
+    // the admin and from nothing else: an extension reads the DOM, and this
+    // JSON is a request body away from any log that records one. What a screen
+    // needs in order to let an operator replace a key is not the key, it is
+    // whether one is stored - which is what `secretsConfigured` says.
+    const { settings: visible, secretsConfigured } = withoutSecrets(settingsMap);
+
+    return NextResponse.json({ settings: visible, secretsConfigured });
 }
 
 // PATCH /api/v1/settings - Bulk update settings
@@ -96,6 +106,16 @@ export async function PATCH(request: NextRequest) {
                 { status: 400 },
             );
         }
+        // A credential is a string or it is nothing. The column is JSON, so
+        // without this a number would be stored unsealed beside keys that are
+        // sealed, and the module reading it would get a value the boundary
+        // never saw.
+        if (isSecretSetting(key) && typeof rawValue !== "string") {
+            return NextResponse.json(
+                { error: `Setting "${key}" must be a string` },
+                { status: 400 },
+            );
+        }
     }
 
     // Upsert each setting. Setting.value is Json; cast through InputJsonValue.
@@ -108,8 +128,40 @@ export async function PATCH(request: NextRequest) {
     // fifth used to leave four of them written under a message that said the
     // save had failed. The pre-flight above already keeps a *rejection* from
     // writing anything; this covers the write itself giving out halfway.
+
+    // Sealed before the write, so no path into the column skips it. A key a
+    // module declared in `secretSettings` goes in as ciphertext; everything
+    // else goes in as it arrived. An empty string stays empty, because
+    // clearing a key is how an operator removes a gateway.
+    //
+    // Sealing needs SECRET_ENCRYPTION_KEY, and an install that upgraded
+    // without setting one throws here rather than storing the credential in
+    // the clear. That refusal has to be legible: the fix is one environment
+    // variable, and an operator reading "could not save" under a payment form
+    // has no way to reach it. Nothing is written either - the throw happens
+    // before the transaction, so a body carrying a credential and a site name
+    // saves neither, which is the same all-or-nothing this endpoint already
+    // promises.
+    let forStorage: Record<string, unknown>;
+    try {
+        forStorage = settingsForStorage(parsed.data);
+    } catch (error) {
+        log.error("settings: could not encrypt a credential", {
+            error: error instanceof Error ? error.message : String(error),
+        });
+        return NextResponse.json(
+            {
+                error:
+                    "This server cannot store a credential: SECRET_ENCRYPTION_KEY is missing " +
+                    "or is not a 64-character hex value. Set it, restart, and save again.",
+                code: "secret_key_missing",
+            },
+            { status: 500 },
+        );
+    }
+
     await prisma.$transaction(
-        Object.entries(parsed.data).map(([key, rawValue]) => {
+        Object.entries(forStorage).map(([key, rawValue]) => {
             const value = CSS_SANITIZED_SETTING_KEYS.has(key)
                 ? sanitizeCustomCss(rawValue)
                 : rawValue;

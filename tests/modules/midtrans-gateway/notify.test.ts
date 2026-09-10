@@ -15,14 +15,12 @@ import crypto from "crypto";
 const SERVER_KEY = "SB-Mid-server-test";
 
 vi.mock("@/core/sdk/server", () => ({
-    prisma: {
-        setting: {
-            findMany: async () => [
-                { key: "midtrans_server_key", value: SERVER_KEY },
-                { key: "midtrans_test_mode", value: "true" },
-            ],
-        },
-    },
+    // The gateway reads its credentials through the SDK now: the server key is
+    // encrypted at rest, and `readSettingStrings` is what opens it.
+    readSettingStrings: async () => ({
+        midtrans_server_key: SERVER_KEY,
+        midtrans_test_mode: "true",
+    }),
     log: { error: vi.fn(), warn: vi.fn(), info: vi.fn() },
     // The route reads its body through the SDK's bounded reader, which
     // answers a malformed or oversized body with a response of its own. What

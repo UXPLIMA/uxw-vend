@@ -8,7 +8,7 @@
  * be checked.
  */
 import crypto from "crypto";
-import { prisma } from "@/core/sdk/server";
+import { readSettingStrings } from "@/core/sdk/server";
 
 export const NOWPAYMENTS_API = "https://api.nowpayments.io/v1";
 
@@ -18,15 +18,10 @@ export interface NowPaymentsConfig {
 }
 
 async function readSettings(): Promise<Record<string, string | null>> {
-    const rows = await prisma.setting.findMany({
-        where: { key: { in: ["nowpayments_api_key", "nowpayments_ipn_secret"] } },
-    });
-    const map: Record<string, string | null> = {};
-    for (const row of rows) {
-        const value = row.value;
-        map[row.key] = typeof value === "string" && value.trim().length > 0 ? value.trim() : null;
-    }
-    return map;
+    // Through the SDK rather than off the row. The credentials among these
+    // keys are encrypted at rest, so a direct read returns ciphertext and
+    // the provider rejects it as if the operator had mistyped the key.
+    return readSettingStrings(["nowpayments_api_key", "nowpayments_ipn_secret"]);
 }
 
 export async function getNowPaymentsConfig(): Promise<NowPaymentsConfig | null> {

@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-10",
-  "updatedAt": "2026-09-10T08:00:58Z",
+  "updatedAt": "2026-09-10T12:13:34Z",
   "modules": [
     {
       "id": "announcements",
@@ -117,13 +117,13 @@
       "name": "BirFatura Invoicing",
       "description": "Publishes this shop's paid orders for BirFatura to pull and invoice. The integrator calls in with a shared secret; nothing is sent out.",
       "i18n": {},
-      "version": "1.0.0",
-      "coreVersion": "^1.34.0",
+      "version": "1.1.0",
+      "coreVersion": "^1.44.0",
       "author": "uxwVend",
       "icon": "FileText",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-09T18:07:05Z",
+      "updatedAt": "2026-09-10T12:13:34Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -241,13 +241,13 @@
           "description": "Cloudflare R2 üzerinde çalışan S3 uyumlu nesne depolama (çıkış ücreti yok)"
         }
       },
-      "version": "1.2.0",
-      "coreVersion": "^1.25.0",
+      "version": "1.3.0",
+      "coreVersion": "^1.44.0",
       "author": "uxwVend",
       "icon": "Cloud",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-06T10:37:06Z",
+      "updatedAt": "2026-09-10T12:13:34Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -276,13 +276,13 @@
           "description": "Cloudflare tarafından sağlanan, gizliliğe saygılı CAPTCHA alternatifi"
         }
       },
-      "version": "1.4.0",
-      "coreVersion": "^1.25.0",
+      "version": "1.5.0",
+      "coreVersion": "^1.44.0",
       "author": "uxwVend",
       "icon": "Shield",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-06T10:37:06Z",
+      "updatedAt": "2026-09-10T12:13:34Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -313,13 +313,13 @@
           "description": "Coinbase Commerce üzerinden Bitcoin, Ethereum, USDC ve diğer kripto ödemelerini alın"
         }
       },
-      "version": "1.0.4",
-      "coreVersion": "^1.3.0",
+      "version": "1.1.0",
+      "coreVersion": "^1.44.0",
       "author": "uxwVend",
       "icon": "Bitcoin",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-10T12:13:34Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -356,13 +356,13 @@
           "description": "CoinPayments üzerinden Bitcoin, Litecoin, USDT ve diğer kripto ödemelerini alın"
         }
       },
-      "version": "1.0.4",
-      "coreVersion": "^1.3.0",
+      "version": "1.1.0",
+      "coreVersion": "^1.44.0",
       "author": "uxwVend",
       "icon": "Bitcoin",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-10T12:13:34Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -837,13 +837,13 @@
           "description": "E-posta servisi yapılandırması ve şablonları"
         }
       },
-      "version": "1.0.7",
-      "coreVersion": "^1.0.0",
+      "version": "1.1.0",
+      "coreVersion": "^1.44.0",
       "author": "uxwVend",
       "icon": "Mail",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-10T12:13:34Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -1269,13 +1269,13 @@
           "description": "iyzico üzerinden taksit ve 3D Secure destekli Türk kartı ödemelerini alın"
         }
       },
-      "version": "1.0.4",
-      "coreVersion": "^1.3.0",
+      "version": "1.1.0",
+      "coreVersion": "^1.44.0",
       "author": "uxwVend",
       "icon": "CreditCard",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-10T12:13:34Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1597,13 +1597,13 @@
           "description": "Mercado Pago üzerinden Latin Amerika genelinde kart, Pix, boleto ve nakit ödemelerini alın"
         }
       },
-      "version": "1.0.6",
-      "coreVersion": "^1.3.0",
+      "version": "1.1.0",
+      "coreVersion": "^1.44.0",
       "author": "uxwVend",
       "icon": "Wallet",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-10T12:13:34Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1676,13 +1676,13 @@
           "description": "Midtrans üzerinden Endonezya'da havale, e-cüzdan, market ve kart ödemelerini alın"
         }
       },
-      "version": "1.0.5",
-      "coreVersion": "^1.3.0",
+      "version": "1.1.0",
+      "coreVersion": "^1.44.0",
       "author": "uxwVend",
       "icon": "Smartphone",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-10T12:13:34Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1761,13 +1761,13 @@
           "description": "Mollie üzerinden iDEAL, Bancontact, SEPA ve kart ödemelerini alın"
         }
       },
-      "version": "1.0.4",
-      "coreVersion": "^1.3.0",
+      "version": "1.1.0",
+      "coreVersion": "^1.44.0",
       "author": "uxwVend",
       "icon": "Landmark",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-10T12:13:34Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1840,13 +1840,13 @@
           "description": "NOWPayments üzerinden 200'den fazla kripto para ile ödeme alın"
         }
       },
-      "version": "1.0.5",
-      "coreVersion": "^1.3.0",
+      "version": "1.1.0",
+      "coreVersion": "^1.44.0",
       "author": "uxwVend",
       "icon": "Bitcoin",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-10T12:13:34Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1884,13 +1884,13 @@
           "description": "Param (TurkPos) üzerinden Türk kartı ve taksitli ödemeleri alın"
         }
       },
-      "version": "1.0.4",
-      "coreVersion": "^1.3.0",
+      "version": "1.1.0",
+      "coreVersion": "^1.44.0",
       "author": "uxwVend",
       "icon": "CreditCard",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-10T12:13:34Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1922,13 +1922,13 @@
       "name": "Parasut Invoicing",
       "description": "Issues a sales invoice in Parasut for every paid order, using the invoice details the checkout collected.",
       "i18n": {},
-      "version": "1.1.0",
-      "coreVersion": "^1.34.0",
+      "version": "1.2.0",
+      "coreVersion": "^1.44.0",
       "author": "uxwVend",
       "icon": "FileText",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-10T08:00:58Z",
+      "updatedAt": "2026-09-10T12:13:34Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1997,13 +1997,13 @@
           "description": "Paymentwall üzerinden yerel ödemeleri, cüzdanları ve mobil faturalandırmayı kullanın"
         }
       },
-      "version": "1.0.3",
-      "coreVersion": "^1.3.0",
+      "version": "1.1.0",
+      "coreVersion": "^1.44.0",
       "author": "uxwVend",
       "icon": "Globe",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-10T12:13:34Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2040,13 +2040,13 @@
           "description": "PayPal üzerinden bakiye veya bağlı kartla ödeme alın"
         }
       },
-      "version": "2.0.5",
-      "coreVersion": "^1.3.0",
+      "version": "2.1.0",
+      "coreVersion": "^1.44.0",
       "author": "uxwVend",
       "icon": "DollarSign",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-10T12:13:34Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2082,13 +2082,13 @@
           "description": "Kartı ya da banka hesabı olmayan alıcılar için paysafecard ön ödemeli kupon ödemelerini alın"
         }
       },
-      "version": "1.0.4",
-      "coreVersion": "^1.3.0",
+      "version": "1.1.0",
+      "coreVersion": "^1.44.0",
       "author": "uxwVend",
       "icon": "Ticket",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-10T12:13:34Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2125,13 +2125,13 @@
           "description": "PayTR üzerinden Türk kartı, taksit ve havale ödemelerini alın"
         }
       },
-      "version": "1.0.5",
-      "coreVersion": "^1.3.0",
+      "version": "1.1.0",
+      "coreVersion": "^1.44.0",
       "author": "uxwVend",
       "icon": "CreditCard",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-10T12:13:34Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2276,13 +2276,13 @@
           "description": "Razorpay üzerinden Hindistan'da UPI, kart, internet bankacılığı ve cüzdan ödemelerini alın"
         }
       },
-      "version": "1.0.5",
-      "coreVersion": "^1.3.0",
+      "version": "1.1.0",
+      "coreVersion": "^1.44.0",
       "author": "uxwVend",
       "icon": "Smartphone",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-05T20:06:18Z",
+      "updatedAt": "2026-09-10T12:13:34Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2394,13 +2394,13 @@
           "description": "Resend API üzerinden e-posta gönderin"
         }
       },
-      "version": "1.0.5",
-      "coreVersion": "^1.0.0",
+      "version": "1.1.0",
+      "coreVersion": "^1.44.0",
       "author": "uxwVend",
       "icon": "Mail",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-10T12:13:34Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -2795,13 +2795,13 @@
           "description": "Stripe üzerinden abonelikler dahil kart, Apple Pay ve Google Pay ödemelerini alın"
         }
       },
-      "version": "2.1.0",
-      "coreVersion": "^1.3.0",
+      "version": "2.2.0",
+      "coreVersion": "^1.44.0",
       "author": "uxwVend",
       "icon": "CreditCard",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-09T14:20:43Z",
+      "updatedAt": "2026-09-10T12:13:34Z",
       "screenshots": [],
       "tags": [
         "commerce"

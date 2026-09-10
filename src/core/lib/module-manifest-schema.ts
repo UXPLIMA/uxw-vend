@@ -764,6 +764,67 @@ export const moduleManifestSchema = z.object({
             "settings: duplicate key",
         )
         .optional(),
+    /**
+     * The settings key this module's screen writes the mail API key to.
+     *
+     * Core owns the mailer and no module owns it, but the key's *name* is the
+     * provider module's vocabulary, and core read that name literally for as
+     * long as this existed. Declaring it means core asks "which key holds
+     * the mail credential" instead of knowing the answer, which is the same
+     * shape as every other provider contract here.
+     *
+     * Declare it in `secretSettings` too: it is a credential like any other.
+     */
+    emailProvider: z
+        .object({
+            apiKeySetting: z
+                .string()
+                .min(1)
+                .max(64)
+                .regex(/^[a-z][a-z0-9_]*$/, "emailProvider.apiKeySetting must be a snake_case setting key"),
+            /** Environment fallback, for an install configured from the image. */
+            envVar: z
+                .string()
+                .min(1)
+                .max(64)
+                .regex(/^[A-Z][A-Z0-9_]*$/, "emailProvider.envVar must be SCREAMING_SNAKE_CASE")
+                .optional(),
+        })
+        .strict()
+        .optional(),
+
+    /**
+     * Keys in the site settings store whose value is a credential.
+     *
+     * A gateway's secret key, an invoicing provider's password, a webhook
+     * signing secret: anything that authenticates this install to somebody
+     * else. Core encrypts a declared key on write, decrypts it on read for
+     * the module that owns it, and never sends it to a browser.
+     *
+     * The declaration lives here rather than in core because core may not
+     * name a module, and it is a list rather than a flag on `settings`
+     * because these are not module settings: they are keys in the shared
+     * `Setting` table, written by the site settings endpoint, and they are
+     * snake_case for that reason.
+     *
+     * `key.field` addresses a credential that is one field of a stored
+     * object, which is how a module with its own settings endpoint keeps a
+     * whole configuration under one key.
+     */
+    secretSettings: z
+        .array(
+            z
+                .string()
+                .min(1)
+                .max(96)
+                .regex(
+                    /^[a-z][a-z0-9_]*(\.[a-zA-Z][a-zA-Z0-9]*)?$/,
+                    "secretSettings: expected a snake_case setting key, optionally with a .field suffix",
+                ),
+        )
+        .max(50)
+        .refine((list) => new Set(list).size === list.length, "secretSettings: duplicate key")
+        .optional(),
     dependencies: z.array(dependencySpec).max(50).optional(),
     conflicts: z.array(dependencySpec).max(50).optional(),
     /**

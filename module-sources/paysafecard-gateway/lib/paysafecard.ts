@@ -7,7 +7,7 @@
  * payment as AUTHORIZED and stopping there would show a paid order to nobody
  * and refund itself a few days later.
  */
-import { prisma } from "@/core/sdk/server";
+import { readSettingStrings } from "@/core/sdk/server";
 
 const PROD_API = "https://api.paysafecard.com/v1";
 const TEST_API = "https://apitest.paysafecard.com/v1";
@@ -18,15 +18,10 @@ export interface PaysafecardConfig {
 }
 
 async function readSettings(): Promise<Record<string, string | null>> {
-    const rows = await prisma.setting.findMany({
-        where: { key: { in: ["paysafecard_api_key", "paysafecard_test_mode"] } },
-    });
-    const map: Record<string, string | null> = {};
-    for (const row of rows) {
-        const value = row.value;
-        map[row.key] = typeof value === "string" && value.trim().length > 0 ? value.trim() : null;
-    }
-    return map;
+    // Through the SDK rather than off the row. The credentials among these
+    // keys are encrypted at rest, so a direct read returns ciphertext and
+    // the provider rejects it as if the operator had mistyped the key.
+    return readSettingStrings(["paysafecard_api_key", "paysafecard_test_mode"]);
 }
 
 export async function getPaysafecardConfig(): Promise<PaysafecardConfig | null> {

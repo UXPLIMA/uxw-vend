@@ -1,15 +1,15 @@
-import { prisma } from "./db";
+import { ModuleEmailApiKeyEnvVars, ModuleEmailApiKeySettings } from "@/core/generated/module-data";
+import { readSettingValues } from "@/core/lib/setting-values";
 
 /**
  * Where the mailer gets its transport and its return address.
  *
- * Two modules ship a screen for exactly these three values - `resend-provider`
- * and `email-templates` both write `resend_api_key`, `email_from` and
- * `email_from_name` - and nothing read the rows. An operator pasted an API key
- * into the admin panel, saw "Saved", and mail stayed off, with the key now
- * sitting in the database earning nothing. So the row is read first and the
- * environment variable is the fallback, which is the order an operator
- * expects: the image ships a default, the running site overrides it.
+ * Two modules ship a screen for exactly these three values - a mail API key, a
+ * return address and a display name - and nothing read the rows. An operator
+ * pasted an API key into the admin panel, saw "Saved", and mail stayed off,
+ * with the key now sitting in the database earning nothing. So the row is read
+ * first and the environment variable is the fallback, which is the order an
+ * operator expects: the image ships a default, the running site overrides it.
  *
  * Cached for a few seconds because every queued message asks. A save is not
  * required to take effect instantly; a mailer that opens a database
@@ -38,23 +38,35 @@ function firstString(...candidates: unknown[]): string | null {
     return null;
 }
 
-const KEYS = ["resend_api_key", "email_from", "email_from_name"] as const;
+/**
+ * The return address is core's own vocabulary; the API key's name is not.
+ *
+ * Which settings key holds the mail credential is the provider module's to
+ * say - core used to read that key by its literal name, which is core naming
+ * a module - so it comes from whatever mail providers are installed. It is a
+ * declared credential too, which is why this reads through the settings
+ * boundary rather than off the row: encrypted at rest, a direct read would
+ * hand the ciphertext to the provider and every message would fail to send.
+ */
+const OWN_KEYS = ["email_from", "email_from_name"] as const;
 
 export async function getEmailConfig(): Promise<EmailConfig> {
     const now = Date.now();
     if (cache && cache.expiresAt > now) return cache.value;
 
-    const stored: Record<string, unknown> = {};
+    let stored: Record<string, unknown> = {};
     try {
-        const rows = await prisma.setting.findMany({ where: { key: { in: [...KEYS] } } });
-        for (const row of rows) stored[row.key] = row.value;
+        stored = await readSettingValues([...OWN_KEYS, ...ModuleEmailApiKeySettings]);
     } catch {
         // A settings read must never take down the mailer; the environment
         // is a complete configuration on its own.
     }
 
     const value: EmailConfig = {
-        apiKey: firstString(stored.resend_api_key, process.env.RESEND_API_KEY),
+        apiKey: firstString(
+            ...ModuleEmailApiKeySettings.map((key) => stored[key]),
+            ...ModuleEmailApiKeyEnvVars.map((name) => process.env[name]),
+        ),
         fromEmail:
             firstString(stored.email_from, process.env.EMAIL_FROM) ?? "noreply@uxwvend.com",
         fromName: firstString(stored.email_from_name),

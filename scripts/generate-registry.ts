@@ -166,6 +166,9 @@ function generateRegistry() {
     const allUserDataTables: ({ model: string; key: string; column: string; erasure?: "purge" | "retain"; module: string })[] = [];
     const allModerationProviders: ({ id: string; label: string; labelKey?: string; settingKey?: string; settingLabelKey?: string; settingDescKey?: string; handler: string; module: string })[] = [];
     const allSettings: Record<string, ModuleSetting[]> = {};
+    const allSecretSettings = new Set<string>();
+    const allEmailApiKeySettings = new Set<string>();
+    const allEmailApiKeyEnvVars = new Set<string>();
 
 
     for (const { moduleName, manifest } of loaded) {
@@ -181,6 +184,9 @@ function generateRegistry() {
         manifest.authProviders?.forEach((ap) => allAuthProviders.push({ ...ap, module: moduleName }));
         manifest.webhookChannels?.forEach((wc) => allWebhookChannels.push({ ...wc, module: moduleName }));
         if (manifest.settings?.length) allSettings[manifest.id] = manifest.settings;
+        manifest.secretSettings?.forEach((key: string) => allSecretSettings.add(key));
+        if (manifest.emailProvider) allEmailApiKeySettings.add(manifest.emailProvider.apiKeySetting);
+        if (manifest.emailProvider?.envVar) allEmailApiKeyEnvVars.add(manifest.emailProvider.envVar);
         manifest.settingsCards?.forEach((sc) => allSettingsCards.push({ ...sc, module: moduleName }));
         manifest.navbarComponents?.forEach((nc) => allNavbarComponents.push({ ...nc, module: moduleName }));
         manifest.footerComponents?.forEach((fc) => allFooterComponents.push({ ...fc, module: moduleName }));
@@ -364,6 +370,14 @@ function generateRegistry() {
     dataContent += `// Admin-editable settings declared by each module, keyed by module id.\n`;
     dataContent += `// Core renders, validates and clamps these without knowing what any key means.\n`;
     dataContent += `export const ModuleSettings: Record<string, ModuleSetting[]> = ${JSON.stringify(allSettings, null, 2)};\n\n`;
+    dataContent += `// Setting keys whose value is a credential, declared by the modules that\n`;
+    dataContent += `// own them. Core encrypts these on write and never returns one to a\n`;
+    dataContent += `// browser; a "key.field" entry addresses one field of a stored object.\n`;
+    dataContent += `export const ModuleSecretSettings: string[] = ${JSON.stringify([...allSecretSettings].sort(), null, 2)};\n\n`;
+    dataContent += `// Settings keys a mail provider module writes its API key to. Core owns the\n`;
+    dataContent += `// mailer and asks which key holds the credential rather than knowing a name.\n`;
+    dataContent += `export const ModuleEmailApiKeySettings: string[] = ${JSON.stringify([...allEmailApiKeySettings].sort(), null, 2)};\n\n`;
+    dataContent += `export const ModuleEmailApiKeyEnvVars: string[] = ${JSON.stringify([...allEmailApiKeyEnvVars].sort(), null, 2)};\n\n`;
     dataContent += `export const ModuleWebhookChannels: { id: string; label: string; layout: "json" | "embed" | "attachment"; hosts?: string[]; urlPlaceholder?: string; module: string }[] = ${JSON.stringify(allWebhookChannels, null, 2)};\n`;
     fs.writeFileSync(DATA_FILE, dataContent);
 

@@ -80,6 +80,10 @@ const UNGATED_BY_DESIGN: Record<string, string> = {
         "Right to be forgotten. Disabling a module deletes nothing, so its rows are still there and still the user's; skipping them would leave the data an erasure exists to remove.",
     "src/core/lib/module-settings.ts":
         "Reads a module's own settings declaration. It is called by that module's own code, which the proxy has already gated - and an admin editing a disabled module's settings before turning it on must still see them.",
+    "src/core/lib/secret-settings.ts":
+        "Which settings keys are credentials. Disabling a module deletes nothing, so its keys are still in the table - gating this would stop encrypting them on write and stop decrypting what is already there, which turns a disable into a leak and a re-enable into a gateway that cannot authenticate.",
+    "src/core/lib/email-config.ts":
+        "The mailer is core's, and the provider module only says which key holds its credential. Mail has to keep going out while a module is being installed, updated or turned off; a password reset that silently stops sending is the failure this would cause.",
     "src/app/[locale]/[...slug]/page.tsx": "Module page catch-all, gated by the proxy.",
     "src/app/[locale]/(admin)/admin/[...slug]/page.tsx": "Module admin catch-all, gated by the proxy.",
 };

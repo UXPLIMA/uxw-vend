@@ -7,7 +7,7 @@
  * fails silently and a callback that verifies wrongly are the same bug.
  */
 import crypto from "crypto";
-import { prisma } from "@/core/sdk/server";
+import { readSettingStrings } from "@/core/sdk/server";
 
 export interface PaytrConfig {
     merchantId: string;
@@ -17,17 +17,15 @@ export interface PaytrConfig {
 }
 
 async function readSettings(): Promise<Record<string, string | null>> {
-    const rows = await prisma.setting.findMany({
-        where: {
-            key: { in: ["paytr_merchant_id", "paytr_merchant_key", "paytr_merchant_salt", "paytr_test_mode"] },
-        },
-    });
-    const map: Record<string, string | null> = {};
-    for (const row of rows) {
-        const value = row.value;
-        map[row.key] = typeof value === "string" && value.trim().length > 0 ? value.trim() : null;
-    }
-    return map;
+    // Through the SDK rather than off the row. The credentials among these
+    // keys are encrypted at rest, so a direct read returns ciphertext and
+    // the provider rejects it as if the operator had mistyped the key.
+    return readSettingStrings([
+        "paytr_merchant_id",
+        "paytr_merchant_key",
+        "paytr_merchant_salt",
+        "paytr_test_mode",
+    ]);
 }
 
 export async function getPaytrConfig(): Promise<PaytrConfig | null> {

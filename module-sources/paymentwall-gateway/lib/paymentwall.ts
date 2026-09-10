@@ -11,7 +11,7 @@
  * a payment with.
  */
 import crypto from "crypto";
-import { prisma } from "@/core/sdk/server";
+import { readSettingStrings } from "@/core/sdk/server";
 
 export const PAYMENTWALL_WIDGET = "https://api.paymentwall.com/api/subscription";
 
@@ -21,15 +21,10 @@ export interface PaymentwallConfig {
 }
 
 async function readSettings(): Promise<Record<string, string | null>> {
-    const rows = await prisma.setting.findMany({
-        where: { key: { in: ["paymentwall_project_key", "paymentwall_secret_key"] } },
-    });
-    const map: Record<string, string | null> = {};
-    for (const row of rows) {
-        const value = row.value;
-        map[row.key] = typeof value === "string" && value.trim().length > 0 ? value.trim() : null;
-    }
-    return map;
+    // Through the SDK rather than off the row. The credentials among these
+    // keys are encrypted at rest, so a direct read returns ciphertext and
+    // the provider rejects it as if the operator had mistyped the key.
+    return readSettingStrings(["paymentwall_project_key", "paymentwall_secret_key"]);
 }
 
 export async function getPaymentwallConfig(): Promise<PaymentwallConfig | null> {

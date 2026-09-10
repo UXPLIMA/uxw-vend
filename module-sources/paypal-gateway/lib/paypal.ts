@@ -13,7 +13,7 @@
  * dominates anyway.
  */
 
-import { prisma } from "@/core/sdk/server";
+import { readSettingStrings } from "@/core/sdk/server";
 
 type PaypalCreds = { clientId: string | null; clientSecret: string | null; mode: "live" | "sandbox" };
 
@@ -24,14 +24,10 @@ const CACHE_TTL_MS = 30_000;
 async function readCreds(): Promise<PaypalCreds> {
     const now = Date.now();
     if (cached && now - cachedAt < CACHE_TTL_MS) return cached;
-    const rows = await prisma.setting.findMany({
-        where: { key: { in: ["paypal_client_id", "paypal_client_secret", "paypal_mode"] } },
-    });
-    const map: Record<string, string | null> = {};
-    for (const r of rows) {
-        const v = r.value;
-        map[r.key] = typeof v === "string" && v.trim().length > 0 ? v.trim() : null;
-    }
+    // Through the SDK rather than off the row. The credentials among these
+    // keys are encrypted at rest, so a direct read returns ciphertext and
+    // the provider rejects it as if the operator had mistyped the key.
+    const map = await readSettingStrings(["paypal_client_id", "paypal_client_secret", "paypal_mode"]);
     const mode = (map.paypal_mode ?? process.env.PAYPAL_MODE ?? "sandbox") === "live" ? "live" : "sandbox";
     cached = {
         clientId:     map.paypal_client_id     ?? process.env.PAYPAL_CLIENT_ID     ?? null,

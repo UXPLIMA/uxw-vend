@@ -103,11 +103,22 @@ describe("the keys the screens promise are the keys the code reads", () => {
     const email = fs.readFileSync(path.join(root, "src/core/lib/email.ts"), "utf8");
 
     it("the mailer resolves its transport through the settings row", () => {
-        for (const key of ["resend_api_key", "email_from", "email_from_name"]) {
+        // The return address is core's own vocabulary and stays a literal.
+        for (const key of ["email_from", "email_from_name"]) {
             expect(emailConfig).toContain(`"${key}"`);
         }
-        // The environment is the fallback, not the source.
-        expect(emailConfig).toContain("process.env.RESEND_API_KEY");
+        // The API key's name is the provider module's, so core asks for it
+        // rather than spelling it: naming the key here would be core naming a
+        // module, and it is a declared credential besides, which is why this
+        // reads through the settings boundary instead of off the row.
+        expect(emailConfig).toContain("ModuleEmailApiKeySettings");
+        expect(emailConfig).toContain("readSettingValues");
+        expect(emailConfig, "core must not spell a provider's key name").not.toMatch(
+            /"[a-z_]*(api_key|secret|token)"/,
+        );
+        // The environment is the fallback, not the source, and it is declared
+        // by the same module for the same reason.
+        expect(emailConfig).toContain("ModuleEmailApiKeyEnvVars");
         expect(emailConfig).toContain("process.env.EMAIL_FROM");
         expect(email).toContain("getEmailConfig");
         expect(email, "the mailer must not read the environment behind the config").not.toContain(

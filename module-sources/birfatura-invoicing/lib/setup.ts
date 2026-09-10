@@ -4,13 +4,16 @@
  * Kept apart from `token.ts` and `order-answer.ts` so those stay importable
  * without dragging a server bundle behind them.
  */
-import { prisma } from "@/core/sdk/server";
+import { readSettingStrings } from "@/core/sdk/server";
 
 export const TOKEN_KEY = "birfatura_token";
 
 export async function invoicingToken(): Promise<string> {
-    const row = await prisma.setting.findUnique({ where: { key: TOKEN_KEY } });
-    return typeof row?.value === "string" ? row.value.trim() : "";
+    // Through the SDK rather than off the row. The credentials among these
+    // keys are encrypted at rest, so a direct read returns ciphertext and
+    // the provider rejects it as if the operator had mistyped the key.
+    const values = await readSettingStrings([TOKEN_KEY]);
+    return values[TOKEN_KEY] ?? "";
 }
 
 export async function isConfigured(): Promise<boolean> {

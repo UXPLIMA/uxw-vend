@@ -6,7 +6,7 @@
  * Mollie itself, so this module reads the payment back with its own API key
  * before it settles anything.
  */
-import { prisma } from "@/core/sdk/server";
+import { readSettingStrings } from "@/core/sdk/server";
 
 export const MOLLIE_API = "https://api.mollie.com/v2";
 
@@ -15,13 +15,10 @@ export interface MollieConfig {
 }
 
 async function readSettings(): Promise<Record<string, string | null>> {
-    const rows = await prisma.setting.findMany({ where: { key: { in: ["mollie_api_key"] } } });
-    const map: Record<string, string | null> = {};
-    for (const row of rows) {
-        const value = row.value;
-        map[row.key] = typeof value === "string" && value.trim().length > 0 ? value.trim() : null;
-    }
-    return map;
+    // Through the SDK rather than off the row. The credentials among these
+    // keys are encrypted at rest, so a direct read returns ciphertext and
+    // the provider rejects it as if the operator had mistyped the key.
+    return readSettingStrings(["mollie_api_key"]);
 }
 
 export async function getMollieConfig(): Promise<MollieConfig | null> {

@@ -7,7 +7,7 @@
  * the status is always read back with the account's access token.
  */
 import crypto from "crypto";
-import { prisma } from "@/core/sdk/server";
+import { readSettingStrings } from "@/core/sdk/server";
 
 export const MERCADOPAGO_API = "https://api.mercadopago.com";
 
@@ -17,15 +17,10 @@ export interface MercadoPagoConfig {
 }
 
 async function readSettings(): Promise<Record<string, string | null>> {
-    const rows = await prisma.setting.findMany({
-        where: { key: { in: ["mercadopago_access_token", "mercadopago_webhook_secret"] } },
-    });
-    const map: Record<string, string | null> = {};
-    for (const row of rows) {
-        const value = row.value;
-        map[row.key] = typeof value === "string" && value.trim().length > 0 ? value.trim() : null;
-    }
-    return map;
+    // Through the SDK rather than off the row. The credentials among these
+    // keys are encrypted at rest, so a direct read returns ciphertext and
+    // the provider rejects it as if the operator had mistyped the key.
+    return readSettingStrings(["mercadopago_access_token", "mercadopago_webhook_secret"]);
 }
 
 export async function getMercadoPagoConfig(): Promise<MercadoPagoConfig | null> {
