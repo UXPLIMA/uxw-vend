@@ -12,6 +12,12 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.40.0 - `verifyPassword` joins `@/core/sdk/server`. Which algorithm hashed a
+ * password is now an operator setting, so a module comparing with one of them
+ * by name starts refusing correct passwords the day the setting moves: the
+ * two-factor module could disable nothing and close no account on a site that
+ * had switched, while the same members signed in normally. Additive.
+ *
  * 1.39.0 - `IconPicker` joins `@/core/sdk/ui`, beside the `NavIcon` that draws
  * what it picks. A module that stores a lucide icon name could render one and
  * not choose one, so every icon field in a module admin was a free text box;
@@ -276,4 +282,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.39.0";
+export const CORE_API_VERSION = "1.40.0";

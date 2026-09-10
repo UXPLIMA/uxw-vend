@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ensureHooks } from "@/core/lib/hooks-bootstrap";
 import { z } from "zod";
-import bcrypt from "bcryptjs";
 import fs from "fs/promises";
 import path from "path";
 import { execFileSync } from "child_process";
 import AdmZip from "adm-zip";
 import { validateZipEntries } from "@/core/lib/module-zip-validator";
 import prisma from "@/core/lib/db";
+import { DEFAULT_ALGORITHM, hashPassword } from "@/core/lib/password-hash";
 import { markSetupComplete } from "@/core/lib/setup-state";
 import { invalidateModuleCache } from "@/core/lib/module-cache";
 import { devOnlyDetail } from "@/core/lib/api-utils";
@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
     // Hash the password outside the transaction - bcrypt is CPU-heavy and
     // the advisory-locked transaction below should hold the lock for as
     // little time as possible.
-    const hashed = await bcrypt.hash(data.admin.password, 12);
+    const hashed = await hashPassword(data.admin.password, DEFAULT_ALGORITHM);
 
     // Stable integer key for pg_advisory_xact_lock. Any constant works as
     // long as nothing else in the app uses it for another purpose.

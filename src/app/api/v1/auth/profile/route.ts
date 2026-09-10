@@ -5,8 +5,8 @@ import { prisma } from "@/core/lib/db";
 import { rateLimit } from "@/core/lib/rate-limit";
 import { enforcePasswordPolicy } from "@/core/lib/security-settings";
 import { updateUserSchema, updatePasswordSchema } from "@/core/lib/validations";
-import bcrypt from "bcryptjs";
-import { BCRYPT_ROUNDS } from "@/core/lib/constants";
+import { hashPassword, verifyPassword } from "@/core/lib/password-hash";
+import { getHashAlgorithm } from "@/core/lib/security-settings";
 import { readJsonBody } from "@/core/lib/api-body";
 import { z } from "zod";
 
@@ -81,12 +81,12 @@ export async function PATCH(request: NextRequest) {
             return NextResponse.json({ error: "Cannot change password for OAuth accounts", code: "oauth_password_change" }, { status: 400 });
         }
 
-        const isValid = await bcrypt.compare(validation.data.currentPassword, user.password);
+        const isValid = await verifyPassword(validation.data.currentPassword, user.password);
         if (!isValid) {
             return NextResponse.json({ error: "Current password is incorrect", code: "wrong_password" }, { status: 400 });
         }
 
-        const hashedPassword = await bcrypt.hash(validation.data.newPassword, BCRYPT_ROUNDS);
+        const hashedPassword = await hashPassword(validation.data.newPassword, await getHashAlgorithm());
         await prisma.user.update({
             where: { id: session.user.id },
             data: { password: hashedPassword },

@@ -1,14 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import { ensureHooks } from "@/core/lib/hooks-bootstrap";
-import bcrypt from "bcryptjs";
 import { prisma } from "@/core/lib/db";
 import { registerSchema } from "@/core/lib/validations";
 import { sendWelcomeEmail } from "@/core/lib/email";
 import { logActivity } from "@/core/lib/activity-log";
 import { rateLimit, getClientIP, rateLimits } from "@/core/lib/rate-limit";
-import { BCRYPT_ROUNDS } from "@/core/lib/constants";
+import { hashPassword } from "@/core/lib/password-hash";
+import { checkUsername, registrationRefusal } from "@/core/lib/registration-rules";
 import { checkPasswordBreach } from "@/core/lib/password-breach";
-import { enforcePasswordPolicy } from "@/core/lib/security-settings";
+import {
+    enforcePasswordPolicy,
+    getHashAlgorithm,
+    getRegistrationCaps,
+    getUsernameRule,
+} from "@/core/lib/security-settings";
 import { runAuthChallenge } from "@/core/lib/auth-challenge";
 import { challengeFieldsFrom } from "@/core/lib/auth-challenge-shared";
 import { readJsonBody } from "@/core/lib/api-body";
@@ -80,6 +85,52 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        // The operator's own rule, on top of the schema's. It can only be
+        // narrower than what `registerSchema` already accepted, so anything
+        // reaching here has passed both.
+        const naming = await getUsernameRule();
+        const named = checkUsername(username, naming.rule, naming.minLength);
+        // Two literal codes rather than one built from the reason: a code a
+        // client cannot predict is a code no screen can put into a sentence.
+        if (!named.ok && named.reason === "too_short") {
+            return NextResponse.json(
+                { error: "That username is too short", code: "username_too_short" },
+                { status: 400 },
+            );
+        }
+        if (!named.ok) {
+            return NextResponse.json(
+                { error: "That username is not allowed here", code: "username_not_allowed" },
+                { status: 400 },
+            );
+        }
+
+        // Counted before the account is written and after the password checks,
+        // so a site at its ceiling still refuses a weak password on its own
+        // terms rather than blaming the cap.
+        const caps = await getRegistrationCaps();
+        if (caps.daily > 0 || caps.total > 0) {
+            const dayStart = new Date();
+            dayStart.setHours(0, 0, 0, 0);
+            const [today, total] = await Promise.all([
+                caps.daily > 0 ? prisma.user.count({ where: { createdAt: { gte: dayStart } } }) : Promise.resolve(0),
+                caps.total > 0 ? prisma.user.count() : Promise.resolve(0),
+            ]);
+            const refused = registrationRefusal(caps, { today, total });
+            if (refused === "daily_cap") {
+                return NextResponse.json(
+                    { error: "No more accounts today", code: "registration_daily_cap" },
+                    { status: 403 },
+                );
+            }
+            if (refused === "total_cap") {
+                return NextResponse.json(
+                    { error: "Registration is closed", code: "registration_total_cap" },
+                    { status: 403 },
+                );
+            }
+        }
+
         // Fast-path rejection for the common (non-concurrent) duplicate case
         // so we don't burn bcrypt cycles on a doomed insert. Concurrent
         // duplicates still race through the unique-constraint catch below.
@@ -109,7 +160,7 @@ export async function POST(request: NextRequest) {
             },
         });
 
-        const hashedPassword = await bcrypt.hash(password, BCRYPT_ROUNDS);
+        const hashedPassword = await hashPassword(password, await getHashAlgorithm());
         const userLocale = detectLocale(request);
 
         const user = await prisma.user.create({

@@ -3,9 +3,9 @@ import { ensureHooks } from "@/core/lib/hooks-bootstrap";
 import { z } from "zod";
 import { readJsonBody } from "@/core/lib/api-body";
 import { prisma } from "@/core/lib/db";
-import bcrypt from "bcryptjs";
 import { createHash } from "crypto";
-import { BCRYPT_ROUNDS } from "@/core/lib/constants";
+import { hashPassword } from "@/core/lib/password-hash";
+import { getHashAlgorithm } from "@/core/lib/security-settings";
 import { rateLimit, getClientIP } from "@/core/lib/rate-limit";
 import { logActivity } from "@/core/lib/activity-log";
 import { checkPasswordBreach } from "@/core/lib/password-breach";
@@ -86,7 +86,7 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Invalid or expired reset token", code: "invalid_token" }, { status: 400 });
         }
 
-        const hashedPassword = await bcrypt.hash(password, BCRYPT_ROUNDS);
+        const hashedPassword = await hashPassword(password, await getHashAlgorithm());
 
         await prisma.user.update({
             where: { id: user.id },

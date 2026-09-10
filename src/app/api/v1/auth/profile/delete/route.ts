@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
 import { z } from "zod";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
+import { verifyPassword } from "@/core/lib/password-hash";
 import { rateLimit, getClientIP } from "@/core/lib/rate-limit";
 import { softDeleteUser } from "@/core/lib/user-deletion";
 import { logActivity } from "@/core/lib/activity-log";
@@ -65,7 +65,7 @@ export async function POST(request: Request) {
         );
     }
 
-    const passwordOk = await bcrypt.compare(parsed.data.password, user.password);
+    const passwordOk = await verifyPassword(parsed.data.password, user.password);
     if (!passwordOk) {
         return NextResponse.json({ error: "Incorrect password", code: "wrong_password" }, { status: 400 });
     }

@@ -18,6 +18,17 @@ export { sanitizeHtml } from "@/core/lib/sanitize";
 // --- Database ---
 export { prisma } from "@/core/lib/db";
 
+/**
+ * Checking a member's password against the hash on their row.
+ *
+ * A module must never reach for `bcrypt.compare` itself. Which algorithm made
+ * a hash is an operator setting, and a module comparing with one algorithm is
+ * a module that starts refusing correct passwords the day the setting moves -
+ * the two-factor module could disable nothing and close no account on a site
+ * that had switched, while the same members signed in normally.
+ */
+export { verifyPassword } from "@/core/lib/password-hash";
+
 // --- Homepage sections a theme or a module can render directly ---
 // Reads the activity feed straight from the database rather than through the
 // API. Its own doc comment always described it as something a theme could

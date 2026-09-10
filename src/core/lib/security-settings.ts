@@ -11,8 +11,16 @@
  * could silently weaken every password check is worse than no control.
  */
 
+import { USERNAME_MAX_LENGTH, USERNAME_MIN_LENGTH } from "./constants";
 import { prisma } from "./db";
+import { DEFAULT_ALGORITHM, isHashAlgorithm, type HashAlgorithm } from "./hash-algorithms";
 import { PASSWORD_POLICY, checkPasswordPolicy, type PasswordCheck } from "./password-policy";
+import {
+    DEFAULT_USERNAME_RULE,
+    isUsernameRule,
+    type RegistrationCaps,
+    type UsernameRule,
+} from "./registration-rules";
 
 const SETTING_KEYS = {
     passwordMinLength: "password_min_length",
@@ -20,6 +28,11 @@ const SETTING_KEYS = {
     emailVerifyExpiryHours: "email_verify_expiry_hours",
     settingsCacheSeconds: "settings_cache_seconds",
     maxLoginAttempts: "max_login_attempts",
+    passwordHashAlgorithm: "password_hash_algorithm",
+    usernameRule: "username_rule",
+    usernameMinLength: "username_min_length",
+    registrationDailyCap: "registration_daily_cap",
+    registrationTotalCap: "registration_total_cap",
 } as const;
 
 export interface BoundedSetting {
@@ -85,6 +98,36 @@ export const MAX_LOGIN_ATTEMPTS: BoundedSetting = {
     max: 100,
 };
 
+/**
+ * How short a username an operator will accept, at or above core's own floor.
+ * The ceiling is core's, because a name longer than the column advertises is
+ * not something a setting should be able to promise.
+ */
+const USERNAME_MIN: BoundedSetting = {
+    key: SETTING_KEYS.usernameMinLength,
+    defaultValue: USERNAME_MIN_LENGTH,
+    min: USERNAME_MIN_LENGTH,
+    max: USERNAME_MAX_LENGTH,
+};
+
+/**
+ * New accounts a day, and accounts in total. Zero is off in both, so the max
+ * is a number nobody reaches rather than a number that means "unlimited".
+ */
+const REGISTRATION_DAILY_CAP: BoundedSetting = {
+    key: SETTING_KEYS.registrationDailyCap,
+    defaultValue: 0,
+    min: 0,
+    max: 1_000_000,
+};
+
+const REGISTRATION_TOTAL_CAP: BoundedSetting = {
+    key: SETTING_KEYS.registrationTotalCap,
+    defaultValue: 0,
+    min: 0,
+    max: 100_000_000,
+};
+
 function toNumber(raw: unknown): number | null {
     if (typeof raw === "number") return Number.isFinite(raw) ? raw : null;
     if (typeof raw === "string" && raw.trim()) {
@@ -145,4 +188,34 @@ export async function enforcePasswordPolicy(password: unknown): Promise<Password
         return { ok: false, reason: "too_short", message: `Password must be at least ${min} characters` };
     }
     return { ok: true };
+}
+
+/**
+ * Which algorithm the next hash is made with.
+ *
+ * A row naming anything else - a typo, or an algorithm a future version
+ * dropped - reads as the default rather than throwing, because a settings row
+ * is not a reason for nobody to be able to register. Nothing here rewrites an
+ * existing hash: see `password-hash.ts` for why that happens at a login.
+ */
+export async function getHashAlgorithm(): Promise<HashAlgorithm> {
+    const raw = await readSetting(SETTING_KEYS.passwordHashAlgorithm);
+    return isHashAlgorithm(raw) ? raw : DEFAULT_ALGORITHM;
+}
+
+/** The username rule an operator picked, or core's own. */
+export async function getUsernameRule(): Promise<{ rule: UsernameRule; minLength: number }> {
+    const [raw, min] = await Promise.all([
+        readSetting(SETTING_KEYS.usernameRule),
+        getBounded(USERNAME_MIN),
+    ]);
+    return { rule: isUsernameRule(raw) ? raw : DEFAULT_USERNAME_RULE, minLength: min };
+}
+
+export async function getRegistrationCaps(): Promise<RegistrationCaps> {
+    const [daily, total] = await Promise.all([
+        getBounded(REGISTRATION_DAILY_CAP),
+        getBounded(REGISTRATION_TOTAL_CAP),
+    ]);
+    return { daily, total };
 }

@@ -18,8 +18,9 @@ import { forgetChecked, markChecked, wasCheckedWithin } from "./session-check-me
 import { recordSignIn, touchSession, SESSION_TOUCH_INTERVAL_MS } from "./session-registry";
 import { PrismaAdapter } from "@auth/prisma-adapter";
 import { coreAuthAdapter } from "./auth-adapter";
-import bcrypt from "bcryptjs";
 import { prisma } from "./db";
+import { hashPassword, needsRehash, verifyPassword } from "./password-hash";
+import { getHashAlgorithm } from "./security-settings";
 import {
     getLockoutStatus,
     registerFailedLogin,
@@ -187,7 +188,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     throw new SignInRefusal(REFUSAL_CODE.accountLocked);
                 }
 
-                const isPasswordValid = await bcrypt.compare(
+                const isPasswordValid = await verifyPassword(
                     credentials.password as string,
                     user.password
                 );
@@ -204,6 +205,28 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
                     // an early-warning email with the attacker's IP.
                     await registerFailedLogin(user.id, { ip });
                     return null;
+                }
+
+                /**
+                 * The only moment a stored hash can be moved to the algorithm
+                 * an operator has since chosen: the password is in this
+                 * process now and never again. It runs after the password
+                 * check and before the two-factor one on purpose - the
+                 * password is proven here, and a member who cannot produce
+                 * their second factor has still proven it.
+                 *
+                 * Detached, and its failure is not the member's problem: a
+                 * write that does not land leaves the old hash, which still
+                 * verifies, and the next login tries again.
+                 */
+                if (needsRehash(user.password, await getHashAlgorithm())) {
+                    void (async () => {
+                        const moved = await hashPassword(
+                            credentials.password as string,
+                            await getHashAlgorithm(),
+                        );
+                        await prisma.user.update({ where: { id: user.id }, data: { password: moved } });
+                    })().catch(() => { /* Old hash stands. Tried again next time. */ });
                 }
 
                 // 2FA check - only if fields exist on user (added by two-factor-auth module)

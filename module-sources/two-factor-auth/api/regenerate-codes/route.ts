@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
-import { generateBackupCodes, prisma, rateLimitStrict, verifyToken, readJsonBody } from "@/core/sdk/server";
+import { generateBackupCodes, prisma, rateLimitStrict, readJsonBody, verifyPassword, verifyToken } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { twoFactorChallengeSchema } from "../../lib/validations";
 
@@ -73,7 +72,7 @@ export async function POST(request: NextRequest) {
     if (!authorized && password) {
         const storedPassword = userAny.password as string | null;
         if (storedPassword) {
-            authorized = await bcrypt.compare(password, storedPassword);
+            authorized = await verifyPassword(password, storedPassword);
         }
     }
 

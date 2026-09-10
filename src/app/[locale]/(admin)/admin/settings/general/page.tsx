@@ -8,6 +8,9 @@ import { Button } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
 import { Label } from "@/core/components/ui/label";
 import { Loader2, Check } from "lucide-react";
+import { NativeSelect } from "@/core/components/ui/native-select";
+import { HASH_ALGORITHMS, type HashAlgorithm } from "@/core/lib/hash-algorithms";
+import { USERNAME_RULES, type UsernameRule } from "@/core/lib/registration-rules";
 import { toast } from "sonner";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 import { LoadFailed } from "@/core/components/ui/load-failed";
@@ -16,10 +19,36 @@ import { useSettingsLoad } from "@/core/hooks/useSettingsLoad";
 interface FieldDef {
     key: string;
     labelKey: string;
-    type: "number";
-    defaultValue: number;
+    type: "number" | "choice";
+    defaultValue: string | number;
     descriptionKey?: string;
+    /**
+     * For a choice: the values and what each is called. Written out rather
+     * than composed from the value, because a key built as
+     * `` `${labelKey}_${value}` `` is a key no scan of the tree can find, and
+     * the gate that catches a string nothing reads would then be catching
+     * these instead of catching real ones.
+     */
+    choices?: readonly { value: string; labelKey: string }[];
 }
+
+/**
+ * Typed as a record over the union, so adding an algorithm or a rule without
+ * naming it stops the build rather than shipping an empty dropdown entry.
+ */
+const HASH_LABELS: Record<HashAlgorithm, string> = {
+    bcrypt: "generalSettings_hashAlgorithm_bcrypt",
+    scrypt: "generalSettings_hashAlgorithm_scrypt",
+};
+
+const USERNAME_RULE_LABELS: Record<UsernameRule, string> = {
+    default: "generalSettings_usernameRule_default",
+    letters_numbers: "generalSettings_usernameRule_letters_numbers",
+    lowercase: "generalSettings_usernameRule_lowercase",
+};
+
+const HASH_CHOICES = HASH_ALGORITHMS.map((value) => ({ value, labelKey: HASH_LABELS[value] }));
+const USERNAME_RULE_CHOICES = USERNAME_RULES.map((value) => ({ value, labelKey: USERNAME_RULE_LABELS[value] }));
 
 interface SectionDef {
     titleKey: string;
@@ -33,6 +62,16 @@ const sections: SectionDef[] = [
             { key: "password_min_length", labelKey: "generalSettings_minPasswordLength", type: "number", defaultValue: 10, descriptionKey: "generalSettings_minPasswordLengthHint" },
             { key: "email_verify_expiry_hours", labelKey: "generalSettings_emailVerifyExpiry", type: "number", defaultValue: 24 },
             { key: "password_reset_expiry_minutes", labelKey: "generalSettings_passwordResetExpiry", type: "number", defaultValue: 60 },
+            { key: "password_hash_algorithm", labelKey: "generalSettings_hashAlgorithm", type: "choice", defaultValue: "bcrypt", choices: HASH_CHOICES, descriptionKey: "generalSettings_hashAlgorithmHint" },
+        ],
+    },
+    {
+        titleKey: "generalSettings_registration",
+        fields: [
+            { key: "username_rule", labelKey: "generalSettings_usernameRule", type: "choice", defaultValue: "default", choices: USERNAME_RULE_CHOICES, descriptionKey: "generalSettings_usernameRuleHint" },
+            { key: "username_min_length", labelKey: "generalSettings_usernameMinLength", type: "number", defaultValue: 3 },
+            { key: "registration_daily_cap", labelKey: "generalSettings_registrationDailyCap", type: "number", defaultValue: 0, descriptionKey: "generalSettings_registrationCapHint" },
+            { key: "registration_total_cap", labelKey: "generalSettings_registrationTotalCap", type: "number", defaultValue: 0 },
         ],
     },
     {
@@ -139,15 +178,30 @@ export default function GeneralSettingsPage() {
                             <CardContent className="space-y-4">
                                 {section.fields.map((field) => (
                                     <div key={field.key}>
-                                        <Label>{t(field.labelKey)}</Label>
-                                        <Input
-                                            aria-label={t(field.labelKey)}
-                                            type="number"
-                                            value={values[field.key] as string}
-                                            onChange={(e) => setValue(field.key, e.target.value)}
-                                            placeholder={String(field.defaultValue)}
-                                            min={0}
-                                        />
+                                        <Label htmlFor={field.key}>{t(field.labelKey)}</Label>
+                                        {field.type === "choice" ? (
+                                            <NativeSelect
+                                                id={field.key}
+                                                value={values[field.key] as string}
+                                                onChange={(e) => setValue(field.key, e.target.value)}
+                                            >
+                                                {(field.choices ?? []).map((choice) => (
+                                                    <option key={choice.value} value={choice.value}>
+                                                        {t(choice.labelKey)}
+                                                    </option>
+                                                ))}
+                                            </NativeSelect>
+                                        ) : (
+                                            <Input
+                                                id={field.key}
+                                                aria-label={t(field.labelKey)}
+                                                type="number"
+                                                value={values[field.key] as string}
+                                                onChange={(e) => setValue(field.key, e.target.value)}
+                                                placeholder={String(field.defaultValue)}
+                                                min={0}
+                                            />
+                                        )}
                                         {field.descriptionKey && (
                                             <p className="text-xs text-muted-foreground mt-1">{t(field.descriptionKey)}</p>
                                         )}

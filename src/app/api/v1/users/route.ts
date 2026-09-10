@@ -2,9 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/core/lib/auth";
 import { prisma } from "@/core/lib/db";
 import { isAdmin } from "@/core/lib/permissions";
-import { PER_PAGE_USERS, BCRYPT_ROUNDS, USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH } from "@/core/lib/constants";
+import { PER_PAGE_USERS, USERNAME_MIN_LENGTH, USERNAME_MAX_LENGTH } from "@/core/lib/constants";
+import { hashPassword } from "@/core/lib/password-hash";
+import { getHashAlgorithm } from "@/core/lib/security-settings";
 import { enforcePasswordPolicy } from "@/core/lib/security-settings";
-import bcrypt from "bcryptjs";
 import { readJsonBody } from "@/core/lib/api-body";
 import { z } from "zod";
 import { PASSWORD_POLICY } from "@/core/lib/password-policy";
@@ -148,7 +149,7 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        const hashedPassword = await bcrypt.hash(password, BCRYPT_ROUNDS);
+        const hashedPassword = await hashPassword(password, await getHashAlgorithm());
 
         // Use provided roleId or fall back to default "user" role
         let assignRoleId: string | null | undefined = roleId;
