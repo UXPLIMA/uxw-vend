@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-10",
-  "updatedAt": "2026-09-10T00:48:54Z",
+  "updatedAt": "2026-09-10T00:59:47Z",
   "modules": [
     {
       "id": "announcements",
@@ -2678,13 +2678,13 @@
           "description": "Ürün, kategori, sepet ve siparişleriyle eksiksiz e-ticaret"
         }
       },
-      "version": "2.23.0",
+      "version": "2.24.0",
       "coreVersion": "^1.38.0",
       "author": "uxwVend Team",
       "icon": "ShoppingBag",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-09T23:52:11Z",
+      "updatedAt": "2026-09-10T00:59:47Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2717,7 +2717,7 @@
       },
       "stats": {
         "publicRoutes": 5,
-        "adminRoutes": 13,
+        "adminRoutes": 14,
         "apiRoutes": 50,
         "widgets": 6
       }
