@@ -126,7 +126,13 @@ src/modules/*
 # Legacy generated translation files (translation system is now DB-backed)
 # messages/*.json is no longer written. messages-core/*.json is the seed source
 # for the Translation table; runtime reads from DB via translation-service.ts.
-messages/
+#
+# Anchored to the root. Unanchored it matched every directory of that name at
+# any depth, and a module's `pages/admin/messages/` went missing from the
+# repository while working perfectly on the machine that wrote it - the
+# marketplace zip is built from disk, so nothing downstream noticed.
+# `every-module-source-file-is-in-the-repository.test.ts` now would.
+/messages/
 
 # User-uploaded files (local fallback when S3 not configured)
 public/uploads/*

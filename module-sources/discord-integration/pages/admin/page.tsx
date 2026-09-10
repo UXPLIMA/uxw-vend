@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { useState } from "react";
 import { Link } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, Input, Label, LoadFailed } from "@/core/sdk/ui";
+import { Button, Card, CardContent, Input, Label, LoadFailed, buttonClassName } from "@/core/sdk/ui";
 import { ArrowLeft, Loader2, Check, Send } from "lucide-react";
 import { AdminPageHeader, useSettingsLoad } from "@/core/sdk/admin";
 
@@ -143,12 +143,15 @@ export default function DiscordSettingsPage() {
                 description={t("adm_webhooksSubtitle")}
                 backHref="/admin/settings/general"
                 backLabel={commonT("back")}
-                actions={
+                actions={<>
+                    <Link href="/admin/discord/messages" className={buttonClassName("outline", "default")}>
+                        {t("adm_msgTitle")}
+                    </Link>
                     <Button type="submit" form={FORM_ID} disabled={saving}>
                         {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> {t("adm_saving")}</> :
                          saved ? <><Check className="w-4 h-4" /> {t("adm_saved")}</> : t("adm_saveWebhooks")}
                     </Button>
-                }
+                </>}
             />
 
             {error && (
