@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-10",
-  "updatedAt": "2026-09-10T01:44:59Z",
+  "updatedAt": "2026-09-10T02:06:16Z",
   "modules": [
     {
       "id": "announcements",
@@ -2138,13 +2138,13 @@
           "description": "Herkese açık oyuncu profil sayfaları"
         }
       },
-      "version": "1.1.19",
+      "version": "1.1.20",
       "coreVersion": "^1.28.0",
       "author": "uxwVend",
       "icon": "Users",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-08T15:13:55Z",
+      "updatedAt": "2026-09-10T02:06:16Z",
       "screenshots": [],
       "tags": [
         "gaming"

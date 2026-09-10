@@ -12,6 +12,14 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.42.0 - `RoleBadge` joins `@/core/sdk/ui`, beside the `RoleName` that was
+ * already there and which nothing rendered. The declarations an operator wrote
+ * for a role had a writer and no readers: five screens drew a role out of
+ * `role.color` by hand, so a gradient showed up nowhere and the column may as
+ * well not have existed. Both components now write the rule, both check it
+ * again at the render site, and a gate keeps a sixth screen from being written
+ * the old way. Additive.
+ *
  * 1.41.0 - `normalisedMatrix` and `clearedMatrix` join `@/core/sdk`, beside the
  * `accessByRole` that reads what they write. A grid sending only its ticked
  * rows sends nothing when an operator unticks everybody, and nothing is read as
@@ -292,4 +300,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.41.0";
+export const CORE_API_VERSION = "1.42.0";

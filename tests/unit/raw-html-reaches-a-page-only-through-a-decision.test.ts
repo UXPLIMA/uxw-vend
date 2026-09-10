@@ -32,7 +32,9 @@ const ARGUED_FOR: Record<string, string> = {
     "src/app/[locale]/layout.tsx":
         "three sites: a static literal that reads localStorage, the organization JSON-LD which escapes `<`, and theme CSS built from an allowlist of token names and hex colours",
     "src/core/components/ui/RoleName.tsx":
-        "one CSS rule for one role, built from a string that has been through safeRoleCss - which refuses a brace, an angle bracket, an at-rule and every function that fetches or runs anything, after folding the escapes and comments a browser folds. The class it is scoped to is built from the role's id, so nothing an operator writes chooses the selector.",
+        "one CSS rule for one role, built from a string that has been through safeRoleCss - which refuses a brace, an angle bracket, an at-rule and every function that fetches or runs anything, after folding the escapes and comments a browser folds. The selector comes from roleScope, which reduces the role's id to characters that cannot close the rule or the tag, so neither half of the rule is chosen by anything an operator wrote.",
+    "src/core/components/ui/RoleBadge.tsx":
+        "the same rule for the pill beside the name, from badgeCss through the same safeRoleCss and the same roleScope. Without any CSS it writes no html at all: it falls back to the inline colour every screen used to draw by hand.",
     "module-sources/blog/pages/[...params]/page.tsx":
         "article JSON-LD from buildArticleJsonLd, which escapes `<` so a title cannot close the script tag",
 };

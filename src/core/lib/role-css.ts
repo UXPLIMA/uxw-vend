@@ -89,3 +89,28 @@ export function safeRoleCss(css: string): string | null {
     // rewriting somebody's stylesheet into a shape they did not write.
     return typed;
 }
+
+/**
+ * The class name a role's rule is written for.
+ *
+ * `safeRoleCss` judges the declarations. It says nothing about the selector
+ * they are wrapped in, and that selector is interpolated into the same
+ * `<style>` element - a role id holding a brace or an angle bracket would
+ * close the rule, or the tag, without a character of it passing the check.
+ *
+ * No id can today: they are `cuid()` and nothing takes one from a request.
+ * But "the other end happens to be safe" is the shape of the defect this file
+ * was written twice to fix, so the scope is built out of characters that
+ * cannot break out rather than out of trust in where the id came from.
+ *
+ * Unusable characters become their code point rather than being dropped, so
+ * two ids that differ only in them stay two classes.
+ */
+export function roleScope(part: "name" | "badge", id: string): string {
+    const safe = [...id]
+        .map((char) => (/[a-zA-Z0-9_-]/.test(char) ? char : `-${char.codePointAt(0)?.toString(36)}-`))
+        .join("");
+    // An empty id would leave every role sharing one class, which is one role
+    // wearing another's style.
+    return `uxw-${part}-${safe === "" ? "none" : safe}`;
+}

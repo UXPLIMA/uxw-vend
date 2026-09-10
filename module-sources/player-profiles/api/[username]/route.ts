@@ -90,7 +90,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             username: true,
             avatar: true,
             createdAt: true,
-            role: { select: { name: true, displayName: true, color: true } },
+            // The id and the declarations too: a screen drawing a role
+            // without them draws the colour and silently ignores
+            // whatever the operator actually wrote.
+            role: { select: { id: true, name: true, displayName: true, color: true, nameCss: true, badgeCss: true } },
         },
     });
 

@@ -4,7 +4,7 @@ import { useState, useEffect, use } from "react";
 import Image from "next/image";
 import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/core/sdk/navigation";
-import { Card, CardContent, CardHeader, CardTitle } from "@/core/sdk/ui";
+import { Card, CardContent, CardHeader, CardTitle, RoleBadge } from "@/core/sdk/ui";
 import { PageFrame } from "@/core/sdk/layout";
 import { Loader2, MessageSquare, FileText, ShoppingCart, ThumbsUp, Calendar } from "lucide-react";
 import { getMinecraftAvatar } from "../../../lib/minecraft";
@@ -15,7 +15,14 @@ interface Player {
     username: string;
     avatar: string | null;
     createdAt: string;
-    role: { name: string; displayName: string; color: string | null } | null;
+    role: {
+        id: string;
+        name: string;
+        displayName: string;
+        color: string | null;
+        nameCss?: string | null;
+        badgeCss?: string | null;
+    } | null;
     // Only the statistics this install can actually count. A module that is
     // not installed contributes no key at all, so nothing renders a zero for it.
     _count: Record<string, number | undefined>;
@@ -90,14 +97,7 @@ export default function PlayerProfilePage({ params }: PageProps) {
                             );
                         })()}
                         <div>
-                            {player.role && (
-                                <span className="text-sm font-medium px-2 py-0.5 rounded mt-1 inline-block" style={{
-                                    backgroundColor: (player.role.color || "#6b7280") + "15",
-                                    color: player.role.color || "#6b7280",
-                                }}>
-                                    {player.role.displayName}
-                                </span>
-                            )}
+                            <RoleBadge role={player.role ?? null} className="mt-1" />
                             <p className="text-sm text-muted-foreground mt-1 flex items-center gap-1">
                                 <Calendar className="w-3 h-3" />
                                 {t("joinDate")}: {new Date(player.createdAt).toLocaleDateString(__dateTag)}

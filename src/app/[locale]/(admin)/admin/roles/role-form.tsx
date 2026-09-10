@@ -14,6 +14,9 @@ import { toast } from "sonner";
 import { CheckboxField } from "@/core/components/ui/checkbox";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 import { cn } from "@/core/lib/utils";
+import { Textarea } from "@/core/components/ui/textarea";
+import { RoleBadge } from "@/core/components/ui/RoleBadge";
+import { RoleName } from "@/core/components/ui/RoleName";
 
 /**
  * The role editor, on its own route.
@@ -41,6 +44,9 @@ export interface RoleRecord {
     color: string | null;
     priority: number;
     isDefault: boolean;
+    /** Declarations an operator wrote, for the name and for the pill. */
+    nameCss?: string | null;
+    badgeCss?: string | null;
     permissions: RolePermission[];
     _count: { users: number };
 }
@@ -64,6 +70,8 @@ export function RoleForm({ role }: { role?: RoleRecord }) {
         color: role?.color ?? "#6366f1",
         priority: role?.priority ?? 0,
         permissions: role?.permissions.map((p) => p.name) ?? ([] as string[]),
+        nameCss: role?.nameCss ?? "",
+        badgeCss: role?.badgeCss ?? "",
     });
 
     const isAdminRole = role?.name === "admin";
@@ -103,7 +111,13 @@ export function RoleForm({ role }: { role?: RoleRecord }) {
             const res = await fetch(role ? `/api/v1/roles/${role.id}` : "/api/v1/roles", {
                 method: role ? "PATCH" : "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(form),
+                body: JSON.stringify({
+                    ...form,
+                    // Empty means "no rule", which is a null column rather
+                    // than an empty string nothing would ever match.
+                    nameCss: form.nameCss.trim() || null,
+                    badgeCss: form.badgeCss.trim() || null,
+                }),
             });
             const failed = await writeError(res, commonT("somethingWentWrong"), t);
             if (failed) {
@@ -191,6 +205,52 @@ export function RoleForm({ role }: { role?: RoleRecord }) {
                                 />
                                 <p className="text-xs text-muted-foreground mt-1">{t("roles_priorityHint")}</p>
                             </div>
+                        </div>
+
+                        {/* Declarations rather than a colour, because that is
+                            what an operator actually wants: a gradient with
+                            `background-clip`, an animation with a keyframe.
+                            None of it survives being flattened into a style
+                            attribute, so the site writes a rule instead - and
+                            `safeRoleCss` decides what may go in one, here and
+                            again at every render site. */}
+                        <div className="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <Label htmlFor="role-name-css">{t("roles_nameCss")}</Label>
+                                <Textarea
+                                    id="role-name-css"
+                                    rows={3}
+                                    value={form.nameCss}
+                                    placeholder={t("roles_cssPlaceholder")}
+                                    onChange={(e) => setForm({ ...form, nameCss: e.target.value })}
+                                />
+                                <p className="text-xs text-muted-foreground mt-1">{t("roles_cssHint")}</p>
+                            </div>
+                            <div>
+                                <Label htmlFor="role-badge-css">{t("roles_badgeCss")}</Label>
+                                <Textarea
+                                    id="role-badge-css"
+                                    rows={3}
+                                    value={form.badgeCss}
+                                    placeholder={t("roles_cssPlaceholder")}
+                                    onChange={(e) => setForm({ ...form, badgeCss: e.target.value })}
+                                />
+                                <p className="text-xs text-muted-foreground mt-1">{t("roles_badgeCssHint")}</p>
+                            </div>
+                        </div>
+
+                        {/* Drawn the way the site will draw it. A rule that is
+                            refused shows the plain name here too, which is the
+                            only warning an operator gets before saving. */}
+                        <div className="flex items-center gap-3 border border-border rounded-lg p-3">
+                            <span className="text-xs text-muted-foreground">{t("roles_preview")}</span>
+                            <RoleName
+                                name={form.displayName || t("roles_previewName")}
+                                role={{ id: "preview", displayName: form.displayName, color: form.color, nameCss: form.nameCss }}
+                            />
+                            <RoleBadge
+                                role={{ id: "preview", name: form.displayName || t("roles_previewName"), displayName: form.displayName, color: form.color, badgeCss: form.badgeCss }}
+                            />
                         </div>
 
                         <div>

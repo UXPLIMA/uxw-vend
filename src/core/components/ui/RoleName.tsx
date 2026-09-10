@@ -1,4 +1,4 @@
-import { safeRoleCss } from "@/core/lib/role-css";
+import { roleScope, safeRoleCss } from "@/core/lib/role-css";
 
 /**
  * A member's name, wearing the style their role was given.
@@ -26,9 +26,9 @@ export function RoleName({
     if (!role) return <span className={className}>{name}</span>;
 
     const css = safeRoleCss(role.nameCss ?? "");
-    // A class an operator cannot choose: the id is ours, so two roles cannot
-    // collide and nothing else on the page can be reached from here.
-    const scope = `uxw-role-${role.id}`;
+    // A class an operator cannot choose, and one that cannot close the rule
+    // it opens however the id was made. See `roleScope`.
+    const scope = roleScope("name", role.id);
 
     return (
         <>

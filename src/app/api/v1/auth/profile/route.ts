@@ -28,7 +28,10 @@ export async function GET() {
             locale: true,
             currency: true,
             createdAt: true,
-            role: { select: { name: true, displayName: true, color: true } },
+            // The id and the declarations too: a screen drawing a role
+            // without them draws the colour and silently ignores
+            // whatever the operator actually wrote.
+            role: { select: { id: true, name: true, displayName: true, color: true, nameCss: true, badgeCss: true } },
         },
     });
 

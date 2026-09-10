@@ -27,6 +27,8 @@ import { ThemeComponentSlot } from "@/core/components/theme/ThemeComponentSlot";
 import { isEnabledIn } from "@/core/lib/module-enabled";
 import { authErrorMessage } from "@/core/lib/auth-error-message";
 import { dateLocaleTag } from "@/core/lib/utils";
+import { RoleBadge } from "@/core/components/ui/RoleBadge";
+import { RoleName } from "@/core/components/ui/RoleName";
 
 interface UserProfile {
     id: string;
@@ -36,7 +38,14 @@ interface UserProfile {
     locale: string;
     currency: string;
     createdAt: string;
-    role: { name: string; displayName: string; color: string | null } | null;
+    role: {
+        id: string;
+        name: string;
+        displayName: string;
+        color: string | null;
+        nameCss?: string | null;
+        badgeCss?: string | null;
+    } | null;
 }
 
 export default function ProfilePage() {
@@ -239,19 +248,11 @@ export default function ProfilePage() {
                         )}
                     </div>
                     <div>
-                        <h1 className="text-2xl font-bold text-foreground">{profile?.username}</h1>
+                        <h1 className="text-2xl font-bold text-foreground">
+                            <RoleName name={profile?.username ?? ""} role={profile?.role ?? null} />
+                        </h1>
                         <p className="text-muted-foreground text-sm">{profile?.email}</p>
-                        {profile?.role && (
-                            <span
-                                className="text-xs px-2 py-0.5 rounded mt-1 inline-block"
-                                style={{
-                                    backgroundColor: (profile.role.color || "#6366f1") + "20",
-                                    color: profile.role.color || "#6366f1",
-                                }}
-                            >
-                                {profile.role.displayName}
-                            </span>
-                        )}
+                        <RoleBadge role={profile?.role ?? null} className="mt-1" />
                     </div>
                 </div>
 

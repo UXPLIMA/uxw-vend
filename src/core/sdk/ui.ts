@@ -32,6 +32,18 @@ export { NavIcon } from "@/core/components/ui/NavIcon";
 export { IconPicker } from "@/core/components/ui/icon-picker";
 
 /**
+ * A member's name and the pill beside it, wearing what their role was given.
+ *
+ * An operator writes declarations per role; both components check them again
+ * at the render site, because a row edited straight in the database has to
+ * draw safely too. A module drawing a name out of `role.color` by hand is a
+ * screen where the operator's styling silently does nothing, which is what
+ * these replaced.
+ */
+export { RoleName } from "@/core/components/ui/RoleName";
+export { RoleBadge } from "@/core/components/ui/RoleBadge";
+
+/**
  * The site's public settings, fetched once per page however many components
  * ask. A module reaching for `/api/v1/public-settings` directly is what this
  * replaces: the allow-list is core's, so the module would be reading a
@@ -112,7 +124,3 @@ export { usePrompt, type PromptOptions } from "@/core/components/ui/confirm-dial
 export { useLocalDate } from "@/core/hooks/useLocalDate";
 export { useRelativeTime } from "@/core/hooks/useRelativeTime";
 
-// A member's name wearing its role's style. The declarations an operator wrote
-// are judged here as well as when they were saved: a row edited in the
-// database still has to render safely.
-export { RoleName } from "@/core/components/ui/RoleName";

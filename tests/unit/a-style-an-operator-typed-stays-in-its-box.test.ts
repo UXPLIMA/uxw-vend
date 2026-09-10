@@ -25,7 +25,7 @@
  * judged, not after.
  */
 import { describe, it, expect } from "vitest";
-import { safeRoleCss } from "@/core/lib/role-css";
+import { roleScope, safeRoleCss } from "@/core/lib/role-css";
 
 describe("what an operator may write", () => {
     it("takes plain declarations", () => {
@@ -150,5 +150,45 @@ describe("what is not CSS at all", () => {
 
     it("refuses more than anybody types by hand", () => {
         expect(safeRoleCss("color: red;".repeat(500))).toBeNull();
+    });
+});
+
+/**
+ * The selector the declarations are wrapped in.
+ *
+ * `safeRoleCss` judges what an operator wrote. It says nothing about the class
+ * name the render sites build the rule from, and that name is interpolated
+ * into the same `<style>` element: a role id holding a brace or an angle
+ * bracket would close the rule, or the tag, without a single character of it
+ * passing through the check.
+ *
+ * Today no id can. They are `cuid()` and nothing accepts one from a request.
+ * But "the other end happens to be safe" is the shape of every defect this
+ * file exists because of, so the scope is built out of characters that cannot
+ * break out rather than out of trust in where the id came from.
+ */
+describe("the class a role's rule is written for", () => {
+    it("is a class name, whatever the id was", () => {
+        expect(roleScope("name", "abc123")).toBe("uxw-name-abc123");
+    });
+
+    it("carries nothing that could close the rule or the tag", () => {
+        for (const id of ["a{b", "a}b", "a<b", "a>b", "a b", "a\"b", "a/*b"]) {
+            const scope = roleScope("name", id);
+            expect(/^[a-zA-Z0-9_-]+$/.test(scope), `${id} -> ${scope}`).toBe(true);
+        }
+    });
+
+    it("keeps two roles apart even after the unusable characters go", () => {
+        expect(roleScope("name", "a{b")).not.toBe(roleScope("name", "a}b"));
+    });
+
+    it("never answers with a bare prefix, which every role would share", () => {
+        expect(roleScope("name", "")).not.toBe("uxw-name-");
+        expect(roleScope("name", "{}")).not.toBe(roleScope("name", "<>"));
+    });
+
+    it("keeps a name apart from a badge on the same role", () => {
+        expect(roleScope("name", "abc")).not.toBe(roleScope("badge", "abc"));
     });
 });

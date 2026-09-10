@@ -13,6 +13,8 @@ import { writeError } from "@/core/lib/write-result";
 import { LoadFailed } from "@/core/components/ui/load-failed";
 import type { RoleRecord } from "./role-form";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
+import { RoleBadge } from "@/core/components/ui/RoleBadge";
+import { RoleName } from "@/core/components/ui/RoleName";
 
 type Role = RoleRecord;
 
@@ -89,12 +91,13 @@ export default function AdminRolesPage() {
                     <Card key={role.id} className="relative">
                         <CardHeader>
                             <CardTitle className="flex items-center justify-between">
+                                {/* Drawn the way the site draws it, so an
+                                    operator sees what they wrote rather than a
+                                    swatch of the colour underneath it. */}
                                 <div className="flex items-center gap-2">
-                                    <Shield
-                                        className="w-5 h-5"
-                                        style={{ color: role.color || "#6366f1" }}
-                                    />
-                                    <span>{role.displayName}</span>
+                                    <Shield className="w-5 h-5 text-muted-foreground" aria-hidden="true" />
+                                    <RoleName name={role.displayName} role={role} />
+                                    <RoleBadge role={role} />
                                 </div>
                                 <div className="flex gap-1">
                                     <Link href={`/admin/roles/${role.id}/edit`} className={buttonClassName("ghost", "sm")}>

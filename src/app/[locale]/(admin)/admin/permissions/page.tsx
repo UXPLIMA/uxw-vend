@@ -11,6 +11,7 @@ import { ModulePermissionResources } from "@/core/generated/module-registry";
 import { writeError } from "@/core/lib/write-result";
 import { badgeClassName } from "@/core/components/ui/badge";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
+import { RoleName } from "@/core/components/ui/RoleName";
 
 interface Role {
     id: string;
@@ -170,9 +171,11 @@ export default function PermissionsMatrixPage() {
                                     {nonAdminRoles.map((role) => (
                                         <tr key={role.id} className="border-b border-border last:border-0">
                                             <td className="py-2 pr-4">
-                                                <span className="font-medium" style={{ color: role.color || undefined }}>
-                                                    {role.displayName || role.name}
-                                                </span>
+                                                <RoleName
+                                                    name={role.displayName || role.name}
+                                                    role={role}
+                                                    className="font-medium"
+                                                />
                                             </td>
                                             {ACTIONS.map((action) => {
                                                 const g = findGrant(resource, action, role.id);
