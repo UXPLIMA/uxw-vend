@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { ModuleSlotContents, SlotContentRegistry } from "@/core/generated/module-registry";
+import { ModuleSlotContents } from "@/core/generated/module-registry";
+import { SlotContentRegistry } from "@/core/generated/module-components";
 import { useAllModules } from "@/core/providers/module-provider";
 import { ModuleErrorBoundary } from "@/core/components/ModuleErrorBoundary";
 import { isEnabledIn } from "@/core/lib/module-enabled";

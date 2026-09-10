@@ -1,7 +1,8 @@
 "use client";
 
 import React from "react";
-import { ContextProviderRegistry, ModuleContextProviders as ProviderList } from "@/core/generated/module-registry";
+import { ModuleContextProviders as ProviderList } from "@/core/generated/module-registry";
+import { ContextProviderRegistry } from "@/core/generated/module-components";
 import { useAllModules } from "@/core/providers/module-provider";
 import { isEnabledIn } from "@/core/lib/module-enabled";
 

@@ -2,10 +2,8 @@
 
 import { usePathname } from "@/core/lib/i18n/navigation";
 import { useAllModules } from "@/core/providers/module-provider";
-import {
-    ModuleLayoutComponents as LayoutComponentList,
-    LayoutComponentRegistry,
-} from "@/core/generated/module-registry";
+import { ModuleLayoutComponents as LayoutComponentList } from "@/core/generated/module-registry";
+import { LayoutComponentRegistry } from "@/core/generated/module-components";
 import { ModuleErrorBoundary } from "@/core/components/ModuleErrorBoundary";
 import { isEnabledIn } from "@/core/lib/module-enabled";
 

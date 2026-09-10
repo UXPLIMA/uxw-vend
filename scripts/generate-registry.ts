@@ -14,6 +14,7 @@ function toComponentName(basename: string): string {
 
 const MODULES_DIR = path.join(process.cwd(), 'src/modules');
 const OUTPUT_FILE = path.join(process.cwd(), 'src/core/generated/module-registry.tsx');
+const COMPONENTS_FILE = path.join(process.cwd(), 'src/core/generated/module-components.tsx');
 
 interface LoadedManifest {
     moduleName: string;
@@ -74,7 +75,10 @@ type ManifestItem = { module: string } & Record<string, string | number | boolea
 function generateRegistry() {
     const loaded = loadManifests();
 
-    const imports = `/* eslint-disable */\nimport dynamic from 'next/dynamic';\nimport type { ComponentType } from 'react';\n\n`;
+    // No `next/dynamic` here any more: every registry in this file holds a
+    // component that is part of a page already rendering. The page registry
+    // next door still uses it, because a module page is a route of its own.
+    const imports = `/* eslint-disable */\nimport type { ComponentType } from 'react';\n\n`;
     const pageImports = `/* eslint-disable */\nimport dynamic from 'next/dynamic';\nimport type { ComponentType } from 'react';\nimport { PageLoader } from '@/core/components/ui/page-loader';\n\n`;
 
     let mapping = `export const ModuleRegistry: Record<string, ComponentType<any>> = {\n`;
@@ -233,25 +237,55 @@ function generateRegistry() {
     allContextProviders.sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
     allProfileTabs.sort((a, b) => (a.order ?? 999) - (b.order ?? 999));
 
-    function emitDynamicRegistry(
+    /**
+     * Components a module contributes to a page somebody is already looking at:
+     * a widget, a homepage section, a profile tab, something in the navbar or
+     * the footer, or content for another module's slot.
+     *
+     * Imported, not lazily loaded. These used to be `next/dynamic` with
+     * `loading: () => null`, and the parent that renders them is a client
+     * component, so `dynamic` could not render them on the server either - the
+     * homepage's server HTML contained none of the widget markup at all. The
+     * page painted a shell and about a second later the chunks landed and put
+     * roughly 1200px of cards into the sidebar at once, which moved everything
+     * below them and pushed the footer out of the viewport. Cumulative layout
+     * shift measured 0.29 against a 0.1 budget.
+     *
+     * Lazy loading was buying nothing: an entry is only emitted for a module
+     * that is installed, so the import path always resolves at build time and
+     * there is no runtime question for it to answer. What it cost was a second
+     * round trip and a component that rendered nothing until it arrived.
+     *
+     * A module *page* is still split, because that is a route of its own that
+     * a visitor may never open. These are pieces of a page already rendering.
+     */
+    let staticImportLines = '';
+    let staticImportCount = 0;
+    /** The component maps, which go to their own file: see below. */
+    let componentBody = '';
+
+    function emitStaticRegistry(
         label: string,
         exportName: string,
         items: Array<{ id: string; component: string; module: string }>,
-        loadingExpr = 'null',
-    ): string {
+    ): void {
         let out = `// ${label}\nexport const ${exportName}: Record<string, ComponentType<any>> = {\n`;
         for (const item of items) {
             const importPath = buildImportPath(item.component, item.module);
             const baseName = toComponentName(path.basename(importPath));
-            out += `  '${item.id}': dynamic(() => import('${importPath}').then((mod: Record<string, unknown>) => (mod.${baseName} ?? mod['${item.id}'] ?? mod.default ?? mod) as ComponentType<any>), { loading: () => ${loadingExpr} }),\n`;
+            // A namespace import, because which name the component is exported
+            // under varies: the file's own name, the registry id, or default.
+            const alias = `mod${staticImportCount++}`;
+            staticImportLines += `import * as ${alias} from '${importPath}';\n`;
+            out += `  '${item.id}': pickComponent(${alias}, '${baseName}', '${item.id}'),\n`;
         }
         out += '};\n\n';
-        return out;
+        componentBody += out;
     }
 
-    const widgetImports = emitDynamicRegistry('Widget component registry', 'WidgetComponentRegistry', allWidgets);
-    let homepageSectionImports = emitDynamicRegistry('Homepage section component registry', 'HomepageSectionRegistry', allHomepageSections);
-    homepageSectionImports += `export const ModuleHomepageSections: { id: string; type: string; component: string; order: number; module: string }[] = ${JSON.stringify(allHomepageSections, null, 2)};\n\n`;
+    emitStaticRegistry('Widget component registry', 'WidgetComponentRegistry', allWidgets);
+    emitStaticRegistry('Homepage section component registry', 'HomepageSectionRegistry', allHomepageSections);
+    const homepageSectionImports = `export const ModuleHomepageSections: { id: string; type: string; component: string; order: number; module: string }[] = ${JSON.stringify(allHomepageSections, null, 2)};\n\n`;
 
     let widgetRegistry = `export const ModuleWidgets: { id: string; label?: string; labelKey?: string; component: string; module: string; defaultOrder: number; defaultVisible: boolean }[] = ${JSON.stringify(allWidgets, null, 2)};\n\n`;
     widgetRegistry += `export const ModuleNavLinks: { label: string; labelKey?: string; href: string; icon?: string; position?: number; module: string }[] = ${JSON.stringify(allNavLinks, null, 2)};\n\n`;
@@ -263,8 +297,8 @@ function generateRegistry() {
     widgetRegistry += `// RBAC resource strings modules own - surfaced in the admin permission matrix (flattened + deduped).\n`;
     widgetRegistry += `export const ModulePermissionResources: string[] = ${JSON.stringify([...new Set(allPermissionResources)], null, 2)};\n\n`;
 
-    let profileTabImports = emitDynamicRegistry('Profile tab component registry', 'ProfileTabRegistry', allProfileTabs);
-    profileTabImports += `export const ModuleProfileTabs: { id: string; label: string; component: string; order: number; module: string }[] = ${JSON.stringify(allProfileTabs, null, 2)};\n\n`;
+    emitStaticRegistry('Profile tab component registry', 'ProfileTabRegistry', allProfileTabs);
+    const profileTabImports = `export const ModuleProfileTabs: { id: string; label: string; component: string; order: number; module: string }[] = ${JSON.stringify(allProfileTabs, null, 2)};\n\n`;
 
     widgetRegistry += profileTabImports;
     widgetRegistry += `export const ModuleOauthButtons: { id: string; provider: string; label: string; color: string; svgIcon: string; href?: string; module: string }[] = ${JSON.stringify(allOauthButtons, null, 2)};\n\n`;
@@ -274,14 +308,14 @@ function generateRegistry() {
     widgetRegistry += `// User-data registry: tables modules contribute to GDPR personal-data exports,\n// each saying whether erasure purges it or keeps it. See user-deletion.ts.\n`;
     widgetRegistry += `export const ModuleUserDataTables: { model: string; key: string; column: string; erasure?: "purge" | "retain"; module: string }[] = ${JSON.stringify(allUserDataTables, null, 2)};\n`;
 
-    let layoutImports = emitDynamicRegistry('Layout component registry (rendered on every page)', 'LayoutComponentRegistry', allLayoutComponents);
-    layoutImports += `export const ModuleLayoutComponents: { id: string; component: string; module: string; include?: string[]; exclude?: string[] }[] = ${JSON.stringify(allLayoutComponents, null, 2)};\n\n`;
+    emitStaticRegistry('Layout component registry (rendered on every page)', 'LayoutComponentRegistry', allLayoutComponents);
+    const layoutImports = `export const ModuleLayoutComponents: { id: string; component: string; module: string; include?: string[]; exclude?: string[] }[] = ${JSON.stringify(allLayoutComponents, null, 2)};\n\n`;
 
-    let navbarImports = emitDynamicRegistry('Navbar component registry (rendered in navbar right side)', 'NavbarComponentRegistry', allNavbarComponents);
-    navbarImports += `export const ModuleNavbarComponents: { id: string; component: string; order: number; module: string }[] = ${JSON.stringify(allNavbarComponents, null, 2)};\n\n`;
+    emitStaticRegistry('Navbar component registry (rendered in navbar right side)', 'NavbarComponentRegistry', allNavbarComponents);
+    const navbarImports = `export const ModuleNavbarComponents: { id: string; component: string; order: number; module: string }[] = ${JSON.stringify(allNavbarComponents, null, 2)};\n\n`;
 
-    let footerImports = emitDynamicRegistry('Footer component registry (rendered in site footer)', 'FooterComponentRegistry', allFooterComponents);
-    footerImports += `export const ModuleFooterComponents: { id: string; component: string; section?: string; order?: number; module: string }[] = ${JSON.stringify(allFooterComponents, null, 2)};\n\n`;
+    emitStaticRegistry('Footer component registry (rendered in site footer)', 'FooterComponentRegistry', allFooterComponents);
+    const footerImports = `export const ModuleFooterComponents: { id: string; component: string; section?: string; order?: number; module: string }[] = ${JSON.stringify(allFooterComponents, null, 2)};\n\n`;
 
     // Context providers are the one registry that must be imported statically.
     // `next/dynamic` wraps its component in a Suspense boundary, and these
@@ -290,19 +324,19 @@ function generateRegistry() {
     // is committed as 200, and a later `notFound()` or a thrown error can no
     // longer set a status. Every 404 on the site was a soft 404 because of it.
     let contextProviderImports = '';
-    let contextImports = '// Context provider registry - wraps children, used for React contexts\n';
-    contextImports += '// Statically imported on purpose: see scripts/generate-registry.ts.\n';
-    contextImports += `export const ContextProviderRegistry: Record<string, ComponentType<any>> = {\n`;
+    let contextRegistry = '// Context provider registry - wraps children, used for React contexts\n';
+    contextRegistry += '// Statically imported on purpose: see scripts/generate-registry.ts.\n';
+    contextRegistry += `export const ContextProviderRegistry: Record<string, ComponentType<any>> = {\n`;
     allContextProviders.forEach((cp, index) => {
         const importPath = buildImportPath(cp.component, cp.module);
         const baseName = toComponentName(path.basename(importPath));
         const ns = `ContextProviderModule${index}`;
         contextProviderImports += `import * as ${ns} from '${importPath}';\n`;
-        contextImports += `  '${cp.id}': pickContextProvider(${ns} as unknown as Record<string, unknown>, '${cp.id}', '${baseName}'),\n`;
+        contextRegistry += `  '${cp.id}': pickContextProvider(${ns} as unknown as Record<string, unknown>, '${cp.id}', '${baseName}'),\n`;
     });
     if (contextProviderImports) contextProviderImports += '\n';
-    contextImports += '};\n\n';
-    contextImports += `export const ModuleContextProviders: { id: string; component: string; order?: number; module: string }[] = ${JSON.stringify(allContextProviders, null, 2)};\n\n`;
+    contextRegistry += '};\n\n';
+    const contextImports = `export const ModuleContextProviders: { id: string; component: string; order?: number; module: string }[] = ${JSON.stringify(allContextProviders, null, 2)};\n\n`;
 
     const contextProviderHelper = allContextProviders.length > 0
         ? `// Resolves the provider a module exported, whatever it named it.\n` +
@@ -310,17 +344,52 @@ function generateRegistry() {
           `    return (mod[id] ?? mod[baseName] ?? mod.default ?? mod) as ComponentType<any>;\n` +
           `}\n\n`
         : '';
-    contextImports = contextProviderHelper + contextImports;
+    componentBody += contextProviderHelper + contextRegistry;
 
-    let slotImports = emitDynamicRegistry("Slot content registry - modules injecting into other modules' named slots", 'SlotContentRegistry', allSlotContents);
-    slotImports += `export const ModuleSlotContents: { id: string; slot: string; component: string; order?: number; module: string }[] = ${JSON.stringify(allSlotContents, null, 2)};\n\n`;
+    emitStaticRegistry("Slot content registry - modules injecting into other modules' named slots", 'SlotContentRegistry', allSlotContents);
+    const slotImports = `export const ModuleSlotContents: { id: string; slot: string; component: string; order?: number; module: string }[] = ${JSON.stringify(allSlotContents, null, 2)};\n\n`;
 
-    const content = imports + contextProviderImports + routeData + '\n\n' + widgetImports + homepageSectionImports + layoutImports + navbarImports + footerImports + contextImports + slotImports + widgetRegistry;
+    // The namespace imports the registries above reference, and the one
+    // helper that reads a component out of one. Which name a module exports
+    // its component under varies - the file's own name, the registry id, or
+    // default - and the lazy version resolved the same three in the same
+    // order.
+    const pickHelper =
+        `function pickComponent(ns: Record<string, unknown>, ...names: string[]): ComponentType<any> {\n` +
+        `    for (const name of names) {\n` +
+        `        const found = ns[name];\n` +
+        `        if (found) return found as ComponentType<any>;\n` +
+        `    }\n` +
+        `    return (ns.default ?? ns) as ComponentType<any>;\n` +
+        `}\n\n`;
+
+    /*
+     * Two files, because they cost different things to import.
+     *
+     * The component maps now hold real imports rather than lazy ones, so
+     * importing them pulls every widget, tab and slot a module contributes,
+     * and with them next-intl, the icon set and whatever else those
+     * components reach for. The data arrays beside them are plain JSON that
+     * server code and tests read constantly - route tables, the GDPR table
+     * list, the permission resources. Leaving the two in one file made every
+     * one of those readers pay for the component tree; six test suites went
+     * from reading an array to failing on a client-only import.
+     */
+    const componentsContent =
+        `/* eslint-disable */\nimport type { ComponentType } from 'react';\n\n` +
+        staticImportLines + contextProviderImports + '\n' + pickHelper + componentBody;
+
+    const registryContent =
+        imports + routeData + '\n\n' +
+        homepageSectionImports + layoutImports + navbarImports +
+        footerImports + contextImports + slotImports + widgetRegistry;
 
     const dir = path.dirname(OUTPUT_FILE);
     if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-    fs.writeFileSync(OUTPUT_FILE, content);
+    fs.writeFileSync(OUTPUT_FILE, registryContent);
+    fs.writeFileSync(COMPONENTS_FILE, componentsContent);
     console.log(`Generated module registry at ${OUTPUT_FILE}`);
+    console.log(`Generated module component registry at ${COMPONENTS_FILE}`);
 
     // The API handler map lives in its own file, and deliberately so.
     //

@@ -48,6 +48,18 @@ const moduleSourceAliases = moduleIdsIn(sourcesDir)
     }));
 
 export default defineConfig({
+    /*
+     * No PostCSS in the test run.
+     *
+     * The module component registries are static imports now, so a test that
+     * renders the navbar pulls the components modules contribute to it, and
+     * those reach a stylesheet. Vite then goes looking for a PostCSS config
+     * and finds this project's, whose first plugin is named as a string for
+     * Next to resolve - which Vite will not accept. Nothing here asserts on a
+     * style, so the answer is to not process CSS rather than to keep a second
+     * PostCSS config in step with the real one.
+     */
+    css: { postcss: { plugins: [] } },
     test: {
         globals: true,
         environment: 'jsdom',

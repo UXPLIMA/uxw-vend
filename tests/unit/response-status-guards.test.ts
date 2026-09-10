@@ -18,11 +18,19 @@ describe("context provider registry", () => {
 
     it("emits context providers as static imports", () => {
         const block = generator.slice(
-            generator.indexOf("let contextImports"),
-            generator.indexOf("let slotImports"),
+            generator.indexOf("let contextRegistry"),
+            generator.indexOf("const contextProviderHelper"),
         );
         expect(block).not.toContain("dynamic(");
         expect(block).toContain("import * as ${ns}");
+    });
+
+    it("emits every in-page registry the same way, for the same reason", () => {
+        // The Suspense boundary that broke the status code is the same one a
+        // widget got, where it cost a layout shift instead. Both are gone; see
+        // a-module-component-does-not-arrive-late.test.ts.
+        expect(generator).not.toContain("loading: () => ${loadingExpr}");
+        expect(generator).toContain("function emitStaticRegistry");
     });
 });
 

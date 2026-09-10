@@ -11,7 +11,8 @@ import { useDarkMode } from "@/core/hooks/useDarkMode";
 import Image from "next/image";
 import { useSiteSettings } from "@/core/hooks/useSiteSettings";
 import { useAllModules } from "@/core/providers/module-provider";
-import { ModuleNavLinks, ModuleRoutes, ModuleNavbarComponents, NavbarComponentRegistry } from "@/core/generated/module-registry";
+import { ModuleNavLinks, ModuleRoutes, ModuleNavbarComponents } from "@/core/generated/module-registry";
+import { NavbarComponentRegistry } from "@/core/generated/module-components";
 import { ModuleErrorBoundary } from "@/core/components/ModuleErrorBoundary";
 import { Slot } from "@/core/components/Slot";
 
