@@ -27,7 +27,7 @@
  */
 import { describe, it, expect } from "vitest";
 import { accessByRole } from "@/core/lib/access-by-role";
-import { clearedMatrix, normalisedMatrix } from "@/modules/forum/lib/permission-matrix";
+import { clearedMatrix, normalisedMatrix } from "@/core/lib/permission-matrix";
 
 const draft = (roleId: string, canView: boolean, canPost: boolean, canReply: boolean) =>
     ({ roleId, canView, canPost, canReply });

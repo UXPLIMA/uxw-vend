@@ -122,6 +122,12 @@ export type { RedirectRule } from "@/core/lib/redirect-resolve";
 export { accessByRole } from "@/core/lib/access-by-role";
 export type { AccessNode, AccessRule, Access } from "@/core/lib/access-by-role";
 
+// The writing half of the same decision. A grid that sends only its ticked
+// rows sends nothing when an operator unticks everybody, which is read as
+// "nobody has ruled on this" and opens the container to the world.
+export { clearedMatrix, normalisedMatrix } from "@/core/lib/permission-matrix";
+export type { MatrixRule } from "@/core/lib/permission-matrix";
+
 // Keeping a member out of one part of the site rather than all of it. The
 // scope is the asking module's own word; core never interprets it.
 export { restrictedFrom, SITE_WIDE } from "@/core/lib/restrictions";

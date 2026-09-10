@@ -5,8 +5,7 @@ import { useTranslations } from "next-intl";
 import { toast } from "sonner";
 import { Button, Card, CardContent, CardHeader, CardTitle, Checkbox, LoadFailed } from "@/core/sdk/ui";
 import { AdminPageHeader } from "@/core/sdk/admin";
-import { writeError } from "@/core/sdk";
-import { clearedMatrix, normalisedMatrix, type MatrixRule } from "../../../lib/permission-matrix";
+import { clearedMatrix, normalisedMatrix, writeError, type MatrixRule } from "@/core/sdk";
 
 /**
  * Who may read, write and reply in each category.

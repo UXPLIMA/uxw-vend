@@ -50,6 +50,17 @@ interface AdminCrudPageProps {
     displayField: string; // which field to show as title in list
     secondaryField?: string; // subtitle in list
     secondaryRender?: (item: Record<string, unknown>) => string; // overrides secondaryField when provided
+    /**
+     * A second place a row can go, beside editing its own fields.
+     *
+     * Some rows are a door as well as a record - a support department has
+     * questions and permissions behind it, a category has a matrix - and
+     * without this the module has to abandon this component and write the list
+     * again to add one link. `rowActionLabel` comes with it because a link
+     * with no words is a link a screen reader reads as nothing.
+     */
+    rowHref?: (item: Record<string, unknown>) => string;
+    rowActionLabel?: string;
 }
 
 /**
@@ -67,7 +78,7 @@ interface AdminCrudPageProps {
  * two more files per module. The address changes, the back button works and
  * the form owns the screen, which is what the path segment was for.
  */
-export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displayField, secondaryField, secondaryRender }: AdminCrudPageProps) {
+export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displayField, secondaryField, secondaryRender, rowHref, rowActionLabel }: AdminCrudPageProps) {
     const ct = useTranslations("admin");
     const commonT = useTranslations("common");
     const [items, setItems] = useState<Record<string, unknown>[]>([]);
@@ -340,6 +351,11 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
                                         ) : null}
                                     </div>
                                     <div className="flex gap-1">
+                                        {rowHref && rowActionLabel && (
+                                            <Link href={rowHref(item)} className={buttonClassName("outline", "sm")}>
+                                                {rowActionLabel}
+                                            </Link>
+                                        )}
                                         <Button
                                             aria-label={commonT("edit")}
                                             variant="ghost"

@@ -13,6 +13,8 @@ export default function Page() {
             listKey="departments"
             displayField="name"
             secondaryField="description"
+            rowHref={(item) => `/admin/tickets/departments/${item.id}`}
+            rowActionLabel={t("adm_setupTitle")}
             fields={[
                 { key: "name", label: t("adm_field1Label"), required: true, placeholder: t("adm_field1Placeholder") },
                 { key: "description", label: t("adm_field2Label"), placeholder: t("adm_field2Placeholder") },

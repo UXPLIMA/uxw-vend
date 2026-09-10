@@ -1,7 +1,7 @@
 /**
- * What the permission grid sends, and why it cannot just send the ticks.
+ * What a permission grid sends, and why it cannot just send the ticks.
  *
- * `accessByRole` has two silences that mean opposite things. A category nobody
+ * `access-by-role.ts` next door has two silences that mean opposite things. A category nobody
  * has ruled on is open, because anything else turns installing a permission
  * system into an outage. A category where somebody has written a list, and the
  * list does not name this role, is shut to it, because once an operator has
@@ -23,6 +23,11 @@
  * you cannot open is a contradiction that would draw a reply box on a page
  * that 404s. So the tick is taken back here, where an operator can see it
  * happen, rather than discarded three layers down where they cannot.
+ *
+ * It sits in core because the reading half does. The forum wrote it first
+ * and the support desk needs the same answer about its departments; a second
+ * copy is a second thing to fix, and the line that would drift is the one
+ * that decides whether a container is open to everybody.
  */
 
 export interface MatrixRule {

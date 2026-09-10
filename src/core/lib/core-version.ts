@@ -12,6 +12,16 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 1.41.0 - `normalisedMatrix` and `clearedMatrix` join `@/core/sdk`, beside the
+ * `accessByRole` that reads what they write. A grid sending only its ticked
+ * rows sends nothing when an operator unticks everybody, and nothing is read as
+ * "nobody has ruled on this": the strictest thing a screen can say produces the
+ * loosest thing the site can do. The forum wrote the answer first and the
+ * support desk needs the same one. `AdminCrudPage` takes `rowHref` and
+ * `rowActionLabel` in the same change: some rows are a door as well as a
+ * record, and without a link a module had to abandon the component and write
+ * the list again to add one. Additive.
+ *
  * 1.40.0 - `verifyPassword` joins `@/core/sdk/server`. Which algorithm hashed a
  * password is now an operator setting, so a module comparing with one of them
  * by name starts refusing correct passwords the day the setting moves: the
@@ -282,4 +292,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.40.0";
+export const CORE_API_VERSION = "1.41.0";
