@@ -32,7 +32,7 @@
 import { randomBytes, scrypt as scryptCallback, timingSafeEqual, type ScryptOptions } from "node:crypto";
 import bcrypt from "bcryptjs";
 import { BCRYPT_ROUNDS } from "@/core/lib/constants";
-import { DEFAULT_ALGORITHM, isHashAlgorithm, type HashAlgorithm } from "@/core/lib/hash-algorithms";
+import type { HashAlgorithm } from "@/core/lib/hash-algorithms";
 
 // Re-exported so a server caller has one import rather than two. A client
 // component takes the list from `hash-algorithms.ts` directly.

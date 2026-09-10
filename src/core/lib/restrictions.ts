@@ -56,3 +56,43 @@ export function restrictedFrom(
         return has === asked || has === SITE_WIDE;
     });
 }
+
+/** As long as a scope may be. A word, not a sentence. */
+const MAX_SCOPE = 64;
+
+export type NewRestrictionRefusal = "empty_scope" | "already_lapsed" | "too_long";
+
+/**
+ * Null when an operator may place this one.
+ *
+ * Both refusals exist because the alternative is a control that appears to
+ * work and does not. A blank scope is read above as "no", so a row holding one
+ * is a restriction the screen lists, the operator believes, and nothing
+ * enforces. An expiry already in the past is the same thing with a date on it.
+ * The comparison matches the one above exactly - at the moment it expires, not
+ * the day after - so the two cannot drift into disagreeing about a restriction
+ * that is placed and immediately gone.
+ */
+export function checkNewRestriction(
+    scope: string,
+    expiresAt: Date | null,
+    now: Date = new Date(),
+): NewRestrictionRefusal | null {
+    const asked = scope.trim();
+    if (asked === "") return "empty_scope";
+    if (asked.length > MAX_SCOPE) return "too_long";
+    if (expiresAt !== null && expiresAt.getTime() <= now.getTime()) return "already_lapsed";
+    return null;
+}
+
+/**
+ * Taking one off, as a change to the row rather than the loss of it.
+ *
+ * `restrictions-server.ts` keeps lapsed rows on purpose: an operator reading
+ * somebody's history wants to see the month they spent out of the tickets.
+ * Lifting therefore ends a restriction where it stands and leaves the record
+ * of what was done and when.
+ */
+export function lift(now: Date = new Date()): { expiresAt: Date } {
+    return { expiresAt: now };
+}

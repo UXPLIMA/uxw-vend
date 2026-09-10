@@ -20,6 +20,7 @@ import { writeError, errorMessage } from "@/core/lib/write-result";
 import { NativeSelect } from "@/core/components/ui/native-select";
 import { AdminPageHeader } from "@/core/components/admin/AdminPageHeader";
 import { LoadFailed } from "@/core/components/ui/load-failed";
+import { CustomerView } from "./CustomerView";
 
 interface UserDetail {
     id: string;
@@ -529,6 +530,14 @@ export default function AdminUserDetailPage() {
                         </CardContent>
                     </Card>
                 </div>
+            </div>
+
+            {/* Everything installed knows something about this member. The
+                page above is core's own columns; this is the rest of the
+                site answering, and it loads on its own so a slow module
+                delays a panel rather than the screen. */}
+            <div className="mt-8">
+                <CustomerView userId={user.id} />
             </div>
 
             {deleteModalOpen && (
