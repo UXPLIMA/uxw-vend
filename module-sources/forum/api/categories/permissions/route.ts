@@ -21,17 +21,44 @@ const matrixSchema = z.object({
     })).max(100),
 });
 
+/**
+ * Everything the grid needs, narrowed by nothing.
+ *
+ * `/api/v1/forum/categories` narrows to what the reader may see, which is
+ * right for the board and would be a trap here: an admin whose own role is
+ * unticked for a category would find that category missing from the screen
+ * that exists to untick it back, and one wrong row would put a category
+ * permanently out of reach from inside the product. Inactive categories are
+ * here for the same reason - a board an operator switched off is one they may
+ * still need to fix the permissions on before switching it back on.
+ */
 export async function GET(request: NextRequest) {
     const session = await auth();
     if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     if (!(await isAdmin(session.user.id))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
-    const categoryId = request.nextUrl.searchParams.get("categoryId");
-    const rules = await prisma.forumCategoryPermission.findMany({
-        where: categoryId ? { categoryId } : {},
-        take: 2000,
-    });
-    return NextResponse.json({ rules }, { headers: { "Cache-Control": "private, no-store" } });
+    const categoryId = new URL(request.url).searchParams.get("categoryId");
+    const [rules, categories, roles] = await Promise.all([
+        prisma.forumCategoryPermission.findMany({
+            where: categoryId ? { categoryId } : {},
+            take: 2000,
+        }),
+        prisma.forumCategory.findMany({
+            select: { id: true, name: true, parentId: true, isActive: true, order: true },
+            orderBy: { order: "asc" },
+            take: 500,
+        }),
+        prisma.role.findMany({
+            select: { id: true, name: true, displayName: true, color: true, priority: true },
+            orderBy: { priority: "desc" },
+            take: 200,
+        }),
+    ]);
+
+    return NextResponse.json(
+        { rules, categories, roles },
+        { headers: { "Cache-Control": "private, no-store" } },
+    );
 }
 
 export async function PUT(request: NextRequest) {
