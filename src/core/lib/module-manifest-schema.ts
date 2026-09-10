@@ -646,17 +646,42 @@ const CSP_ORIGIN = z
         "must be a concrete https origin, e.g. https://discord.com",
     );
 
-const cspContribution = z
+/**
+ * The same, plus a socket.
+ *
+ * `connect-src` governs what a page may open, and for a chat widget that is a
+ * websocket rather than a request: the conversation arrives down it. With only
+ * `https://` accepted, a module needing one had two options and both were bad
+ * - leave it out and let the policy block the socket, which is a bubble that
+ * appears and never connects, or widen the policy by hand somewhere core
+ * cannot see.
+ *
+ * Only here, and only encrypted. `ws://` would take the conversation off the
+ * connection the rest of the page is on, and a socket is not where a script,
+ * a stylesheet or a picture comes from.
+ */
+const CSP_CONNECT_ORIGIN = z
+    .string()
+    .min(1)
+    .max(253)
+    .regex(
+        /^(https|wss):\/\/[a-z0-9-]+(\.[a-z0-9-]+)+$/,
+        "must be a concrete https or wss origin, e.g. https://discord.com",
+    );
+
+export const moduleCspSchema = z
     .object({
         "script-src": z.array(CSP_ORIGIN).max(10).optional(),
         "frame-src": z.array(CSP_ORIGIN).max(10).optional(),
-        "connect-src": z.array(CSP_ORIGIN).max(10).optional(),
+        "connect-src": z.array(CSP_CONNECT_ORIGIN).max(10).optional(),
         "img-src": z.array(CSP_ORIGIN).max(10).optional(),
         "style-src": z.array(CSP_ORIGIN).max(10).optional(),
         "font-src": z.array(CSP_ORIGIN).max(10).optional(),
         "media-src": z.array(CSP_ORIGIN).max(10).optional(),
     })
     .strict();
+
+const cspContribution = moduleCspSchema;
 
 /**
  * One admin-editable setting a module declares.

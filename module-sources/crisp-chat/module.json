@@ -1,0 +1,76 @@
+{
+  "id": "crisp-chat",
+  "name": "Crisp Chat",
+  "description": "A live chat bubble on every page, served by Crisp. Nothing is loaded until the visitor has accepted cookies.",
+  "version": "1.0.0",
+  "coreVersion": "^1.43.0",
+  "category": "integration",
+  "author": "uxwVend",
+  "icon": "MessageCircle",
+  "csp": {
+    "script-src": [
+      "https://client.crisp.chat"
+    ],
+    "connect-src": [
+      "https://client.crisp.chat",
+      "wss://client.relay.crisp.chat"
+    ],
+    "img-src": [
+      "https://client.crisp.chat",
+      "https://image.crisp.chat"
+    ],
+    "style-src": [
+      "https://client.crisp.chat"
+    ],
+    "font-src": [
+      "https://client.crisp.chat"
+    ]
+  },
+  "layoutComponents": [
+    {
+      "id": "CrispChat",
+      "component": "components/ChatWidget"
+    }
+  ],
+  "adminRoutes": [
+    {
+      "path": "/settings/crisp-chat",
+      "component": "pages/admin/page.tsx"
+    }
+  ],
+  "settingsCards": [
+    {
+      "title": "Live chat",
+      "description": "The chat bubble visitors talk to you through.",
+      "href": "/settings/crisp-chat",
+      "icon": "MessageCircle",
+      "color": "text-blue-500"
+    }
+  ],
+  "api": [
+    {
+      "path": "/crisp-chat/config",
+      "handler": "api/config/route.ts",
+      "method": "GET",
+      "description": "The site id, or nothing when it is not set up."
+    }
+  ],
+  "translations": {
+    "en": {
+      "crispChat": {
+        "adm_title": "Crisp Chat",
+        "adm_subtitle": "The chat bubble visitors talk to you through.",
+        "adm_websiteId": "Website ID",
+        "adm_websiteIdDesc": "From the provider's dashboard, under Settings. It is a UUID; anything else is refused and the bubble stays away. Nothing loads until a visitor has accepted cookies."
+      }
+    },
+    "tr": {
+      "crispChat": {
+        "adm_title": "Crisp Chat",
+        "adm_subtitle": "Ziyaretçilerin sizinle konuştuğu sohbet balonu.",
+        "adm_websiteId": "Website ID",
+        "adm_websiteIdDesc": "Sağlayıcının panelinde Ayarlar altında. Bir UUID'dir; başka her şey reddedilir ve balon çıkmaz. Ziyaretçi çerezleri kabul etmeden hiçbir şey yüklenmez."
+      }
+    }
+  }
+}

@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-10",
-  "updatedAt": "2026-09-10T07:15:27Z",
+  "updatedAt": "2026-09-10T07:46:08Z",
   "modules": [
     {
       "id": "announcements",
@@ -494,6 +494,36 @@
         "publicRoutes": 0,
         "adminRoutes": 1,
         "apiRoutes": 2,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "crisp-chat",
+      "name": "Crisp Chat",
+      "description": "A live chat bubble on every page, served by Crisp. Nothing is loaded until the visitor has accepted cookies.",
+      "i18n": {},
+      "version": "1.0.0",
+      "coreVersion": "^1.43.0",
+      "author": "uxwVend",
+      "icon": "MessageCircle",
+      "category": "integration",
+      "verified": true,
+      "updatedAt": "2026-09-10T07:46:08Z",
+      "screenshots": [],
+      "tags": [
+        "integration"
+      ],
+      "zip": "crisp-chat.zip",
+      "dependencies": [],
+      "conflicts": [],
+      "hooks": {
+        "emits": [],
+        "listens": []
+      },
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 1,
+        "apiRoutes": 1,
         "widgets": 0
       }
     },

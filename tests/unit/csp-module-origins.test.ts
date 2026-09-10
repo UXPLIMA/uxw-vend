@@ -1,4 +1,5 @@
 import { describe, it, expect } from "vitest";
+import { moduleCspSchema } from "@/core/lib/module-manifest-schema";
 import fs from "fs";
 import path from "path";
 
@@ -128,14 +129,18 @@ describe("every module", () => {
         expect([...new Set(undeclared)]).toEqual([]);
     });
 
-    it("declares only concrete https origins", () => {
+    it("declares only concrete origins, and a socket only where one can be opened", () => {
+        const HTTPS = /^https:\/\/[a-z0-9-]+(\.[a-z0-9-]+)+$/;
+        // A websocket is a connection, not a script or a picture, so it is a
+        // shape `connect-src` may hold and no other directive may.
+        const CONNECTABLE = /^(https|wss):\/\/[a-z0-9-]+(\.[a-z0-9-]+)+$/;
+
         const bad: string[] = [];
         for (const { name, manifest } of modules) {
             for (const [directive, origins] of Object.entries(manifest.csp ?? {})) {
+                const shape = directive === "connect-src" ? CONNECTABLE : HTTPS;
                 for (const origin of origins) {
-                    if (!/^https:\/\/[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(origin)) {
-                        bad.push(`${name} ${directive}: ${origin}`);
-                    }
+                    if (!shape.test(origin)) bad.push(`${name} ${directive}: ${origin}`);
                 }
             }
         }
@@ -161,5 +166,50 @@ describe("the api documentation", () => {
         expect(
             fs.existsSync(path.join(root, "src/app/[locale]/(admin)/admin/api-docs/page.tsx")),
         ).toBe(true);
+    });
+});
+
+/**
+ * A socket is a connection too.
+ *
+ * `connect-src` governs what a page may open, and for a chat widget that is a
+ * websocket rather than a request: the conversation arrives down it. The
+ * origin pattern only ever accepted `https://`, so a module needing one had
+ * two options and both were bad - leave it out of the manifest and let the
+ * policy block the socket, which is a chat bubble that appears and never
+ * connects, or widen the policy by hand somewhere core cannot see.
+ *
+ * So `wss://` is accepted, and only where a socket can be opened. Everything
+ * the pattern refused before it still refuses: a bare scheme, a wildcard, a
+ * host with no dot in it, and `ws://` without the s, which would take the
+ * conversation off the encrypted connection the rest of the page is on.
+ */
+describe("a websocket origin", () => {
+    it("is accepted where a page may open a connection", () => {
+        expect(moduleCspSchema.safeParse({ "connect-src": ["wss://client.relay.example.com"] }).success).toBe(true);
+    });
+
+    it("is accepted beside an https origin in the same list", () => {
+        const parsed = moduleCspSchema.safeParse({
+            "connect-src": ["https://client.example.com", "wss://client.relay.example.com"],
+        });
+        expect(parsed.success).toBe(true);
+    });
+
+    it("is refused where a script or a picture comes from", () => {
+        for (const directive of ["script-src", "img-src", "style-src", "font-src", "frame-src", "media-src"]) {
+            const parsed = moduleCspSchema.safeParse({ [directive]: ["wss://client.relay.example.com"] });
+            expect(parsed.success, directive).toBe(false);
+        }
+    });
+
+    it("is refused without the encryption", () => {
+        expect(moduleCspSchema.safeParse({ "connect-src": ["ws://client.relay.example.com"] }).success).toBe(false);
+    });
+
+    it("refuses what it always refused", () => {
+        for (const bad of ["wss://*", "wss:", "wss://localhost", "wss://example.com/path", "*"]) {
+            expect(moduleCspSchema.safeParse({ "connect-src": [bad] }).success, bad).toBe(false);
+        }
     });
 });
