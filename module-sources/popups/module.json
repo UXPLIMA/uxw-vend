@@ -2,8 +2,8 @@
   "id": "popups",
   "name": "Popups",
   "description": "Modal popup notifications and promotions",
-  "version": "1.2.0",
-  "coreVersion": "^2.0.0",
+  "version": "1.2.1",
+  "coreVersion": "^2.1.0",
   "category": "management",
   "author": "Blysis",
   "icon": "Bell",
@@ -15,7 +15,8 @@
       "label": "Popups",
       "path": "/popups",
       "icon": "Bell",
-      "group": "design"
+      "group": "design",
+      "section": "layout"
     }
   ],
   "adminRoutes": [

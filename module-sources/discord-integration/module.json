@@ -2,8 +2,8 @@
   "id": "discord-integration",
   "name": "Discord Integration",
   "description": "Discord webhook notifications and settings",
-  "version": "1.4.0",
-  "coreVersion": "^2.0.0",
+  "version": "1.4.1",
+  "coreVersion": "^2.1.0",
   "category": "integration",
   "author": "Blysis",
   "icon": "MessageSquare",
@@ -12,7 +12,8 @@
       "label": "Discord",
       "path": "/discord",
       "icon": "MessageSquare",
-      "group": "settings"
+      "group": "system",
+      "section": "integrations"
     }
   ],
   "adminRoutes": [

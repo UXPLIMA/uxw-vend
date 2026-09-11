@@ -2,8 +2,8 @@
   "id": "changelog",
   "name": "Changelog",
   "description": "Release notes and update history",
-  "version": "1.2.0",
-  "coreVersion": "^2.0.0",
+  "version": "1.2.1",
+  "coreVersion": "^2.1.0",
   "category": "community",
   "author": "Blysis",
   "icon": "History",
@@ -15,7 +15,8 @@
       "label": "Changelog",
       "path": "/changelog",
       "icon": "History",
-      "group": "content"
+      "group": "content",
+      "section": "publishing"
     }
   ],
   "routes": [

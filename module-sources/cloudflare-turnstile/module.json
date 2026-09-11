@@ -2,8 +2,8 @@
   "id": "cloudflare-turnstile",
   "name": "Cloudflare Turnstile",
   "description": "Privacy-focused CAPTCHA alternative powered by Cloudflare",
-  "version": "1.6.0",
-  "coreVersion": "^2.0.0",
+  "version": "1.6.1",
+  "coreVersion": "^2.1.0",
   "secretSettings": [
     "cloudflare_turnstile_config.secretKey"
   ],
@@ -15,7 +15,8 @@
       "label": "Cloudflare Turnstile",
       "path": "/security/turnstile",
       "icon": "Shield",
-      "group": "advanced"
+      "group": "system",
+      "section": "security"
     }
   ],
   "adminRoutes": [

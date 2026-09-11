@@ -2,8 +2,8 @@
   "id": "downloads",
   "name": "Downloads",
   "description": "File download center for resources and mods",
-  "version": "1.2.0",
-  "coreVersion": "^2.0.0",
+  "version": "1.2.1",
+  "coreVersion": "^2.1.0",
   "category": "gaming",
   "author": "Blysis",
   "icon": "Download",
@@ -15,7 +15,8 @@
       "label": "Downloads",
       "path": "/downloads",
       "icon": "Download",
-      "group": "content"
+      "group": "content",
+      "section": "publishing"
     }
   ],
   "routes": [

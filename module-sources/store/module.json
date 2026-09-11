@@ -2,7 +2,7 @@
   "id": "store",
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
-  "version": "2.25.1",
+  "version": "2.25.2",
   "coreVersion": "^2.0.0",
   "category": "commerce",
   "author": "Blysis Team",
@@ -132,7 +132,7 @@
       "id": "commerce",
       "label": "Commerce",
       "icon": "ShoppingBag",
-      "order": 10
+      "order": 30
     }
   ],
   "menu": [

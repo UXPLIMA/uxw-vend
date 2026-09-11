@@ -2,8 +2,8 @@
   "id": "help-center",
   "name": "Help Center",
   "description": "Knowledge base with categories and searchable articles",
-  "version": "1.4.0",
-  "coreVersion": "^2.0.0",
+  "version": "1.4.1",
+  "coreVersion": "^2.1.0",
   "category": "management",
   "author": "Blysis Team",
   "icon": "HelpCircle",
@@ -39,7 +39,8 @@
       "label": "Help Center",
       "path": "/help",
       "icon": "HelpCircle",
-      "group": "content"
+      "group": "content",
+      "section": "publishing"
     }
   ],
   "routes": [

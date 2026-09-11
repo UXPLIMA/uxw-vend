@@ -12,6 +12,14 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 2.1.0 - `menu[].section` lets a module say which section of a group its
+ * admin page belongs to, and a group declares its own `order` rather than
+ * being appended after everything core ships. Without the first, a module with
+ * a single page had nowhere to say what kind of thing it was and fell into a
+ * pooled drawer; fourteen payment providers ended up there, under Settings,
+ * while the page that configures payment was in Commerce. Both are additions:
+ * a manifest that names neither is arranged exactly as it was.
+ *
  * 2.0.0 - The product is called Blysis. Every name it published moves with it,
  * and two of them are a module's to declare: the global interfaces a module
  * augments to type its own hooks are `BlysisHookPayloads`,
@@ -330,4 +338,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "2.0.0";
+export const CORE_API_VERSION = "2.1.0";

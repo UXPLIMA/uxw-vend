@@ -2,8 +2,8 @@
   "id": "coinpayments-gateway",
   "name": "CoinPayments Gateway",
   "description": "Take Bitcoin, Litecoin, USDT and other crypto payments through CoinPayments",
-  "version": "1.2.0",
-  "coreVersion": "^2.0.0",
+  "version": "1.2.1",
+  "coreVersion": "^2.1.0",
   "secretSettings": [
     "coinpayments_ipn_secret"
   ],
@@ -27,7 +27,8 @@
       "label": "CoinPayments Settings",
       "path": "/settings/coinpayments",
       "icon": "Bitcoin",
-      "group": "settings"
+      "group": "commerce",
+      "section": "payments"
     }
   ],
   "adminRoutes": [

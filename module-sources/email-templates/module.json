@@ -2,8 +2,8 @@
   "id": "email-templates",
   "name": "Email Templates",
   "description": "Email service configuration and templates",
-  "version": "1.2.0",
-  "coreVersion": "^2.0.0",
+  "version": "1.2.1",
+  "coreVersion": "^2.1.0",
   "secretSettings": [
     "resend_api_key"
   ],
@@ -19,7 +19,8 @@
       "label": "Email Settings",
       "path": "/email",
       "icon": "Mail",
-      "group": "settings"
+      "group": "system",
+      "section": "integrations"
     }
   ],
   "adminRoutes": [

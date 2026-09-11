@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-11",
-  "updatedAt": "2026-09-11T11:32:54Z",
+  "updatedAt": "2026-09-11T13:12:03Z",
   "modules": [
     {
       "id": "announcements",
@@ -13,13 +13,13 @@
           "description": "Site genelinde duyuru bantları"
         }
       },
-      "version": "1.1.0",
-      "coreVersion": "^2.0.0",
+      "version": "1.1.1",
+      "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "Megaphone",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-11T13:12:03Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -202,13 +202,13 @@
           "description": "Sürüm notları ve güncelleme geçmişi"
         }
       },
-      "version": "1.2.0",
-      "coreVersion": "^2.0.0",
+      "version": "1.2.1",
+      "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "History",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-11T10:08:12Z",
+      "updatedAt": "2026-09-11T13:12:03Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -241,13 +241,13 @@
           "description": "Cloudflare R2 üzerinde çalışan S3 uyumlu nesne depolama (çıkış ücreti yok)"
         }
       },
-      "version": "1.4.0",
-      "coreVersion": "^2.0.0",
+      "version": "1.4.1",
+      "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "Cloud",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-11T13:04:50Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -276,13 +276,13 @@
           "description": "Cloudflare tarafından sağlanan, gizliliğe saygılı CAPTCHA alternatifi"
         }
       },
-      "version": "1.6.0",
-      "coreVersion": "^2.0.0",
+      "version": "1.6.1",
+      "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "Shield",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-11T13:04:50Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -313,13 +313,13 @@
           "description": "Coinbase Commerce üzerinden Bitcoin, Ethereum, USDC ve diğer kripto ödemelerini alın"
         }
       },
-      "version": "1.2.0",
-      "coreVersion": "^2.0.0",
+      "version": "1.2.1",
+      "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "Bitcoin",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-11T13:04:50Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -356,13 +356,13 @@
           "description": "CoinPayments üzerinden Bitcoin, Litecoin, USDT ve diğer kripto ödemelerini alın"
         }
       },
-      "version": "1.2.0",
-      "coreVersion": "^2.0.0",
+      "version": "1.2.1",
+      "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "Bitcoin",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-11T13:04:50Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -537,13 +537,13 @@
           "description": "Veri yedeklemesi için CSV dışa ve içe aktarma araçları"
         }
       },
-      "version": "1.1.0",
-      "coreVersion": "^2.0.0",
+      "version": "1.1.1",
+      "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "Download",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-11T13:04:50Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -651,13 +651,13 @@
           "description": "Yöneticinin oluşturduğu HTML içerik sayfaları"
         }
       },
-      "version": "1.1.0",
-      "coreVersion": "^2.0.0",
+      "version": "1.1.1",
+      "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "FileText",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-11T13:12:03Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -721,13 +721,13 @@
           "description": "Discord webhook bildirimleri ve ayarları"
         }
       },
-      "version": "1.4.0",
-      "coreVersion": "^2.0.0",
+      "version": "1.4.1",
+      "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "MessageSquare",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-11T13:04:50Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -800,13 +800,13 @@
           "description": "Kaynaklar ve modlar için dosya indirme merkezi"
         }
       },
-      "version": "1.2.0",
-      "coreVersion": "^2.0.0",
+      "version": "1.2.1",
+      "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "Download",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-11T10:22:21Z",
+      "updatedAt": "2026-09-11T13:12:03Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -837,13 +837,13 @@
           "description": "E-posta servisi yapılandırması ve şablonları"
         }
       },
-      "version": "1.2.0",
-      "coreVersion": "^2.0.0",
+      "version": "1.2.1",
+      "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "Mail",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-11T13:04:50Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -1007,13 +1007,13 @@
           "description": "Kategoriler, konular ve yanıtlarla topluluk tartışma forumu"
         }
       },
-      "version": "1.3.1",
+      "version": "1.3.2",
       "coreVersion": "^2.0.0",
       "author": "Blysis Team",
       "icon": "MessageSquare",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-11T11:32:54Z",
+      "updatedAt": "2026-09-11T13:04:50Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -1084,13 +1084,13 @@
           "description": "Google Analytics takip entegrasyonu"
         }
       },
-      "version": "1.1.0",
-      "coreVersion": "^2.0.0",
+      "version": "1.1.1",
+      "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "BarChart",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-11T13:04:50Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1154,13 +1154,13 @@
           "description": "Kategorili ve aranabilir makalelerden oluşan bilgi bankası"
         }
       },
-      "version": "1.4.0",
-      "coreVersion": "^2.0.0",
+      "version": "1.4.1",
+      "coreVersion": "^2.1.0",
       "author": "Blysis Team",
       "icon": "HelpCircle",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-11T09:22:56Z",
+      "updatedAt": "2026-09-11T13:12:03Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -1269,13 +1269,13 @@
           "description": "iyzico üzerinden taksit ve 3D Secure destekli Türk kartı ödemelerini alın"
         }
       },
-      "version": "1.2.0",
-      "coreVersion": "^2.0.0",
+      "version": "1.2.1",
+      "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "CreditCard",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-11T13:04:50Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1492,13 +1492,13 @@
           "description": "Giriş sınırlaması: kaç başarısız denemenin hesabı kilitleyeceği"
         }
       },
-      "version": "1.1.0",
-      "coreVersion": "^2.0.0",
+      "version": "1.1.1",
+      "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "Shield",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-11T13:04:50Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -1597,13 +1597,13 @@
           "description": "Mercado Pago üzerinden Latin Amerika genelinde kart, Pix, boleto ve nakit ödemelerini alın"
         }
       },
-      "version": "1.2.0",
-      "coreVersion": "^2.0.0",
+      "version": "1.2.1",
+      "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "Wallet",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-11T13:04:50Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1676,13 +1676,13 @@
           "description": "Midtrans üzerinden Endonezya'da havale, e-cüzdan, market ve kart ödemelerini alın"
         }
       },
-      "version": "1.2.0",
-      "coreVersion": "^2.0.0",
+      "version": "1.2.1",
+      "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "Smartphone",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-11T13:04:50Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1761,13 +1761,13 @@
           "description": "Mollie üzerinden iDEAL, Bancontact, SEPA ve kart ödemelerini alın"
         }
       },
-      "version": "1.2.0",
-      "coreVersion": "^2.0.0",
+      "version": "1.2.1",
+      "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "Landmark",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-11T13:04:50Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1840,13 +1840,13 @@
           "description": "NOWPayments üzerinden 200'den fazla kripto para ile ödeme alın"
         }
       },
-      "version": "1.2.0",
-      "coreVersion": "^2.0.0",
+      "version": "1.2.1",
+      "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "Bitcoin",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-11T13:04:50Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1884,13 +1884,13 @@
           "description": "Param (TurkPos) üzerinden Türk kartı ve taksitli ödemeleri alın"
         }
       },
-      "version": "1.2.0",
-      "coreVersion": "^2.0.0",
+      "version": "1.2.1",
+      "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "CreditCard",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-11T13:04:50Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1997,13 +1997,13 @@
           "description": "Paymentwall üzerinden yerel ödemeleri, cüzdanları ve mobil faturalandırmayı kullanın"
         }
       },
-      "version": "1.2.0",
-      "coreVersion": "^2.0.0",
+      "version": "1.2.1",
+      "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "Globe",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-11T13:04:50Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2040,13 +2040,13 @@
           "description": "PayPal üzerinden bakiye veya bağlı kartla ödeme alın"
         }
       },
-      "version": "2.2.0",
-      "coreVersion": "^2.0.0",
+      "version": "2.2.1",
+      "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "DollarSign",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-11T13:04:50Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2082,13 +2082,13 @@
           "description": "Kartı ya da banka hesabı olmayan alıcılar için paysafecard ön ödemeli kupon ödemelerini alın"
         }
       },
-      "version": "1.2.0",
-      "coreVersion": "^2.0.0",
+      "version": "1.2.1",
+      "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "Ticket",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-11T13:04:50Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2125,13 +2125,13 @@
           "description": "PayTR üzerinden Türk kartı, taksit ve havale ödemelerini alın"
         }
       },
-      "version": "1.2.0",
-      "coreVersion": "^2.0.0",
+      "version": "1.2.1",
+      "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "CreditCard",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-11T13:04:50Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2203,13 +2203,13 @@
           "description": "Modal açılır pencere bildirimleri ve tanıtımları"
         }
       },
-      "version": "1.2.0",
-      "coreVersion": "^2.0.0",
+      "version": "1.2.1",
+      "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "Bell",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-11T13:12:03Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -2276,13 +2276,13 @@
           "description": "Razorpay üzerinden Hindistan'da UPI, kart, internet bankacılığı ve cüzdan ödemelerini alın"
         }
       },
-      "version": "1.2.0",
-      "coreVersion": "^2.0.0",
+      "version": "1.2.1",
+      "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "Smartphone",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-11T13:04:50Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2499,13 +2499,13 @@
           "description": "Sayfa başına meta etiketleri, OpenGraph ve yapılandırılmış veri ile gelişmiş SEO yönetimi"
         }
       },
-      "version": "1.3.0",
-      "coreVersion": "^2.0.0",
+      "version": "1.3.1",
+      "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "Search",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-11T13:12:03Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -2534,13 +2534,13 @@
           "description": "Oyun sunucusu yönetimi, RCON ve durum izleme"
         }
       },
-      "version": "1.2.0",
+      "version": "1.2.1",
       "coreVersion": "^2.0.0",
       "author": "Blysis",
       "icon": "Server",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-11T13:04:50Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -2601,13 +2601,13 @@
           "description": "Ana sayfa görsel galerisi ve bantları"
         }
       },
-      "version": "1.1.0",
-      "coreVersion": "^2.0.0",
+      "version": "1.1.1",
+      "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "Image",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-11T13:12:03Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -2741,13 +2741,13 @@
           "description": "Ürün, kategori, sepet ve siparişleriyle eksiksiz e-ticaret"
         }
       },
-      "version": "2.25.1",
+      "version": "2.25.2",
       "coreVersion": "^2.0.0",
       "author": "Blysis Team",
       "icon": "ShoppingBag",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-11T11:32:54Z",
+      "updatedAt": "2026-09-11T13:04:50Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2795,13 +2795,13 @@
           "description": "Stripe üzerinden abonelikler dahil kart, Apple Pay ve Google Pay ödemelerini alın"
         }
       },
-      "version": "2.3.0",
-      "coreVersion": "^2.0.0",
+      "version": "2.3.1",
+      "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "CreditCard",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-11T13:04:50Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -3203,13 +3203,13 @@
           "description": "Webhook teslimat kayıtlarını görüntüleyin ve yönetin"
         }
       },
-      "version": "1.1.1",
-      "coreVersion": "^2.0.0",
+      "version": "1.1.2",
+      "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "Webhook",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-11T11:32:54Z",
+      "updatedAt": "2026-09-11T13:04:50Z",
       "screenshots": [],
       "tags": [
         "integration"

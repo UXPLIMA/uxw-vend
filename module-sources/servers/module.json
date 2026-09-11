@@ -2,7 +2,7 @@
   "id": "servers",
   "name": "Game Servers",
   "description": "Game server management, RCON, and status monitoring",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "coreVersion": "^2.0.0",
   "category": "gaming",
   "author": "Blysis",
@@ -176,7 +176,7 @@
       "id": "gaming",
       "label": "Gaming",
       "icon": "Gamepad2",
-      "order": 30
+      "order": 50
     }
   ]
 }

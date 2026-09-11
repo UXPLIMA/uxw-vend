@@ -2,8 +2,8 @@
   "id": "iyzico-gateway",
   "name": "iyzico Payment Gateway",
   "description": "Take Turkish card payments through iyzico, with instalments and 3D Secure",
-  "version": "1.2.0",
-  "coreVersion": "^2.0.0",
+  "version": "1.2.1",
+  "coreVersion": "^2.1.0",
   "secretSettings": [
     "iyzico_api_key",
     "iyzico_secret_key"
@@ -28,7 +28,8 @@
       "label": "iyzico Settings",
       "path": "/settings/iyzico",
       "icon": "CreditCard",
-      "group": "settings"
+      "group": "commerce",
+      "section": "payments"
     }
   ],
   "adminRoutes": [

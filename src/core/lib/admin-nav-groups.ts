@@ -85,6 +85,14 @@ export interface NavSection {
     header?: string;
     headerKey?: string;
     items: NavItem[];
+    /**
+     * The name a module's `menu[].section` can point at.
+     *
+     * Without it a module naming "security" got a second Security section
+     * below core's, reading the same word twice in one group. A section core
+     * ships is the place; a module joins it rather than reinventing it.
+     */
+    id?: string;
 }
 
 export interface NavGroup {
@@ -95,12 +103,26 @@ export interface NavGroup {
     sections: NavSection[];
     /** If a path under this prefix is active, this group is selected. */
     pathPrefix?: string | string[];
+    /**
+     * Where the group sits in the rail. Core declares its own with gaps, so a
+     * group a module declares can sit between two of them - which is the whole
+     * point: the screens an operator opens daily are the ones a module ships,
+     * and they used to be pushed below the ones opened twice a year.
+     */
+    order?: number;
 }
 
 /**
- * Core navigation groups. Every group here owns at least one core item,
- * so none of them can render empty. Modules extend them via
- * `buildNavGroups()`.
+ * Core navigation groups, in the order an operator reaches for them.
+ *
+ * The numbers leave gaps on purpose. A group a module declares names its own,
+ * and the ones that matter here are 30, 40 and 50: the screens a community
+ * actually runs on - a shop, a forum, whatever the site is for - used to be
+ * pushed below Settings because they arrive from a module. Core cannot name
+ * them, so it leaves them room instead.
+ *
+ * Every group here owns at least one core item, so none of them can render
+ * empty. Modules extend them via `buildNavGroups()`.
  */
 export const CORE_NAV_GROUPS: NavGroup[] = [
     {
@@ -108,6 +130,7 @@ export const CORE_NAV_GROUPS: NavGroup[] = [
         icon: LayoutDashboard,
         label: "Dashboard",
         labelKey: "sidebar_dashboard",
+        order: 10,
         pathPrefix: ["/admin", "/admin/analytics", "/admin/observability"],
         sections: [
             {
@@ -120,47 +143,62 @@ export const CORE_NAV_GROUPS: NavGroup[] = [
         ],
     },
     {
-        id: "users",
-        icon: Users,
-        label: "Users",
-        labelKey: "sidebar_users",
-        pathPrefix: ["/admin/users", "/admin/roles", "/admin/permissions", "/admin/warnings", "/admin/ip-blocks"],
+        id: "content",
+        icon: FileText,
+        label: "Content",
+        labelKey: "sidebar_content",
+        order: 20,
+        pathPrefix: ["/admin/moderation", "/admin/settings/moderation", "/admin/revisions", "/admin/broadcasts", "/admin/warnings", "/admin/ip-blocks"],
         sections: [
             {
-                header: "User Management",
-                headerKey: "sidebar_userManagement",
+                id: "publishing",
+                header: "Publishing",
+                headerKey: "sidebar_publishing",
                 items: [
-                    { href: "/admin/users", label: "Users", labelKey: "sidebar_users", icon: Users },
-                    { href: "/admin/roles", label: "Roles", labelKey: "sidebar_roles", icon: ShieldCheck },
-                    { href: "/admin/permissions", label: "Permissions", labelKey: "sidebar_permissions", icon: ClipboardCheck },
-                    { href: "/admin/resource-permissions", label: "Resource Grants", labelKey: "sidebar_resourcePermissions", icon: ShieldCheck },
+                    { href: "/admin/broadcasts", label: "Broadcasts", labelKey: "sidebar_broadcasts", icon: Megaphone },
+                    { href: "/admin/revisions", label: "Revisions", labelKey: "sidebar_revisions", icon: History },
                 ],
             },
             {
+                // Moderation was in two groups: the queue and its settings under
+                // Content, the warnings and blocks that come out of it under
+                // Users. One moderator's job, two places to look for it.
+                id: "moderation",
                 header: "Moderation",
                 headerKey: "sidebar_moderation",
                 items: [
+                    { href: "/admin/moderation", label: "Moderation Queue", labelKey: "sidebar_moderationQueue", icon: ShieldAlert },
                     { href: "/admin/warnings", label: "Warnings", labelKey: "sidebar_warnings", icon: AlertTriangle },
                     { href: "/admin/ip-blocks", label: "IP Blocks", labelKey: "sidebar_ipBlocks", icon: ShieldOff },
+                    { href: "/admin/settings/moderation", label: "Moderation Settings", labelKey: "sidebar_moderationSettings", icon: SlidersHorizontal },
                 ],
             },
         ],
     },
     {
-        id: "content",
-        icon: FileText,
-        label: "Content",
-        labelKey: "sidebar_content",
-        pathPrefix: ["/admin/moderation", "/admin/settings/moderation", "/admin/revisions", "/admin/broadcasts"],
+        id: "users",
+        icon: Users,
+        label: "People",
+        labelKey: "sidebar_people",
+        order: 60,
+        pathPrefix: ["/admin/users", "/admin/roles", "/admin/permissions", "/admin/resource-permissions"],
         sections: [
             {
-                header: "Workflow",
-                headerKey: "sidebar_workflow",
+                id: "accounts",
+                header: "Accounts",
+                headerKey: "sidebar_accounts",
                 items: [
-                    { href: "/admin/moderation", label: "Moderation Queue", labelKey: "sidebar_moderationQueue", icon: ShieldAlert },
-                    { href: "/admin/settings/moderation", label: "Moderation Settings", labelKey: "sidebar_moderationSettings", icon: SlidersHorizontal },
-                    { href: "/admin/revisions", label: "Revisions", labelKey: "sidebar_revisions", icon: History },
-                    { href: "/admin/broadcasts", label: "Broadcasts", labelKey: "sidebar_broadcasts", icon: Megaphone },
+                    { href: "/admin/users", label: "Users", labelKey: "sidebar_users", icon: Users },
+                ],
+            },
+            {
+                id: "access",
+                header: "Access",
+                headerKey: "sidebar_access",
+                items: [
+                    { href: "/admin/roles", label: "Roles", labelKey: "sidebar_roles", icon: ShieldCheck },
+                    { href: "/admin/permissions", label: "Permissions", labelKey: "sidebar_permissions", icon: ClipboardCheck },
+                    { href: "/admin/resource-permissions", label: "Resource Grants", labelKey: "sidebar_resourcePermissions", icon: ShieldCheck },
                 ],
             },
         ],
@@ -170,9 +208,11 @@ export const CORE_NAV_GROUPS: NavGroup[] = [
         icon: Palette,
         label: "Design",
         labelKey: "sidebar_design",
-        pathPrefix: ["/admin/settings/navbar", "/admin/settings/footer", "/admin/settings/widgets", "/admin/settings/css", "/admin/media", "/admin/translations"],
+        order: 70,
+        pathPrefix: ["/admin/settings/navbar", "/admin/settings/footer", "/admin/settings/widgets", "/admin/settings/css", "/admin/settings/theme", "/admin/media", "/admin/translations"],
         sections: [
             {
+                id: "appearance",
                 header: "Appearance",
                 headerKey: "sidebar_appearance",
                 items: [
@@ -181,6 +221,7 @@ export const CORE_NAV_GROUPS: NavGroup[] = [
                 ],
             },
             {
+                id: "layout",
                 header: "Layout",
                 headerKey: "sidebar_layout",
                 items: [
@@ -190,6 +231,7 @@ export const CORE_NAV_GROUPS: NavGroup[] = [
                 ],
             },
             {
+                id: "media",
                 header: "Media",
                 headerKey: "sidebar_media",
                 items: [
@@ -197,6 +239,7 @@ export const CORE_NAV_GROUPS: NavGroup[] = [
                 ],
             },
             {
+                id: "wording",
                 header: "Wording",
                 headerKey: "sidebar_wording",
                 items: [
@@ -206,44 +249,27 @@ export const CORE_NAV_GROUPS: NavGroup[] = [
         ],
     },
     {
-        id: "marketplace",
-        icon: Package,
-        label: "Marketplace",
-        labelKey: "sidebar_marketplace",
-        pathPrefix: ["/admin/modules"],
+        // Marketplace and Activity were top-level groups of one and two items:
+        // two icons in the rail for pages nobody opens on their way anywhere.
+        // What they have in common with the rest of this group is that they
+        // are about the installation rather than about what it publishes.
+        id: "system",
+        icon: Wrench,
+        label: "System",
+        labelKey: "sidebar_system",
+        order: 80,
+        pathPrefix: ["/admin/modules", "/admin/cron", "/admin/email-queue", "/admin/backup", "/admin/updates", "/admin/api-docs", "/admin/api-keys", "/admin/dev", "/admin/system", "/admin/activity-log", "/admin/audit-log", "/admin/settings/rate-limits", "/admin/settings/alerting", "/admin/settings/maintenance"],
         sections: [
             {
+                id: "modules",
+                header: "Modules",
+                headerKey: "sidebar_modules",
                 items: [
                     { href: "/admin/modules", label: "Modules", labelKey: "sidebar_modules", icon: Package },
                 ],
             },
-        ],
-    },
-    {
-        id: "activity",
-        icon: Activity,
-        label: "Activity",
-        labelKey: "sidebar_activity",
-        pathPrefix: ["/admin/activity-log", "/admin/audit-log"],
-        sections: [
             {
-                header: "History",
-                headerKey: "sidebar_history",
-                items: [
-                    { href: "/admin/activity-log", label: "Activity Log", labelKey: "sidebar_activityLog", icon: ScrollText },
-                    { href: "/admin/audit-log", label: "Audit Log", labelKey: "sidebar_auditLog", icon: ScrollText },
-                ],
-            },
-        ],
-    },
-    {
-        id: "advanced",
-        icon: Wrench,
-        label: "Advanced",
-        labelKey: "sidebar_advanced",
-        pathPrefix: ["/admin/cron", "/admin/email-queue", "/admin/backup", "/admin/updates", "/admin/api-docs", "/admin/api-keys", "/admin/dev", "/admin/system", "/admin/settings/rate-limits", "/admin/settings/alerting", "/admin/settings/maintenance"],
-        sections: [
-            {
+                id: "operations",
                 header: "Operations",
                 headerKey: "sidebar_operations",
                 items: [
@@ -255,6 +281,7 @@ export const CORE_NAV_GROUPS: NavGroup[] = [
                 ],
             },
             {
+                id: "security",
                 header: "Security",
                 headerKey: "sidebar_security",
                 items: [
@@ -264,6 +291,16 @@ export const CORE_NAV_GROUPS: NavGroup[] = [
                 ],
             },
             {
+                id: "history",
+                header: "History",
+                headerKey: "sidebar_history",
+                items: [
+                    { href: "/admin/activity-log", label: "Activity Log", labelKey: "sidebar_activityLog", icon: ScrollText },
+                    { href: "/admin/audit-log", label: "Audit Log", labelKey: "sidebar_auditLog", icon: ScrollText },
+                ],
+            },
+            {
+                id: "developer",
                 header: "Developer",
                 headerKey: "sidebar_developer",
                 items: [
@@ -279,6 +316,7 @@ export const CORE_NAV_GROUPS: NavGroup[] = [
         icon: Settings,
         label: "Settings",
         labelKey: "sidebar_settings",
+        order: 90,
         pathPrefix: ["/admin/settings"],
         sections: [
             {
@@ -294,16 +332,16 @@ export const CORE_NAV_GROUPS: NavGroup[] = [
 /** Id of the catch-all bucket for menu items that name no group. */
 export const FALLBACK_NAV_GROUP_ID = "modules";
 
-// Render order. Core groups keep their declared array order; everything a
-// module or theme adds sits after them, so installing a module never
-// reshuffles the groups an admin already knows.
-const MODULE_GROUP_ORDER_BASE = 1000;
+// Render order. Every group declares its own number and core leaves gaps, so
+// a group a module declares sits where it says it does rather than after
+// everything core ships. A group that declares nothing goes to the end, which
+// is where an unplaced thing belongs.
 const FALLBACK_GROUP_ORDER = 8000;
 const THEME_GROUP_ORDER = 9000;
 
 export interface ModuleMenuContribution {
     id: string;
-    menu?: { path: string; label: string; icon?: string; group?: string }[];
+    menu?: { path: string; label: string; icon?: string; group?: string; section?: string }[];
 }
 
 export interface BuildNavGroupsOptions {
@@ -383,7 +421,7 @@ export function buildNavGroups({
 }: BuildNavGroupsOptions = {}): NavGroup[] {
     const groups: NavGroup[] = coreGroups.map(cloneGroup);
     const sortOrder = new Map<string, number>();
-    groups.forEach((group, index) => sortOrder.set(group.id, index));
+    groups.forEach((group, index) => sortOrder.set(group.id, group.order ?? index));
 
     // Modules may declare groups core does not ship, and several modules may
     // declare the same one - a storefront and a credits module both belong
@@ -402,7 +440,7 @@ export function buildNavGroups({
             labelKey: `navGroup_${declaration.id}`,
             sections: [],
         });
-        sortOrder.set(declaration.id, MODULE_GROUP_ORDER_BASE + (declaration.order ?? 0));
+        sortOrder.set(declaration.id, declaration.order ?? FALLBACK_GROUP_ORDER);
     }
 
     if (themeGroup) {
@@ -423,7 +461,18 @@ export function buildNavGroups({
     // Orders, ...". The pooled section is moved to the end of its group
     // below, once every module has had its turn.
     const namedSections = new Map<string, NavSection>();
+    const sharedSections = new Map<string, NavSection>();
     const pooledSections = new Map<string, NavSection>();
+
+    // A core section that named itself is already the place a module means.
+    const coreSections = new Set<NavSection>();
+    for (const group of groups) {
+        for (const section of group.sections) {
+            if (!section.id) continue;
+            sharedSections.set(`${group.id}::section::${section.id}`, section);
+            coreSections.add(section);
+        }
+    }
 
     for (const mod of [...modules].sort((a, b) => a.id.localeCompare(b.id))) {
         if (!mod.menu || mod.menu.length === 0) continue;
@@ -440,7 +489,25 @@ export function buildNavGroups({
                 icon: resolveIcon(entry.icon),
             };
 
-            if (isMulti) {
+            // A section several modules share. Fourteen payment providers are
+            // a category, and they were falling one by one into the pooled
+            // drawer under Settings while the page that configures payment sat
+            // in Commerce. Naming the section is how a module that ships one
+            // page says what kind of thing it is.
+            if (entry.section) {
+                const key = `${group.id}::section::${entry.section}`;
+                let section = sharedSections.get(key);
+                if (!section) {
+                    section = {
+                        header: translate(`navSection_${entry.section}`, entry.section),
+                        headerKey: `navSection_${entry.section}`,
+                        items: [],
+                    };
+                    sharedSections.set(key, section);
+                    group.sections.push(section);
+                }
+                section.items.push(item);
+            } else if (isMulti) {
                 const key = `${group.id}::${mod.id}`;
                 let section = namedSections.get(key);
                 if (!section) {
@@ -466,13 +533,23 @@ export function buildNavGroups({
     }
 
     const pooled = new Set(pooledSections.values());
+    const shared = new Set([...sharedSections.values()].filter((s) => !coreSections.has(s)));
 
     return groups
         .map((group) => {
             const kept = group.sections.filter((s) => s.items.length > 0);
-            // The pooled section is the group's tail, whatever order the
-            // modules that filled it happened to be walked in.
-            const sections = [...kept.filter((s) => !pooled.has(s)), ...kept.filter((s) => pooled.has(s))];
+            // Core's own sections first, then the ones a module named for
+            // itself, then the ones several modules share, then the drawer.
+            // The drawer is last whatever order the modules that filled it
+            // happened to be walked in, and a shared section sits below the
+            // module that owns the group: Payments belongs under Store, not
+            // above it, and which of them is walked first is an accident of
+            // the alphabet.
+            const sections = [
+                ...kept.filter((s) => !pooled.has(s) && !shared.has(s)),
+                ...kept.filter((s) => shared.has(s)),
+                ...kept.filter((s) => pooled.has(s)),
+            ];
             // A header over the only section in a group names the group a
             // second time and distinguishes it from nothing. Gaming is four
             // one-page modules, so its whole contents sat under a lone

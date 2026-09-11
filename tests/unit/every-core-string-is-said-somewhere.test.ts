@@ -98,6 +98,16 @@ const CONSTRUCTED: { match: RegExp; built: string; resolves: (suffix: string) =>
     { match: /^alerting_(.+)Hint$/, built: "`alerting_${status}Hint`", resolves: (s) => BLOB.includes(s) },
     // The block merger, over the category a module's page block declares.
     { match: /^blocks_cat_(.+)$/, built: "`blocks_cat_${cat}`", resolves: (s) => BLOB.includes(s) },
+    // buildNavGroups, over a section several modules share in one group. The
+    // proof is a manifest that puts an entry there: core ships the heading,
+    // modules decide whether anything stands under it.
+    {
+        match: /^navSection_(.+)$/,
+        built: "`navSection_${entry.section}`",
+        // A section core ships carries its own heading, so a key of this shape
+        // beside one is never looked up however many manifests name it.
+        resolves: (s) => BLOB.includes(`"section": "${s}"`) && !BLOB.includes(`id: "${s}",\n                header:`),
+    },
 ];
 
 function catalogue(locale: string): [string, string][] {

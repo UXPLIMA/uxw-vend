@@ -104,6 +104,18 @@ const menuItem = z.object({
     path: panelRelativePath,
     icon: iconName.optional(),
     group: z.string().min(1).max(64).regex(/^[a-z][a-z0-9-]*$/).optional(),
+    /**
+     * The section inside that group, shared with every other module naming it.
+     *
+     * Without it, a module that ships one admin page has no way to say what
+     * kind of thing it is, and lands in the group's pooled drawer. Fourteen
+     * payment providers landed there one at a time, under Settings, while the
+     * page that configures payment was in Commerce.
+     *
+     * The heading is translated from `navSection_<id>`, so the name here is a
+     * slug and not display text.
+     */
+    section: z.string().min(1).max(64).regex(/^[a-z][a-z0-9-]*$/).optional(),
 });
 
 const routeEntry = z.object({

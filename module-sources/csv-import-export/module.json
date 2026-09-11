@@ -2,8 +2,8 @@
   "id": "csv-import-export",
   "name": "CSV Import/Export",
   "description": "CSV export and import utilities for data backup",
-  "version": "1.1.0",
-  "coreVersion": "^2.0.0",
+  "version": "1.1.1",
+  "coreVersion": "^2.1.0",
   "category": "integration",
   "author": "Blysis",
   "icon": "Download",
@@ -15,7 +15,8 @@
       "label": "Export/Import",
       "path": "/export",
       "icon": "Download",
-      "group": "advanced"
+      "group": "system",
+      "section": "operations"
     }
   ],
   "adminRoutes": [

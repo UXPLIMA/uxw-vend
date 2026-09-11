@@ -2,8 +2,8 @@
   "id": "param-gateway",
   "name": "Param Payment Gateway",
   "description": "Take Turkish card and instalment payments through Param (TurkPos)",
-  "version": "1.2.0",
-  "coreVersion": "^2.0.0",
+  "version": "1.2.1",
+  "coreVersion": "^2.1.0",
   "secretSettings": [
     "param_client_password",
     "param_guid"
@@ -28,7 +28,8 @@
       "label": "Param Settings",
       "path": "/settings/param",
       "icon": "CreditCard",
-      "group": "settings"
+      "group": "commerce",
+      "section": "payments"
     }
   ],
   "adminRoutes": [

@@ -2,8 +2,8 @@
   "id": "razorpay-gateway",
   "name": "Razorpay Gateway",
   "description": "Take UPI, card, netbanking and wallet payments in India through Razorpay",
-  "version": "1.2.0",
-  "coreVersion": "^2.0.0",
+  "version": "1.2.1",
+  "coreVersion": "^2.1.0",
   "secretSettings": [
     "razorpay_key_secret",
     "razorpay_webhook_secret"
@@ -28,7 +28,8 @@
       "label": "Razorpay Settings",
       "path": "/settings/razorpay",
       "icon": "Smartphone",
-      "group": "settings"
+      "group": "commerce",
+      "section": "payments"
     }
   ],
   "adminRoutes": [

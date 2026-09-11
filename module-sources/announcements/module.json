@@ -2,8 +2,8 @@
   "id": "announcements",
   "name": "Announcements",
   "description": "Site-wide announcement banners",
-  "version": "1.1.0",
-  "coreVersion": "^2.0.0",
+  "version": "1.1.1",
+  "coreVersion": "^2.1.0",
   "category": "management",
   "author": "Blysis",
   "icon": "Megaphone",
@@ -15,7 +15,8 @@
       "label": "Announcements",
       "path": "/announcements",
       "icon": "Megaphone",
-      "group": "content"
+      "group": "content",
+      "section": "publishing"
     }
   ],
   "adminRoutes": [

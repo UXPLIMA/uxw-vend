@@ -15,12 +15,13 @@ import { describe, it, expect } from "vitest";
 import { readFileSync, readdirSync, existsSync } from "fs";
 import { join } from "path";
 import { locales } from "@/core/lib/i18n/config";
+import { CORE_NAV_GROUPS } from "@/core/lib/admin-nav-groups";
 
 const ROOT = join(__dirname, "../..");
 const SOURCES = join(ROOT, "module-sources");
 
 interface Manifest {
-    menu?: { label: string; path: string; group?: string }[];
+    menu?: { label: string; path: string; group?: string; section?: string }[];
     navGroups?: { id: string; label: string }[];
     translations?: Record<string, Record<string, Record<string, string>>>;
 }
@@ -66,10 +67,12 @@ describe("a module menu entry", () => {
     });
 
     it("names a group that something declares", () => {
-        // An item whose group nothing provides lands in a catch-all bucket
-        // beside the marketplace, which is where every payment gateway's
-        // settings page used to live.
-        const declared = new Set(["dashboard", "users", "content", "design", "marketplace", "activity", "advanced", "settings"]);
+        // An item whose group nothing provides lands in a catch-all drawer,
+        // which is a page an operator finds by accident or not at all.
+        //
+        // Core's ids are read from core rather than copied here: the copy
+        // that used to stand in this line outlived two of the groups it named.
+        const declared = new Set(CORE_NAV_GROUPS.map((g) => g.id));
         for (const { manifest } of manifests()) {
             for (const group of manifest.navGroups ?? []) declared.add(group.id);
         }
@@ -81,6 +84,30 @@ describe("a module menu entry", () => {
             }
         }
         expect(orphans).toEqual([]);
+    });
+
+    it("names a section with a heading over it", () => {
+        // Two ways to have one: join a section core ships, which carries its
+        // own heading, or name a new one and let core's `navSection_<id>` say
+        // what it is called. A slug with neither renders as the slug itself -
+        // "payments", lower case and in English, over fourteen providers.
+        const coreSectionIds = new Set(
+            CORE_NAV_GROUPS.flatMap((g) => g.sections.map((s) => s.id)).filter(Boolean),
+        );
+        const missing: string[] = [];
+        for (const locale of locales) {
+            const admin = JSON.parse(readFileSync(join(ROOT, `messages-core/${locale}.json`), "utf-8")).admin;
+            for (const { id, manifest } of withMenus) {
+                for (const entry of manifest.menu ?? []) {
+                    if (!entry.section) continue;
+                    if (coreSectionIds.has(entry.section)) continue;
+                    if (!admin[`navSection_${entry.section}`]) {
+                        missing.push(`${id}/${locale}: admin.navSection_${entry.section}`);
+                    }
+                }
+            }
+        }
+        expect(missing).toEqual([]);
     });
 
     it("declares the label of any group it invents", () => {

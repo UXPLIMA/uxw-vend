@@ -2,8 +2,8 @@
   "id": "paysafecard-gateway",
   "name": "paysafecard Gateway",
   "description": "Take prepaid voucher payments through paysafecard, for buyers with no card or bank account",
-  "version": "1.2.0",
-  "coreVersion": "^2.0.0",
+  "version": "1.2.1",
+  "coreVersion": "^2.1.0",
   "secretSettings": [
     "paysafecard_api_key"
   ],
@@ -27,7 +27,8 @@
       "label": "paysafecard Settings",
       "path": "/settings/paysafecard",
       "icon": "Ticket",
-      "group": "settings"
+      "group": "commerce",
+      "section": "payments"
     }
   ],
   "adminRoutes": [

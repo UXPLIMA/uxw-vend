@@ -2,8 +2,8 @@
   "id": "paypal-gateway",
   "name": "PayPal Payment Gateway",
   "description": "Take payments through PayPal, with a balance or a linked card",
-  "version": "2.2.0",
-  "coreVersion": "^2.0.0",
+  "version": "2.2.1",
+  "coreVersion": "^2.1.0",
   "secretSettings": [
     "paypal_client_secret"
   ],
@@ -27,7 +27,8 @@
       "label": "PayPal Settings",
       "path": "/settings/paypal",
       "icon": "DollarSign",
-      "group": "settings"
+      "group": "commerce",
+      "section": "payments"
     }
   ],
   "adminRoutes": [

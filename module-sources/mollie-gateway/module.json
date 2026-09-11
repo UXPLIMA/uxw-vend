@@ -2,8 +2,8 @@
   "id": "mollie-gateway",
   "name": "Mollie Payment Gateway",
   "description": "Take iDEAL, Bancontact, SEPA and card payments through Mollie",
-  "version": "1.2.0",
-  "coreVersion": "^2.0.0",
+  "version": "1.2.1",
+  "coreVersion": "^2.1.0",
   "secretSettings": [
     "mollie_api_key"
   ],
@@ -27,7 +27,8 @@
       "label": "Mollie Settings",
       "path": "/settings/mollie",
       "icon": "Landmark",
-      "group": "settings"
+      "group": "commerce",
+      "section": "payments"
     }
   ],
   "adminRoutes": [

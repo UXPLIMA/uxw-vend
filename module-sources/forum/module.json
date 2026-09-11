@@ -2,7 +2,7 @@
   "id": "forum",
   "name": "Forum Module",
   "description": "Community discussion forum with categories, topics, and replies",
-  "version": "1.3.1",
+  "version": "1.3.2",
   "coreVersion": "^2.0.0",
   "category": "community",
   "author": "Blysis Team",
@@ -582,7 +582,7 @@
       "id": "community",
       "label": "Community",
       "icon": "MessagesSquare",
-      "order": 20
+      "order": 40
     }
   ]
 }
