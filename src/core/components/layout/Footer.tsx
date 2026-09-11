@@ -2,7 +2,7 @@
 
 import { Link, usePathname, useRouter } from "@/core/lib/i18n/navigation";
 import { useLocale, useTranslations } from "next-intl";
-import { Globe, Mail, Users, Heart } from "lucide-react";
+import { Globe, Mail, Users } from "lucide-react";
 import { serverConfig } from "@/core/config/server";
 import { localeNames, locales, type Locale } from "@/core/lib/i18n/config";
 import { useSiteSettings } from "@/core/hooks/useSiteSettings";
@@ -14,6 +14,7 @@ import { FooterDropdown } from "@/core/components/ui/footer-dropdown";
 import { Slot } from "@/core/components/Slot";
 import { NavIcon } from "@/core/components/ui/NavIcon";
 import { legacyColumns, parseFooterColumns, placeModuleLinks, withHomeLink, type FooterColumnLink } from "@/core/lib/footer-columns";
+import { VENDOR_NAME, VENDOR_URL } from "@/core/config/vendor";
 
 
 const FOOTER_LINK_CLASS = "text-muted-foreground hover:text-foreground transition-colors";
@@ -238,12 +239,24 @@ function DefaultFooter() {
                             {(settings.footer_copyright as string)
                                 || `© ${new Date().getFullYear()} ${siteName}. ${t('allRightsReserved')}`}
                         </p>
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <span>{t('builtWith')}</span>
-                            <Heart className="w-4 h-4 text-primary fill-primary" />
-                            <span>{t('by')}</span>
-                            <span className="text-primary font-medium">{siteName}</span>
-                        </div>
+                        {/* One sentence, one key. Three keys glued together read
+                            as "Built with by Blysis" in English and came out in
+                            the wrong order in Turkish, where the verb is last. */}
+                        <p className="text-sm text-muted-foreground">
+                            {t.rich('madeBy', {
+                                vendor: VENDOR_NAME,
+                                link: (chunks) => (
+                                    <a
+                                        href={VENDOR_URL}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-primary font-medium hover:underline underline-offset-4 rounded-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/70 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
+                                    >
+                                        {chunks}
+                                    </a>
+                                ),
+                            })}
+                        </p>
                     </div>
                 </div>
             </div>

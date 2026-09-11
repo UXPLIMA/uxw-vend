@@ -1233,8 +1233,7 @@
     "quickLinks": "Hızlı Bağlantılar",
     "legal": "Yasal",
     "allRightsReserved": "Tüm hakları saklıdır.",
-    "builtWith": "Şununla yapıldı",
-    "by": "tarafından"
+    "madeBy": "<link>{vendor}</link> tarafından yapıldı"
   },
   "profile": {
     "title": "Profil",

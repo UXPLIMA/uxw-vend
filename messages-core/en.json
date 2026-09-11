@@ -1233,8 +1233,7 @@
     "quickLinks": "Quick Links",
     "legal": "Legal",
     "allRightsReserved": "All rights reserved.",
-    "builtWith": "Built with",
-    "by": "by"
+    "madeBy": "Made by <link>{vendor}</link>"
   },
   "profile": {
     "title": "Profile",
