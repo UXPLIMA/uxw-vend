@@ -62,7 +62,7 @@ function knownNamespaces(): string[] {
 const NAMESPACES = knownNamespaces();
 
 /**
- * `common.save`, but not `uxwvend.com` or `0.2.1`. Anchored on a namespace the
+ * `common.save`, but not `blysis.com` or `0.2.1`. Anchored on a namespace the
  * product declares, which is what keeps a domain name or a filename out.
  */
 const KEY_PATTERN = new RegExp(

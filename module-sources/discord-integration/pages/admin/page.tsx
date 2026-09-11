@@ -89,10 +89,10 @@ export default function DiscordSettingsPage() {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
-                    username: "uxwVend",
+                    username: "Blysis",
                     embeds: [{
                         title: "Test Notification",
-                        description: "This is a test webhook from uxwVend. If you see this, your webhook is configured correctly!",
+                        description: "This is a test webhook from Blysis. If you see this, your webhook is configured correctly!",
                         color: 0x22c55e,
                         timestamp: new Date().toISOString(),
                     }],

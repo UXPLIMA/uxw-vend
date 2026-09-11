@@ -39,7 +39,7 @@ export function buildTokenOverrideCss(
 
     const declarations = Object.entries(colors)
         .filter(([name, value]) => isTokenName(name) && typeof value === "string" && HEX_COLOUR.test(value))
-        .map(([name, value]) => `  --uxw-color-${name}: ${value as string};`);
+        .map(([name, value]) => `  --blysis-color-${name}: ${value as string};`);
 
     if (declarations.length === 0) return "";
 

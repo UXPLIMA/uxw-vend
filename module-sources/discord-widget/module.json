@@ -2,10 +2,10 @@
   "id": "discord-widget",
   "name": "Discord Widget",
   "description": "Discord server widget on homepage sidebar",
-  "version": "1.1.0",
-  "coreVersion": "^1.20.0",
+  "version": "1.2.0",
+  "coreVersion": "^2.0.0",
   "category": "integration",
-  "author": "uxwVend",
+  "author": "Blysis",
   "icon": "MessageSquare",
   "widgets": [
     {

@@ -121,7 +121,7 @@ export default function HomePage() {
                 and `a-column-starts-where-the-one-beside-it-does` holds the
                 two numbers together.
               */}
-              <div aria-hidden="true" className="hidden lg:block uxw-heading-spacer" />
+              <div aria-hidden="true" className="hidden lg:block blysis-heading-spacer" />
               {enabledWidgets.map((w) => {
                 const WidgetComponent = WidgetComponentRegistry[w.id];
                 return (

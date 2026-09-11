@@ -1,4 +1,4 @@
-<!-- Thanks for contributing to uxwVend! -->
+<!-- Thanks for contributing to Blysis! -->
 
 ## Summary
 
@@ -13,7 +13,7 @@
 
 ## Core motto checklist
 
-uxwVend's central invariant: **core knows nothing about any module or theme.**
+Blysis's central invariant: **core knows nothing about any module or theme.**
 
 - [ ] No module names, module paths, or module-specific code added to `src/core/` or core app files
 - [ ] No hardcoded theme names in core

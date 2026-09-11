@@ -12,7 +12,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 const { setting, resolveAppUrl, serverConfig } = vi.hoisted(() => ({
     setting: { findMany: vi.fn() },
     resolveAppUrl: vi.fn(() => "https://games.example"),
-    serverConfig: { name: "uxwVend", description: "Default description" },
+    serverConfig: { name: "Blysis", description: "Default description" },
 }));
 
 vi.mock("@/core/lib/db", () => ({ prisma: { setting }, default: { setting } }));
@@ -38,7 +38,7 @@ const tw = (meta: Metadata) => meta.twitter as unknown as Record<string, unknown
 beforeEach(() => {
     setting.findMany.mockReset().mockResolvedValue([]);
     resolveAppUrl.mockReset().mockReturnValue("https://games.example");
-    serverConfig.name = "uxwVend";
+    serverConfig.name = "Blysis";
     serverConfig.description = "Default description";
 });
 
@@ -89,7 +89,7 @@ describe("buildPageMeta", () => {
     it("ignores an empty setting value rather than blanking the default", async () => {
         setting.findMany.mockResolvedValue([{ key: "site_name", value: "" }]);
         const meta = await buildPageMeta({ title: "x" });
-        expect(meta.openGraph?.siteName).toBe("uxwVend");
+        expect(meta.openGraph?.siteName).toBe("Blysis");
     });
 
     it("falls back to the defaults when the database is unavailable", async () => {
@@ -97,7 +97,7 @@ describe("buildPageMeta", () => {
 
         // This runs during `next build`, where DATABASE_URL may not resolve.
         const meta = await buildPageMeta({ title: "x" });
-        expect(meta.openGraph?.siteName).toBe("uxwVend");
+        expect(meta.openGraph?.siteName).toBe("Blysis");
     });
 
     it("tolerates a serverConfig with no description", async () => {
@@ -202,7 +202,7 @@ describe("buildPageMetaSync", () => {
     it("uses the serverConfig name rather than the stored one", async () => {
         setting.findMany.mockResolvedValue([{ key: "site_name", value: "Acme Games" }]);
 
-        expect(buildPageMetaSync({ title: "x" }).openGraph?.siteName).toBe("uxwVend");
+        expect(buildPageMetaSync({ title: "x" }).openGraph?.siteName).toBe("Blysis");
         expect((await buildPageMeta({ title: "x" })).openGraph?.siteName).toBe("Acme Games");
     });
 
@@ -248,7 +248,7 @@ describe("buildArticleJsonLd", () => {
     it("names the site as publisher", () => {
         const ld = JSON.parse(buildArticleJsonLd(base));
         expect(ld.publisher).toEqual({
-            "@type": "Organization", name: "uxwVend", url: "https://games.example",
+            "@type": "Organization", name: "Blysis", url: "https://games.example",
         });
     });
 
@@ -295,7 +295,7 @@ describe("buildOrganizationJsonLd", () => {
         expect(ld).toEqual({
             "@context": "https://schema.org",
             "@type": "Organization",
-            name: "uxwVend",
+            name: "Blysis",
             url: "https://games.example",
             description: "Default description",
         });

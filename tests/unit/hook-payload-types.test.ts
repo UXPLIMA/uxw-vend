@@ -8,10 +8,10 @@ import type { HookHandlerFor } from "@/core/lib/hooks";
  * registry can be tested without one.
  */
 declare global {
-    interface UxwVendFilterPayloads {
+    interface BlysisFilterPayloads {
         "test.ctx.chain": string;
     }
-    interface UxwVendFilterContexts {
+    interface BlysisFilterContexts {
         "test.ctx.chain": { locale: string };
     }
 }
@@ -27,7 +27,7 @@ describe("hook payload registry", () => {
 
     it("types the payload of a declared action", () => {
         let seen = "";
-        // `payload` is typed from UxwVendHookPayloads - no annotation here.
+        // `payload` is typed from BlysisHookPayloads - no annotation here.
         addAction("user.registered", (payload) => {
             seen = payload.username;
         });
@@ -88,7 +88,7 @@ describe("hook payload registry", () => {
     });
 
     it("leaves the context of an undeclared filter optional and unknown", () => {
-        // No entry in UxwVendFilterContexts: passing one is still allowed, and
+        // No entry in BlysisFilterContexts: passing one is still allowed, and
         // omitting it still compiles.
         expect(applyFilters("ad.hoc.chain", 5, { anything: true })).toBe(5);
     });

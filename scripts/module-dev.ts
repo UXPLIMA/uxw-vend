@@ -2,7 +2,7 @@
  * module-dev.ts
  * ---------------------------------------------------------------
  * Developer CLI for scaffolding new module-contributable extensions
- * into existing uxwVend modules.
+ * into existing Blysis modules.
  *
  * USAGE
  *   npx tsx scripts/module-dev.ts <subcommand> [args...]

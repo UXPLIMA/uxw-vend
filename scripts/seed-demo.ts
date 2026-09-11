@@ -58,7 +58,7 @@ function option(name: string): string | null {
 const OPTIONS = {
     only: option("module"),
     scale: Math.max(1, Math.min(50, Number(option("scale") ?? 3))),
-    seed: option("seed") ?? "uxwvend",
+    seed: option("seed") ?? "blysis",
     clean: flag("clean"),
     list: flag("list"),
     force: flag("force"),

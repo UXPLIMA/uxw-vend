@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
 /**
- * Playwright config for uxwVend E2E tests.
+ * Playwright config for Blysis E2E tests.
  *
  * No `webServer` is configured on purpose: locally the suite runs against the
  * server you already have up (PM2, `npm run dev`), and letting Playwright boot

@@ -33,7 +33,7 @@ export function RichContent({
 }) {
     return (
         <Tag
-            className={cn("uxw-content", className)}
+            className={cn("blysis-content", className)}
             dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html) }}
         />
     );

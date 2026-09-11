@@ -1,18 +1,18 @@
 #!/usr/bin/env bash
 #
-# uxwVend one-command installer.
+# Blysis one-command installer.
 #
-#   curl -fsSL https://raw.githubusercontent.com/UXPLIMA/uxw-vend/main/install.sh | sudo bash
+#   curl -fsSL https://raw.githubusercontent.com/UXPLIMA/blysis/main/install.sh | sudo bash
 #
 # Installs Docker if it is missing, generates every secret, writes .env,
 # pulls the prebuilt image, starts the stack, waits until the app answers,
 # and prints the URL and admin credentials.
 #
 # Re-running it is an upgrade: an existing .env is never overwritten, so
-# secrets and answers survive. See `uxwvend update` for the short form.
+# secrets and answers survive. See `blysis update` for the short form.
 #
 # Flags (all optional - without them the installer asks three questions):
-#   --dir PATH        install root                        (default /opt/uxwvend)
+#   --dir PATH        install root                        (default /opt/blysis)
 #   --domain HOST     public hostname; empty means "use the server IP"
 #   --email ADDR      admin account e-mail
 #   --tls / --no-tls  run Caddy for automatic HTTPS (requires --domain)
@@ -24,14 +24,14 @@
 #   --help
 set -euo pipefail
 
-REPO_SLUG="UXPLIMA/uxw-vend"
+REPO_SLUG="UXPLIMA/blysis"
 # Overridable so a fork can serve its own copies, and so the piped
 # (`curl | bash`) path can be exercised against a local checkout in tests.
-RAW_BASE="${UXWVEND_RAW_BASE:-https://raw.githubusercontent.com/${REPO_SLUG}/main}"
-IMAGE_DEFAULT="ghcr.io/uxplima/uxw-vend"
+RAW_BASE="${BLYSIS_RAW_BASE:-https://raw.githubusercontent.com/${REPO_SLUG}/main}"
+IMAGE_DEFAULT="ghcr.io/uxplima/blysis"
 COMPOSE_FILES=(docker-compose.yml docker-compose.build.yml docker-compose.debug.yml Caddyfile updater.sh)
 
-INSTALL_DIR="/opt/uxwvend"
+INSTALL_DIR="/opt/blysis"
 DOMAIN=""
 ADMIN_EMAIL=""
 USE_TLS=""
@@ -92,7 +92,7 @@ fi
 if [ "$DRY_RUN" -eq 1 ]; then
     # --dir is honoured so a test can inspect the generated .env; without it
     # the dry run picks a throwaway directory.
-    [ "$DIR_EXPLICIT" -eq 1 ] || INSTALL_DIR="$(mktemp -d)/uxwvend"
+    [ "$DIR_EXPLICIT" -eq 1 ] || INSTALL_DIR="$(mktemp -d)/blysis"
     warn "Dry run: installing to $INSTALL_DIR, nothing else on this host is touched."
 elif [ "$FROM_SOURCE" -eq 1 ]; then
     # docker-compose.build.yml sets `context: .`, which Compose resolves
@@ -105,7 +105,7 @@ elif [ "$FROM_SOURCE" -eq 1 ]; then
     warn "Building from source: installing in place at $INSTALL_DIR"
 fi
 
-printf '\n%suxwVend installer%s\n\n' "$C_BOLD" "$C_RESET"
+printf '\n%sBlysis installer%s\n\n' "$C_BOLD" "$C_RESET"
 
 # -------------------------------------------------------------- platform ----
 step "Checking the host"
@@ -275,8 +275,8 @@ if [ -n "$SCRIPT_DIR" ] && [ -f "$SCRIPT_DIR/docker-compose.yml" ]; then
             cp "$SCRIPT_DIR/$f" "$INSTALL_DIR/$f"
         done
     fi
-    if [ -f "$SCRIPT_DIR/scripts/uxwvend" ]; then
-        cp "$SCRIPT_DIR/scripts/uxwvend" "$INSTALL_DIR/uxwvend.cli"
+    if [ -f "$SCRIPT_DIR/scripts/blysis" ]; then
+        cp "$SCRIPT_DIR/scripts/blysis" "$INSTALL_DIR/blysis.cli"
     fi
 else
     if [ "$FROM_SOURCE" -eq 1 ]; then
@@ -286,13 +286,13 @@ else
     for f in "${COMPOSE_FILES[@]}"; do
         curl -fsSL "$RAW_BASE/$f" -o "$INSTALL_DIR/$f" || die "Could not download $f from $RAW_BASE."
     done
-    curl -fsSL "$RAW_BASE/scripts/uxwvend" -o "$INSTALL_DIR/uxwvend.cli" || true
+    curl -fsSL "$RAW_BASE/scripts/blysis" -o "$INSTALL_DIR/blysis.cli" || true
 fi
 ok "Stack files in $INSTALL_DIR"
 
 # ------------------------------------------------------------------- env ----
 # URL-safe by construction. POSTGRES_PASSWORD in particular is interpolated
-# into postgresql://uxwvend:<pw>@db:5432/uxwvend, where a '/', '@' or ':' from
+# into postgresql://blysis:<pw>@db:5432/blysis, where a '/', '@' or ':' from
 # base64 would silently corrupt the connection string.
 gen_hex()  { openssl rand -hex "$1"; }
 gen_b64url() { openssl rand -base64 "$1" | tr '+/' '-_' | tr -d '='; }
@@ -314,7 +314,7 @@ if [ "$IS_UPGRADE" -eq 0 ]; then
 # Back this file up: without it the database rows encrypted with
 # SECRET_ENCRYPTION_KEY cannot be read again.
 #
-# Safe to edit. Apply changes with: uxwvend restart
+# Safe to edit. Apply changes with: blysis restart
 
 NODE_ENV=production
 
@@ -340,8 +340,8 @@ APP_BIND_ADDR=$APP_BIND_ADDR
 APP_PORT=$APP_PORT
 
 # --- image ---
-UXWVEND_IMAGE=$IMAGE_DEFAULT
-UXWVEND_VERSION=$IMAGE_VERSION
+BLYSIS_IMAGE=$IMAGE_DEFAULT
+BLYSIS_VERSION=$IMAGE_VERSION
 ENVEOF
     chmod 600 "$ENV_FILE"
     ok "Secrets written to $ENV_FILE (mode 600)"
@@ -377,7 +377,7 @@ if [ "$DRY_RUN" -eq 1 ]; then
     exit 0
 fi
 
-step "Starting uxwVend"
+step "Starting Blysis"
 if [ "$FROM_SOURCE" -eq 1 ]; then
     info "Building the image from source - this takes a few minutes."
     compose build || die "The image build failed. The output above says why."
@@ -391,7 +391,7 @@ else
     fi
 fi
 
-compose up -d || die "The stack failed to start. Run 'uxwvend logs' to see why."
+compose up -d || die "The stack failed to start. Run 'blysis logs' to see why."
 
 # ---------------------------------------------------------------- health ----
 step "Waiting for the app"
@@ -418,28 +418,28 @@ done
 if [ "$HEALTHY" -eq 0 ]; then
     warn "The app did not answer $HEALTH_URL within $HEALTH_TIMEOUT seconds. Last 50 log lines:"
     compose logs --tail=50 2>&1 | sed 's/^/    /' >&2
-    die "Installation did not complete. The stack is still running - inspect it with 'uxwvend logs'."
+    die "Installation did not complete. The stack is still running - inspect it with 'blysis logs'."
 fi
 ok "Healthy"
 
 # ------------------------------------------------------------------- cli ----
 HAVE_CLI=0
-if [ -f "$INSTALL_DIR/uxwvend.cli" ]; then
-    install -m 0755 "$INSTALL_DIR/uxwvend.cli" /usr/local/bin/uxwvend
-    rm -f "$INSTALL_DIR/uxwvend.cli"
-    printf 'UXWVEND_DIR=%s\n' "$INSTALL_DIR" > /etc/uxwvend.conf
-    chmod 644 /etc/uxwvend.conf
+if [ -f "$INSTALL_DIR/blysis.cli" ]; then
+    install -m 0755 "$INSTALL_DIR/blysis.cli" /usr/local/bin/blysis
+    rm -f "$INSTALL_DIR/blysis.cli"
+    printf 'BLYSIS_DIR=%s\n' "$INSTALL_DIR" > /etc/blysis.conf
+    chmod 644 /etc/blysis.conf
     HAVE_CLI=1
-    ok "Installed the 'uxwvend' command"
+    ok "Installed the 'blysis' command"
 else
-    # Only reachable when the download of scripts/uxwvend failed; the stack
+    # Only reachable when the download of scripts/blysis failed; the stack
     # itself is up, so say what is missing instead of implying a broken install.
-    warn "Could not install the 'uxwvend' helper - manage the stack with
+    warn "Could not install the 'blysis' helper - manage the stack with
     'cd $INSTALL_DIR && docker compose ...' instead."
 fi
 
 # --------------------------------------------------------------- summary ----
-printf '\n%s%s uxwVend is running%s\n\n' "$C_GREEN" "$C_BOLD" "$C_RESET"
+printf '\n%s%s Blysis is running%s\n\n' "$C_GREEN" "$C_BOLD" "$C_RESET"
 
 if [ "$IS_UPGRADE" -eq 1 ]; then
     printf '  %sUpdated in place.%s Your .env and database were left untouched.\n\n' "$C_BOLD" "$C_RESET"
@@ -457,10 +457,10 @@ else
 fi
 
 if [ "$HAVE_CLI" -eq 1 ]; then
-    printf '\n  %suxwvend update%s    pull the newest version and restart\n' "$C_BOLD" "$C_RESET"
-    printf '  %suxwvend backup%s    dump the database into %s/backups\n' "$C_BOLD" "$C_RESET" "$INSTALL_DIR"
-    printf '  %suxwvend logs%s      follow the logs\n' "$C_BOLD" "$C_RESET"
-    printf '  %suxwvend status%s    show what is running\n\n' "$C_BOLD" "$C_RESET"
+    printf '\n  %sblysis update%s    pull the newest version and restart\n' "$C_BOLD" "$C_RESET"
+    printf '  %sblysis backup%s    dump the database into %s/backups\n' "$C_BOLD" "$C_RESET" "$INSTALL_DIR"
+    printf '  %sblysis logs%s      follow the logs\n' "$C_BOLD" "$C_RESET"
+    printf '  %sblysis status%s    show what is running\n\n' "$C_BOLD" "$C_RESET"
 else
     printf '\n'
 fi

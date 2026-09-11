@@ -27,8 +27,8 @@ import { validateApiKey } from '@/core/lib/api-key-auth';
 const ACTIVE_ADMIN = { isBanned: false, isDeleted: false, role: { name: 'admin' } };
 
 describe('validateApiKey', () => {
-    const rawKey = 'uxw_abc123def456ghijklmnopqrstuvwxyz0123456789ab';
-    const prefix = rawKey.slice(0, 12); // 'uxw_abc123de'
+    const rawKey = 'blysis_abc123def456ghijklmnopqrstuvwxyz0123456789ab';
+    const prefix = rawKey.slice(0, 12); // 'blysis_abc123de'
     let keyHash: string;
 
     beforeEach(async () => {
@@ -57,7 +57,7 @@ describe('validateApiKey', () => {
             permissions: ['*'], isActive: true, expiresAt: null, user: ACTIVE_ADMIN,
         }]);
 
-        const result = await validateApiKey('uxw_abc123deWRONGKEYHERE000000000000000000000000');
+        const result = await validateApiKey('blysis_abc123deWRONGKEYHERE000000000000000000000000');
         expect(result.valid).toBe(false);
     });
 

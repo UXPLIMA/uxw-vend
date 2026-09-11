@@ -150,7 +150,7 @@ describe("RedisCacheBackend", () => {
 
         await RedisCacheBackend.get("board:a");
 
-        expect(redis.get).toHaveBeenCalledWith("uxw:cache:board:a");
+        expect(redis.get).toHaveBeenCalledWith("blysis:cache:board:a");
     });
 
     it("parses the stored json", async () => {
@@ -178,7 +178,7 @@ describe("RedisCacheBackend", () => {
 
         await RedisCacheBackend.set("k", { a: 1 }, 2500);
 
-        expect(redis.set).toHaveBeenCalledWith("uxw:cache:k", '{"a":1}', { EX: 3 });
+        expect(redis.set).toHaveBeenCalledWith("blysis:cache:k", '{"a":1}', { EX: 3 });
     });
 
     it("never writes a sub-second ttl that would expire instantly", async () => {
@@ -198,26 +198,26 @@ describe("RedisCacheBackend", () => {
 
         await RedisCacheBackend.del("k");
 
-        expect(redis.del).toHaveBeenCalledWith("uxw:cache:k");
+        expect(redis.del).toHaveBeenCalledWith("blysis:cache:k");
     });
 
     it("scans in batches rather than issuing KEYS", async () => {
         const redis = fakeRedis({
-            scan: vi.fn(async () => ({ cursor: 0, keys: ["uxw:cache:board:a"] })),
+            scan: vi.fn(async () => ({ cursor: 0, keys: ["blysis:cache:board:a"] })),
         });
         getRedisClient.mockResolvedValue(redis);
         const { RedisCacheBackend } = await load(true);
 
         await RedisCacheBackend.delByPrefix("board:");
 
-        expect(redis.scan).toHaveBeenCalledWith(0, { MATCH: "uxw:cache:board:*", COUNT: 100 });
-        expect(redis.del).toHaveBeenCalledWith(["uxw:cache:board:a"]);
+        expect(redis.scan).toHaveBeenCalledWith(0, { MATCH: "blysis:cache:board:*", COUNT: 100 });
+        expect(redis.del).toHaveBeenCalledWith(["blysis:cache:board:a"]);
     });
 
     it("follows the scan cursor to the end", async () => {
         const scan = vi.fn()
-            .mockResolvedValueOnce({ cursor: 17, keys: ["uxw:cache:board:a"] })
-            .mockResolvedValueOnce({ cursor: 0, keys: ["uxw:cache:board:b"] });
+            .mockResolvedValueOnce({ cursor: 17, keys: ["blysis:cache:board:a"] })
+            .mockResolvedValueOnce({ cursor: 0, keys: ["blysis:cache:board:b"] });
         const redis = fakeRedis({ scan });
         getRedisClient.mockResolvedValue(redis);
         const { RedisCacheBackend } = await load(true);
@@ -453,7 +453,7 @@ describe("invalidate", () => {
         await invalidate("board:*");
 
         expect(redis.scan.mock.calls[0]![1]).toEqual({
-            MATCH: "uxw:cache:board:*", COUNT: 100,
+            MATCH: "blysis:cache:board:*", COUNT: 100,
         });
     });
 
@@ -464,7 +464,7 @@ describe("invalidate", () => {
 
         await invalidate("bo*ard");
 
-        expect(redis.del).toHaveBeenCalledWith("uxw:cache:bo*ard");
+        expect(redis.del).toHaveBeenCalledWith("blysis:cache:bo*ard");
         expect(redis.scan).not.toHaveBeenCalled();
     });
 });

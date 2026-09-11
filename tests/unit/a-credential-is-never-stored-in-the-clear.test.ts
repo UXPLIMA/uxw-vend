@@ -95,13 +95,13 @@ describe("a settings map on its way into the database", () => {
                 gateway_merchant_id: "123456",
                 gateway_secret_key: "sk_live_abc",
                 gateway_webhook_secret: "whsec_abc",
-                site_name: "uxwVend",
+                site_name: "Blysis",
             },
             DECLARED,
         );
 
         expect(stored.gateway_merchant_id).toBe("123456");
-        expect(stored.site_name).toBe("uxwVend");
+        expect(stored.site_name).toBe("Blysis");
         expect(isEncrypted(String(stored.gateway_secret_key))).toBe(true);
         expect(isEncrypted(String(stored.gateway_webhook_secret))).toBe(true);
     });
@@ -160,11 +160,11 @@ describe("a settings map on its way to a browser", () => {
             {
                 gateway_merchant_id: "123456",
                 gateway_secret_key: sealValue("sk_live_abc"),
-                site_name: "uxwVend",
+                site_name: "Blysis",
             },
             DECLARED,
         );
-        expect(settings).toEqual({ gateway_merchant_id: "123456", site_name: "uxwVend" });
+        expect(settings).toEqual({ gateway_merchant_id: "123456", site_name: "Blysis" });
         expect(JSON.stringify(settings)).not.toContain("sk_live");
         expect(JSON.stringify(settings)).not.toContain("v1:");
     });
@@ -181,7 +181,7 @@ describe("a settings map on its way to a browser", () => {
     });
 
     it("counts a credential nobody has stored as not configured", () => {
-        const { secretsConfigured } = withoutSecrets({ site_name: "uxwVend" }, DECLARED);
+        const { secretsConfigured } = withoutSecrets({ site_name: "Blysis" }, DECLARED);
         expect(secretsConfigured).toEqual([]);
     });
 });
@@ -233,10 +233,10 @@ describe("an install with no encryption key", () => {
         vi.stubEnv("SECRET_ENCRYPTION_KEY", "");
         const { withoutSecrets } = await freshBoundary();
         const { settings, secretsConfigured } = withoutSecrets(
-            { gateway_secret_key: "sk_live_legacy", site_name: "uxwVend" },
+            { gateway_secret_key: "sk_live_legacy", site_name: "Blysis" },
             DECLARED,
         );
-        expect(settings).toEqual({ site_name: "uxwVend" });
+        expect(settings).toEqual({ site_name: "Blysis" });
         expect(secretsConfigured).toEqual(["gateway_secret_key"]);
     });
 });

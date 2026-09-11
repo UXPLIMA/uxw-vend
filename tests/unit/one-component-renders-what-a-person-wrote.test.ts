@@ -19,7 +19,7 @@ import path from "node:path";
  * design: the day one of them renders its content on the server, it throws.
  *
  * `RichContent` is the one place. It sanitises with the isomorphic build and
- * styles with `.uxw-content`, in the theme's colours.
+ * styles with `.blysis-content`, in the theme's colours.
  */
 
 const ROOT = path.resolve(__dirname, "../..");
@@ -101,14 +101,14 @@ describe("HTML a person wrote", () => {
 
     it("is styled by core, in the theme's colours", () => {
         const css = fs.readFileSync(path.join(ROOT, "src/app/globals.css"), "utf8");
-        expect(css).toContain(".uxw-content");
+        expect(css).toContain(".blysis-content");
         for (const selector of ["h1", "ul", "ol", "blockquote", "code", "pre", "a", "table"]) {
-            expect(css, `.uxw-content ${selector}`).toMatch(
-                new RegExp(String.raw`\.uxw-content[^{]*\b${selector}\b[^{]*\{`),
+            expect(css, `.blysis-content ${selector}`).toMatch(
+                new RegExp(String.raw`\.blysis-content[^{]*\b${selector}\b[^{]*\{`),
             );
         }
         // Fixed colours here would be the same drift the panel gate keeps out.
-        const block = css.slice(css.indexOf(".uxw-content"));
+        const block = css.slice(css.indexOf(".blysis-content"));
         const content = block.slice(0, block.indexOf("\n.text-gradient"));
         expect(content).not.toMatch(/#[0-9a-fA-F]{3,8}\b|\brgb\(|\bhsl\(/);
     });
@@ -119,7 +119,7 @@ describe("HTML a person wrote", () => {
         const component = fs.readFileSync(path.join(ROOT, "src/core/components/ui/rich-content.tsx"), "utf8");
         expect(component).toContain('from "isomorphic-dompurify"');
         expect(component).toContain("DOMPurify.sanitize(html)");
-        expect(component).toContain("uxw-content");
+        expect(component).toContain("blysis-content");
     });
 
     it("is required by every module that renders it", () => {
@@ -145,8 +145,14 @@ describe("HTML a person wrote", () => {
             const asked = manifest.coreVersion.match(/\^(\d+)\.(\d+)\.(\d+)/);
             expect(asked, `${id} declares ${manifest.coreVersion}`).toBeTruthy();
             expect(atLeast(asked!.slice(1, 4).map(Number), INTRODUCED_IN), id).toBe(true);
-            // Same major, or the caret range would not admit it at all.
-            expect(asked![1], id).toBe(String(INTRODUCED_IN[0]));
+            // And a range the core it runs against actually satisfies. This
+            // used to read "same major as the version RichContent arrived in",
+            // which was the same thing while there had only ever been one
+            // major and stopped being true the moment there were two: a module
+            // asking for ^2.0.0 gets RichContent, and asking for ^1.x would
+            // mean it cannot run on the core that is shipping.
+            expect(asked![1], `${id} asks for a major the core is not on`)
+                .toBe(core![1]);
         }
     });
 });

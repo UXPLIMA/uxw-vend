@@ -73,6 +73,9 @@ interface Unnamed {
     tag: string;
 }
 
+/** Components that render a string rather than a glyph. */
+const RENDERS_ITS_OWN_TEXT = /<(SiteName)\b/;
+
 function unnamedControls(): Unnamed[] {
     const found: Unnamed[] = [];
     for (const file of FILES) {
@@ -90,7 +93,16 @@ function unnamedControls(): Unnamed[] {
                     const text = body.replace(/<[^>]*>/g, "").replace(/\s/g, "");
                     // A nested alt or sr-only span names the control too; so
                     // does any word of visible text, which is the usual case.
-                    named = /aria-label|title=|sr-only|alt=/.test(body) || /\w/.test(text);
+                    // A component whose job is to print words names the
+                    // control as surely as the words themselves would. Tags
+                    // are stripped before the word check, so `<SiteName />`
+                    // reduces to nothing and reads as an unnamed control -
+                    // while at runtime it is the installation's own name, and
+                    // an aria-label would replace the visible one.
+                    named =
+                        /aria-label|title=|sr-only|alt=/.test(body) ||
+                        RENDERS_ITS_OWN_TEXT.test(body) ||
+                        /\w/.test(text);
                 }
                 if (named) continue;
                 found.push({ file: rel(file), line: source.slice(0, m.index!).split("\n").length, tag });

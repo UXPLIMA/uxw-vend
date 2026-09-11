@@ -52,7 +52,7 @@ export async function GET(request: Request) {
             ipAddress: getClientIP(request.headers),
         });
 
-        const filename = `uxwvend-data-${userId}-${exportedAt
+        const filename = `blysis-data-${userId}-${exportedAt
             .toISOString()
             .slice(0, 10)}.zip`;
 

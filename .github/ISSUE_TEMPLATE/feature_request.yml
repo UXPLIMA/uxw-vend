@@ -1,5 +1,5 @@
 name: Feature request
-description: Suggest an idea or enhancement for uxwVend
+description: Suggest an idea or enhancement for Blysis
 labels: ["enhancement"]
 body:
   - type: textarea
@@ -20,7 +20,7 @@ body:
     id: layer
     attributes:
       label: Which layer?
-      description: uxwVend keeps a strict core / module / theme separation.
+      description: Blysis keeps a strict core / module / theme separation.
       options:
         - New or existing module (preferred for features)
         - Theme

@@ -46,7 +46,7 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             ipAddress: getClientIP(request.headers),
         });
 
-        const filename = `uxwvend-data-${targetId}-${exportedAt
+        const filename = `blysis-data-${targetId}-${exportedAt
             .toISOString()
             .slice(0, 10)}.zip`;
 

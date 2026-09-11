@@ -1,5 +1,5 @@
 /**
- * uxwVend module SDK - server-only surface.
+ * Blysis module SDK - server-only surface.
  *
  * Every symbol here reaches the database, the filesystem, or Node crypto, so
  * importing it from a `"use client"` file fails the build. Client code wants

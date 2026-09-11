@@ -1,5 +1,6 @@
 {
   "common": {
+    "appName": "Blysis",
     "back": "Back",
     "cancel": "Cancel",
     "close": "Close",
@@ -491,7 +492,7 @@
     "footer_columns": "Columns",
     "footer_columnsHint": "Each column is a heading and its links. A column can also adopt the links an installed module contributes, by naming that module's section.",
     "footer_copyright": "Copyright Text",
-    "footer_copyrightPlaceholder": "© 2026 uxwVend. All rights reserved.",
+    "footer_copyrightPlaceholder": "© 2026 Blysis. All rights reserved.",
     "footer_linkHref": "Address",
     "footer_linkHrefPlaceholder": "/a-page or https://example.com",
     "footer_linkIcon": "Icon",
@@ -709,7 +710,7 @@
     "modules_noModules": "No modules installed",
     "modules_notFound": "Module not found in marketplace",
     "modules_off": "OFF",
-    "modules_officialModules": "Official modules from the uxwVend marketplace",
+    "modules_officialModules": "Official modules from the Blysis marketplace",
     "modules_on": "ON",
     "modules_pages": "{count} pages",
     "modules_pleaseWait": "Please wait - another operation is in progress",
@@ -1375,7 +1376,7 @@
     "password": "Password",
     "passwordMinLength": "Password must be at least 6 characters",
     "passwordsDontMatch": "Passwords don't match",
-    "registerSubtitle": "Get started with uxwVend",
+    "registerSubtitle": "Get started with Blysis",
     "registerTitle": "Create Account",
     "rememberMe": "Keep me signed in",
     "resetButton": "Reset Password",
@@ -1419,7 +1420,7 @@
     "metaDescription": "Search everything this site publishes."
   },
   "setup": {
-    "title": "uxwVend Setup",
+    "title": "Blysis Setup",
     "subtitle": "A few quick steps and your platform is ready.",
     "back": "Back",
     "next": "Next",
@@ -1437,7 +1438,7 @@
       "done": "Done"
     },
     "welcome": {
-      "title": "Welcome to uxwVend",
+      "title": "Welcome to Blysis",
       "body": "This wizard creates your administrator account, sets up your site and installs your first modules from the marketplace. You can change any of it later from the admin panel.",
       "note": "The platform ships with no modules. Everything you add here is optional."
     },

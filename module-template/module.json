@@ -3,7 +3,7 @@
 
     "id": "my-module",
     "name": "My Module",
-    "description": "A template module for uxwVend",
+    "description": "A template module for Blysis",
     "version": "1.0.0",
     "coreVersion": "^1.0.0",
     "category": "content",
@@ -148,19 +148,19 @@
         "en": {
             "myModule": {
                 "title": "My Module",
-                "description": "Example module for uxwVend"
+                "description": "Example module for Blysis"
             }
         },
         "tr": {
             "myModule": {
                 "title": "Modulom",
-                "description": "uxwVend icin ornek modul"
+                "description": "Blysis icin ornek modul"
             }
         },
         "de": {
             "myModule": {
                 "title": "Mein Modul",
-                "description": "Beispielmodul fuer uxwVend"
+                "description": "Beispielmodul fuer Blysis"
             }
         }
     }

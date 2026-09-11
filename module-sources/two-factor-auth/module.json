@@ -2,10 +2,10 @@
   "id": "two-factor-auth",
   "name": "Two-Factor Authentication",
   "description": "TOTP-based 2FA with backup codes for enhanced account security",
-  "version": "1.1.1",
-  "coreVersion": "^1.25.0",
+  "version": "1.2.0",
+  "coreVersion": "^2.0.0",
   "category": "management",
-  "author": "uxwVend",
+  "author": "Blysis",
   "icon": "Shield",
   "api": [
     {

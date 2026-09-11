@@ -1,5 +1,5 @@
 /**
- * uxwVend module SDK - demo data.
+ * Blysis module SDK - demo data.
  *
  * A module that ships a screen ships the data that makes the screen worth
  * looking at. An empty install answers every question with "nothing here

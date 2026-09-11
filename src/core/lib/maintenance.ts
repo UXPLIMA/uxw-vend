@@ -26,7 +26,7 @@ const CACHE_TTL_MS = 5_000; // 5 seconds - short enough to feel instant after ad
 // in the API route updates a *different* `cached` variable than the one
 // getMaintenanceConfig() reads inside the proxy, causing a stale-cache window
 // where the proxy keeps serving old state for up to CACHE_TTL_MS.
-const GLOBAL_KEY = "__uxwvend_maintenance_cache__" as const;
+const GLOBAL_KEY = "__blysis_maintenance_cache__" as const;
 
 interface MaintenanceCache {
     config: MaintenanceConfig | null;

@@ -1,5 +1,5 @@
 /**
- * uxwVend module SDK - page composition.
+ * Blysis module SDK - page composition.
  *
  * A module page that renders a full public screen needs the site chrome; a
  * module that contributes into a slot needs `Slot`. Both are stable contracts

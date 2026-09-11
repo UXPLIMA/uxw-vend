@@ -2,10 +2,10 @@
   "id": "seo",
   "name": "SEO Manager",
   "description": "Advanced SEO management with per-page meta tags, OpenGraph, and structured data",
-  "version": "1.2.1",
-  "coreVersion": "^1.25.0",
+  "version": "1.3.0",
+  "coreVersion": "^2.0.0",
   "category": "content",
-  "author": "uxwVend",
+  "author": "Blysis",
   "icon": "Search",
   "permissions": [
     "seo.manage"

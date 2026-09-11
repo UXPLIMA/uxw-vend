@@ -1,6 +1,6 @@
 #!/bin/bash
-# uxwVend Database Restore Script
-# Usage: ./scripts/restore.sh backups/uxwvend_20260403.sql.gz
+# Blysis Database Restore Script
+# Usage: ./scripts/restore.sh backups/blysis_20260403.sql.gz
 #
 # Connection parameters are parsed from DATABASE_URL and passed to psql
 # via named flags + PGPASSWORD env var (avoiding password exposure in
@@ -11,7 +11,7 @@ set -e
 if [ -z "$1" ]; then
     echo "Usage: $0 <backup-file.sql.gz>"
     echo "Available backups:"
-    ls -la backups/uxwvend_*.sql.gz 2>/dev/null || echo "  No backups found"
+    ls -la backups/blysis_*.sql.gz 2>/dev/null || echo "  No backups found"
     exit 1
 fi
 

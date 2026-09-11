@@ -36,7 +36,7 @@ function ensureDefaults(
         name: m.name,
         description: m.description ?? "",
         version: m.version,
-        author: m.author ?? "uxwVend",
+        author: m.author ?? "Blysis",
         icon: m.icon ?? "Package",
         category: m.category ?? "content",
         verified: m.verified ?? true,

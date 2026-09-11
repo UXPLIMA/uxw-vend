@@ -23,7 +23,7 @@
  * the module itself declared, which no visitor can influence.
  *
  * That pattern is a URL, and a URL is written once, in English. A Turkish
- * visitor reading "Mağaza" under an <h1> had "Store | uxwVend" in the browser
+ * visitor reading "Mağaza" under an <h1> had "Store | Blysis" in the browser
  * tab and in the search result, and `/store/vip` was titled "Vip", which is
  * not a word in either language. So a route may also declare `titleKey`, a
  * key into the translations the module already ships, and the humanized

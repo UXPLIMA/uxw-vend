@@ -11,7 +11,7 @@ import type { Page } from '@playwright/test';
  *
  * The fallbacks are what `prisma/seed.ts` makes when it is told nothing, and
  * `the-e2e-login-matches-the-account-the-seed-makes.test.ts` holds them to it.
- * They drifted once: the helper looked for `admin@uxwvend.com` while the seed
+ * They drifted once: the helper looked for `admin@blysis.com` while the seed
  * wrote `admin@example.com`, and a local run answered with twenty specs each
  * waiting fifteen seconds for a navigation that could never come.
  *
@@ -19,7 +19,7 @@ import type { Page } from '@playwright/test';
  * told otherwise. What `login` can do is say so.
  */
 export const ADMIN_EMAIL = process.env.E2E_ADMIN_EMAIL ?? 'admin@example.com';
-export const ADMIN_USERNAME = process.env.E2E_ADMIN_USERNAME ?? 'uxwadmin';
+export const ADMIN_USERNAME = process.env.E2E_ADMIN_USERNAME ?? 'blysisadmin';
 export const ADMIN_PASSWORD = process.env.E2E_ADMIN_PASSWORD ?? 'admin123';
 
 /**

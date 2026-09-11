@@ -70,7 +70,7 @@ function iconOnlyControlsWithoutName(file: string): string[] {
                         .trim();
                     const named = /aria-label|aria-labelledby|title=/.test(attrs);
                     // Exactly one self-closing capitalised element and nothing else.
-                    const iconOnly = /^<[A-Z][A-Za-z0-9]*\b[^>]*\/>$/.test(inner);
+                    const iconOnly = /^<[A-Z][A-Za-z0-9]*\b[^>]*\/>$/.test(inner) && !RENDERS_ITS_OWN_TEXT.test(inner);
                     if (iconOnly && !named) {
                         found.push(
                             `${path.relative(root, file)}: <${tag}> wrapping ${inner.replace(/\s+/g, " ").slice(0, 60)}`,
@@ -84,6 +84,18 @@ function iconOnlyControlsWithoutName(file: string): string[] {
 
     return found;
 }
+
+/**
+ * Components that render words rather than a glyph.
+ *
+ * These scans look for a control whose only child is a self-closing
+ * capitalised element, on the assumption that such an element is an icon. That
+ * holds for every one of them except a component whose whole job is to print
+ * text: `<SiteName />` renders the installation's own name, so the link around
+ * it has a perfectly good accessible name and adding an `aria-label` would
+ * override the visible one with a second copy of it.
+ */
+const RENDERS_ITS_OWN_TEXT = /^<(SiteName)\b/;
 
 describe("icon-only controls", () => {
     const files = SCANNED.flatMap((dir) => tsxFiles(path.join(root, dir)));

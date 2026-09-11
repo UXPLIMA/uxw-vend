@@ -38,7 +38,7 @@ export async function checkPasswordBreach(password: string): Promise<BreachCheck
         const timer = setTimeout(() => controller.abort(), HIBP_TIMEOUT_MS);
         try {
             const res = await fetch(HIBP_RANGE_URL + prefix, {
-                headers: { "Add-Padding": "true", "User-Agent": "uxwvend-password-check" },
+                headers: { "Add-Padding": "true", "User-Agent": "blysis-password-check" },
                 signal: controller.signal,
             });
             if (!res.ok) return { ok: true, count: 0 };

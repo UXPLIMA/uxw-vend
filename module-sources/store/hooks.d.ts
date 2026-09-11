@@ -7,7 +7,7 @@
  * `Number(...)`) instead of formatting an object into a message.
  */
 declare global {
-    interface UxwVendHookPayloads {
+    interface BlysisHookPayloads {
         "store.order.created": StoreOrderHookPayload;
         "store.order.completed": StoreOrderHookPayload;
         "store.product.created": { id: string; name: string; slug: string };
@@ -32,7 +32,7 @@ declare global {
      * them: every gateway depends on the store, so this file is always present,
      * and one published contract beats each gateway inventing its own.
      */
-    interface UxwVendFilterPayloads {
+    interface BlysisFilterPayloads {
         /** Which gateways can take this currency right now. */
         "payment.providers": PaymentProviderSummary[];
         /** Where to send the buyer, once a gateway has started the payment. */
@@ -69,7 +69,7 @@ declare global {
     }
 
     /** The other half of the same six filters: what each one is asked about. */
-    interface UxwVendFilterContexts {
+    interface BlysisFilterContexts {
         "payment.providers": { currency: string };
         "payment.session": PaymentSessionRequest;
         "payment.settled": PaymentSettlement;

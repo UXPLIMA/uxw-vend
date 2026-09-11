@@ -35,11 +35,11 @@ function makeBuild(buildId = "build-1"): void {
 
 /** Stand in for the Dockerfile's unmasked build-id stamp. */
 function stampImage(buildId: string): void {
-    fs.writeFileSync(path.join(root, ".uxwvend-image-build-id"), `${buildId}\n`);
+    fs.writeFileSync(path.join(root, ".blysis-image-build-id"), `${buildId}\n`);
 }
 
 beforeEach(() => {
-    root = fs.mkdtempSync(path.join(os.tmpdir(), "uxwvend-build-state-"));
+    root = fs.mkdtempSync(path.join(os.tmpdir(), "blysis-build-state-"));
     fs.mkdirSync(path.join(root, "src/modules"), { recursive: true });
 });
 
@@ -132,7 +132,7 @@ describe("detectDrift", () => {
         expect(detectDrift(root)?.kind).toBe("modules-changed");
     });
 
-    // The `uxwvend update` case: the modules volume and the .next volume both
+    // The `blysis update` case: the modules volume and the .next volume both
     // survive, so the module set matches - but the build belongs to the image
     // that was just replaced.
     it("reports drift when the image changed under an unchanged module set", () => {
@@ -178,7 +178,7 @@ describe("writeBuildState", () => {
     it("reads back as absent when the state file is corrupt", () => {
         makeBuild();
         writeBuildState(root);
-        fs.writeFileSync(path.join(root, ".next/uxwvend-build-state.json"), "{ not json");
+        fs.writeFileSync(path.join(root, ".next/blysis-build-state.json"), "{ not json");
         expect(readBuildState(root)).toBeNull();
     });
 });

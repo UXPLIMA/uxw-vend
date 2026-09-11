@@ -2,10 +2,10 @@
   "id": "in-app-notifications",
   "name": "In-App Notifications",
   "description": "In-app notification system with bell icon",
-  "version": "1.2.3",
-  "coreVersion": "^1.29.0",
+  "version": "1.3.0",
+  "coreVersion": "^2.0.0",
   "category": "community",
-  "author": "uxwVend",
+  "author": "Blysis",
   "icon": "Bell",
   "navbarComponents": [
     {

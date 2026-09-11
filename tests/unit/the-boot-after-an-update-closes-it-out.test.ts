@@ -21,13 +21,13 @@ import path from "node:path";
 let dir: string;
 
 beforeEach(() => {
-    dir = fs.mkdtempSync(path.join(os.tmpdir(), "uxw-boot-"));
-    process.env.UXWVEND_UPDATE_DIR = dir;
+    dir = fs.mkdtempSync(path.join(os.tmpdir(), "blysis-boot-"));
+    process.env.BLYSIS_UPDATE_DIR = dir;
 });
 
 afterEach(() => {
     fs.rmSync(dir, { recursive: true, force: true });
-    delete process.env.UXWVEND_UPDATE_DIR;
+    delete process.env.BLYSIS_UPDATE_DIR;
 });
 
 const { writeIntent, readIntent, reconcileUpdate } = await import("@/core/lib/core-update");

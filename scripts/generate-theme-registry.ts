@@ -52,7 +52,7 @@ function emitTokensCss(themes: Record<string, ThemeManifest>): string {
             for (const [name, value] of Object.entries(modeDef.tokens?.colors ?? {})) {
                 colorDefaults.set(name, value);
             }
-            for (const [name, value] of colorDefaults) lines.push(`    --uxw-color-${name}: ${value};`);
+            for (const [name, value] of colorDefaults) lines.push(`    --blysis-color-${name}: ${value};`);
 
             const fontDefaults = new Map<string, string>();
             for (const [name, def] of Object.entries(theme.tokens?.fonts ?? {})) {
@@ -61,7 +61,7 @@ function emitTokensCss(themes: Record<string, ThemeManifest>): string {
             for (const [name, value] of Object.entries(modeDef.tokens?.fonts ?? {})) {
                 fontDefaults.set(name, value);
             }
-            for (const [name, value] of fontDefaults) lines.push(`    --uxw-font-${name}: ${value};`);
+            for (const [name, value] of fontDefaults) lines.push(`    --blysis-font-${name}: ${value};`);
 
             if (theme.tokens?.radius && "default" in theme.tokens.radius && theme.tokens.radius.default !== undefined) {
                 // The manifest stores the operator's *choice* - `md` - and a
@@ -71,7 +71,7 @@ function emitTokensCss(themes: Record<string, ThemeManifest>): string {
                 // turned into a length here or no declaration is written.
                 const radius = radiusLength(theme.tokens.radius.default);
                 if (radius) {
-                    lines.push(`    --uxw-radius: ${radius};`);
+                    lines.push(`    --blysis-radius: ${radius};`);
                 } else {
                     console.warn(`[themes] ${theme.id}: radius "${String(theme.tokens.radius.default)}" is not a length, leaving the default`);
                 }

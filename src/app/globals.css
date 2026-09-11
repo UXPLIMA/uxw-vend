@@ -4,61 +4,61 @@
 
 /* Fallback root tokens so built-in styles work before a theme data-attr is applied. */
 :root {
-  --uxw-color-primary: #2563eb;
-  --uxw-color-primaryForeground: #ffffff;
-  --uxw-color-secondary: #6b6862;
-  --uxw-color-secondaryForeground: #ffffff;
-  --uxw-color-accent: #b45309;
-  --uxw-color-accentForeground: #ffffff;
-  --uxw-color-background: #ffffff;
-  --uxw-color-foreground: #1c1b19;
-  --uxw-color-muted: #f5f4f2;
-  --uxw-color-mutedForeground: #6b6862;
-  --uxw-color-border: #e4e2de;
-  --uxw-color-card: #ffffff;
-  --uxw-color-cardForeground: #1c1b19;
-  --uxw-color-destructive: #b91c1c;
-  --uxw-color-destructiveForeground: #ffffff;
-  --uxw-color-success: #15803d;
-  --uxw-color-successForeground: #ffffff;
-  --uxw-color-warning: #b45309;
-  --uxw-color-warningForeground: #ffffff;
-  --uxw-font-heading: var(--font-outfit), var(--font-inter), system-ui, sans-serif;
-  --uxw-font-body: var(--font-inter), system-ui, sans-serif;
-  --uxw-font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, monospace;
-  --uxw-radius: 0.5rem;
+  --blysis-color-primary: #2563eb;
+  --blysis-color-primaryForeground: #ffffff;
+  --blysis-color-secondary: #6b6862;
+  --blysis-color-secondaryForeground: #ffffff;
+  --blysis-color-accent: #b45309;
+  --blysis-color-accentForeground: #ffffff;
+  --blysis-color-background: #ffffff;
+  --blysis-color-foreground: #1c1b19;
+  --blysis-color-muted: #f5f4f2;
+  --blysis-color-mutedForeground: #6b6862;
+  --blysis-color-border: #e4e2de;
+  --blysis-color-card: #ffffff;
+  --blysis-color-cardForeground: #1c1b19;
+  --blysis-color-destructive: #b91c1c;
+  --blysis-color-destructiveForeground: #ffffff;
+  --blysis-color-success: #15803d;
+  --blysis-color-successForeground: #ffffff;
+  --blysis-color-warning: #b45309;
+  --blysis-color-warningForeground: #ffffff;
+  --blysis-font-heading: var(--font-outfit), var(--font-inter), system-ui, sans-serif;
+  --blysis-font-body: var(--font-inter), system-ui, sans-serif;
+  --blysis-font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, monospace;
+  --blysis-radius: 0.5rem;
 }
 
 @theme inline {
-  --color-primary:                var(--uxw-color-primary);
-  --color-primary-foreground:     var(--uxw-color-primaryForeground);
-  --color-secondary:              var(--uxw-color-secondary);
-  --color-secondary-foreground:   var(--uxw-color-secondaryForeground);
-  --color-accent:                 var(--uxw-color-accent);
-  --color-accent-foreground:      var(--uxw-color-accentForeground);
-  --color-background:             var(--uxw-color-background);
-  --color-foreground:             var(--uxw-color-foreground);
-  --color-muted:                  var(--uxw-color-muted);
-  --color-muted-foreground:       var(--uxw-color-mutedForeground);
-  --color-border:                 var(--uxw-color-border);
-  --color-card:                   var(--uxw-color-card);
-  --color-card-foreground:        var(--uxw-color-cardForeground);
-  --color-destructive:            var(--uxw-color-destructive);
-  --color-destructive-foreground: var(--uxw-color-destructiveForeground);
-  --color-success:                var(--uxw-color-success);
-  --color-success-foreground:     var(--uxw-color-successForeground);
-  --color-warning:                var(--uxw-color-warning);
-  --color-warning-foreground:     var(--uxw-color-warningForeground);
-  --font-heading:                 var(--uxw-font-heading);
-  --font-body:                    var(--uxw-font-body);
-  --font-mono:                    var(--uxw-font-mono);
-  --radius:                       var(--uxw-radius);
+  --color-primary:                var(--blysis-color-primary);
+  --color-primary-foreground:     var(--blysis-color-primaryForeground);
+  --color-secondary:              var(--blysis-color-secondary);
+  --color-secondary-foreground:   var(--blysis-color-secondaryForeground);
+  --color-accent:                 var(--blysis-color-accent);
+  --color-accent-foreground:      var(--blysis-color-accentForeground);
+  --color-background:             var(--blysis-color-background);
+  --color-foreground:             var(--blysis-color-foreground);
+  --color-muted:                  var(--blysis-color-muted);
+  --color-muted-foreground:       var(--blysis-color-mutedForeground);
+  --color-border:                 var(--blysis-color-border);
+  --color-card:                   var(--blysis-color-card);
+  --color-card-foreground:        var(--blysis-color-cardForeground);
+  --color-destructive:            var(--blysis-color-destructive);
+  --color-destructive-foreground: var(--blysis-color-destructiveForeground);
+  --color-success:                var(--blysis-color-success);
+  --color-success-foreground:     var(--blysis-color-successForeground);
+  --color-warning:                var(--blysis-color-warning);
+  --color-warning-foreground:     var(--blysis-color-warningForeground);
+  --font-heading:                 var(--blysis-font-heading);
+  --font-body:                    var(--blysis-font-body);
+  --font-mono:                    var(--blysis-font-mono);
+  --radius:                       var(--blysis-radius);
 }
 
 body {
-  color: var(--uxw-color-foreground);
-  font-family: var(--uxw-font-body);
-  background: var(--uxw-color-background);
+  color: var(--blysis-color-foreground);
+  font-family: var(--blysis-font-body);
+  background: var(--blysis-color-background);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -75,12 +75,12 @@ body {
  * taller than this; the variable is here so a theme can say so.
  */
 :root {
-  --uxw-mobile-nav-height: 3.5rem;
+  --blysis-mobile-nav-height: 3.5rem;
 }
 
 @media (max-width: 639.98px) {
   body {
-    padding-bottom: calc(var(--uxw-mobile-nav-height) + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(var(--blysis-mobile-nav-height) + env(safe-area-inset-bottom, 0px));
   }
 }
 
@@ -95,8 +95,8 @@ body {
 
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--uxw-color-mutedForeground); opacity: 0.5; border-radius: 999px; }
-::-webkit-scrollbar-thumb:hover { background: var(--uxw-color-mutedForeground); }
+::-webkit-scrollbar-thumb { background: var(--blysis-color-mutedForeground); opacity: 0.5; border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: var(--blysis-color-mutedForeground); }
 
 ::selection { background: var(--color-primary); color: white; }
 :focus-visible { outline: 2px solid var(--color-primary); outline-offset: 2px; }
@@ -114,54 +114,54 @@ body {
  *
  * The colours are the theme's, so an article recolours with everything else.
  */
-.uxw-content {
+.blysis-content {
   /* No colour of its own: a changelog entry is muted and an article is not,
      and the caller says which with the utility it already had. */
   line-height: 1.7;
   overflow-wrap: break-word;
 }
 
-.uxw-content > :first-child { margin-top: 0; }
-.uxw-content > :last-child { margin-bottom: 0; }
+.blysis-content > :first-child { margin-top: 0; }
+.blysis-content > :last-child { margin-bottom: 0; }
 
-.uxw-content h1,
-.uxw-content h2,
-.uxw-content h3,
-.uxw-content h4 {
+.blysis-content h1,
+.blysis-content h2,
+.blysis-content h3,
+.blysis-content h4 {
   color: inherit;
   font-weight: 600;
   line-height: 1.3;
   margin: 1.6em 0 0.6em;
 }
 
-.uxw-content h1 { font-size: 1.75em; }
-.uxw-content h2 { font-size: 1.4em; }
-.uxw-content h3 { font-size: 1.2em; }
-.uxw-content h4 { font-size: 1.05em; }
+.blysis-content h1 { font-size: 1.75em; }
+.blysis-content h2 { font-size: 1.4em; }
+.blysis-content h3 { font-size: 1.2em; }
+.blysis-content h4 { font-size: 1.05em; }
 
-.uxw-content p { margin: 0 0 1em; }
+.blysis-content p { margin: 0 0 1em; }
 
-.uxw-content a {
+.blysis-content a {
   color: var(--color-primary);
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
-.uxw-content a:hover { opacity: 0.8; }
+.blysis-content a:hover { opacity: 0.8; }
 
-.uxw-content strong { font-weight: 600; }
-.uxw-content em { font-style: italic; }
+.blysis-content strong { font-weight: 600; }
+.blysis-content em { font-style: italic; }
 
-.uxw-content ul,
-.uxw-content ol {
+.blysis-content ul,
+.blysis-content ol {
   margin: 0 0 1em;
   padding-left: 1.5rem;
 }
 
-.uxw-content ul { list-style: disc; }
-.uxw-content ol { list-style: decimal; }
-.uxw-content li { margin: 0.35em 0; }
-.uxw-content li::marker { color: var(--color-muted-foreground); }
+.blysis-content ul { list-style: disc; }
+.blysis-content ol { list-style: decimal; }
+.blysis-content li { margin: 0.35em 0; }
+.blysis-content li::marker { color: var(--color-muted-foreground); }
 
 /**
  * A tick box is 16px square, and the site-wide radius is tuned for cards and
@@ -171,8 +171,8 @@ body {
  * never have. Capped at a quarter of the box, and still zero for a theme that
  * asked for square corners.
  */
-.uxw-control-radius {
-  border-radius: min(var(--uxw-radius), 0.25rem);
+.blysis-control-radius {
+  border-radius: min(var(--blysis-radius), 0.25rem);
 }
 
 /*
@@ -189,16 +189,16 @@ body {
  * it to start level with the cards in the column beside it, which begin under
  * exactly that heading.
  */
-.uxw-heading-spacer {
+.blysis-heading-spacer {
     height: 1.75rem;
     margin-bottom: 1.5rem;
 }
 
-.uxw-checkbox-radius {
-  border-radius: min(var(--uxw-radius), 0.375rem);
+.blysis-checkbox-radius {
+  border-radius: min(var(--blysis-radius), 0.375rem);
 }
 
-.uxw-content blockquote {
+.blysis-content blockquote {
   margin: 1.2em 0;
   padding: 0.2em 0 0.2em 1rem;
   border-left: 3px solid var(--color-primary);
@@ -206,7 +206,7 @@ body {
   font-style: italic;
 }
 
-.uxw-content code {
+.blysis-content code {
   background: var(--color-muted);
   border-radius: 0.3rem;
   padding: 0.15em 0.4em;
@@ -214,7 +214,7 @@ body {
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
 }
 
-.uxw-content pre {
+.blysis-content pre {
   background: var(--color-muted);
   border: 1px solid var(--color-border);
   border-radius: 0.6rem;
@@ -223,27 +223,27 @@ body {
   overflow-x: auto;
 }
 
-.uxw-content pre code {
+.blysis-content pre code {
   background: transparent;
   padding: 0;
   font-size: 0.875em;
 }
 
-.uxw-content img,
-.uxw-content video {
+.blysis-content img,
+.blysis-content video {
   max-width: 100%;
   height: auto;
   border-radius: 0.6rem;
   margin: 1em 0;
 }
 
-.uxw-content hr {
+.blysis-content hr {
   border: 0;
   border-top: 1px solid var(--color-border);
   margin: 2em 0;
 }
 
-.uxw-content table {
+.blysis-content table {
   width: 100%;
   border-collapse: collapse;
   margin: 0 0 1em;
@@ -251,14 +251,14 @@ body {
   overflow-x: auto;
 }
 
-.uxw-content th,
-.uxw-content td {
+.blysis-content th,
+.blysis-content td {
   border: 1px solid var(--color-border);
   padding: 0.5rem 0.75rem;
   text-align: left;
 }
 
-.uxw-content th {
+.blysis-content th {
   background: var(--color-muted);
   font-weight: 600;
 }
@@ -314,30 +314,30 @@ body {
 
 /* Dark mode - only legitimate overrides that can't be fixed at component level */
 [data-mode="dark"] {
-  background-color: var(--uxw-color-background) !important;
-  color: var(--uxw-color-foreground) !important;
+  background-color: var(--blysis-color-background) !important;
+  color: var(--blysis-color-foreground) !important;
 }
 /* HTML elements without Tailwind classes */
-[data-mode="dark"] table { color: var(--uxw-color-foreground); }
-[data-mode="dark"] th { color: var(--uxw-color-mutedForeground) !important; border-color: var(--uxw-color-border) !important; }
-[data-mode="dark"] td { border-color: var(--uxw-color-border) !important; }
-[data-mode="dark"] tr:hover { background-color: var(--uxw-color-muted) !important; }
-[data-mode="dark"] .divide-y > * + * { border-color: var(--uxw-color-border) !important; }
-[data-mode="dark"] .border-b { border-color: var(--uxw-color-border) !important; }
-[data-mode="dark"] .border-t { border-color: var(--uxw-color-border) !important; }
+[data-mode="dark"] table { color: var(--blysis-color-foreground); }
+[data-mode="dark"] th { color: var(--blysis-color-mutedForeground) !important; border-color: var(--blysis-color-border) !important; }
+[data-mode="dark"] td { border-color: var(--blysis-color-border) !important; }
+[data-mode="dark"] tr:hover { background-color: var(--blysis-color-muted) !important; }
+[data-mode="dark"] .divide-y > * + * { border-color: var(--blysis-color-border) !important; }
+[data-mode="dark"] .border-b { border-color: var(--blysis-color-border) !important; }
+[data-mode="dark"] .border-t { border-color: var(--blysis-color-border) !important; }
 /* Native form elements */
 [data-mode="dark"] input, [data-mode="dark"] textarea, [data-mode="dark"] select:not(.appearance-none) {
-  background-color: var(--uxw-color-background) !important;
-  border-color: var(--uxw-color-border) !important;
-  color: var(--uxw-color-foreground) !important;
+  background-color: var(--blysis-color-background) !important;
+  border-color: var(--blysis-color-border) !important;
+  color: var(--blysis-color-foreground) !important;
 }
 [data-mode="dark"] input::placeholder, [data-mode="dark"] textarea::placeholder {
-  color: var(--uxw-color-mutedForeground) !important;
+  color: var(--blysis-color-mutedForeground) !important;
 }
 [data-mode="dark"] input[type="color"] { background-color: transparent !important; }
 /* Code blocks */
-[data-mode="dark"] code { background-color: var(--uxw-color-muted) !important; color: var(--uxw-color-foreground) !important; }
-[data-mode="dark"] pre { background-color: var(--uxw-color-background) !important; color: var(--uxw-color-foreground) !important; }
+[data-mode="dark"] code { background-color: var(--blysis-color-muted) !important; color: var(--blysis-color-foreground) !important; }
+[data-mode="dark"] pre { background-color: var(--blysis-color-background) !important; color: var(--blysis-color-foreground) !important; }
 /* Status badge backgrounds (semantic colors) */
 [data-mode="dark"] .bg-green-50 { background-color: rgba(34, 197, 94, 0.1) !important; }
 [data-mode="dark"] .bg-red-50 { background-color: rgba(239, 68, 68, 0.1) !important; }
@@ -348,28 +348,28 @@ body {
 [data-mode="dark"] .shadow-lg { box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important; }
 /* ARIA roles */
 [data-mode="dark"] [role="menu"], [data-mode="dark"] [role="listbox"] {
-  background-color: var(--uxw-color-card) !important;
-  border-color: var(--uxw-color-border) !important;
+  background-color: var(--blysis-color-card) !important;
+  border-color: var(--blysis-color-border) !important;
 }
 
 .admin-sidebar {
-  background: var(--uxw-color-card);
-  border-right: 1px solid var(--uxw-color-border);
+  background: var(--blysis-color-card);
+  border-right: 1px solid var(--blysis-color-border);
 }
 
 .admin-sidebar-link {
   transition: all 0.15s ease;
-  color: var(--uxw-color-mutedForeground);
+  color: var(--blysis-color-mutedForeground);
 }
 
 .admin-sidebar-link:hover {
-  color: var(--uxw-color-foreground);
-  background: var(--uxw-color-muted);
+  color: var(--blysis-color-foreground);
+  background: var(--blysis-color-muted);
 }
 
 .admin-sidebar-link.active {
-  color: var(--uxw-color-primary);
-  background: color-mix(in srgb, var(--uxw-color-primary) 10%, transparent);
+  color: var(--blysis-color-primary);
+  background: color-mix(in srgb, var(--blysis-color-primary) 10%, transparent);
   font-weight: 500;
 }
 

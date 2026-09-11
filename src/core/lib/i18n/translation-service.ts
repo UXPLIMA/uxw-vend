@@ -16,7 +16,7 @@ import { shippedMessages } from "@/core/lib/i18n/shipped-messages";
 import { cacheGet, cacheSet, cacheDel } from "@/core/lib/redis";
 import { isUnsafeKey, emptyRecord } from "@/core/lib/safe-object";
 
-const CACHE_PREFIX = "uxw:translations:";
+const CACHE_PREFIX = "blysis:translations:";
 const CACHE_TTL_SECONDS = 120;
 
 // ---------------------------------------------------------------------------

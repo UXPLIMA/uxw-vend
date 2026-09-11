@@ -54,7 +54,7 @@ function requestRestart(): void {
 // round, and two PM2 workers could compute different float approximations
 // and acquire technically different locks (mutual exclusion would silently
 // break).
-const INSTALL_ADVISORY_LOCK_KEY = BigInt("0x7578774d6f64496e"); // "uxwModIn"
+const INSTALL_ADVISORY_LOCK_KEY = BigInt("0x626c794d6f64496e"); // "blyModIn"
 
 let installing = false;
 let buildScheduled = false;
@@ -271,7 +271,7 @@ export function scheduleBuild(): void {
             //    `next start` reads the route + build manifests once, at boot.
             //    Rebuilding underneath it changes nothing the running process
             //    can see, so an install is not live until the process is
-            //    replaced. This used to call `npx pm2 restart uxwvend` inside
+            //    replaced. This used to call `npx pm2 restart blysis` inside
             //    a try/catch - and pm2 is in neither the image nor
             //    package.json, so the call always threw and was always
             //    swallowed. Every module install rebuilt and then served the

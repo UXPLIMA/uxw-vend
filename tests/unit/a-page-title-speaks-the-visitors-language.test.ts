@@ -13,11 +13,11 @@ import { resolveRouteTitle, titleFromMessages, humanizeSegment } from "@/core/li
  *
  * Measured on the demo, every module page in Turkish:
  *
- *   /tr/store        <h1>Mağaza</h1>            <title>Store | uxwVend</title>
- *   /tr/store/cart   <h1>Alışveriş Sepeti</h1>  <title>Cart | uxwVend</title>
- *   /tr/punishments  <h1>Cezalar</h1>           <title>Punishments | uxwVend</title>
- *   /tr/leaderboard  <h1>Sıralama</h1>          <title>Leaderboard | uxwVend</title>
- *   /tr/vote         <h1>Oy Ver, Ödül Kazan</h1><title>Vote | uxwVend</title>
+ *   /tr/store        <h1>Mağaza</h1>            <title>Store | Blysis</title>
+ *   /tr/store/cart   <h1>Alışveriş Sepeti</h1>  <title>Cart | Blysis</title>
+ *   /tr/punishments  <h1>Cezalar</h1>           <title>Punishments | Blysis</title>
+ *   /tr/leaderboard  <h1>Sıralama</h1>          <title>Leaderboard | Blysis</title>
+ *   /tr/vote         <h1>Oy Ver, Ödül Kazan</h1><title>Vote | Blysis</title>
  *
  * The tab is what a visitor reads with twenty of them open, and the title is
  * the line a search engine prints, so the one string a Turkish visitor was

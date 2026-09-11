@@ -1,4 +1,4 @@
-# Reverse proxy + automatic HTTPS for uxwVend.
+# Reverse proxy + automatic HTTPS for Blysis.
 #
 # DOMAIN and TLS_EMAIL come from .env via docker-compose.yml. Caddy obtains a
 # Let's Encrypt certificate on first request and renews it by itself; there is

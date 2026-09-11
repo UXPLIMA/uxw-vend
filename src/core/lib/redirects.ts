@@ -21,7 +21,7 @@ import { cached } from "./cache";
 const CACHE_MS = 60_000;
 
 export async function siteRedirects(): Promise<RoutingRedirectRule[]> {
-    return cached("uxw:routing:redirects", CACHE_MS, async () =>
+    return cached("blysis:routing:redirects", CACHE_MS, async () =>
         applyFiltersAsync("routing.redirects", [] as RoutingRedirectRule[], {}),
     );
 }

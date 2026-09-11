@@ -7,8 +7,8 @@
  * All files live in the top-level `backups/` directory (gitignored).
  *
  * Filename convention:
- *     uxwvend-{type}-{ISO-date-safe}.sql.gz
- *   e.g. uxwvend-manual-2026-04-08T12-34-56-789Z.sql.gz
+ *     blysis-{type}-{ISO-date-safe}.sql.gz
+ *   e.g. blysis-manual-2026-04-08T12-34-56-789Z.sql.gz
  *
  * The `id` used by the public API is the filename WITHOUT the `.sql.gz`
  * extension - deterministic, collision-free, and safe to use in URLs.
@@ -32,7 +32,7 @@ export interface BackupMeta {
 
 const BACKUP_DIR = path.resolve(process.cwd(), "backups");
 const FILE_EXT = ".sql.gz";
-const FILENAME_RE = /^uxwvend-(manual|scheduled)-([0-9TZ\-]+)\.sql\.gz$/;
+const FILENAME_RE = /^blysis-(manual|scheduled)-([0-9TZ\-]+)\.sql\.gz$/;
 
 const RETAIN_MANUAL = 10;
 const RETAIN_SCHEDULED = 30;
@@ -66,7 +66,7 @@ function safeTimestamp(date: Date): string {
 }
 
 function buildFilename(type: "manual" | "scheduled", date: Date): string {
-    return `uxwvend-${type}-${safeTimestamp(date)}${FILE_EXT}`;
+    return `blysis-${type}-${safeTimestamp(date)}${FILE_EXT}`;
 }
 
 function idToFilename(id: string): string | null {

@@ -9,7 +9,7 @@ interface Props {
     children?: React.ReactNode;
 }
 
-const STORAGE_KEY = "uxwvend.admin.updateBanner.dismissedFor";
+const STORAGE_KEY = "blysis.admin.updateBanner.dismissedFor";
 
 /**
  * Client wrapper that owns the dismiss state for the admin update banner.

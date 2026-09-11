@@ -10,7 +10,7 @@
  * Every name below also appears in this module's `hooksEmitted` manifest field.
  */
 declare global {
-    interface UxwVendHookPayloads {
+    interface BlysisHookPayloads {
         "blog.article.created": BlogArticleHookPayload;
         "blog.article.updated": BlogArticleHookPayload;
         "blog.article.deleted": { id: string; slug: string };

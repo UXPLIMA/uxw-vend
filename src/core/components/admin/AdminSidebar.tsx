@@ -13,6 +13,7 @@ import {
     type NavSection,
 } from "@/core/lib/admin-nav-groups";
 import { useAdminNav, type AdminNavModule } from "@/core/hooks/useAdminNav";
+import { SiteName, useSiteInitials } from "@/core/components/ui/site-name";
 
 interface AdminSidebarProps {
     userName?: string;
@@ -55,6 +56,7 @@ export function AdminSidebar({ modules = [], activeThemeId }: AdminSidebarProps)
     const drawerRef = useModalDialog<HTMLElement>(mobileOpen, () => setMobileOpen(false));
     const { isDark, toggle: toggleDarkMode } = useDarkMode();
     const t = useTranslations("admin");
+    const siteInitials = useSiteInitials();
 
     // The breadcrumb builds the same groups from the same hook, so the two
     // never disagree about what a route is called.
@@ -138,13 +140,13 @@ export function AdminSidebar({ modules = [], activeThemeId }: AdminSidebarProps)
                     className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center hover:bg-primary/20 transition"
                     aria-label={t("sidebar_adminHome")}
                 >
-                    <span className="text-xs font-bold">UV</span>
+                    <span className="text-xs font-bold">{siteInitials}</span>
                 </Link>
                 <span
                     role="tooltip"
                     className="pointer-events-none absolute left-full top-1/2 -translate-y-1/2 ml-2 px-2 py-1 rounded-md bg-foreground text-background text-xs font-medium whitespace-nowrap shadow-lg opacity-0 group-hover/rail:opacity-100 transition-opacity duration-150 z-50"
                 >
-                    uxwVend
+                    <SiteName />
                 </span>
             </div>
             {groups.map((group) => {

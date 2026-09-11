@@ -112,5 +112,5 @@ export function roleScope(part: "name" | "badge", id: string): string {
         .join("");
     // An empty id would leave every role sharing one class, which is one role
     // wearing another's style.
-    return `uxw-${part}-${safe === "" ? "none" : safe}`;
+    return `blysis-${part}-${safe === "" ? "none" : safe}`;
 }

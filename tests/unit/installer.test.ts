@@ -14,7 +14,7 @@ const INSTALLER = path.join(REPO, "install.sh");
  * host. Docker is never contacted.
  */
 function dryRun(args: string[]): { dir: string; env: Record<string, string>; stdout: string } {
-    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "uxwvend-install-"));
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "blysis-install-"));
     const stdout = execFileSync(
         "bash",
         [INSTALLER, "--dry-run", "--dir", dir, ...args],
@@ -43,7 +43,7 @@ describe("install.sh", () => {
     });
 
     it("keeps POSTGRES_PASSWORD URL-safe", () => {
-        // It is interpolated into postgresql://uxwvend:<pw>@db:5432/uxwvend.
+        // It is interpolated into postgresql://blysis:<pw>@db:5432/blysis.
         // A '/', '@' or ':' from base64 would silently corrupt the DSN.
         const { env } = dryRun([]);
         expect(env.POSTGRES_PASSWORD).toMatch(/^[0-9a-f]+$/);
@@ -118,9 +118,9 @@ describe("install.sh", () => {
 
     it("works when piped from curl, where stdin is the script itself", () => {
         // `curl ... | sudo bash` has no source tree next to the script, so the
-        // installer downloads the stack files instead. UXWVEND_RAW_BASE points
+        // installer downloads the stack files instead. BLYSIS_RAW_BASE points
         // that download at a local copy so the path is exercised offline.
-        const raw = fs.mkdtempSync(path.join(os.tmpdir(), "uxwvend-raw-"));
+        const raw = fs.mkdtempSync(path.join(os.tmpdir(), "blysis-raw-"));
         fs.mkdirSync(path.join(raw, "scripts"));
         for (const f of [
             "docker-compose.yml",
@@ -134,17 +134,17 @@ describe("install.sh", () => {
         ]) {
             fs.copyFileSync(path.join(REPO, f), path.join(raw, f));
         }
-        fs.copyFileSync(path.join(REPO, "scripts/uxwvend"), path.join(raw, "scripts/uxwvend"));
+        fs.copyFileSync(path.join(REPO, "scripts/blysis"), path.join(raw, "scripts/blysis"));
 
-        const dir = fs.mkdtempSync(path.join(os.tmpdir(), "uxwvend-piped-"));
+        const dir = fs.mkdtempSync(path.join(os.tmpdir(), "blysis-piped-"));
         execFileSync("bash", ["-s", "--", "--dry-run", "--dir", dir], {
             input: fs.readFileSync(INSTALLER),
             encoding: "utf8",
             cwd: REPO,
-            env: { ...process.env, UXWVEND_RAW_BASE: `file://${raw}` },
+            env: { ...process.env, BLYSIS_RAW_BASE: `file://${raw}` },
         });
 
-        for (const f of ["docker-compose.yml", "Caddyfile", "uxwvend.cli"]) {
+        for (const f of ["docker-compose.yml", "Caddyfile", "blysis.cli"]) {
             expect(fs.existsSync(path.join(dir, f)), f).toBe(true);
         }
         expect(fs.existsSync(path.join(dir, ".env"))).toBe(true);

@@ -1,5 +1,5 @@
 {
-  "$comment": "The catalogue the admin update screen reads. Published beside module-marketplace/index.json on the same base, so a fork or an air-gapped mirror serves its own by pointing UXWVEND_MARKETPLACE_BASE somewhere else. Newest last is not required; the reader sorts.",
+  "$comment": "The catalogue the admin update screen reads. Published beside module-marketplace/index.json on the same base, so a fork or an air-gapped mirror serves its own by pointing BLYSIS_MARKETPLACE_BASE somewhere else. Newest last is not required; the reader sorts.",
   "updated": "2026-09-07",
   "releases": [
     {

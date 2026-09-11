@@ -1,5 +1,5 @@
 #!/bin/bash
-# uxwVend Database Backup Script
+# Blysis Database Backup Script
 # Usage: ./scripts/backup.sh
 #
 # Connection parameters are parsed from DATABASE_URL and passed to pg_dump
@@ -10,7 +10,7 @@ set -e
 
 TIMESTAMP=$(date +%Y%m%d_%H%M%S)
 BACKUP_DIR="./backups"
-BACKUP_FILE="${BACKUP_DIR}/uxwvend_${TIMESTAMP}.sql"
+BACKUP_FILE="${BACKUP_DIR}/blysis_${TIMESTAMP}.sql"
 
 mkdir -p "$BACKUP_DIR"
 
@@ -52,5 +52,5 @@ echo "Backup saved: ${BACKUP_FILE}.gz"
 echo "Size: $(du -h "${BACKUP_FILE}.gz" | cut -f1)"
 
 # Keep only last 10 backups
-ls -t ${BACKUP_DIR}/uxwvend_*.sql.gz 2>/dev/null | tail -n +11 | xargs rm -f 2>/dev/null
+ls -t ${BACKUP_DIR}/blysis_*.sql.gz 2>/dev/null | tail -n +11 | xargs rm -f 2>/dev/null
 echo "Done."

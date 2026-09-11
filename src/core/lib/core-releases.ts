@@ -1,8 +1,8 @@
 /**
- * Which versions of uxwVend exist, and which one an install may move to.
+ * Which versions of Blysis exist, and which one an install may move to.
  *
  * The feed is a static `releases.json` published beside the module catalogue,
- * on the base `UXWVEND_MARKETPLACE_BASE` already points at, so a fork or an
+ * on the base `BLYSIS_MARKETPLACE_BASE` already points at, so a fork or an
  * air-gapped mirror serves its own releases with no extra configuration. It is
  * a file rather than the GitHub releases API for three reasons: no rate limit
  * on an unauthenticated read, fields this product decides (a security flag, a

@@ -10,14 +10,14 @@
  * made deliverable outlive it.
  */
 declare global {
-    interface UxwVendFilterPayloads {
+    interface BlysisFilterPayloads {
         /** Everything anything installed here can hand over. */
         "marketplace.delivery.kinds": MarketDeliveryKind[];
         /** Whether somebody handed it over. */
         "marketplace.deliver": MarketDeliveryOutcome;
     }
 
-    interface UxwVendFilterContexts {
+    interface BlysisFilterContexts {
         "marketplace.delivery.kinds": Record<string, never>;
         "marketplace.deliver": MarketDelivery;
     }

@@ -7,8 +7,8 @@ import { prisma } from "./db";
 import { cacheGetJSON, cacheSetJSON, cacheDel } from "./redis";
 import { resolveSettings, type SettingValue } from "./module-settings";
 
-const CACHE_KEY = "uxw:modules:status";
-const CONFIG_CACHE_KEY = "uxw:modules:config";
+const CACHE_KEY = "blysis:modules:status";
+const CONFIG_CACHE_KEY = "blysis:modules:config";
 const CACHE_TTL = 30; // seconds
 
 /** Get all module enabled/disabled states (cached) */

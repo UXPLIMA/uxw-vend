@@ -68,7 +68,7 @@ export async function getEmailConfig(): Promise<EmailConfig> {
             ...ModuleEmailApiKeyEnvVars.map((name) => process.env[name]),
         ),
         fromEmail:
-            firstString(stored.email_from, process.env.EMAIL_FROM) ?? "noreply@uxwvend.com",
+            firstString(stored.email_from, process.env.EMAIL_FROM) ?? "noreply@blysis.com",
         fromName: firstString(stored.email_from_name),
     };
     cache = { value, expiresAt: now + CACHE_MS };

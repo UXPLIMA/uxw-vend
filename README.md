@@ -1,11 +1,11 @@
 <div align="center">
-  <h1>uxwVend</h1>
+  <h1>Blysis</h1>
 
   <p><strong>A plugin-first platform whose core ships empty.</strong></p>
   <p>Game-server websites, digital storefronts and community portals. Every feature is a module installed at runtime from a built-in marketplace, or uploaded as a ZIP.</p>
 
-  [![CI](https://github.com/UXPLIMA/uxw-vend/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/UXPLIMA/uxw-vend/actions/workflows/build-and-test.yml)
-  [![Release](https://img.shields.io/github/v/release/UXPLIMA/uxw-vend?display_name=tag&sort=semver)](https://github.com/UXPLIMA/uxw-vend/releases)
+  [![CI](https://github.com/UXPLIMA/blysis/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/UXPLIMA/blysis/actions/workflows/build-and-test.yml)
+  [![Release](https://img.shields.io/github/v/release/UXPLIMA/blysis?display_name=tag&sort=semver)](https://github.com/UXPLIMA/blysis/releases)
   [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
   ![Next.js](https://img.shields.io/badge/Next.js-16.3-black?logo=next.js)
@@ -21,7 +21,7 @@
 ## Install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/UXPLIMA/uxw-vend/main/install.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/UXPLIMA/blysis/main/install.sh | sudo bash
 ```
 
 One command on a fresh VPS. It installs Docker if the machine does not have it,
@@ -30,7 +30,7 @@ app, waits until the site answers, and prints the URL and the admin password.
 Three questions, each with a default. Give it a domain and it also obtains and
 renews an HTTPS certificate on its own.
 
-Afterwards the machine has a `uxwvend` command: `update`, `backup`, `restore`,
+Afterwards the machine has a `blysis` command: `update`, `backup`, `restore`,
 `logs`, `status`, `restart`.
 
 Then open the site, finish the setup wizard, and install modules from
@@ -198,8 +198,8 @@ Requires Node.js 24+ and PostgreSQL 14+. Redis is optional locally and required
 in production, where the rate limiter fails closed without it.
 
 ```bash
-git clone https://github.com/UXPLIMA/uxw-vend.git
-cd uxw-vend
+git clone https://github.com/UXPLIMA/blysis.git
+cd blysis
 npm install                            # postinstall runs db:merge + generate-themes + generate-registry
 
 cp .env.example .env

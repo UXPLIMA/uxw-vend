@@ -12,6 +12,19 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 2.0.0 - The product is called Blysis. Every name it published moves with it,
+ * and two of them are a module's to declare: the global interfaces a module
+ * augments to type its own hooks are `BlysisHookPayloads`,
+ * `BlysisFilterPayloads` and `BlysisFilterContexts`, and a module built against
+ * the old names will not compile. That is a renamed symbol rather than a
+ * removed one, so nothing about the shape changed - but a declared range is
+ * exactly the thing that should catch it, which is what a major is for.
+ *
+ * The CSS custom properties a theme reads are renamed on the same principle
+ * (`--blysis-color-*`, `--blysis-radius`), as is the API key prefix. Keys
+ * already issued keep working: a key is found by the prefix stored beside it,
+ * so only new ones carry the new word.
+ *
  * 1.44.0 - `readSettingValues`, `readSettingStrings`, `settingsForStorage` and
  * `withoutSecrets` join `@/core/sdk/server`, and the manifest gains
  * `secretSettings` and `emailProvider`. A module's gateway keys were written to
@@ -300,7 +313,7 @@
  * flow documents its own.
  *
  * 1.3.0 - `FilterContext`, and the typed context registry
- * `UxwVendFilterContexts` behind it. A filter that declares a context now has
+ * `BlysisFilterContexts` behind it. A filter that declares a context now has
  * both halves of its contract checked, at the call site and in every listener;
  * a filter that declares none behaves exactly as it did, so this is an
  * addition rather than a break.
@@ -317,4 +330,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "1.44.0";
+export const CORE_API_VERSION = "2.0.0";

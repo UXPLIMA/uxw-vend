@@ -47,7 +47,7 @@ function fontStacks(): { where: string; value: string }[] {
         }
     }
     const globals = fs.readFileSync(path.join(ROOT, "src/app/globals.css"), "utf8");
-    for (const m of globals.matchAll(/--uxw-font-(heading|body|mono):\s*([^;]+);/g)) {
+    for (const m of globals.matchAll(/--blysis-font-(heading|body|mono):\s*([^;]+);/g)) {
         out.push({ where: `src/app/globals.css (${m[1]})`, value: m[2].trim() });
     }
     return out;

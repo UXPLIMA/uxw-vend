@@ -5,7 +5,7 @@
  * `generateMetadata`, a server export, and these are client components: the
  * root layout's `title.default` was the only thing left, so the tab and the
  * search snippet for the login screen, the register screen, the profile and
- * the site search all read "uxwVend" and nothing else. Only `/activity` had a
+ * the site search all read "Blysis" and nothing else. Only `/activity` had a
  * description at all.
  *
  * The fix does not move the pages to the server. Each one gets a sibling

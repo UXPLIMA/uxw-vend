@@ -2,10 +2,10 @@
   "id": "webhook-logs",
   "name": "Webhook Logs",
   "description": "View and manage webhook delivery logs",
-  "version": "1.0.11",
-  "coreVersion": "^1.24.0",
+  "version": "1.1.0",
+  "coreVersion": "^2.0.0",
   "category": "integration",
-  "author": "uxwVend",
+  "author": "Blysis",
   "icon": "Webhook",
   "permissions": [
     "admin.webhooks"

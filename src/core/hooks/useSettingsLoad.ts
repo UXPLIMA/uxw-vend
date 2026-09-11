@@ -10,7 +10,7 @@ import { readJson } from "@/core/lib/read-json";
  * `.catch(() => setLoading(false))`. A failed read left the form at its
  * defaults with no indication that anything had gone wrong, and the save
  * button underneath it wrote those defaults back - a lost custom stylesheet,
- * a site name reset to "uxwVend", a navbar reseeded from the registry.
+ * a site name reset to "Blysis", a navbar reseeded from the registry.
  *
  * `apply` is called with `data.settings` on success and not at all otherwise,
  * so the caller keeps its own state and only has to refuse to render the form

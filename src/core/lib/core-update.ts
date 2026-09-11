@@ -5,7 +5,7 @@
  * socket is root on the host, and this container runs module code that
  * arrives in a ZIP from outside. So updating is somebody else's job. The panel
  * writes an intent into a directory shared with the `updater` service, the
- * updater does the work the `uxwvend update` command does, and writes its
+ * updater does the work the `blysis update` command does, and writes its
  * progress back into the same file for the screen to show.
  *
  * That makes this file a boundary in both directions. What goes out must be
@@ -24,7 +24,7 @@ import type { CoreRelease } from "./core-releases";
  * an override for a test or an unusual deployment.
  */
 function stateDir(): string {
-    return process.env.UXWVEND_UPDATE_DIR?.trim() || "/var/lib/uxwvend/update";
+    return process.env.BLYSIS_UPDATE_DIR?.trim() || "/var/lib/blysis/update";
 }
 
 function intentPath(): string {

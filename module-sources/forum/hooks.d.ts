@@ -3,7 +3,7 @@
  * why the emitter owns these shapes and what widening/narrowing means.
  */
 declare global {
-    interface UxwVendHookPayloads {
+    interface BlysisHookPayloads {
         "forum.topic.created": ForumTopicHookPayload;
         "forum.topic.updated": ForumTopicHookPayload;
         "forum.topic.deleted": { id: string };

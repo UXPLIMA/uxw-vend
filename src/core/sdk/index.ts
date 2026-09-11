@@ -1,5 +1,5 @@
 /**
- * uxwVend module SDK - isomorphic surface.
+ * Blysis module SDK - isomorphic surface.
  *
  * This is the supported import path for modules. `@/core/lib/*` is core's
  * internal layout and modules must not reach into it: core refactors freely
@@ -99,7 +99,7 @@ export {
  *     export default onOrderCreated;
  *
  * The payload itself is declared by whichever module FIRES the hook, in a
- * `declare global { interface UxwVendHookPayloads { … } }` block.
+ * `declare global { interface BlysisHookPayloads { … } }` block.
  */
 export type {
     ActionPayload,

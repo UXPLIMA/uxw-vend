@@ -128,7 +128,7 @@ function main(): void {
         // module.json and general
         ["my-module", moduleId],
         ["My Module", moduleName],
-        ["A template module for uxwVend", moduleDescription || `${moduleName} module for uxwVend`],
+        ["A template module for Blysis", moduleDescription || `${moduleName} module for Blysis`],
 
         // Code identifiers
         ["MyModule", pascalCase],
@@ -143,9 +143,9 @@ function main(): void {
         ["\"myModule\"", `"${camelCase}"`],
 
         // Description placeholders in translations
-        ["Example module for uxwVend", moduleDescription || `${moduleName} module`],
-        ["uxwVend icin ornek modul", moduleDescription || `${moduleName} modulu`],
-        ["Beispielmodul fuer uxwVend", moduleDescription || `${moduleName} Modul`],
+        ["Example module for Blysis", moduleDescription || `${moduleName} module`],
+        ["Blysis icin ornek modul", moduleDescription || `${moduleName} modulu`],
+        ["Beispielmodul fuer Blysis", moduleDescription || `${moduleName} Modul`],
 
         // Turkish/German name placeholders
         ["Modulom", moduleName],
@@ -174,7 +174,7 @@ function main(): void {
     // Ensure core fields are correct
     manifest.id = moduleId;
     manifest.name = moduleName;
-    manifest.description = moduleDescription || `${moduleName} module for uxwVend`;
+    manifest.description = moduleDescription || `${moduleName} module for Blysis`;
 
     fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 4) + "\n");
 

@@ -6,7 +6,7 @@
  * checkout.
  */
 declare global {
-    interface UxwVendHookPayloads {
+    interface BlysisHookPayloads {
         "minecraft.account.linked": MinecraftLinkHookPayload;
         "minecraft.account.unlinked": MinecraftLinkHookPayload;
     }

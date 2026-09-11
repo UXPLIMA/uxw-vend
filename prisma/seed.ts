@@ -58,7 +58,7 @@ async function main() {
     const admin = await prisma.user.upsert({
         where: { email: adminEmail },
         update: { roleId: adminRole.id },
-        create: { email: adminEmail, username: "uxwadmin", password: pw, roleId: adminRole.id },
+        create: { email: adminEmail, username: "blysisadmin", password: pw, roleId: adminRole.id },
     });
     const created = admin.createdAt.getTime() === admin.updatedAt.getTime();
     console.log("[ok]Admin user");

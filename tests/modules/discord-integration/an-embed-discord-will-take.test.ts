@@ -24,7 +24,7 @@ const ok = {
     title: "A new order",
     description: "Somebody bought something.",
     fields: [{ name: "Total", value: "10.00", inline: true }],
-    footer: { text: "uxwVend" },
+    footer: { text: "Blysis" },
 };
 
 describe("an embed within its limits", () => {

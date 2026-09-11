@@ -107,7 +107,19 @@ function stripTags(s: string): string {
     return out;
 }
 
+/**
+ * Components whose whole job is to print words.
+ *
+ * The scan strips tags before looking for text, on the reasoning that a
+ * capitalised self-closing element is an icon. That is true of every one of
+ * them except a component that renders a string: `<SiteName />` prints the
+ * installation's own name, so a link around it already has an accessible name,
+ * and an `aria-label` would replace the visible one with a second copy.
+ */
+const RENDERS_ITS_OWN_TEXT = /<(SiteName)\b/;
+
 export function rendersText(inner: string): boolean {
+    if (RENDERS_ITS_OWN_TEXT.test(inner)) return true;
     const spans = braceSpans(inner);
     for (const [a, b] of spans) {
         const expr = inner.slice(a, b);
@@ -222,6 +234,9 @@ describe("rendersText", () => {
     it("treats a value expression as a name", () => {
         expect(rendersText("{count}")).toBe(true);
         expect(rendersText("{children}")).toBe(true);
+        // A component that prints the installation's name is words, not a glyph.
+        expect(rendersText('<SiteName className="font-bold" />')).toBe(true);
+        expect(rendersText('<Trash2 className="w-4 h-4" />')).toBe(false);
         expect(rendersText('{t("crud_delete")}')).toBe(true);
     });
 

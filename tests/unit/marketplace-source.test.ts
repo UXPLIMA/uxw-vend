@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 
-const ENV_KEY = "UXWVEND_MARKETPLACE_BASE";
-const DEFAULT_HOST = "https://raw.githubusercontent.com/UXPLIMA/uxw-vend/main";
+const ENV_KEY = "BLYSIS_MARKETPLACE_BASE";
+const DEFAULT_HOST = "https://raw.githubusercontent.com/UXPLIMA/blysis/main";
 
 /**
  * The module resolves the base on every call rather than at import time, so a
@@ -29,17 +29,17 @@ describe("marketplace source", () => {
     });
 
     it("lets a fork or an internal mirror take over", async () => {
-        process.env[ENV_KEY] = "https://mirror.example.com/uxwvend";
+        process.env[ENV_KEY] = "https://mirror.example.com/blysis";
         const m = await load();
-        expect(m.moduleMarketplaceBase()).toBe("https://mirror.example.com/uxwvend/module-marketplace");
-        expect(m.themeMarketplaceBase()).toBe("https://mirror.example.com/uxwvend/theme-marketplace");
+        expect(m.moduleMarketplaceBase()).toBe("https://mirror.example.com/blysis/module-marketplace");
+        expect(m.themeMarketplaceBase()).toBe("https://mirror.example.com/blysis/theme-marketplace");
     });
 
     it("strips trailing slashes so the joined URL never doubles them", async () => {
-        process.env[ENV_KEY] = "https://mirror.example.com/uxwvend///";
+        process.env[ENV_KEY] = "https://mirror.example.com/blysis///";
         const m = await load();
         expect(m.moduleMarketplaceIndexUrl()).toBe(
-            "https://mirror.example.com/uxwvend/module-marketplace/index.json",
+            "https://mirror.example.com/blysis/module-marketplace/index.json",
         );
     });
 

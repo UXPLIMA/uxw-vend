@@ -60,7 +60,7 @@ function mkdir(...segments: string[]): void {
 }
 
 beforeEach(() => {
-    root = fs.mkdtempSync(path.join(os.tmpdir(), "uxwvend-loader-"));
+    root = fs.mkdtempSync(path.join(os.tmpdir(), "blysis-loader-"));
     cwd = vi.spyOn(process, "cwd").mockReturnValue(root);
     logWarn.mockClear();
     logError.mockClear();

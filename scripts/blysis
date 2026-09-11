@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# uxwVend management CLI. Installed to /usr/local/bin/uxwvend by install.sh.
+# Blysis management CLI. Installed to /usr/local/bin/blysis by install.sh.
 #
 # Everything here is a thin, memorable wrapper over the docker compose
 # invocation the installation actually needs - including the compose file
@@ -9,8 +9,8 @@
 # Caddy on the next `up`).
 set -euo pipefail
 
-CONF=/etc/uxwvend.conf
-UXWVEND_DIR=/opt/uxwvend
+CONF=/etc/blysis.conf
+BLYSIS_DIR=/opt/blysis
 # shellcheck disable=SC1090
 if [ -f "$CONF" ]; then . "$CONF"; fi
 
@@ -24,10 +24,10 @@ die()  { printf '%s✗ %s%s\n' "$C_RED" "$*" "$C_RESET" >&2; exit 1; }
 ok()   { printf '%s✓ %s%s\n' "$C_GREEN" "$*" "$C_RESET"; }
 info() { printf '  %s\n' "$*"; }
 
-[ -d "$UXWVEND_DIR" ] || die "No installation at $UXWVEND_DIR. Set UXWVEND_DIR in $CONF."
-[ -f "$UXWVEND_DIR/.env" ] || die "No .env at $UXWVEND_DIR/.env - is this an uxwVend installation?"
+[ -d "$BLYSIS_DIR" ] || die "No installation at $BLYSIS_DIR. Set BLYSIS_DIR in $CONF."
+[ -f "$BLYSIS_DIR/.env" ] || die "No .env at $BLYSIS_DIR/.env - is this an Blysis installation?"
 
-env_get() { grep -E "^$1=" "$UXWVEND_DIR/.env" 2>/dev/null | head -1 | cut -d= -f2- || true; }
+env_get() { grep -E "^$1=" "$BLYSIS_DIR/.env" 2>/dev/null | head -1 | cut -d= -f2- || true; }
 
 # The tls profile must be repeated on every compose call. Omitting it on an
 # `up` would leave Caddy stopped and the site unreachable on 443.
@@ -38,21 +38,21 @@ case "$(env_get AUTH_URL)" in
         ;;
 esac
 
-compose() { ( cd "$UXWVEND_DIR" && docker compose "${COMPOSE_ARGS[@]}" "$@" ); }
+compose() { ( cd "$BLYSIS_DIR" && docker compose "${COMPOSE_ARGS[@]}" "$@" ); }
 
 usage() {
     cat <<'USAGE'
-uxwvend - manage this uxwVend installation
+blysis - manage this Blysis installation
 
-  uxwvend update [TAG]   pull the newest image (or TAG), migrate, restart
-  uxwvend backup         dump the database to <install-dir>/backups
-  uxwvend restore FILE   restore a dump (destructive - asks first)
-  uxwvend logs [SVC]     follow logs; SVC is app, db, redis, caddy or migrate
-  uxwvend restart        restart the stack
-  uxwvend stop           stop the stack (data is kept)
-  uxwvend start          start it again
-  uxwvend status         what is running, and whether the app is healthy
-  uxwvend version        installed image tag
+  blysis update [TAG]   pull the newest image (or TAG), migrate, restart
+  blysis backup         dump the database to <install-dir>/backups
+  blysis restore FILE   restore a dump (destructive - asks first)
+  blysis logs [SVC]     follow logs; SVC is app, db, redis, caddy or migrate
+  blysis restart        restart the stack
+  blysis stop           stop the stack (data is kept)
+  blysis start          start it again
+  blysis status         what is running, and whether the app is healthy
+  blysis version        installed image tag
 USAGE
 }
 
@@ -64,10 +64,10 @@ update)
     tag="${1:-}"
     if [ -n "$tag" ]; then
         # Rewrite in place so a later plain `update` keeps the pinned tag.
-        if grep -qE '^UXWVEND_VERSION=' "$UXWVEND_DIR/.env"; then
-            sed -i -E "s|^UXWVEND_VERSION=.*|UXWVEND_VERSION=$tag|" "$UXWVEND_DIR/.env"
+        if grep -qE '^BLYSIS_VERSION=' "$BLYSIS_DIR/.env"; then
+            sed -i -E "s|^BLYSIS_VERSION=.*|BLYSIS_VERSION=$tag|" "$BLYSIS_DIR/.env"
         else
-            printf 'UXWVEND_VERSION=%s\n' "$tag" >> "$UXWVEND_DIR/.env"
+            printf 'BLYSIS_VERSION=%s\n' "$tag" >> "$BLYSIS_DIR/.env"
         fi
         info "Pinned to $tag"
     fi
@@ -92,29 +92,29 @@ update)
             notified=1
             info "Still starting. If you have modules installed, the app is
   recompiling them for this version - several minutes is normal.
-  Watch it with: uxwvend logs"
+  Watch it with: blysis logs"
         fi
         sleep 3
     done
-    die "The app is not answering after the update. Run 'uxwvend logs' to see why."
+    die "The app is not answering after the update. Run 'blysis logs' to see why."
     ;;
 
 backup)
-    mkdir -p "$UXWVEND_DIR/backups"
-    out="$UXWVEND_DIR/backups/uxwvend-$(date -u '+%Y%m%d-%H%M%S').sql.gz"
+    mkdir -p "$BLYSIS_DIR/backups"
+    out="$BLYSIS_DIR/backups/blysis-$(date -u '+%Y%m%d-%H%M%S').sql.gz"
     info "Dumping…"
     # -T: no TTY, so the stream stays clean when redirected.
-    compose exec -T db pg_dump -U uxwvend -d uxwvend --clean --if-exists \
+    compose exec -T db pg_dump -U blysis -d blysis --clean --if-exists \
         | gzip > "$out"
     ok "$out ($(du -h "$out" | cut -f1))"
     printf '\n  %sThis dump does NOT contain .env.%s Secrets encrypted with\n' "$C_YELLOW" "$C_RESET"
     printf '  SECRET_ENCRYPTION_KEY are unreadable without it - back up\n'
-    printf '  %s separately.\n' "$UXWVEND_DIR/.env"
+    printf '  %s separately.\n' "$BLYSIS_DIR/.env"
     ;;
 
 restore)
     file="${1:-}"
-    [ -n "$file" ] || die "Usage: uxwvend restore <file.sql.gz>"
+    [ -n "$file" ] || die "Usage: blysis restore <file.sql.gz>"
     [ -f "$file" ] || die "No such file: $file"
     printf '%sThis overwrites the current database with %s.%s\n' "$C_BOLD" "$file" "$C_RESET"
     printf 'Type the word restore to continue: '
@@ -127,9 +127,9 @@ restore)
     compose stop app
     info "Restoring…"
     if [ "${file##*.}" = "gz" ]; then
-        gunzip -c "$file" | compose exec -T db psql -U uxwvend -d uxwvend -q
+        gunzip -c "$file" | compose exec -T db psql -U blysis -d blysis -q
     else
-        compose exec -T db psql -U uxwvend -d uxwvend -q < "$file"
+        compose exec -T db psql -U blysis -d blysis -q < "$file"
     fi
     info "Starting the app…"
     compose up -d
@@ -138,7 +138,7 @@ restore)
 
 logs)    compose logs -f --tail=100 "$@" ;;
 restart) compose restart; ok "Restarted" ;;
-stop)    compose stop; ok "Stopped (data kept - 'uxwvend start' brings it back)" ;;
+stop)    compose stop; ok "Stopped (data kept - 'blysis start' brings it back)" ;;
 start)   compose up -d; ok "Started" ;;
 
 status)
@@ -153,7 +153,7 @@ status)
     ;;
 
 version)
-    printf '%s:%s\n' "$(env_get UXWVEND_IMAGE)" "$(env_get UXWVEND_VERSION)"
+    printf '%s:%s\n' "$(env_get BLYSIS_IMAGE)" "$(env_get BLYSIS_VERSION)"
     ;;
 
 help|--help|-h) usage ;;

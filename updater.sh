@@ -49,14 +49,14 @@ compose() {
 }
 
 current_tag() {
-    grep -E '^UXWVEND_VERSION=' "$PROJECT/.env" 2>/dev/null | head -n1 | cut -d= -f2- || true
+    grep -E '^BLYSIS_VERSION=' "$PROJECT/.env" 2>/dev/null | head -n1 | cut -d= -f2- || true
 }
 
 pin_tag() {
-    if grep -qE '^UXWVEND_VERSION=' "$PROJECT/.env" 2>/dev/null; then
-        sed -i -E "s|^UXWVEND_VERSION=.*|UXWVEND_VERSION=$1|" "$PROJECT/.env"
+    if grep -qE '^BLYSIS_VERSION=' "$PROJECT/.env" 2>/dev/null; then
+        sed -i -E "s|^BLYSIS_VERSION=.*|BLYSIS_VERSION=$1|" "$PROJECT/.env"
     else
-        printf 'UXWVEND_VERSION=%s\n' "$1" >> "$PROJECT/.env"
+        printf 'BLYSIS_VERSION=%s\n' "$1" >> "$PROJECT/.env"
     fi
 }
 
@@ -136,7 +136,7 @@ run_update() {
     if bring_up && wait_healthy; then
         log "rolled back to ${previous}"
     else
-        log "the rollback did not come up either - run 'uxwvend logs' on the host"
+        log "the rollback did not come up either - run 'blysis logs' on the host"
     fi
     status failed
 }

@@ -33,7 +33,7 @@ export default function Hero() {
           }
         : {
               background:
-                  "linear-gradient(135deg, var(--uxw-color-primary) 0%, var(--uxw-color-accent) 100%)",
+                  "linear-gradient(135deg, var(--blysis-color-primary) 0%, var(--blysis-color-accent) 100%)",
               color: "#ffffff",
           };
 

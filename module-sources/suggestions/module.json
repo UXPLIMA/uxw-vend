@@ -2,10 +2,10 @@
   "id": "suggestions",
   "name": "Suggestions",
   "description": "Community feature suggestions with voting",
-  "version": "1.1.5",
-  "coreVersion": "^1.29.0",
+  "version": "1.2.0",
+  "coreVersion": "^2.0.0",
   "category": "community",
-  "author": "uxwVend",
+  "author": "Blysis",
   "icon": "MessageSquare",
   "permissions": [
     "suggestions.manage"

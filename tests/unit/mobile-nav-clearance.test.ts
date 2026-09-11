@@ -31,8 +31,8 @@ describe("the mobile bottom navigation", () => {
 
     it("the page leaves room for it below that breakpoint", () => {
         expect(CSS).toMatch(/@media\s*\(max-width:\s*639/);
-        expect(CSS).toContain("--uxw-mobile-nav-height");
-        expect(CSS).toMatch(/padding-bottom:\s*calc\(var\(--uxw-mobile-nav-height\)/);
+        expect(CSS).toContain("--blysis-mobile-nav-height");
+        expect(CSS).toMatch(/padding-bottom:\s*calc\(var\(--blysis-mobile-nav-height\)/);
     });
 
     it("and clears the home indicator on top of that", () => {

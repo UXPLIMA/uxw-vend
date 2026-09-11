@@ -62,7 +62,7 @@ describe("getModuleStates", () => {
 
     it("reads the shared cache key", async () => {
         await getModuleStates();
-        expect(cacheGetJSON).toHaveBeenCalledWith("uxw:modules:status");
+        expect(cacheGetJSON).toHaveBeenCalledWith("blysis:modules:status");
     });
 
     it("builds the map from the config rows on a miss", async () => {
@@ -80,7 +80,7 @@ describe("getModuleStates", () => {
         await getModuleStates();
 
         expect(cacheSetJSON).toHaveBeenCalledWith(
-            "uxw:modules:status", { shop: true }, 30,
+            "blysis:modules:status", { shop: true }, 30,
         );
     });
 
@@ -161,7 +161,7 @@ describe("isModuleEnabled", () => {
 describe("invalidateModuleCache", () => {
     it("drops the shared key so the next read re-queries", async () => {
         await invalidateModuleCache();
-        expect(cacheDel).toHaveBeenCalledWith("uxw:modules:status");
+        expect(cacheDel).toHaveBeenCalledWith("blysis:modules:status");
     });
 
     it("drops the config key too", async () => {
@@ -169,7 +169,7 @@ describe("invalidateModuleCache", () => {
         // states one left a module reading its old settings for another
         // thirty seconds after an admin saved new ones.
         await invalidateModuleCache();
-        expect(cacheDel).toHaveBeenCalledWith("uxw:modules:config");
+        expect(cacheDel).toHaveBeenCalledWith("blysis:modules:config");
     });
 });
 
@@ -181,7 +181,7 @@ describe("invalidateModuleCache", () => {
 describe("moduleSettings", () => {
     it("serves a cache hit without touching the database", async () => {
         cacheGetJSON.mockImplementation(async (key: string) =>
-            key === "uxw:modules:config" ? { shop: { currency: "TRY" } } : null);
+            key === "blysis:modules:config" ? { shop: { currency: "TRY" } } : null);
 
         await expect(moduleSettings("shop")).resolves.toEqual({ stored: { currency: "TRY" } });
         expect(moduleConfig.findMany).not.toHaveBeenCalled();
@@ -189,7 +189,7 @@ describe("moduleSettings", () => {
 
     it("reads its own cache key, not the states one", async () => {
         await moduleSettings("shop");
-        expect(cacheGetJSON).toHaveBeenCalledWith("uxw:modules:config");
+        expect(cacheGetJSON).toHaveBeenCalledWith("blysis:modules:config");
     });
 
     it("builds the bag from the config rows on a miss and caches it", async () => {
@@ -201,7 +201,7 @@ describe("moduleSettings", () => {
         await expect(moduleSettings("blog")).resolves.toEqual({ stored: { perPage: 10 } });
         expect(moduleConfig.findMany).toHaveBeenCalledWith({ select: { id: true, config: true } });
         expect(cacheSetJSON).toHaveBeenCalledWith(
-            "uxw:modules:config",
+            "blysis:modules:config",
             { shop: { currency: "TRY" }, blog: { perPage: 10 } },
             30,
         );

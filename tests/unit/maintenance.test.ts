@@ -152,7 +152,7 @@ describe("caching", () => {
         // This is the key the proxy bundle reads; if it moves, the two
         // bundles silently stop sharing state.
         const g = globalThis as unknown as Record<string, unknown>;
-        expect(g["__uxwvend_maintenance_cache__"]).toBeDefined();
+        expect(g["__blysis_maintenance_cache__"]).toBeDefined();
     });
 
     it("is dropped by invalidateMaintenanceCache", async () => {

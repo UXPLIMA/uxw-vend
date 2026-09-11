@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.7
-# Multi-stage build for uxwVend. Node 24 matches package.json engines.node.
+# Multi-stage build for Blysis. Node 24 matches package.json engines.node.
 #
 # Stages:
 #   deps    - install every dep (dev + prod) so the builder can compile TS.
@@ -55,7 +55,7 @@ RUN npx tsx scripts/merge-schemas.ts && \
     npx tsx scripts/generate-openapi.ts && \
     npm run build && \
     rm -rf .next/cache && \
-    cp .next/BUILD_ID .uxwvend-image-build-id && \
+    cp .next/BUILD_ID .blysis-image-build-id && \
     npm prune --omit=dev
 
 FROM node:24-alpine AS runner
@@ -77,7 +77,7 @@ RUN addgroup --system --gid 1001 nodejs && \
 # The channel to the updater. Created here with the right owner because Docker
 # seeds a fresh named volume from the image: without this the app would find a
 # root-owned directory it cannot write an update request into.
-RUN mkdir -p /var/lib/uxwvend/update && chown -R 1001:1001 /var/lib/uxwvend
+RUN mkdir -p /var/lib/blysis/update && chown -R 1001:1001 /var/lib/blysis
 
 # Minimal runtime surface - the builder's .next, the generated Prisma
 # client, marketplace ZIPs, and the scripts the runtime still invokes
@@ -92,7 +92,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next ./.next
 # freshly pulled image's own build id would be hidden behind the previous
 # image's build. This file rides in the image layer where the volume cannot
 # mask it, and is how scripts/reconcile-build.ts notices the image changed.
-COPY --from=builder --chown=nextjs:nodejs /app/.uxwvend-image-build-id ./.uxwvend-image-build-id
+COPY --from=builder --chown=nextjs:nodejs /app/.blysis-image-build-id ./.blysis-image-build-id
 COPY --from=builder --chown=nextjs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nextjs:nodejs /app/package.json ./package.json
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public

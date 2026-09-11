@@ -115,7 +115,7 @@ jobs:
     # lifecycle end to end. Every previous gate ran against the source tree,
     # so nothing tested the artifact people actually install - and two release
     # blockers lived exactly there: an install rebuilt but kept serving the old
-    # build, and installed modules disappeared after `uxwvend update`.
+    # build, and installed modules disappeared after `blysis update`.
     steps:
       - uses: actions/checkout@v7
 
@@ -128,8 +128,8 @@ jobs:
         run: |
           set -euo pipefail
           cat > .env <<'ENVEOF'
-          UXWVEND_IMAGE=uxwvend
-          UXWVEND_VERSION=ci
+          BLYSIS_IMAGE=blysis
+          BLYSIS_VERSION=ci
           POSTGRES_PASSWORD=ci-smoke-postgres-password
           AUTH_SECRET=ci-smoke-secret-key-32-characters!
           SECRET_ENCRYPTION_KEY=0000000000000000000000000000000000000000000000000000000000000000
@@ -148,7 +148,7 @@ jobs:
           push: false
           # Loaded into the local daemon so compose can run it.
           load: true
-          tags: uxwvend:ci
+          tags: blysis:ci
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -209,7 +209,7 @@ jobs:
           cat /tmp/reconcile.txt
           grep -q 'build matches installed modules' /tmp/reconcile.txt
 
-      # `uxwvend update` recreates containers from a new image while the
+      # `blysis update` recreates containers from a new image while the
       # volumes survive. Recreating from the same image is the same shape
       # minus the image change, and is what used to lose the module.
       - name: Modules survive container recreation
@@ -253,13 +253,13 @@ jobs:
       postgres:
         image: postgres:17-alpine
         env:
-          POSTGRES_USER: uxwvend
-          POSTGRES_PASSWORD: uxwvend
-          POSTGRES_DB: uxwvend_e2e
+          POSTGRES_USER: blysis
+          POSTGRES_PASSWORD: blysis
+          POSTGRES_DB: blysis_e2e
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U uxwvend"
+          --health-cmd "pg_isready -U blysis"
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
@@ -281,7 +281,7 @@ jobs:
           --health-retries 10
 
     env:
-      DATABASE_URL: "postgresql://uxwvend:uxwvend@localhost:5432/uxwvend_e2e"
+      DATABASE_URL: "postgresql://blysis:blysis@localhost:5432/blysis_e2e"
       REDIS_URL: "redis://localhost:6379"
       AUTH_SECRET: "ci-e2e-secret-key-32-characters!!"
       SECRET_ENCRYPTION_KEY: "0000000000000000000000000000000000000000000000000000000000000000"
@@ -290,9 +290,9 @@ jobs:
       # The suite signs in as the seeded admin. prisma/seed.ts generates a
       # random password unless these are set, so they are what makes the
       # login-dependent specs runnable at all.
-      SEED_ADMIN_EMAIL: "admin@uxwvend.com"
+      SEED_ADMIN_EMAIL: "admin@blysis.com"
       SEED_ADMIN_PASSWORD: "e2e-admin-password"
-      E2E_ADMIN_EMAIL: "admin@uxwvend.com"
+      E2E_ADMIN_EMAIL: "admin@blysis.com"
       E2E_ADMIN_PASSWORD: "e2e-admin-password"
 
     steps:
@@ -345,7 +345,7 @@ jobs:
       - name: Start server
         run: |
           set -euo pipefail
-          npm start -- --port 3001 --hostname 127.0.0.1 > /tmp/uxwvend-server.log 2>&1 &
+          npm start -- --port 3001 --hostname 127.0.0.1 > /tmp/blysis-server.log 2>&1 &
           for i in $(seq 1 60); do
             if curl -fsS http://127.0.0.1:3001/api/health >/dev/null 2>&1; then
               echo "server up after ${i}s"
@@ -354,7 +354,7 @@ jobs:
             sleep 1
           done
           echo "server did not become healthy within 60s; last 50 log lines:"
-          tail -50 /tmp/uxwvend-server.log || true
+          tail -50 /tmp/blysis-server.log || true
           curl -sS -i http://127.0.0.1:3001/api/health || true
           exit 1
 

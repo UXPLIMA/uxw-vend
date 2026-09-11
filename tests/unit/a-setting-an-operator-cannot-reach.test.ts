@@ -54,6 +54,14 @@ function canWrite(file: string, source: string): boolean {
     return WRITES_A_SETTING.test(source) || p.includes("/admin") || p.includes("(admin)");
 }
 
+/** Whether a declared version is at least the one a feature arrived in. */
+function atLeast(a: number[], b: readonly number[]): boolean {
+    for (let i = 0; i < 3; i++) {
+        if (a[i] !== b[i]) return a[i] > b[i];
+    }
+    return true;
+}
+
 describe("every settings key the code reads can be written", () => {
     const readers = new Map<string, Set<string>>();
     for (const [file, source] of SOURCE) {
@@ -149,9 +157,14 @@ describe("the store's prices can be set", () => {
         // At least the version that accepted `step`, not exactly it: the
         // module widens its floor whenever it starts using something newer,
         // and pinning the spelling made an unrelated bump fail here.
-        const [, major, minor] = /\^(\d+)\.(\d+)\./.exec(manifest.coreVersion ?? "") ?? [];
-        expect(Number(major)).toBe(1);
-        expect(Number(minor)).toBeGreaterThanOrEqual(23);
+        //
+        // Compared as a whole version rather than one field at a time. It used
+        // to read the major and the minor separately and assert the major was
+        // 1, which turned the first major bump the product ever had into a
+        // failure in a test about a number input.
+        const asked = /\^(\d+)\.(\d+)\.(\d+)/.exec(manifest.coreVersion ?? "");
+        expect(asked, `declares ${manifest.coreVersion}`).toBeTruthy();
+        expect(atLeast(asked!.slice(1, 4).map(Number), [1, 23, 0])).toBe(true);
     });
 });
 

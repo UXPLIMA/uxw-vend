@@ -62,8 +62,8 @@ const FEED = {
 let dir: string;
 
 beforeEach(() => {
-    dir = fs.mkdtempSync(path.join(os.tmpdir(), "uxw-update-route-"));
-    process.env.UXWVEND_UPDATE_DIR = dir;
+    dir = fs.mkdtempSync(path.join(os.tmpdir(), "blysis-update-route-"));
+    process.env.BLYSIS_UPDATE_DIR = dir;
     user = { id: "admin-1", role: "admin" };
     admin = true;
     activity.length = 0;
@@ -76,7 +76,7 @@ beforeEach(() => {
 
 afterEach(() => {
     fs.rmSync(dir, { recursive: true, force: true });
-    delete process.env.UXWVEND_UPDATE_DIR;
+    delete process.env.BLYSIS_UPDATE_DIR;
     vi.unstubAllGlobals();
 });
 

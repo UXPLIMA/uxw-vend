@@ -2,10 +2,10 @@
   "id": "url-redirects",
   "name": "URL Redirects",
   "description": "A sign on the door of a page that moved, so old links keep working.",
-  "version": "1.0.0",
-  "coreVersion": "^1.35.0",
+  "version": "1.1.0",
+  "coreVersion": "^2.0.0",
   "category": "content",
-  "author": "uxwVend",
+  "author": "Blysis",
   "icon": "Signpost",
   "hookListeners": [
     {

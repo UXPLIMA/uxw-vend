@@ -52,7 +52,7 @@ jobs:
             type=ref,event=tag
             type=raw,value=latest,enable=${{ !github.event.release.prerelease }}
           labels: |
-            org.opencontainers.image.title=uxw-vend
+            org.opencontainers.image.title=blysis
             org.opencontainers.image.version=${{ github.event.release.tag_name }}
 
       - name: Build and push

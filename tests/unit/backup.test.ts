@@ -99,9 +99,9 @@ describe("backup: listBackups", () => {
 
     it("parses matching filenames and ignores non-matching ones", async () => {
         readdir.mockResolvedValue([
-            "uxwvend-manual-2026-01-01T00-00-00-000Z.sql.gz",
+            "blysis-manual-2026-01-01T00-00-00-000Z.sql.gz",
             "random-file.txt",
-            "uxwvend-scheduled-2026-02-01T00-00-00-000Z.sql.gz",
+            "blysis-scheduled-2026-02-01T00-00-00-000Z.sql.gz",
         ]);
         stat.mockImplementation(async () =>
             makeStat({ size: 1000, birthtime: new Date("2026-01-01") }),
@@ -110,20 +110,20 @@ describe("backup: listBackups", () => {
         const list = await mod.listBackups();
         expect(list).toHaveLength(2);
         const ids = list.map((b) => b.id);
-        expect(ids).toContain("uxwvend-manual-2026-01-01T00-00-00-000Z");
-        expect(ids).toContain("uxwvend-scheduled-2026-02-01T00-00-00-000Z");
+        expect(ids).toContain("blysis-manual-2026-01-01T00-00-00-000Z");
+        expect(ids).toContain("blysis-scheduled-2026-02-01T00-00-00-000Z");
     });
 
     it("sorts results newest first", async () => {
         readdir.mockResolvedValue([
-            "uxwvend-manual-2026-01-01T00-00-00-000Z.sql.gz",
-            "uxwvend-manual-2026-03-01T00-00-00-000Z.sql.gz",
-            "uxwvend-manual-2026-02-01T00-00-00-000Z.sql.gz",
+            "blysis-manual-2026-01-01T00-00-00-000Z.sql.gz",
+            "blysis-manual-2026-03-01T00-00-00-000Z.sql.gz",
+            "blysis-manual-2026-02-01T00-00-00-000Z.sql.gz",
         ]);
         const dateMap: Record<string, Date> = {
-            "uxwvend-manual-2026-01-01T00-00-00-000Z.sql.gz": new Date("2026-01-01"),
-            "uxwvend-manual-2026-02-01T00-00-00-000Z.sql.gz": new Date("2026-02-01"),
-            "uxwvend-manual-2026-03-01T00-00-00-000Z.sql.gz": new Date("2026-03-01"),
+            "blysis-manual-2026-01-01T00-00-00-000Z.sql.gz": new Date("2026-01-01"),
+            "blysis-manual-2026-02-01T00-00-00-000Z.sql.gz": new Date("2026-02-01"),
+            "blysis-manual-2026-03-01T00-00-00-000Z.sql.gz": new Date("2026-03-01"),
         };
         stat.mockImplementation(async (...args: unknown[]) => {
             const filename = path.basename(args[0] as string);
@@ -138,7 +138,7 @@ describe("backup: listBackups", () => {
 
     it("skips non-file entries", async () => {
         readdir.mockResolvedValue([
-            "uxwvend-manual-2026-01-01T00-00-00-000Z.sql.gz",
+            "blysis-manual-2026-01-01T00-00-00-000Z.sql.gz",
         ]);
         stat.mockResolvedValue(makeStat({ isFile: false }));
         const list = await mod.listBackups();
@@ -147,7 +147,7 @@ describe("backup: listBackups", () => {
 
     it("reports sizeBytes and type from filename", async () => {
         readdir.mockResolvedValue([
-            "uxwvend-scheduled-2026-01-01T00-00-00-000Z.sql.gz",
+            "blysis-scheduled-2026-01-01T00-00-00-000Z.sql.gz",
         ]);
         stat.mockResolvedValue(makeStat({ size: 4096 }));
         const list = await mod.listBackups();
@@ -164,7 +164,7 @@ describe("backup: deleteBackup path-traversal protection", () => {
     });
 
     it("rejects id with slashes", async () => {
-        await mod.deleteBackup("uxwvend-manual-2026/../../evil");
+        await mod.deleteBackup("blysis-manual-2026/../../evil");
         expect(unlink).not.toHaveBeenCalled();
     });
 
@@ -174,7 +174,7 @@ describe("backup: deleteBackup path-traversal protection", () => {
     });
 
     it("accepts a well-formed id and calls unlink with backup dir path", async () => {
-        await mod.deleteBackup("uxwvend-manual-2026-01-01T00-00-00-000Z");
+        await mod.deleteBackup("blysis-manual-2026-01-01T00-00-00-000Z");
         expect(unlink).toHaveBeenCalled();
         const firstCall = unlink.mock.calls[0] as unknown as [string];
         expect(firstCall[0]).toBeTypeOf("string");
@@ -190,26 +190,26 @@ describe("backup: getBackupPath", () => {
 
     it("returns null when file does not exist (stat throws)", async () => {
         stat.mockRejectedValue(new Error("ENOENT"));
-        const p = await mod.getBackupPath("uxwvend-manual-2026-01-01T00-00-00-000Z");
+        const p = await mod.getBackupPath("blysis-manual-2026-01-01T00-00-00-000Z");
         expect(p).toBeNull();
     });
 
     it("returns null when the entry is not a file", async () => {
         stat.mockResolvedValue(makeStat({ isFile: false }));
-        const p = await mod.getBackupPath("uxwvend-manual-2026-01-01T00-00-00-000Z");
+        const p = await mod.getBackupPath("blysis-manual-2026-01-01T00-00-00-000Z");
         expect(p).toBeNull();
     });
 
     it("returns a path under BACKUP_DIR for a valid id and existing file", async () => {
         stat.mockResolvedValue(makeStat({ isFile: true }));
-        const p = await mod.getBackupPath("uxwvend-manual-2026-01-01T00-00-00-000Z");
+        const p = await mod.getBackupPath("blysis-manual-2026-01-01T00-00-00-000Z");
         expect(p).not.toBeNull();
         expect((p as string).startsWith(BACKUP_DIR)).toBe(true);
-        expect(p).toContain("uxwvend-manual-2026-01-01T00-00-00-000Z.sql.gz");
+        expect(p).toContain("blysis-manual-2026-01-01T00-00-00-000Z.sql.gz");
     });
 
     it("rejects a valid-looking id containing a traversal sequence", async () => {
-        const p = await mod.getBackupPath("uxwvend-manual-../evil");
+        const p = await mod.getBackupPath("blysis-manual-../evil");
         expect(p).toBeNull();
     });
 });

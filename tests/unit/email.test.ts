@@ -500,7 +500,7 @@ describe("From header", () => {
     it("falls back to the default sender", async () => {
         const { sendEmail } = await loadWithProvider();
         await sendEmail({ to: "user@example.com", subject: "Hi", html: "x" });
-        expect(lastSend().from).toBe("uxwVend <noreply@uxwvend.com>");
+        expect(lastSend().from).toBe("Blysis <noreply@blysis.com>");
     });
 });
 

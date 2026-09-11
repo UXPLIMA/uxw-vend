@@ -4,7 +4,7 @@
   "name": "Flat",
   "description": "Default theme. Neutral gray surfaces, a single blue accent, WCAG AA in both modes.",
   "version": "1.0.0",
-  "author": "uxwVend",
+  "author": "Blysis",
   "modes": {
     "default": "light",
     "available": {

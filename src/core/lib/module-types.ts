@@ -207,7 +207,7 @@ export interface ModuleManifest {
     // can only be verified against a declared emitter, and a hook nobody
     // declares is indistinguishable from a typo. Kept in sync with the source
     // by `npm run validate:module`; the payload type belongs in a
-    // `declare global { interface UxwVendHookPayloads }` block in this module.
+    // `declare global { interface BlysisHookPayloads }` block in this module.
     hooksEmitted?: {
         hook: string;         // hook name this module fires
         type: "action" | "filter";

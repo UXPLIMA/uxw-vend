@@ -1,8 +1,8 @@
-# uxwVend production stack: Postgres, Redis, the app, and (optionally) Caddy.
+# Blysis production stack: Postgres, Redis, the app, and (optionally) Caddy.
 #
 # You should not need to read this file. Run the installer instead:
 #
-#   curl -fsSL https://raw.githubusercontent.com/UXPLIMA/uxw-vend/main/install.sh | sudo bash
+#   curl -fsSL https://raw.githubusercontent.com/UXPLIMA/blysis/main/install.sh | sudo bash
 #
 # It writes the .env this file needs, picks the ports, and starts everything.
 # To drive compose by hand, copy .env.example to .env and set at minimum
@@ -21,18 +21,18 @@ services:
     image: postgres:17-alpine
     restart: unless-stopped
     environment:
-      POSTGRES_DB: uxwvend
-      POSTGRES_USER: uxwvend
+      POSTGRES_DB: blysis
+      POSTGRES_USER: blysis
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
     volumes:
       - pgdata:/var/lib/postgresql/data
     # No `ports:` on purpose. Publishing 5432 puts Postgres on the public
     # internet of every VPS this stack is installed on, guarded by nothing but
     # the password. Sibling services reach it over the compose network by name;
-    # for a shell use `docker compose exec db psql -U uxwvend`, and for a host
+    # for a shell use `docker compose exec db psql -U blysis`, and for a host
     # port use the docker-compose.debug.yml override (binds 127.0.0.1 only).
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U uxwvend -d uxwvend"]
+      test: ["CMD-SHELL", "pg_isready -U blysis -d blysis"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -57,7 +57,7 @@ services:
   # then exits. No-op once the DB is initialized, so it is safe on every
   # `up`. The app waits for this to finish successfully before starting.
   migrate:
-    image: ${UXWVEND_IMAGE:-ghcr.io/uxplima/uxw-vend}:${UXWVEND_VERSION:-latest}
+    image: ${BLYSIS_IMAGE:-ghcr.io/uxplima/blysis}:${BLYSIS_VERSION:-latest}
     depends_on:
       db:
         condition: service_healthy
@@ -65,7 +65,7 @@ services:
       - .env
     environment:
       NODE_ENV: production
-      DATABASE_URL: postgresql://uxwvend:${POSTGRES_PASSWORD}@db:5432/uxwvend
+      DATABASE_URL: postgresql://blysis:${POSTGRES_PASSWORD}@db:5432/blysis
     command: ["npx", "tsx", "scripts/docker-bootstrap.ts"]
     # Same modules volume the app uses. scripts/merge-schemas.ts reads
     # src/modules to rebuild the merged Prisma schema; without this the
@@ -76,7 +76,7 @@ services:
     restart: "no"
 
   app:
-    image: ${UXWVEND_IMAGE:-ghcr.io/uxplima/uxw-vend}:${UXWVEND_VERSION:-latest}
+    image: ${BLYSIS_IMAGE:-ghcr.io/uxplima/blysis}:${BLYSIS_VERSION:-latest}
     restart: unless-stopped
     depends_on:
       db:
@@ -89,7 +89,7 @@ services:
       - .env
     environment:
       NODE_ENV: production
-      DATABASE_URL: postgresql://uxwvend:${POSTGRES_PASSWORD}@db:5432/uxwvend
+      DATABASE_URL: postgresql://blysis:${POSTGRES_PASSWORD}@db:5432/blysis
       REDIS_URL: redis://redis:6379
       AUTH_SECRET: ${AUTH_SECRET:?Set AUTH_SECRET in .env}
       AUTH_URL: ${AUTH_URL:-http://localhost:3001}
@@ -114,14 +114,14 @@ services:
       # volume from the image on first creation, so a fresh install starts
       # with the image's build and never rebuilds at all.
       #
-      # After `uxwvend update` the volume still holds the previous image's
+      # After `blysis update` the volume still holds the previous image's
       # build. scripts/reconcile-build.ts detects that at boot (via the
       # image-build-id stamp the volume cannot mask) and rebuilds once, which
       # is also what makes installed modules survive an update.
       - nextbuild:/app/.next
       # The channel to the updater: the panel writes a requested tag here and
       # reads the updater's progress back. No socket, by design.
-      - updatestate:/var/lib/uxwvend/update
+      - updatestate:/var/lib/blysis/update
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3001/api/health"]
       interval: 30s
@@ -141,14 +141,14 @@ services:
   # host, not from that volume, so a compromised app cannot rewrite what the
   # socket holder runs.
   #
-  # `uxwvend update` on the host does the same job by hand and is unaffected.
+  # `blysis update` on the host does the same job by hand and is unaffected.
   updater:
     image: docker:28-cli
     restart: unless-stopped
     command: ["sh", "/updater.sh"]
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      # The compose project: the files and the .env whose UXWVEND_VERSION is
+      # The compose project: the files and the .env whose BLYSIS_VERSION is
       # what pins the running version.
       - ./:/project
       - ./updater.sh:/updater.sh:ro

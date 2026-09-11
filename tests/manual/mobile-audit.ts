@@ -13,7 +13,7 @@ import { mkdirSync } from "node:fs";
 import { resolve } from "node:path";
 
 const BASE = "http://127.0.0.1:3001";
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@uxwvend.local";
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL || "admin@blysis.local";
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "Admin123!";
 
 type PageSpec = { path: string; requiresAuth: boolean; label: string };

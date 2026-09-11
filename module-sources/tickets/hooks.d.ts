@@ -3,7 +3,7 @@
  * why the emitter owns these shapes and what widening/narrowing means.
  */
 declare global {
-    interface UxwVendHookPayloads {
+    interface BlysisHookPayloads {
         "tickets.ticket.opened": TicketHookPayload;
         "tickets.ticket.updated": TicketHookPayload;
         "tickets.ticket.closed": TicketHookPayload;

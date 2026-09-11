@@ -23,7 +23,7 @@ beforeEach(() => {
     createBackup.mockResolvedValue(META);
     vi.spyOn(console, "error").mockImplementation(() => { });
     vi.stubEnv("MODULE_INSTALL_BACKUP", "1");
-    vi.stubEnv("DATABASE_URL", "postgresql://u:p@localhost:5432/uxwvend");
+    vi.stubEnv("DATABASE_URL", "postgresql://u:p@localhost:5432/blysis");
 });
 
 afterEach(() => {

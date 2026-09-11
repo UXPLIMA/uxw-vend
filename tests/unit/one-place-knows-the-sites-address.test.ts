@@ -6,7 +6,7 @@ import path from "node:path";
  * The site's own address is resolved in one place.
  *
  * `app-url.ts` exists because `NEXT_PUBLIC_*` is frozen into the bundle by
- * `next build` and uxwVend ships a prebuilt image, so a canonical URL read
+ * `next build` and Blysis ships a prebuilt image, so a canonical URL read
  * that way is whatever CI had, for every installation on earth. It also
  * rejects a value that is not an absolute http(s) URL.
  *

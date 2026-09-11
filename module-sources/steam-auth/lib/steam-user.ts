@@ -1,5 +1,5 @@
 /**
- * Turns a verified Steam player into a uxwVend account.
+ * Turns a verified Steam player into a Blysis account.
  *
  * Steam never gives out an email address, and core's `User.email` is a
  * required unique column, so an account created this way gets a placeholder in

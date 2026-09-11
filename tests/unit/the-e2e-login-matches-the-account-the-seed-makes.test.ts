@@ -5,11 +5,11 @@ import path from "node:path";
 /**
  * The end-to-end suite signs in as an account that is not there.
  *
- * `tests/e2e/helpers/login.ts` falls back to `admin@uxwvend.com` / `admin`
+ * `tests/e2e/helpers/login.ts` falls back to `admin@blysis.com` / `admin`
  * when `E2E_ADMIN_*` is unset, under a comment saying the fallbacks are the
  * local dev values "so an existing workstation keeps working without setting
  * anything". `prisma/seed.ts` makes `admin@example.com` with the username
- * `uxwadmin`. They have not agreed for some time.
+ * `blysisadmin`. They have not agreed for some time.
  *
  * CI is unaffected: its workflow sets `SEED_ADMIN_EMAIL` and `E2E_ADMIN_EMAIL`
  * to the same value, so both halves are told the same thing. It is a local run

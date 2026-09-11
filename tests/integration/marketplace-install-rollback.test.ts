@@ -29,8 +29,8 @@ import AdmZip from "adm-zip";
 // Hoisted mocks
 // ---------------------------------------------------------------------------
 
-const tempModulesDir = path.join(os.tmpdir(), `uxw-test-modules-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
-const PROJECT_ROOT_STUB = path.join(os.tmpdir(), `uxw-test-root-${Date.now()}`);
+const tempModulesDir = path.join(os.tmpdir(), `blysis-test-modules-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`);
+const PROJECT_ROOT_STUB = path.join(os.tmpdir(), `blysis-test-root-${Date.now()}`);
 
 vi.mock("@/core/lib/runtime-paths", () => ({
     MODULES_DIR: tempModulesDir,

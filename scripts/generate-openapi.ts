@@ -708,13 +708,13 @@ function generate() {
     const spec = {
         openapi: "3.0.3",
         info: {
-            title: "uxwVend API",
+            title: "Blysis API",
             description:
-                "The API surface uxwVend exports, discovered from the code: core operations from the verbs each route file exports, module operations from the verbs each declared handler exports. Nothing here is documented that is not implemented.",
+                "The API surface Blysis exports, discovered from the code: core operations from the verbs each route file exports, module operations from the verbs each declared handler exports. Nothing here is documented that is not implemented.",
             version: "1.0.0",
             contact: {
-                name: "uxwVend",
-                url: "https://github.com/UXPLIMA/uxw-vend",
+                name: "Blysis",
+                url: "https://github.com/UXPLIMA/blysis",
             },
         },
         servers: [{ url: "/", description: "Current server" }],

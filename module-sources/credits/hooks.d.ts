@@ -10,12 +10,12 @@
  * decide whether to try again.
  */
 declare global {
-    interface UxwVendFilterPayloads {
+    interface BlysisFilterPayloads {
         /** Whether the credits went in, and whether they had already. */
         "credits.award": CreditAwardOutcome;
     }
 
-    interface UxwVendFilterContexts {
+    interface BlysisFilterContexts {
         "credits.award": CreditAwardRequest;
     }
 

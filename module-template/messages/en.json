@@ -1,7 +1,7 @@
 {
     "myModule": {
         "title": "My Module",
-        "description": "Example module for uxwVend",
+        "description": "Example module for Blysis",
         "items": "Items",
         "noItems": "No items found.",
         "createItem": "Create Item",

@@ -29,7 +29,7 @@ if (fs.existsSync(envFile)) {
 
 module.exports = {
     apps: [{
-        name: 'uxwvend',
+        name: 'blysis',
         script: 'npx',
         args: 'next start -p 3001 -H 0.0.0.0',
         cwd: __dirname,

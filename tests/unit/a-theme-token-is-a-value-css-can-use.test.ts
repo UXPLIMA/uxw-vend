@@ -8,15 +8,15 @@ import { radiusLength } from "@/core/lib/theme-radius";
  *
  * The manifest offers the operator a choice by name - "Square (0)", "Rounded
  * (0.5rem)" - and stores what they picked as `md`. The generator wrote that
- * word straight into the variable: `--uxw-radius: md`. Nothing complains,
+ * word straight into the variable: `--blysis-radius: md`. Nothing complains,
  * because a custom property holds any text at all; the failure arrives at the
  * places that do arithmetic with it. `min(md, 0.375rem)` is not a value, so
  * the whole declaration is dropped and the element falls back to a square
  * corner.
  *
  * Measured against a production build on 2026-09-07: the login page's checkbox
- * computed `border-radius: 0px` while its class said `min(var(--uxw-radius),
- * .375rem)`, and `--uxw-radius` read `md`. Every control that clamps the theme
+ * computed `border-radius: 0px` while its class said `min(var(--blysis-radius),
+ * .375rem)`, and `--blysis-radius` read `md`. Every control that clamps the theme
  * radius the same way was square for the same reason, on every install running
  * the flat theme, which is the one that ships.
  *
@@ -69,10 +69,10 @@ describe("the generated theme stylesheet", () => {
     const css = fs.readFileSync(path.join(ROOT, "src/core/generated/theme-tokens.css"), "utf8");
 
     it("declares a radius CSS can compute with, in every theme it carries", () => {
-        const declared = [...css.matchAll(/--uxw-radius:\s*([^;]+);/g)].map((m) => m[1].trim());
+        const declared = [...css.matchAll(/--blysis-radius:\s*([^;]+);/g)].map((m) => m[1].trim());
         expect(declared.length).toBeGreaterThan(0);
         for (const value of declared) {
-            expect(value, `--uxw-radius: ${value} is not a length`).toMatch(/^(0|[\d.]+(px|rem|em|%)|9999px)$/);
+            expect(value, `--blysis-radius: ${value} is not a length`).toMatch(/^(0|[\d.]+(px|rem|em|%)|9999px)$/);
         }
     });
 
@@ -81,6 +81,6 @@ describe("the generated theme stylesheet", () => {
         // a keyword would sit in the variable harmlessly and the next thing to
         // do maths with it would break instead.
         const globals = fs.readFileSync(path.join(ROOT, "src/app/globals.css"), "utf8");
-        expect(globals).toMatch(/\.uxw-checkbox-radius\s*\{[^}]*min\(var\(--uxw-radius\)/);
+        expect(globals).toMatch(/\.blysis-checkbox-radius\s*\{[^}]*min\(var\(--blysis-radius\)/);
     });
 });

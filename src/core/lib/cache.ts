@@ -75,7 +75,7 @@ export const MemoryCacheBackend: CacheBackend = {
 // Redis backend - SCAN + DEL for safe production-grade prefix invalidation.
 // ---------------------------------------------------------------------------
 
-const CACHE_PREFIX = "uxw:cache:";
+const CACHE_PREFIX = "blysis:cache:";
 const SCAN_BATCH = 100;
 
 /** Narrower view of the node-redis client the cache backend actually uses. */

@@ -97,7 +97,7 @@ export async function postToWebhook(
         const res = await fetch(url, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ ...payload, username: payload.username || "uxwVend" }),
+            body: JSON.stringify({ ...payload, username: payload.username || "Blysis" }),
         });
         if (res.ok) return { ok: true, status: res.status, detail: null };
         const detail = await res.text().catch(() => "");

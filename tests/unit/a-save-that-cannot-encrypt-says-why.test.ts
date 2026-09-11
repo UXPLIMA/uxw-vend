@@ -81,7 +81,7 @@ describe("saving a credential on an install with no encryption key", () => {
         vi.stubEnv("SECRET_ENCRYPTION_KEY", "");
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        await PATCH(request({ site_name: "uxwVend", probe_secret_key: "sk_live_1" }) as any);
+        await PATCH(request({ site_name: "Blysis", probe_secret_key: "sk_live_1" }) as any);
         expect(transaction).not.toHaveBeenCalled();
     });
 
@@ -90,7 +90,7 @@ describe("saving a credential on an install with no encryption key", () => {
         vi.stubEnv("SECRET_ENCRYPTION_KEY", "");
 
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const res = await PATCH(request({ site_name: "uxwVend" }) as any);
+        const res = await PATCH(request({ site_name: "Blysis" }) as any);
         expect(res.status).toBe(200);
         expect(transaction).toHaveBeenCalled();
     });

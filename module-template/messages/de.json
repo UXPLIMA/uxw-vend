@@ -1,7 +1,7 @@
 {
     "myModule": {
         "title": "Mein Modul",
-        "description": "Beispielmodul fuer uxwVend",
+        "description": "Beispielmodul fuer Blysis",
         "items": "Elemente",
         "noItems": "Keine Elemente gefunden.",
         "createItem": "Element erstellen",

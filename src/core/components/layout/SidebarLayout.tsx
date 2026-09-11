@@ -43,7 +43,7 @@ export default function StandardSidebarLayout({ children, sidebar, heading }: Si
             </div>
             <div data-sidebar className="space-y-5">
                 {heading ? (
-                    <div aria-hidden="true" className="hidden lg:block uxw-heading-spacer" />
+                    <div aria-hidden="true" className="hidden lg:block blysis-heading-spacer" />
                 ) : null}
                 {sidebar}
             </div>

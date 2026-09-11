@@ -88,7 +88,7 @@ describe("what the socket holder runs", () => {
 
 describe("the shared volume", () => {
     it("is mounted by both sides and declared once", () => {
-        expect(service("app")).toContain("updatestate:/var/lib/uxwvend/update");
+        expect(service("app")).toContain("updatestate:/var/lib/blysis/update");
         expect(service("updater")).toContain("updatestate:/state");
         expect(COMPOSE).toMatch(/^volumes:[\s\S]*^ {2}updatestate:$/m);
     });

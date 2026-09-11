@@ -170,7 +170,7 @@ if (errors.length > 0) {
         console.error(
             "\n  __hook-contracts__.ts is generated from every module's hookListeners:\n" +
                 "  an error there means a listener's payload type disagrees with the\n" +
-                "  payload the emitting module declares in its UxwVendHookPayloads block.",
+                "  payload the emitting module declares in its BlysisHookPayloads block.",
         );
     }
     process.exit(1);

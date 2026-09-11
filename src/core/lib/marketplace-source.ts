@@ -10,17 +10,17 @@
  * `NEXT_PUBLIC_*` into the bundle, which under a prebuilt image would freeze
  * whatever CI happened to have. See `app-url.ts` for the same constraint.
  *
- * `UXWVEND_MARKETPLACE_BASE` lets a fork serve its own catalogue, and lets an
+ * `BLYSIS_MARKETPLACE_BASE` lets a fork serve its own catalogue, and lets an
  * air-gapped install point at an internal mirror. It must be an http(s) URL -
  * these values are interpolated into `fetch()` calls that then unzip whatever
  * comes back, so a `file://` or other scheme here would be a way to read the
  * server's own disk through the module installer.
  */
 
-const DEFAULT_BASE = "https://raw.githubusercontent.com/UXPLIMA/uxw-vend/main";
+const DEFAULT_BASE = "https://raw.githubusercontent.com/UXPLIMA/blysis/main";
 
 function resolveBase(): string {
-    const raw = process.env.UXWVEND_MARKETPLACE_BASE?.trim().replace(/\/+$/, "");
+    const raw = process.env.BLYSIS_MARKETPLACE_BASE?.trim().replace(/\/+$/, "");
     if (!raw) return DEFAULT_BASE;
     try {
         const url = new URL(raw);

@@ -1,6 +1,6 @@
 {
-    "name": "uxwVend",
-    "short_name": "uxwVend",
+    "name": "Blysis",
+    "short_name": "Blysis",
     "description": "Game server management and marketplace platform",
     "start_url": "/",
     "display": "standalone",

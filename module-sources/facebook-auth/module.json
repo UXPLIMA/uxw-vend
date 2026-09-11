@@ -2,10 +2,10 @@
   "id": "facebook-auth",
   "name": "Facebook Login",
   "description": "Allow users to sign in with their Facebook account",
-  "version": "1.0.4",
-  "coreVersion": "^1.0.0",
+  "version": "1.1.0",
+  "coreVersion": "^2.0.0",
   "category": "integration",
-  "author": "uxwVend",
+  "author": "Blysis",
   "icon": "Users",
   "adminRoutes": [
     {

@@ -49,7 +49,7 @@ export interface SiteCurrency {
     loaded: boolean;
 }
 
-const STORAGE_KEY = "uxwvend_display_currency";
+const STORAGE_KEY = "blysis_display_currency";
 const DEFAULT_BASE = "USD";
 
 const SiteCurrencyContext = createContext<SiteCurrency | null>(null);

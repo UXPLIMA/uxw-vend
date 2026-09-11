@@ -307,7 +307,7 @@ export async function exportUserData(userId: string): Promise<UserDataExport> {
  * API route and the admin export share one canonical explanation.
  */
 export function buildExportReadme(userId: string, exportedAt: Date): string {
-    return `uxwVend personal data export
+    return `Blysis personal data export
 ==============================
 
 User ID: ${userId}

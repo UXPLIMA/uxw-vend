@@ -44,7 +44,7 @@ const requestSchema = z.object({
 
 /** The channel this install follows. Betas are opt-in through the environment. */
 function channel(): "stable" | "beta" {
-    return process.env.UXWVEND_UPDATE_CHANNEL === "beta" ? "beta" : "stable";
+    return process.env.BLYSIS_UPDATE_CHANNEL === "beta" ? "beta" : "stable";
 }
 
 function currentVersion(): string {

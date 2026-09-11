@@ -2,13 +2,13 @@
   "id": "cloudflare-r2",
   "name": "Cloudflare R2 Storage",
   "description": "S3-compatible object storage backed by Cloudflare R2 (zero egress fees)",
-  "version": "1.3.0",
-  "coreVersion": "^1.44.0",
+  "version": "1.4.0",
+  "coreVersion": "^2.0.0",
   "secretSettings": [
     "cloudflare_r2_config.secretKey"
   ],
   "category": "integration",
-  "author": "uxwVend",
+  "author": "Blysis",
   "icon": "Cloud",
   "permissions": [
     "cloudflare-r2.manage"

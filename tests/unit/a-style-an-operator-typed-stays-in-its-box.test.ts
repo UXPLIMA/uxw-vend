@@ -169,7 +169,7 @@ describe("what is not CSS at all", () => {
  */
 describe("the class a role's rule is written for", () => {
     it("is a class name, whatever the id was", () => {
-        expect(roleScope("name", "abc123")).toBe("uxw-name-abc123");
+        expect(roleScope("name", "abc123")).toBe("blysis-name-abc123");
     });
 
     it("carries nothing that could close the rule or the tag", () => {
@@ -184,7 +184,7 @@ describe("the class a role's rule is written for", () => {
     });
 
     it("never answers with a bare prefix, which every role would share", () => {
-        expect(roleScope("name", "")).not.toBe("uxw-name-");
+        expect(roleScope("name", "")).not.toBe("blysis-name-");
         expect(roleScope("name", "{}")).not.toBe(roleScope("name", "<>"));
     });
 

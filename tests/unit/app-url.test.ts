@@ -119,8 +119,8 @@ describe("resolveAppName", () => {
         expect(resolveAppName()).toBe("Acme Store");
     });
 
-    it("defaults to uxwVend", async () => {
+    it("defaults to Blysis", async () => {
         const { resolveAppName } = await load();
-        expect(resolveAppName()).toBe("uxwVend");
+        expect(resolveAppName()).toBe("Blysis");
     });
 });

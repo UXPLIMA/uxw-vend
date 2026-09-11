@@ -5,7 +5,7 @@ import { join } from "node:path";
 /**
  * `navigator.clipboard` is a secure-context API.
  *
- * uxwVend is self-hosted, and a fresh install is reached at
+ * Blysis is self-hosted, and a fresh install is reached at
  * http://<ip>:<port> long before anyone points a domain at it. On that origin
  * `navigator.clipboard` is `undefined`, so every "Copy" button - the gift
  * code, the API key, the media URL, the referral link, the backup codes, the

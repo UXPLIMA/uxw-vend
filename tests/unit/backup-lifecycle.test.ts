@@ -85,7 +85,7 @@ beforeEach(() => {
     notesWritten = {};
     nextChild = (child) => { setImmediate(() => child.emit("exit", 0)); };
 
-    vi.stubEnv("DATABASE_URL", "postgresql://user:s3cr3t@db.internal:5433/uxwvend");
+    vi.stubEnv("DATABASE_URL", "postgresql://user:s3cr3t@db.internal:5433/blysis");
 
     spawn.mockImplementation(((command: string, args: string[], options: SpawnCall["options"]) => {
         spawnCalls.push({ command, args, options });
@@ -136,7 +136,7 @@ afterEach(() => {
 });
 
 function backupName(type: "manual" | "scheduled", iso: string): string {
-    return `uxwvend-${type}-${iso.replace(/[:.]/g, "-")}.sql.gz`;
+    return `blysis-${type}-${iso.replace(/[:.]/g, "-")}.sql.gz`;
 }
 
 describe("createBackup", () => {
@@ -157,7 +157,7 @@ describe("createBackup", () => {
         const env = spawnCalls[0].options.env!;
         expect(env.PGHOST).toBe("db.internal");
         expect(env.PGPORT).toBe("5433");
-        expect(env.PGDATABASE).toBe("uxwvend");
+        expect(env.PGDATABASE).toBe("blysis");
         expect(env.PGUSER).toBe("user");
         expect(env.PGPASSWORD).toBe("s3cr3t");
         // A child process that inherits DATABASE_URL can print it in an error
@@ -194,7 +194,7 @@ describe("createBackup", () => {
 
         const meta = await createBackup("scheduled");
 
-        expect(meta.filename).toMatch(/^uxwvend-scheduled-[0-9TZ-]+\.sql\.gz$/);
+        expect(meta.filename).toMatch(/^blysis-scheduled-[0-9TZ-]+\.sql\.gz$/);
         expect(meta.id).toBe(meta.filename.replace(".sql.gz", ""));
         expect(meta.type).toBe("scheduled");
         // gzip magic number - the file on disk is actually compressed.
@@ -217,7 +217,7 @@ describe("createBackup", () => {
         // A truncated archive that looks like a backup is worse than none:
         // it is the one an operator reaches for and it will not restore.
         expect(unlinked).toHaveLength(1);
-        expect(unlinked[0]).toMatch(/^uxwvend-manual-.*\.sql\.gz$/);
+        expect(unlinked[0]).toMatch(/^blysis-manual-.*\.sql\.gz$/);
     });
 
     it("reports pg_dump's own stderr in the error", async () => {
@@ -351,7 +351,7 @@ describe("retention", () => {
 });
 
 describe("restoreBackup", () => {
-    const VALID_ID = "uxwvend-manual-2026-09-01T00-00-00-000Z";
+    const VALID_ID = "blysis-manual-2026-09-01T00-00-00-000Z";
 
     it("reloads the archive through psql with ON_ERROR_STOP", async () => {
         const { restoreBackup } = await load();
@@ -388,9 +388,9 @@ describe("restoreBackup", () => {
 
     it.each([
         "../../etc/passwd",
-        "uxwvend-manual-2026-09-01T00-00-00-000Z/../../../etc/passwd",
+        "blysis-manual-2026-09-01T00-00-00-000Z/../../../etc/passwd",
         "not-a-backup",
-        "uxwvend-hacked-2026-09-01T00-00-00-000Z",
+        "blysis-hacked-2026-09-01T00-00-00-000Z",
         "",
     ])("refuses the id %o without spawning psql", async (id) => {
         const { restoreBackup } = await load();

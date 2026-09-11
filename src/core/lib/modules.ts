@@ -4,7 +4,7 @@ import { CORE_PERMISSIONS } from './permission-names';
 import { ModuleState, ModuleManifest } from './module-types';
 
 /**
- * Module System for uxwVend
+ * Module System for Blysis
  * 
  * Provides runtime module information populated by the file system loader.
  */

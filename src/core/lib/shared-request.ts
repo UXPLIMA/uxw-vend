@@ -17,7 +17,7 @@
  * affects.
  */
 
-export const SHARED_STATE_KEY = Symbol.for("uxwvend.shared-request");
+export const SHARED_STATE_KEY = Symbol.for("blysis.shared-request");
 
 interface Entry {
     /** Resolved payload, present once a request has succeeded. */

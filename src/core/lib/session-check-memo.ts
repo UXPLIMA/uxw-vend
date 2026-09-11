@@ -31,7 +31,7 @@
  * copies in play, one signed-in request still cost three rechecks - the proxy
  * marked its own map and the route never saw it.
  */
-const GLOBAL_KEY = "__uxwvend_session_checked_at__" as const;
+const GLOBAL_KEY = "__blysis_session_checked_at__" as const;
 
 function store(): Map<string, number> {
     const g = globalThis as unknown as Record<string, Map<string, number> | undefined>;

@@ -44,7 +44,7 @@ export default function SetupWizardPage() {
     const [passwordConfirm, setPasswordConfirm] = useState("");
 
     // Step 3: Site
-    const [siteName, setSiteName] = useState("uxwVend");
+    const [siteName, setSiteName] = useState("Blysis");
     const [siteDescription, setSiteDescription] = useState("");
     const [defaultLocaleCode, setDefaultLocaleCode] = useState("en");
 

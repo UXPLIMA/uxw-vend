@@ -1,5 +1,6 @@
 {
   "common": {
+    "appName": "Blysis",
     "back": "Geri",
     "cancel": "İptal",
     "close": "Kapat",
@@ -491,7 +492,7 @@
     "footer_columns": "Sütunlar",
     "footer_columnsHint": "Her sütun bir başlık ve onun bağlantılarıdır. Bir sütun, kurulu bir modülün eklediği bağlantıları da o modülün bölüm adını yazarak sahiplenebilir.",
     "footer_copyright": "Telif Hakkı Metni",
-    "footer_copyrightPlaceholder": "© 2026 uxwVend. Tüm hakları saklıdır.",
+    "footer_copyrightPlaceholder": "© 2026 Blysis. Tüm hakları saklıdır.",
     "footer_linkHref": "Adres",
     "footer_linkHrefPlaceholder": "/bir-sayfa veya https://example.com",
     "footer_linkIcon": "Simge",
@@ -709,7 +710,7 @@
     "modules_noModules": "Yüklü modül yok",
     "modules_notFound": "Modül markette bulunamadı",
     "modules_off": "KAPALI",
-    "modules_officialModules": "uxwVend marketinden resmi modüller",
+    "modules_officialModules": "Blysis marketinden resmi modüller",
     "modules_on": "AÇIK",
     "modules_pages": "{count} sayfa",
     "modules_pleaseWait": "Lütfen bekleyin - başka bir işlem devam ediyor",
@@ -1375,7 +1376,7 @@
     "password": "Şifre",
     "passwordMinLength": "Şifre en az 6 karakter olmalı",
     "passwordsDontMatch": "Şifreler eşleşmiyor",
-    "registerSubtitle": "uxwVend ile başla",
+    "registerSubtitle": "Blysis ile başla",
     "registerTitle": "Hesap Oluştur",
     "rememberMe": "Oturumum açık kalsın",
     "resetButton": "Şifreyi Sıfırla",
@@ -1419,7 +1420,7 @@
     "metaDescription": "Bu sitenin yayımladığı her şeyi ara."
   },
   "setup": {
-    "title": "uxwVend Kurulumu",
+    "title": "Blysis Kurulumu",
     "subtitle": "Birkaç adımda platformunuz hazır.",
     "back": "Geri",
     "next": "İleri",
@@ -1437,7 +1438,7 @@
       "done": "Bitti"
     },
     "welcome": {
-      "title": "uxwVend'e hoş geldiniz",
+      "title": "Blysis'e hoş geldiniz",
       "body": "Bu sihirbaz yönetici hesabınızı oluşturur, sitenizi yapılandırır ve pazar yerinden ilk modüllerinizi kurar. Hepsini sonradan yönetim panelinden değiştirebilirsiniz.",
       "note": "Platform hiçbir modülle gelmez. Burada eklediğiniz her şey isteğe bağlıdır."
     },

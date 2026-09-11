@@ -38,11 +38,11 @@ export type AsyncFilterListener<T = unknown, C = unknown> = (value: T, context?:
  * heard of) without silently accepting a mistyped payload on a declared one.
  */
 export type ActionPayload<K extends string> =
-    K extends keyof UxwVendHookPayloads ? UxwVendHookPayloads[K] : unknown;
+    K extends keyof BlysisHookPayloads ? BlysisHookPayloads[K] : unknown;
 
 /** The value flowing through a filter chain, or `unknown` when undeclared. */
 export type FilterValue<K extends string> =
-    K extends keyof UxwVendFilterPayloads ? UxwVendFilterPayloads[K] : unknown;
+    K extends keyof BlysisFilterPayloads ? BlysisFilterPayloads[K] : unknown;
 
 /**
  * What a filter is asked about, or `unknown` when the hook does not say.
@@ -50,11 +50,11 @@ export type FilterValue<K extends string> =
  * A filter has two halves: the value that flows through the chain, and the
  * thing being asked about. Only the first used to be typed, so a listener read
  * its context through a cast and nothing checked the cast. Hooks that declare
- * a context in `UxwVendFilterContexts` get both halves checked, at the call
+ * a context in `BlysisFilterContexts` get both halves checked, at the call
  * site and in every listener; the rest behave exactly as before.
  */
 export type FilterContext<K extends string> =
-    K extends keyof UxwVendFilterContexts ? UxwVendFilterContexts[K] : unknown;
+    K extends keyof BlysisFilterContexts ? BlysisFilterContexts[K] : unknown;
 
 /**
  * The trailing argument of `applyFilters`/`applyFiltersAsync`.
@@ -64,12 +64,12 @@ export type FilterContext<K extends string> =
  * declares none keeps the old optional `unknown`.
  */
 export type FilterContextArg<K extends string> =
-    K extends keyof UxwVendFilterContexts ? [context: UxwVendFilterContexts[K]] : [context?: unknown];
+    K extends keyof BlysisFilterContexts ? [context: BlysisFilterContexts[K]] : [context?: unknown];
 
 /** The listener shape for a filter, with its context typed and required. */
 export type FilterHandler<K extends string> =
-    K extends keyof UxwVendFilterContexts
-        ? (value: FilterValue<K>, context: UxwVendFilterContexts[K]) => FilterValue<K> | Promise<FilterValue<K>>
+    K extends keyof BlysisFilterContexts
+        ? (value: FilterValue<K>, context: BlysisFilterContexts[K]) => FilterValue<K> | Promise<FilterValue<K>>
         : AsyncFilterListener<FilterValue<K>>;
 
 interface Registration {
@@ -224,7 +224,7 @@ export function applyFilters<K extends string, V extends FilterValue<K>>(
     name: K,
     value: V,
     ...rest: FilterContextArg<K>
-): K extends keyof UxwVendFilterPayloads ? UxwVendFilterPayloads[K] : V {
+): K extends keyof BlysisFilterPayloads ? BlysisFilterPayloads[K] : V {
     const context = rest[0];
     const list = filterRegistry.get(name);
     if (!list || list.length === 0) return value as never;
@@ -245,7 +245,7 @@ export async function applyFiltersAsync<K extends string, V extends FilterValue<
     name: K,
     value: V,
     ...rest: FilterContextArg<K>
-): Promise<K extends keyof UxwVendFilterPayloads ? UxwVendFilterPayloads[K] : V> {
+): Promise<K extends keyof BlysisFilterPayloads ? BlysisFilterPayloads[K] : V> {
     const context = rest[0];
     const list = filterRegistry.get(name);
     if (!list || list.length === 0) return value as never;
@@ -280,7 +280,7 @@ export type HookHandlerFor<K extends string, T extends "action" | "filter"> =
         : FilterHandler<K>;
 
 type DeclaredNames<T extends "action" | "filter"> =
-    T extends "action" ? keyof UxwVendHookPayloads : keyof UxwVendFilterPayloads;
+    T extends "action" ? keyof BlysisHookPayloads : keyof BlysisFilterPayloads;
 
 /**
  * Resolves to `true` when a manifest-declared handler matches the payload its

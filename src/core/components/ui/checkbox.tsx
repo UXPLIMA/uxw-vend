@@ -54,10 +54,10 @@ const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(
                     className={cn(
                         // 18px rather than 16: the label beside it is 14px, and
                         // a box smaller than the text it belongs to reads as an
-                        // afterthought. `uxw-checkbox-radius`, not `rounded`,
+                        // afterthought. `blysis-checkbox-radius`, not `rounded`,
                         // because the site-wide radius is written for buttons
                         // and drew this one as a circle - the radio's shape.
-                        "peer h-[18px] w-[18px] cursor-pointer appearance-none uxw-checkbox-radius",
+                        "peer h-[18px] w-[18px] cursor-pointer appearance-none blysis-checkbox-radius",
                         "border border-border bg-background",
                         "transition-colors duration-150",
                         "hover:border-primary/70",

@@ -7,7 +7,7 @@
 #
 #   ssh -L 5432:127.0.0.1:5432 you@server
 #
-# Prefer `docker compose exec db psql -U uxwvend uxwvend`, which needs no
+# Prefer `docker compose exec db psql -U blysis blysis`, which needs no
 # published port at all. Remove this override when you are done.
 services:
   db:

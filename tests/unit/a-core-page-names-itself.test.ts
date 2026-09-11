@@ -10,15 +10,15 @@ import path from "node:path";
  * these pages are client components, so the root layout's `title.default` was
  * all that was left. Measured on the demo, in English:
  *
- *     /auth/login            title "uxwVend"   description none
- *     /auth/register         title "uxwVend"   description none
- *     /auth/forgot-password  title "uxwVend"   description none
- *     /auth/reset-password   title "uxwVend"   description none
- *     /auth/verify-email     title "uxwVend"   description none
- *     /auth/error            title "uxwVend"   description none
- *     /profile               title "uxwVend"   description none
- *     /search                title "uxwVend"   description none
- *     /maintenance           title "uxwVend"   description none
+ *     /auth/login            title "Blysis"   description none
+ *     /auth/register         title "Blysis"   description none
+ *     /auth/forgot-password  title "Blysis"   description none
+ *     /auth/reset-password   title "Blysis"   description none
+ *     /auth/verify-email     title "Blysis"   description none
+ *     /auth/error            title "Blysis"   description none
+ *     /profile               title "Blysis"   description none
+ *     /search                title "Blysis"   description none
+ *     /maintenance           title "Blysis"   description none
  *
  * Every one of them already shipped a translated heading. The h1 on the login
  * screen said "Welcome Back" and "Hoş Geldin"; the tab said the site name in
@@ -43,7 +43,7 @@ const LOCALE_ROOT = path.join(ROOT, "src/app/[locale]");
 const { setting, resolveAppUrl, serverConfig } = vi.hoisted(() => ({
     setting: { findMany: vi.fn(async () => []) },
     resolveAppUrl: vi.fn(() => "https://games.example"),
-    serverConfig: { name: "uxwVend", description: "Default description" },
+    serverConfig: { name: "Blysis", description: "Default description" },
 }));
 vi.mock("@/core/lib/db", () => ({ prisma: { setting }, default: { setting } }));
 vi.mock("@/core/lib/app-url", () => ({ resolveAppUrl }));
@@ -168,7 +168,7 @@ describe("every declared screen", () => {
     });
 
     it("says something different from the site name", () => {
-        // The defect was every tab reading "uxwVend"; a key resolving to that
+        // The defect was every tab reading "Blysis"; a key resolving to that
         // would reproduce it while passing the test above.
         const same = CORE_SCREENS.filter((s) => lookup("en", s.titleKey) === serverConfig.name).map((s) => s.path);
         expect(same).toEqual([]);

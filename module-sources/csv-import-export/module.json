@@ -2,10 +2,10 @@
   "id": "csv-import-export",
   "name": "CSV Import/Export",
   "description": "CSV export and import utilities for data backup",
-  "version": "1.0.10",
-  "coreVersion": "^1.0.0",
+  "version": "1.1.0",
+  "coreVersion": "^2.0.0",
   "category": "integration",
-  "author": "uxwVend",
+  "author": "Blysis",
   "icon": "Download",
   "permissions": [
     "admin.export"

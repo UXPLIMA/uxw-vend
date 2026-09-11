@@ -573,7 +573,7 @@ model EmailJob {
   @@index([createdAt])
 }
 
-// One attempt at moving the install to another version of uxwVend.
+// One attempt at moving the install to another version of Blysis.
 //
 // The row is the audit trail: the intent file on the shared volume is what the
 // updater reads and it holds one run at a time, while this answers "what has

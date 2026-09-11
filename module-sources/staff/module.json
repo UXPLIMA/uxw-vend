@@ -2,10 +2,10 @@
   "id": "staff",
   "name": "Staff",
   "description": "Staff member listing and applications",
-  "version": "1.1.5",
-  "coreVersion": "^1.29.0",
+  "version": "1.2.0",
+  "coreVersion": "^2.0.0",
   "category": "management",
-  "author": "uxwVend",
+  "author": "Blysis",
   "icon": "Users",
   "permissions": [
     "staff.manage"

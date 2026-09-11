@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
      * a minute of staleness costs the same either way: an operator who fixes
      * the connection waits at most that long to see it.
      */
-    const answer = await cached(`uxw:external-data:${source.id}`, source.cacheSeconds * 1000, async () => {
+    const answer = await cached(`blysis:external-data:${source.id}`, source.cacheSeconds * 1000, async () => {
         // A source may name its own connection; almost none will, so an
         // empty one means the site's single connection under the name the
         // settings screen writes to.

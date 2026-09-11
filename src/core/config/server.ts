@@ -2,7 +2,7 @@
 // Components should prefer useSiteSettings() values over these.
 // For initial setup, configure via Admin > Settings or environment variables.
 export const serverConfig = {
-    name: process.env.SITE_NAME || "uxwVend",
+    name: process.env.SITE_NAME || "Blysis",
     ip: process.env.SERVER_IP || "play.example.com",
     onlineCount: 0,
     communityUrl: process.env.COMMUNITY_URL || "",

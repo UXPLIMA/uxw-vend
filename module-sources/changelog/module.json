@@ -2,10 +2,10 @@
   "id": "changelog",
   "name": "Changelog",
   "description": "Release notes and update history",
-  "version": "1.0.19",
-  "coreVersion": "^1.29.0",
+  "version": "1.1.0",
+  "coreVersion": "^2.0.0",
   "category": "community",
-  "author": "uxwVend",
+  "author": "Blysis",
   "icon": "History",
   "permissions": [
     "changelog.manage"

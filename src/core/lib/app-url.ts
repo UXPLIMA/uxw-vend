@@ -3,7 +3,7 @@
  *
  * Why this exists: `NEXT_PUBLIC_*` variables are inlined into the bundle by
  * `next build` (see node_modules/next/dist/docs/01-app/02-guides/self-hosting.md).
- * uxwVend ships a prebuilt image, so anything read from a `NEXT_PUBLIC_*` var
+ * Blysis ships a prebuilt image, so anything read from a `NEXT_PUBLIC_*` var
  * is frozen to whatever CI had at build time - for every installation on
  * earth. Reading the canonical URL that way produced sitemaps, robots.txt and
  * OpenGraph tags all pointing at `http://localhost:3001`.
@@ -49,5 +49,5 @@ export function resolveAppUrl(): string {
  * should prefer the `site_name` setting - this is the pre-DB fallback.
  */
 export function resolveAppName(): string {
-    return process.env.SITE_NAME || process.env.NEXT_PUBLIC_APP_NAME || "uxwVend";
+    return process.env.SITE_NAME || process.env.NEXT_PUBLIC_APP_NAME || "Blysis";
 }

@@ -53,15 +53,15 @@ describe("one checkbox for the whole panel", () => {
         // quarter-of-16 cap started reading as a hard corner beside the
         // buttons around it.
         const checkbox = fs.readFileSync(join(ROOT, "src/core/components/ui/checkbox.tsx"), "utf8");
-        expect(checkbox).toContain("uxw-checkbox-radius");
+        expect(checkbox).toContain("blysis-checkbox-radius");
         // The comments here explain the old class, so only the code counts.
         const code = checkbox.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
         expect(code).not.toMatch(/\brounded\b(?!-)/);
         const css = fs.readFileSync(join(ROOT, "src/app/globals.css"), "utf8");
-        expect(css).toContain(".uxw-checkbox-radius");
+        expect(css).toContain(".blysis-checkbox-radius");
         // The clamp is the whole point: a theme radius written for buttons
         // must not reach this control unbounded.
-        expect(css).toMatch(/\.uxw-checkbox-radius\s*\{[^}]*min\(var\(--uxw-radius\)/);
+        expect(css).toMatch(/\.blysis-checkbox-radius\s*\{[^}]*min\(var\(--blysis-radius\)/);
         // And the radio still is a circle, or the two have swapped problems.
         expect(fs.readFileSync(join(ROOT, "src/core/components/ui/radio.tsx"), "utf8"))
             .toContain("rounded-full");

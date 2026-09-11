@@ -2,10 +2,10 @@
   "id": "downloads",
   "name": "Downloads",
   "description": "File download center for resources and mods",
-  "version": "1.0.18",
-  "coreVersion": "^1.29.0",
+  "version": "1.1.0",
+  "coreVersion": "^2.0.0",
   "category": "gaming",
-  "author": "uxwVend",
+  "author": "Blysis",
   "icon": "Download",
   "permissions": [
     "downloads.manage"

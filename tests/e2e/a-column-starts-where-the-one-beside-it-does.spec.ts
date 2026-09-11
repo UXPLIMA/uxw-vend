@@ -7,7 +7,7 @@
  * height above the cards it sits beside. It reads as crooked, and it is the
  * complaint that keeps coming back: the widget column floats.
  *
- * The homepage fixed it once, with `uxw-heading-spacer` and a comment naming
+ * The homepage fixed it once, with `blysis-heading-spacer` and a comment naming
  * this file - which did not exist. So the rule was written down and never
  * held, and two more pages drifted out of line behind it. Measured at 1440px
  * on 2026-09-09: /wheel was 64px out (a wheel picker above the card) and

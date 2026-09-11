@@ -1,14 +1,14 @@
 /**
  * Build-state reconciliation.
  *
- * uxwVend compiles module pages into the Next.js build, so `src/modules/` and
+ * Blysis compiles module pages into the Next.js build, so `src/modules/` and
  * `.next/` have to agree with each other. Three events break that agreement,
  * and until this file existed all three broke it silently:
  *
  *  1. **An admin installs or removes a module.** `install-lock` rebuilds, but
  *     the running `next start` read its manifests at boot and keeps serving
  *     the old build until the process is replaced.
- *  2. **The operator runs `uxwvend update`.** A new image arrives carrying a
+ *  2. **The operator runs `blysis update`.** A new image arrives carrying a
  *     `.next` built from zero modules, while the `modules` volume still holds
  *     the admin's modules - every installed module vanishes from the app.
  *  3. **A build is interrupted** (OOM, `docker kill` mid-install) and leaves
@@ -61,7 +61,7 @@ export type DriftReason =
     | { kind: "image-changed"; detail: string }
     | { kind: "modules-changed"; detail: string };
 
-const STATE_FILENAME = "uxwvend-build-state.json";
+const STATE_FILENAME = "blysis-build-state.json";
 
 /**
  * Marker for the generated Prisma client. Lives in node_modules so it is
@@ -69,7 +69,7 @@ const STATE_FILENAME = "uxwvend-build-state.json";
  * such entries, so `npm prune` and `npm ci` leave it alone rather than
  * treating it as an extraneous package.
  */
-const SCHEMA_STATE_FILENAME = ".uxwvend-schema-state.json";
+const SCHEMA_STATE_FILENAME = ".blysis-schema-state.json";
 
 /**
  * Baked into the image next to `.next` by the Dockerfile. `.next` itself is a
@@ -78,7 +78,7 @@ const SCHEMA_STATE_FILENAME = ".uxwvend-schema-state.json";
  * `/app/.next/BUILD_ID` - the stale volume masks it. This unmasked copy is how
  * we notice that the image changed under us.
  */
-const IMAGE_BUILD_ID_FILE = ".uxwvend-image-build-id";
+const IMAGE_BUILD_ID_FILE = ".blysis-image-build-id";
 
 /** What `computeModuleFingerprint` returns when nothing is installed. */
 const EMPTY_FINGERPRINT = createHash("sha256").digest("hex");

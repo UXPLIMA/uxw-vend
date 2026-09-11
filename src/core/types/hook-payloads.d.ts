@@ -13,7 +13,7 @@
  * and modules are forbidden from importing `@/core/lib/*` - they see core only
  * through `@/core/sdk`, which re-exports and therefore cannot be the
  * augmentation target. A global interface is reachable from any file without an
- * import specifier, which is exactly what a plugin host needs. The `UxwVend`
+ * import specifier, which is exactly what a plugin host needs. The `Blysis`
  * prefix keeps the global type namespace unambiguous.
  *
  * ── How a module joins ──
@@ -21,7 +21,7 @@
  * in any `.ts`/`.d.ts` file inside the module:
  *
  *     declare global {
- *         interface UxwVendHookPayloads {
+ *         interface BlysisHookPayloads {
  *             "store.order.created": { orderNumber: string; total: unknown };
  *         }
  *     }
@@ -37,7 +37,7 @@
  * `hooksEmitted` manifest field, which `npm run validate:module` enforces.
  */
 
-interface UxwVendHookPayloads {
+interface BlysisHookPayloads {
     /** Fired once when the hook system finishes booting. */
     "core.boot": Record<string, never>;
 
@@ -76,7 +76,7 @@ interface UxwVendHookPayloads {
 /**
  * The same registry for filters: the value that flows through the chain.
  */
-interface UxwVendFilterPayloads {
+interface BlysisFilterPayloads {
     "email.subject": string;
     "email.body": string;
 
@@ -156,7 +156,7 @@ interface RoutingRedirectRule {
  * Filters with nothing to say about their context simply do not appear, and
  * their context stays `unknown` as before.
  */
-interface UxwVendFilterContexts {
+interface BlysisFilterContexts {
     /**
      * Nothing. The rules are the site's, not this request's: they are asked
      * for once and kept, and deciding per request is what the resolver does

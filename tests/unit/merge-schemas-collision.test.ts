@@ -28,7 +28,7 @@ const SCRIPT_PATH = path.join(PROJECT_ROOT, "scripts/merge-schemas.ts");
 let tmpRoot: string;
 
 beforeEach(() => {
-    tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), "uxw-merge-test-"));
+    tmpRoot = fs.mkdtempSync(path.join(os.tmpdir(), "blysis-merge-test-"));
 
     // Core schema with a User model.
     fs.mkdirSync(path.join(tmpRoot, "prisma"), { recursive: true });

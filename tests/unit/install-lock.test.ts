@@ -143,10 +143,10 @@ describe("acquireInstallLock", () => {
 
         const [key] = pg.clients[0].queries[0].params as string[];
         expect(typeof key).toBe("string");
-        // 0x7578774d6f64496e - larger than Number.MAX_SAFE_INTEGER, so a
+        // 0x626c794d6f64496e - larger than Number.MAX_SAFE_INTEGER, so a
         // float round-trip would produce a different lock id per worker and
         // silently break mutual exclusion.
-        expect(key).toBe(BigInt("0x7578774d6f64496e").toString());
+        expect(key).toBe(BigInt("0x626c794d6f64496e").toString());
         expect(Number(key)).toBeGreaterThan(Number.MAX_SAFE_INTEGER);
     });
 
@@ -232,12 +232,12 @@ describe("acquireInstallLock", () => {
     });
 
     it("builds the lock pool from DATABASE_URL with a bounded size", async () => {
-        process.env.DATABASE_URL = "postgresql://u:p@localhost:5432/uxwvend_test";
+        process.env.DATABASE_URL = "postgresql://u:p@localhost:5432/blysis_test";
         const mod = await load();
         await mod.acquireInstallLock();
 
         expect(pg.poolOptions[0]).toMatchObject({
-            connectionString: "postgresql://u:p@localhost:5432/uxwvend_test",
+            connectionString: "postgresql://u:p@localhost:5432/blysis_test",
             max: 2,
         });
     });

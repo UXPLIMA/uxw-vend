@@ -2,10 +2,10 @@
   "id": "showcase",
   "name": "Showcase",
   "description": "A grid of cards: a picture, a heading, a line of text and somewhere to go. What is being shown is the operator's business.",
-  "version": "1.0.0",
-  "coreVersion": "^1.35.0",
+  "version": "1.1.0",
+  "coreVersion": "^2.0.0",
   "category": "content",
-  "author": "uxwVend",
+  "author": "Blysis",
   "icon": "LayoutGrid",
   "routes": [
     {

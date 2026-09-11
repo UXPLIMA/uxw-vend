@@ -44,7 +44,7 @@ export default function Hero() {
             style={{
                 background: bgImage
                     ? `linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55)), url(${bgImage}) center/cover no-repeat`
-                    : "linear-gradient(135deg, var(--uxw-color-muted) 0%, var(--uxw-color-card) 100%)",
+                    : "linear-gradient(135deg, var(--blysis-color-muted) 0%, var(--blysis-color-card) 100%)",
                 color: "#f8f8f8",
             }}
         >
@@ -59,7 +59,7 @@ export default function Hero() {
                                 className="group flex items-center gap-3 text-left hover:opacity-90 transition"
                                 aria-label="Copy server IP"
                             >
-                                <Gamepad2 className="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 drop-shadow" style={{ color: "var(--uxw-color-primary)" }} />
+                                <Gamepad2 className="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 drop-shadow" style={{ color: "var(--blysis-color-primary)" }} />
                                 <div className="min-w-0">
                                     <div className="text-[10px] md:text-xs uppercase tracking-wider opacity-85">
                                         <Slot name="hero.liveStats" />

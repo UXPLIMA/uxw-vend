@@ -24,7 +24,7 @@ function manifestWithSchedule(schedule: string) {
         name: "Example",
         version: "1.0.0",
         description: "A module with one scheduled job.",
-        author: "uxwVend",
+        author: "Blysis",
         coreVersion: "^1.0.0",
         cronJobs: [{ id: "tidy-up", schedule, handler: "cron/tidy-up.ts" }],
     };

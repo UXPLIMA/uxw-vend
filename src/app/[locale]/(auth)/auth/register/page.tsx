@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { SiteName } from "@/core/components/ui/site-name";
 import { Link, useRouter } from "@/core/lib/i18n/navigation";
 import { Home } from "lucide-react";
 import { Button } from "@/core/components/ui/button";
@@ -77,7 +78,7 @@ export default function RegisterPage() {
             <div className="w-full max-w-md">
                 <div className="text-center mb-8">
                     <Link href="/" className="inline-flex items-center gap-3">
-                        <span className="font-bold text-2xl text-foreground">uxwVend</span>
+                        <SiteName className="font-bold text-2xl text-foreground" />
                     </Link>
                 </div>
 

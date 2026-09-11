@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
-  "updated": "2026-09-10",
-  "updatedAt": "2026-09-10T16:25:09Z",
+  "updated": "2026-09-11",
+  "updatedAt": "2026-09-11T08:20:12Z",
   "modules": [
     {
       "id": "announcements",
@@ -13,13 +13,13 @@
           "description": "Site genelinde duyuru bantları"
         }
       },
-      "version": "1.0.15",
-      "coreVersion": "^1.29.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Megaphone",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-08T17:14:35Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -52,13 +52,13 @@
           "description": "Kullanıcıların Apple hesabıyla giriş yapmasına izin verin"
         }
       },
-      "version": "1.0.4",
-      "coreVersion": "^1.4.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Apple",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -87,13 +87,13 @@
           "description": "Kullanıcıların Battle.net hesabıyla giriş yapmasına izin verin"
         }
       },
-      "version": "1.0.4",
-      "coreVersion": "^1.4.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Swords",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -117,13 +117,13 @@
       "name": "BirFatura Invoicing",
       "description": "Publishes this shop's paid orders for BirFatura to pull and invoice. The integrator calls in with a shared secret; nothing is sent out.",
       "i18n": {},
-      "version": "1.1.0",
-      "coreVersion": "^1.44.0",
-      "author": "uxwVend",
+      "version": "1.2.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "FileText",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-10T12:13:34Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -158,13 +158,13 @@
           "description": "Haber ve duyuru sistemi"
         }
       },
-      "version": "1.2.5",
-      "coreVersion": "^1.29.0",
-      "author": "uxwVend",
+      "version": "1.3.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Newspaper",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-08T17:14:35Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -202,13 +202,13 @@
           "description": "Sürüm notları ve güncelleme geçmişi"
         }
       },
-      "version": "1.0.19",
-      "coreVersion": "^1.29.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "History",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-08T17:49:04Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -241,13 +241,13 @@
           "description": "Cloudflare R2 üzerinde çalışan S3 uyumlu nesne depolama (çıkış ücreti yok)"
         }
       },
-      "version": "1.3.0",
-      "coreVersion": "^1.44.0",
-      "author": "uxwVend",
+      "version": "1.4.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Cloud",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-10T12:13:34Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -276,13 +276,13 @@
           "description": "Cloudflare tarafından sağlanan, gizliliğe saygılı CAPTCHA alternatifi"
         }
       },
-      "version": "1.5.0",
-      "coreVersion": "^1.44.0",
-      "author": "uxwVend",
+      "version": "1.6.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Shield",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-10T12:13:34Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -313,13 +313,13 @@
           "description": "Coinbase Commerce üzerinden Bitcoin, Ethereum, USDC ve diğer kripto ödemelerini alın"
         }
       },
-      "version": "1.1.0",
-      "coreVersion": "^1.44.0",
-      "author": "uxwVend",
+      "version": "1.2.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Bitcoin",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-10T12:13:34Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -356,13 +356,13 @@
           "description": "CoinPayments üzerinden Bitcoin, Litecoin, USDT ve diğer kripto ödemelerini alın"
         }
       },
-      "version": "1.1.0",
-      "coreVersion": "^1.44.0",
-      "author": "uxwVend",
+      "version": "1.2.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Bitcoin",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-10T12:13:34Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -394,13 +394,13 @@
       "name": "Comparison Table",
       "description": "Compare several things feature by feature. A cell nobody filled in is left blank rather than marked as a no.",
       "i18n": {},
-      "version": "1.1.0",
-      "coreVersion": "^1.34.0",
-      "author": "uxwVend",
+      "version": "1.2.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Table",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-10T01:16:53Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -429,13 +429,13 @@
           "description": "KVKK ve GDPR uyumlu çerez onay bandı"
         }
       },
-      "version": "1.0.4",
-      "coreVersion": "^1.0.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Shield",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-06T00:13:47Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -464,13 +464,13 @@
           "description": "Kullanıcılar için sanal para cüzdanı"
         }
       },
-      "version": "1.2.1",
-      "coreVersion": "^1.34.0",
-      "author": "uxwVend",
+      "version": "1.3.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Coins",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-09T18:54:41Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -502,13 +502,13 @@
       "name": "Crisp Chat",
       "description": "A live chat bubble on every page, served by Crisp. Nothing is loaded until the visitor has accepted cookies.",
       "i18n": {},
-      "version": "1.0.0",
-      "coreVersion": "^1.43.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "MessageCircle",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-10T07:46:08Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -537,13 +537,13 @@
           "description": "Veri yedeklemesi için CSV dışa ve içe aktarma araçları"
         }
       },
-      "version": "1.0.10",
-      "coreVersion": "^1.0.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Download",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-07T11:04:42Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -574,13 +574,13 @@
           "description": "Otomatik dönüşümle çoklu para birimi desteği"
         }
       },
-      "version": "1.3.0",
-      "coreVersion": "^1.33.0",
-      "author": "uxwVend",
+      "version": "1.4.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "DollarSign",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-09T14:55:13Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -611,13 +611,13 @@
           "description": "Gönderim takipli dinamik form oluşturucu"
         }
       },
-      "version": "1.0.36",
-      "coreVersion": "^1.28.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "FileEdit",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-08T15:13:55Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -651,13 +651,13 @@
           "description": "Yöneticinin oluşturduğu HTML içerik sayfaları"
         }
       },
-      "version": "1.0.27",
-      "coreVersion": "^1.29.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "FileText",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-08T17:14:35Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -686,13 +686,13 @@
           "description": "Kullanıcıların Discord hesabıyla giriş yapmasına izin verin"
         }
       },
-      "version": "1.0.5",
-      "coreVersion": "^1.0.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "MessageSquare",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -721,13 +721,13 @@
           "description": "Discord webhook bildirimleri ve ayarları"
         }
       },
-      "version": "1.3.0",
-      "coreVersion": "^1.37.0",
-      "author": "uxwVend",
+      "version": "1.4.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "MessageSquare",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-10T02:20:22Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -763,13 +763,13 @@
           "description": "Ana sayfa kenar çubuğunda Discord sunucu bileşeni"
         }
       },
-      "version": "1.1.0",
-      "coreVersion": "^1.20.0",
-      "author": "uxwVend",
+      "version": "1.2.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "MessageSquare",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-06T10:37:06Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -800,13 +800,13 @@
           "description": "Kaynaklar ve modlar için dosya indirme merkezi"
         }
       },
-      "version": "1.0.18",
-      "coreVersion": "^1.29.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Download",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-08T17:49:04Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -837,13 +837,13 @@
           "description": "E-posta servisi yapılandırması ve şablonları"
         }
       },
-      "version": "1.1.0",
-      "coreVersion": "^1.44.0",
-      "author": "uxwVend",
+      "version": "1.2.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Mail",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-10T12:13:34Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -872,13 +872,13 @@
           "description": "Kullanıcıların Epic Games hesabıyla giriş yapmasına izin verin"
         }
       },
-      "version": "1.0.4",
-      "coreVersion": "^1.4.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Gamepad2",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -902,13 +902,13 @@
       "name": "External Data",
       "description": "Read a list out of a database this site does not own: a game server, a billing system, an old forum. Read only, one bounded query, and the connection never reaches a page.",
       "i18n": {},
-      "version": "1.2.0",
-      "coreVersion": "^1.34.0",
-      "author": "uxwVend",
+      "version": "1.3.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Database",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-10T06:42:34Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -937,13 +937,13 @@
           "description": "Kullanıcıların Facebook hesabıyla giriş yapmasına izin verin"
         }
       },
-      "version": "1.0.4",
-      "coreVersion": "^1.0.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Users",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -972,13 +972,13 @@
           "description": "Kullanıcıların FACEIT hesabıyla giriş yapmasına izin verin"
         }
       },
-      "version": "1.0.5",
-      "coreVersion": "^1.0.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Swords",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1007,13 +1007,13 @@
           "description": "Kategoriler, konular ve yanıtlarla topluluk tartışma forumu"
         }
       },
-      "version": "1.2.3",
-      "coreVersion": "^1.37.0",
-      "author": "uxwVend Team",
+      "version": "1.3.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis Team",
       "icon": "MessageSquare",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-10T00:48:54Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -1049,13 +1049,13 @@
           "description": "Kullanıcıların GitHub hesabıyla giriş yapmasına izin verin"
         }
       },
-      "version": "1.0.5",
-      "coreVersion": "^1.0.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Code2",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1084,13 +1084,13 @@
           "description": "Google Analytics takip entegrasyonu"
         }
       },
-      "version": "1.0.8",
-      "coreVersion": "^1.0.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "BarChart",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1119,13 +1119,13 @@
           "description": "Kullanıcıların Google hesabıyla giriş yapmasına izin verin"
         }
       },
-      "version": "1.0.5",
-      "coreVersion": "^1.0.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Globe",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1154,13 +1154,13 @@
           "description": "Kategorili ve aranabilir makalelerden oluşan bilgi bankası"
         }
       },
-      "version": "1.2.6",
-      "coreVersion": "^1.32.0",
-      "author": "uxwVend Team",
+      "version": "1.3.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis Team",
       "icon": "HelpCircle",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-09T23:42:41Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -1191,13 +1191,13 @@
           "description": "Zil simgeli uygulama içi bildirim sistemi"
         }
       },
-      "version": "1.2.3",
-      "coreVersion": "^1.29.0",
-      "author": "uxwVend",
+      "version": "1.3.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Bell",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-08T17:49:04Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -1234,13 +1234,13 @@
           "description": "Kullanıcıların Instagram hesabıyla giriş yapmasına izin verin"
         }
       },
-      "version": "1.0.4",
-      "coreVersion": "^1.4.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Camera",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1269,13 +1269,13 @@
           "description": "iyzico üzerinden taksit ve 3D Secure destekli Türk kartı ödemelerini alın"
         }
       },
-      "version": "1.1.0",
-      "coreVersion": "^1.44.0",
-      "author": "uxwVend",
+      "version": "1.2.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "CreditCard",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-10T12:13:34Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1311,13 +1311,13 @@
           "description": "Kullanıcıların Kakao hesabıyla giriş yapmasına izin verin"
         }
       },
-      "version": "1.0.4",
-      "coreVersion": "^1.0.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "MessageSquare",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1346,13 +1346,13 @@
           "description": "Kullanıcıların Kick hesabıyla giriş yapmasına izin verin"
         }
       },
-      "version": "1.0.4",
-      "coreVersion": "^1.4.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Radio",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1381,13 +1381,13 @@
           "description": "Satın alma, oy ve etkinliğe göre oyuncu sıralamaları"
         }
       },
-      "version": "1.1.14",
-      "coreVersion": "^1.28.0",
-      "author": "uxwVend",
+      "version": "1.2.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Trophy",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-08T17:00:24Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1418,13 +1418,13 @@
           "description": "Dijital ürünler için lisans anahtarı üretin, teslim edin ve etkinleştirin; anahtar başına makine sınırı ile"
         }
       },
-      "version": "1.0.15",
-      "coreVersion": "^1.2.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "KeyRound",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-07T12:40:41Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1457,13 +1457,13 @@
           "description": "Kullanıcıların LINE hesabıyla giriş yapmasına izin verin"
         }
       },
-      "version": "1.0.4",
-      "coreVersion": "^1.0.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "MessageCircle",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1492,13 +1492,13 @@
           "description": "Giriş sınırlaması: kaç başarısız denemenin hesabı kilitleyeceği"
         }
       },
-      "version": "1.0.6",
-      "coreVersion": "^1.0.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Shield",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -1522,13 +1522,13 @@
       "name": "Pay by Hand",
       "description": "Take a payment nobody processes: a bank transfer, cash at the counter, an invoice settled later. The order waits unpaid until an operator confirms the money arrived.",
       "i18n": {},
-      "version": "1.0.0",
-      "coreVersion": "^1.34.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Landmark",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-09T16:45:48Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1557,13 +1557,13 @@
       "name": "Marketplace",
       "description": "Members sell to each other for credits and the site takes a cut. What is handed over is decided by whatever integration is installed.",
       "i18n": {},
-      "version": "1.1.0",
-      "coreVersion": "^1.34.0",
-      "author": "uxwVend",
+      "version": "1.2.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Store",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-10T07:15:27Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1597,13 +1597,13 @@
           "description": "Mercado Pago üzerinden Latin Amerika genelinde kart, Pix, boleto ve nakit ödemelerini alın"
         }
       },
-      "version": "1.1.0",
-      "coreVersion": "^1.44.0",
-      "author": "uxwVend",
+      "version": "1.2.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Wallet",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-10T12:13:34Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1641,13 +1641,13 @@
           "description": "Kullanıcıların Microsoft veya Xbox hesabıyla giriş yapmasına izin verin"
         }
       },
-      "version": "1.0.4",
-      "coreVersion": "^1.0.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Gamepad2",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1676,13 +1676,13 @@
           "description": "Midtrans üzerinden Endonezya'da havale, e-cüzdan, market ve kart ödemelerini alın"
         }
       },
-      "version": "1.1.0",
-      "coreVersion": "^1.44.0",
-      "author": "uxwVend",
+      "version": "1.2.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Smartphone",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-10T12:13:34Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1720,13 +1720,13 @@
           "description": "Oyuncuların sunucuda kendilerine fısıldanan bir kodu okuyarak Minecraft hesabının sahibi olduklarını kanıtlamasını sağlayın"
         }
       },
-      "version": "1.0.8",
-      "coreVersion": "^1.2.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Link2",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-05T20:50:26Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -1761,13 +1761,13 @@
           "description": "Mollie üzerinden iDEAL, Bancontact, SEPA ve kart ödemelerini alın"
         }
       },
-      "version": "1.1.0",
-      "coreVersion": "^1.44.0",
-      "author": "uxwVend",
+      "version": "1.2.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Landmark",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-10T12:13:34Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1805,13 +1805,13 @@
           "description": "Kullanıcıların Naver hesabıyla giriş yapmasına izin verin"
         }
       },
-      "version": "1.0.4",
-      "coreVersion": "^1.0.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Compass",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1840,13 +1840,13 @@
           "description": "NOWPayments üzerinden 200'den fazla kripto para ile ödeme alın"
         }
       },
-      "version": "1.1.0",
-      "coreVersion": "^1.44.0",
-      "author": "uxwVend",
+      "version": "1.2.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Bitcoin",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-10T12:13:34Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1884,13 +1884,13 @@
           "description": "Param (TurkPos) üzerinden Türk kartı ve taksitli ödemeleri alın"
         }
       },
-      "version": "1.1.0",
-      "coreVersion": "^1.44.0",
-      "author": "uxwVend",
+      "version": "1.2.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "CreditCard",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-10T12:13:34Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1922,13 +1922,13 @@
       "name": "Parasut Invoicing",
       "description": "Issues a sales invoice in Parasut for every paid order, using the invoice details the checkout collected.",
       "i18n": {},
-      "version": "1.2.0",
-      "coreVersion": "^1.44.0",
-      "author": "uxwVend",
+      "version": "1.3.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "FileText",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-10T12:13:34Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1962,13 +1962,13 @@
           "description": "Kullanıcıların Patreon hesabıyla giriş yapmasına izin verin"
         }
       },
-      "version": "1.0.4",
-      "coreVersion": "^1.0.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Heart",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -1997,13 +1997,13 @@
           "description": "Paymentwall üzerinden yerel ödemeleri, cüzdanları ve mobil faturalandırmayı kullanın"
         }
       },
-      "version": "1.1.0",
-      "coreVersion": "^1.44.0",
-      "author": "uxwVend",
+      "version": "1.2.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Globe",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-10T12:13:34Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2040,13 +2040,13 @@
           "description": "PayPal üzerinden bakiye veya bağlı kartla ödeme alın"
         }
       },
-      "version": "2.1.0",
-      "coreVersion": "^1.44.0",
-      "author": "uxwVend",
+      "version": "2.2.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "DollarSign",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-10T12:13:34Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2082,13 +2082,13 @@
           "description": "Kartı ya da banka hesabı olmayan alıcılar için paysafecard ön ödemeli kupon ödemelerini alın"
         }
       },
-      "version": "1.1.0",
-      "coreVersion": "^1.44.0",
-      "author": "uxwVend",
+      "version": "1.2.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Ticket",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-10T12:13:34Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2125,13 +2125,13 @@
           "description": "PayTR üzerinden Türk kartı, taksit ve havale ödemelerini alın"
         }
       },
-      "version": "1.1.0",
-      "coreVersion": "^1.44.0",
-      "author": "uxwVend",
+      "version": "1.2.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "CreditCard",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-10T12:13:34Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2168,13 +2168,13 @@
           "description": "Herkese açık oyuncu profil sayfaları"
         }
       },
-      "version": "1.1.20",
-      "coreVersion": "^1.28.0",
-      "author": "uxwVend",
+      "version": "1.2.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Users",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-10T02:06:16Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -2203,13 +2203,13 @@
           "description": "Modal açılır pencere bildirimleri ve tanıtımları"
         }
       },
-      "version": "1.1.8",
-      "coreVersion": "^1.0.0",
-      "author": "uxwVend",
+      "version": "1.2.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Bell",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -2238,13 +2238,13 @@
           "description": "Oyuncu ceza geçmişi ve yasaklama yönetimi"
         }
       },
-      "version": "1.1.3",
-      "coreVersion": "^1.29.0",
-      "author": "uxwVend",
+      "version": "1.2.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Shield",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-08T17:14:35Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -2276,13 +2276,13 @@
           "description": "Razorpay üzerinden Hindistan'da UPI, kart, internet bankacılığı ve cüzdan ödemelerini alın"
         }
       },
-      "version": "1.1.0",
-      "coreVersion": "^1.44.0",
-      "author": "uxwVend",
+      "version": "1.2.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Smartphone",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-10T12:13:34Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2320,13 +2320,13 @@
           "description": "Kullanıcıların Reddit hesabıyla giriş yapmasına izin verin"
         }
       },
-      "version": "1.0.4",
-      "coreVersion": "^1.0.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "MessageCircle",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -2355,13 +2355,13 @@
           "description": "Yeni kullanıcı davet ederek kredi kazanın"
         }
       },
-      "version": "1.1.4",
-      "coreVersion": "^1.29.0",
-      "author": "uxwVend",
+      "version": "1.2.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "UserPlus",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-08T17:49:04Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -2394,13 +2394,13 @@
           "description": "Resend API üzerinden e-posta gönderin"
         }
       },
-      "version": "1.1.0",
-      "coreVersion": "^1.44.0",
-      "author": "uxwVend",
+      "version": "1.2.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Mail",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-10T12:13:34Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -2431,13 +2431,13 @@
           "description": "Kullanıcıların Roblox hesabıyla giriş yapmasına izin verin"
         }
       },
-      "version": "1.0.5",
-      "coreVersion": "^1.0.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Boxes",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -2461,13 +2461,13 @@
       "name": "Rank Delivery",
       "description": "Lets members sell a rank for a number of days in the market. The first thing anything here can hand over.",
       "i18n": {},
-      "version": "1.0.0",
-      "coreVersion": "^1.42.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "ShieldCheck",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-10T07:15:27Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -2499,13 +2499,13 @@
           "description": "Sayfa başına meta etiketleri, OpenGraph ve yapılandırılmış veri ile gelişmiş SEO yönetimi"
         }
       },
-      "version": "1.2.1",
-      "coreVersion": "^1.25.0",
-      "author": "uxwVend",
+      "version": "1.3.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Search",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-07T12:40:41Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -2534,13 +2534,13 @@
           "description": "Oyun sunucusu yönetimi, RCON ve durum izleme"
         }
       },
-      "version": "1.1.10",
-      "coreVersion": "^1.3.0",
-      "author": "uxwVend",
+      "version": "1.2.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Server",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -2566,13 +2566,13 @@
       "name": "Showcase",
       "description": "A grid of cards: a picture, a heading, a line of text and somewhere to go. What is being shown is the operator's business.",
       "i18n": {},
-      "version": "1.0.0",
-      "coreVersion": "^1.35.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "LayoutGrid",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-09T20:19:32Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -2601,13 +2601,13 @@
           "description": "Ana sayfa görsel galerisi ve bantları"
         }
       },
-      "version": "1.0.14",
-      "coreVersion": "^1.0.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Image",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-06T00:13:47Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -2636,13 +2636,13 @@
           "description": "Kullanıcıların Spotify hesabıyla giriş yapmasına izin verin"
         }
       },
-      "version": "1.0.4",
-      "coreVersion": "^1.0.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Music",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -2671,13 +2671,13 @@
           "description": "Burayı yönetenler ve onları yöneten ekran."
         }
       },
-      "version": "1.1.5",
-      "coreVersion": "^1.29.0",
-      "author": "uxwVend",
+      "version": "1.2.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Users",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-08T17:49:04Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -2706,13 +2706,13 @@
           "description": "Kullanıcıların Steam hesabıyla giriş yapmasına izin verin"
         }
       },
-      "version": "1.0.8",
-      "coreVersion": "^1.0.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Gamepad2",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -2741,13 +2741,13 @@
           "description": "Ürün, kategori, sepet ve siparişleriyle eksiksiz e-ticaret"
         }
       },
-      "version": "2.24.0",
-      "coreVersion": "^1.38.0",
-      "author": "uxwVend Team",
+      "version": "2.25.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis Team",
       "icon": "ShoppingBag",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-10T00:59:47Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2795,13 +2795,13 @@
           "description": "Stripe üzerinden abonelikler dahil kart, Apple Pay ve Google Pay ödemelerini alın"
         }
       },
-      "version": "2.2.0",
-      "coreVersion": "^1.44.0",
-      "author": "uxwVend",
+      "version": "2.3.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "CreditCard",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-10T12:13:34Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2840,13 +2840,13 @@
           "description": "Oylamalı topluluk özellik önerileri"
         }
       },
-      "version": "1.1.5",
-      "coreVersion": "^1.29.0",
-      "author": "uxwVend",
+      "version": "1.2.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "MessageSquare",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-08T18:08:35Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -2877,13 +2877,13 @@
       "name": "Tawk.to Chat",
       "description": "A live chat bubble on every page, served by Tawk.to. Nothing is loaded until the visitor has accepted cookies.",
       "i18n": {},
-      "version": "1.0.0",
-      "coreVersion": "^1.34.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "MessageCircle",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-09T19:42:45Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -2912,13 +2912,13 @@
           "description": "Departmanlı ve öncelik seviyeli müşteri destek talebi sistemi"
         }
       },
-      "version": "1.3.0",
-      "coreVersion": "^1.37.0",
-      "author": "uxwVend Team",
+      "version": "1.4.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis Team",
       "icon": "Ticket",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-10T16:25:09Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -2952,13 +2952,13 @@
           "description": "Kullanıcıların TikTok hesabıyla giriş yapmasına izin verin"
         }
       },
-      "version": "1.0.4",
-      "coreVersion": "^1.0.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Video",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -2987,13 +2987,13 @@
           "description": "Kural tabanlı otomatik ödüllendirme motoruyla başarım rozetleri"
         }
       },
-      "version": "1.1.4",
-      "coreVersion": "^1.29.0",
-      "author": "uxwVend",
+      "version": "1.2.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Trophy",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-08T17:49:04Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -3024,13 +3024,13 @@
           "description": "Kullanıcıların Twitch hesabıyla giriş yapmasına izin verin"
         }
       },
-      "version": "1.0.5",
-      "coreVersion": "^1.0.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Video",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -3059,13 +3059,13 @@
           "description": "Hesap güvenliğini artırmak için yedek kodlu, TOTP tabanlı iki adımlı doğrulama"
         }
       },
-      "version": "1.1.1",
-      "coreVersion": "^1.25.0",
-      "author": "uxwVend",
+      "version": "1.2.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Shield",
       "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-10T00:15:34Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "management"
@@ -3094,13 +3094,13 @@
       "name": "URL Redirects",
       "description": "A sign on the door of a page that moved, so old links keep working.",
       "i18n": {},
-      "version": "1.0.0",
-      "coreVersion": "^1.35.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Signpost",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-09T19:55:15Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -3131,13 +3131,13 @@
           "description": "Kullanıcıların VK hesabıyla giriş yapmasına izin verin"
         }
       },
-      "version": "1.0.4",
-      "coreVersion": "^1.0.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "MessagesSquare",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -3166,13 +3166,13 @@
           "description": "Oyuncuları sıralamada yer aldığınız sunucu listelerine yönlendirin ve kimin oy verdiğini sayın"
         }
       },
-      "version": "1.2.3",
-      "coreVersion": "^1.29.0",
-      "author": "uxwVend",
+      "version": "1.3.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Vote",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-08T17:14:35Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -3203,13 +3203,13 @@
           "description": "Webhook teslimat kayıtlarını görüntüleyin ve yönetin"
         }
       },
-      "version": "1.0.11",
-      "coreVersion": "^1.24.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Webhook",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-06T06:44:39Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -3238,13 +3238,13 @@
           "description": "Yapılandırılabilir ödüller ve bekleme süreleriyle çevir-kazan oyunu"
         }
       },
-      "version": "1.4.0",
-      "coreVersion": "^1.29.0",
-      "author": "uxwVend",
+      "version": "1.5.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Dices",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-09T09:58:07Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -3279,13 +3279,13 @@
           "description": "Kullanıcıların X (Twitter) hesabıyla giriş yapmasına izin verin"
         }
       },
-      "version": "1.0.4",
-      "coreVersion": "^1.0.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "AtSign",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -3314,13 +3314,13 @@
           "description": "Kullanıcıların Yandex hesabıyla giriş yapmasına izin verin"
         }
       },
-      "version": "1.0.4",
-      "coreVersion": "^1.0.0",
-      "author": "uxwVend",
+      "version": "1.1.0",
+      "coreVersion": "^2.0.0",
+      "author": "Blysis",
       "icon": "Search",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-05T23:35:44Z",
+      "updatedAt": "2026-09-11T08:20:12Z",
       "screenshots": [],
       "tags": [
         "integration"

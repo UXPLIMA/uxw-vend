@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
     }
     const { name, permissions, expiresAt } = parsed.data;
 
-    const rawKey = `uxw_${randomBytes(24).toString("hex")}`;
+    const rawKey = `blysis_${randomBytes(24).toString("hex")}`;
     const keyPrefix = rawKey.slice(0, 12);
     const keyHash = await bcrypt.hash(rawKey, BCRYPT_ROUNDS);
 

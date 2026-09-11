@@ -39,7 +39,7 @@ export default function SiteSettingsPage() {
     const [error, setError] = useState<string | null>(null);
 
     const [form, setForm] = useState({
-        siteName: "uxwVend",
+        siteName: "Blysis",
         siteDescription: "",
         serverIp: "",
         contactEmail: "",
@@ -52,10 +52,10 @@ export default function SiteSettingsPage() {
     });
 
     // A read that failed would otherwise offer this form at its defaults, and
-    // saving it renames the site to "uxwVend" and empties every social link.
+    // saving it renames the site to "Blysis" and empties every social link.
     const { loading, failed, retry } = useSettingsLoad((s) => {
         setForm({
-            siteName: (s.siteName as string) || "uxwVend",
+            siteName: (s.siteName as string) || "Blysis",
             siteDescription: (s.siteDescription as string) || "",
             serverIp: (s.serverIp as string) || "",
             contactEmail: (s.contactEmail as string) || "",

@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
 
         // Core keeps the rules for a minute; an operator who just wrote one
         // should not have to wait to try it.
-        await invalidate("uxw:routing:redirects");
+        await invalidate("blysis:routing:redirects");
 
         await logActivity({
             userId: session.user.id,

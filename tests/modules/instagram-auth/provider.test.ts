@@ -23,9 +23,9 @@ describe("instagram provider", () => {
     });
 
     it("names the account by its handle", () => {
-        expect(provider.profile!({ id: "17841400000000000", username: "uxwvend" }, {})).toMatchObject({
+        expect(provider.profile!({ id: "17841400000000000", username: "blysis" }, {})).toMatchObject({
             id: "17841400000000000",
-            name: "uxwvend",
+            name: "blysis",
             email: null,
         });
     });

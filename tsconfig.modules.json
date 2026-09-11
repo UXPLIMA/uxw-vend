@@ -3,7 +3,7 @@
   "extends": "./tsconfig.json",
   "compilerOptions": { "noEmit": true },
   "exclude": ["node_modules", "module-template", ".next"],
-  "//include": "src/core/types holds global `.d.ts` declarations (the hook payload registry). Nothing imports them, so they only enter a program that lists them explicitly - without this line every module file sees UxwVendHookPayloads as undeclared.",
+  "//include": "src/core/types holds global `.d.ts` declarations (the hook payload registry). Nothing imports them, so they only enter a program that lists them explicitly - without this line every module file sees BlysisHookPayloads as undeclared.",
   "include": [
     "module-sources/**/*.ts",
     "module-sources/**/*.tsx",

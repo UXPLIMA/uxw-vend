@@ -53,12 +53,12 @@ export function AppThemeProvider({ children, themeId, mode, serverConfig }: AppT
         if (window.parent === window) return;
         const handler = (event: MessageEvent) => {
             if (event.origin !== window.location.origin) return;
-            if (event.data?.type === "uxwvend:theme-preview" && typeof event.data.overrides === "object") {
+            if (event.data?.type === "blysis:theme-preview" && typeof event.data.overrides === "object") {
                 setPreviewOverrides(event.data.overrides as Record<string, unknown>);
             }
         };
         window.addEventListener("message", handler);
-        try { window.parent.postMessage({ type: "uxwvend:preview-ready" }, window.location.origin); }
+        try { window.parent.postMessage({ type: "blysis:preview-ready" }, window.location.origin); }
         catch { /* cross-origin / detached - ignore */ }
         return () => window.removeEventListener("message", handler);
     }, []);
@@ -71,7 +71,7 @@ export function AppThemeProvider({ children, themeId, mode, serverConfig }: AppT
     const setMode = (next: string) => {
         if (activeTheme.modes.available[next]) {
             setCurrentMode(next);
-            try { document.cookie = `uxw_mode=${next}; path=/; max-age=31536000; samesite=lax`; } catch { /* ignore cookie set failure */ }
+            try { document.cookie = `blysis_mode=${next}; path=/; max-age=31536000; samesite=lax`; } catch { /* ignore cookie set failure */ }
         }
     };
 

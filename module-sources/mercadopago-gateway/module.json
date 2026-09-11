@@ -2,14 +2,14 @@
   "id": "mercadopago-gateway",
   "name": "Mercado Pago Gateway",
   "description": "Take card, Pix, boleto and cash payments across Latin America through Mercado Pago",
-  "version": "1.1.0",
-  "coreVersion": "^1.44.0",
+  "version": "1.2.0",
+  "coreVersion": "^2.0.0",
   "secretSettings": [
     "mercadopago_access_token",
     "mercadopago_webhook_secret"
   ],
   "category": "commerce",
-  "author": "uxwVend",
+  "author": "Blysis",
   "icon": "Wallet",
   "dependencies": [
     "store@^2.0.0"

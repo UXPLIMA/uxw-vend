@@ -182,7 +182,7 @@ for name in sorted(os.listdir(SOURCES_DIR)):
         "i18n": catalog_i18n(m),
         "version": version,
         "coreVersion": m.get("coreVersion"),
-        "author": m.get("author", "uxwVend"),
+        "author": m.get("author", "Blysis"),
         "icon": m.get("icon", "Package"),
         "category": cat,
         "verified": True,

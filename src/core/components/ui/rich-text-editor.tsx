@@ -115,13 +115,13 @@ export function RichTextEditor({
                 .rich-text-editor .ql-toolbar {
                     border-top-left-radius: 0.375rem;
                     border-top-right-radius: 0.375rem;
-                    background: var(--uxw-color-muted);
+                    background: var(--blysis-color-muted);
                 }
                 .rich-text-editor .ql-editor {
                     min-height: 280px;
                 }
                 .rich-text-editor .ql-editor.ql-blank::before {
-                    color: var(--uxw-color-mutedForeground);
+                    color: var(--blysis-color-mutedForeground);
                     font-style: normal;
                 }
             `}</style>

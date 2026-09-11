@@ -38,12 +38,12 @@ declare global {
         serverId?: string | null;
     }
 
-    interface UxwVendFilterPayloads {
+    interface BlysisFilterPayloads {
         "server.command": ServerCommandResult;
     }
 
     /** The question, as opposed to the answer above. */
-    interface UxwVendFilterContexts {
+    interface BlysisFilterContexts {
         "server.command": ServerCommandRequest;
     }
 }

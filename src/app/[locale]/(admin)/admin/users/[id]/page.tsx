@@ -143,7 +143,7 @@ export default function AdminUserDetailPage() {
             a.href = url;
             const cd = res.headers.get("Content-Disposition") || "";
             const match = cd.match(/filename="([^"]+)"/);
-            a.download = match?.[1] || `uxwvend-data-${userId}.zip`;
+            a.download = match?.[1] || `blysis-data-${userId}.zip`;
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);
@@ -555,7 +555,7 @@ export default function AdminUserDetailPage() {
                         role="dialog"
                         aria-modal="true"
                         aria-labelledby="admin-delete-title"
-                        className="relative bg-card border border-[var(--uxw-color-border)] rounded-xl shadow-2xl p-6 w-full max-w-md mx-4"
+                        className="relative bg-card border border-[var(--blysis-color-border)] rounded-xl shadow-2xl p-6 w-full max-w-md mx-4"
                     >
                         <div className="flex items-start gap-3 mb-4">
                             <div className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center flex-shrink-0">

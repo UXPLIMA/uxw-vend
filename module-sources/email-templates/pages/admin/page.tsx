@@ -12,7 +12,7 @@ export default function EmailSettingsPage() {
             fields={[
                 { key: "resend_api_key", label: t("adm_field1Label"), type: "password", placeholder: "re_...", description: t("adm_field1Desc") },
                 { key: "email_from", label: t("adm_field2Label"), type: "email", placeholder: "noreply@yoursite.com" },
-                { key: "email_from_name", label: t("adm_field3Label"), placeholder: "uxwVend" },
+                { key: "email_from_name", label: t("adm_field3Label"), placeholder: "Blysis" },
             ]}
         />
     );

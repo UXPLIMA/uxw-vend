@@ -2,8 +2,8 @@
   "id": "email-templates",
   "name": "Email Templates",
   "description": "Email service configuration and templates",
-  "version": "1.1.0",
-  "coreVersion": "^1.44.0",
+  "version": "1.2.0",
+  "coreVersion": "^2.0.0",
   "secretSettings": [
     "resend_api_key"
   ],
@@ -12,7 +12,7 @@
     "envVar": "RESEND_API_KEY"
   },
   "category": "content",
-  "author": "uxwVend",
+  "author": "Blysis",
   "icon": "Mail",
   "menu": [
     {

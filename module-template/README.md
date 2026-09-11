@@ -1,6 +1,6 @@
 # Module Template
 
-Starter for new uxwVend modules. The `npm run create:module` script copies this directory into `module-sources/<id>/` and rewrites placeholders in every file.
+Starter for new Blysis modules. The `npm run create:module` script copies this directory into `module-sources/<id>/` and rewrites placeholders in every file.
 
 ---
 
@@ -16,7 +16,7 @@ Arguments:
 |----------|-------|----------|---------|
 | 1 | Module ID | Yes | - (lowercase, letters/digits/hyphens, starts with a letter, no double hyphens) |
 | 2 | Display name | No | Title-cased from the ID |
-| 3 | Description | No | `"<Name> module for uxwVend"` |
+| 3 | Description | No | `"<Name> module for Blysis"` |
 
 The script:
 
@@ -33,7 +33,7 @@ The script:
    | `MyModuleItem` | `<PascalCase>Item` |
    | `myModuleItems` | `<camelCase>Items` |
    | `"myModule"` (in translations) | `"<camelCase>"` |
-   | `A template module for uxwVend` | `<description>` |
+   | `A template module for Blysis` | `<description>` |
 
 3. Rewrites `module.json` cleanly (sets `id`, `name`, `description`; strips the `_comment` field).
 4. Prints the next-steps checklist.

@@ -129,7 +129,7 @@ export function IconPicker({
                         role="dialog"
                         aria-modal="true"
                         aria-label={t("iconPicker_title")}
-                        className="relative mx-4 flex max-h-[80vh] w-full max-w-2xl flex-col rounded-xl border border-[var(--uxw-color-border)] bg-card shadow-2xl"
+                        className="relative mx-4 flex max-h-[80vh] w-full max-w-2xl flex-col rounded-xl border border-[var(--blysis-color-border)] bg-card shadow-2xl"
                     >
                         <div className="flex items-center gap-2 border-b border-border p-4">
                             <Input

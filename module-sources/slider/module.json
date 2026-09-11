@@ -2,10 +2,10 @@
   "id": "slider",
   "name": "Slider",
   "description": "Homepage image carousel and banners",
-  "version": "1.0.14",
-  "coreVersion": "^1.0.0",
+  "version": "1.1.0",
+  "coreVersion": "^2.0.0",
   "category": "content",
-  "author": "uxwVend",
+  "author": "Blysis",
   "icon": "Image",
   "permissions": [
     "slider.manage"

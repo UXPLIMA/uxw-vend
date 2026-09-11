@@ -12,7 +12,7 @@ import { readJson, ReadFailed } from "@/core/lib/read-json";
  * called it loaded. The catch below them said `setLoading(false)` and nothing
  * else. So a failed read rendered a complete, plausible, editable form - and
  * the save button under it wrote the defaults over the real settings: a lost
- * custom stylesheet, a site renamed to "uxwVend" with its social links
+ * custom stylesheet, a site renamed to "Blysis" with its social links
  * emptied, a navbar replaced by the module registry's own defaults.
  *
  * The read lives in one hook now for the screens that read nothing else. It
