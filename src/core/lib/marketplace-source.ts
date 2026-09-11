@@ -31,6 +31,18 @@ function resolveBase(): string {
     }
 }
 
+/**
+ * Whether an operator pointed this install somewhere of their own.
+ *
+ * A reader that has a copy of the catalogue on disk needs to know this: the
+ * copy is right for an install that was never pointed anywhere, and wrong for
+ * one that was, where it silently answers a question the operator asked
+ * somebody else.
+ */
+export function marketplaceIsConfigured(): boolean {
+    return resolveBase() !== DEFAULT_BASE;
+}
+
 /** The root the catalogue is served from, for readers that are not a ZIP. */
 export function marketplaceBase(): string {
     return resolveBase();
