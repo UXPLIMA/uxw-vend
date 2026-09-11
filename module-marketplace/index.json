@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-11",
-  "updatedAt": "2026-09-11T10:08:12Z",
+  "updatedAt": "2026-09-11T10:22:21Z",
   "modules": [
     {
       "id": "announcements",
@@ -800,13 +800,13 @@
           "description": "Kaynaklar ve modlar için dosya indirme merkezi"
         }
       },
-      "version": "1.1.0",
+      "version": "1.2.0",
       "coreVersion": "^2.0.0",
       "author": "Blysis",
       "icon": "Download",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-11T10:22:21Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -821,9 +821,9 @@
         "listens": []
       },
       "stats": {
-        "publicRoutes": 1,
+        "publicRoutes": 2,
         "adminRoutes": 1,
-        "apiRoutes": 2,
+        "apiRoutes": 3,
         "widgets": 0
       }
     },

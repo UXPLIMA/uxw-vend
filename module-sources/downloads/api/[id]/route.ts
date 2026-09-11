@@ -1,15 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
+import { downloadSlug } from "../../lib/guide";
 import { isAdmin, prisma, rateLimitForRoleAsync, readJsonBody, getClientIP } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { canDownload } from "../../lib/can-download";
 import { z } from "zod";
 
+/**
+ * What an edit may write, bounded the way a create is.
+ *
+ * These were unbounded while the create path capped every one of them, so a
+ * title that could not be created could be edited into place afterwards - and
+ * the column takes it. The two paths now agree, plus the switch and the two
+ * fields only an edit reaches.
+ */
 const downloadUpdateSchema = z.object({
-    title: z.string().optional(),
-    description: z.string().nullable().optional(),
-    fileName: z.string().optional(),
-    fileUrl: z.string().optional(),
-    fileSize: z.number().int().nullable().optional(),
+    title: z.string().trim().min(1).max(200).optional(),
+    description: z.string().max(2_000).nullable().optional(),
+    details: z.string().max(50_000).nullable().optional(),
+    coverImage: z.string().max(500).nullable().optional(),
+    fileName: z.string().trim().min(1).max(255).optional(),
+    fileUrl: z.string().trim().min(1).max(2_000).optional(),
+    fileSize: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER).nullable().optional(),
     isActive: z.boolean().optional(),
 });
 
@@ -88,7 +99,19 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
     if (!validation.success) {
         return NextResponse.json({ error: validation.error.issues[0].message }, { status: 400 });
     }
-    const download = await prisma.download.update({ where: { id }, data: validation.data });
+    // The slug follows the title so a renamed file reads correctly in a URL,
+    // while the number in front of it keeps every shared link working. The
+    // guide is sanitised on the way in, like the one the create path writes.
+    const { title, details, ...rest } = validation.data;
+    const { sanitizeHtml } = await import("@/core/sdk/server");
+    const download = await prisma.download.update({
+        where: { id },
+        data: {
+            ...rest,
+            ...(title !== undefined ? { title, slug: downloadSlug(title) } : {}),
+            ...(details !== undefined ? { details: details ? sanitizeHtml(details) : null } : {}),
+        },
+    });
     return NextResponse.json({ download });
 }
 

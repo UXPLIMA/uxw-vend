@@ -2,7 +2,7 @@
   "id": "downloads",
   "name": "Downloads",
   "description": "File download center for resources and mods",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "coreVersion": "^2.0.0",
   "category": "gaming",
   "author": "Blysis",
@@ -23,6 +23,12 @@
       "path": "/downloads",
       "component": "pages/public/page.tsx",
       "titleKey": "pageTitles.downloads"
+    },
+    {
+      "path": "/downloads/[...slug]",
+      "component": "pages/public/guide/[number]/page.tsx",
+      "titleKey": "pageTitles.downloads",
+      "resolver": "lib/download-exists.ts"
     }
   ],
   "adminRoutes": [
@@ -41,6 +47,12 @@
       "path": "/downloads/[id]",
       "handler": "api/[id]/route.ts",
       "description": "Get, update, or delete a single download entry."
+    },
+    {
+      "path": "/downloads/guide/[number]",
+      "handler": "api/guide/[number]/route.ts",
+      "method": "GET",
+      "description": "One active download with its guide, for its own page."
     }
   ],
   "hooksEmitted": [
@@ -88,7 +100,16 @@
         "empty": "No downloads available",
         "unknownSize": "Unknown size",
         "downloadsCount": "{count, plural, one {# download} other {# downloads}}",
-        "downloadAction": "Download"
+        "downloadAction": "Download",
+        "readGuide": "How to use it",
+        "backToList": "All downloads",
+        "guideMissing": "That download has no guide to show.",
+        "adm_field2Help": "The line under the title in the list. Keep it short.",
+        "adm_guideLabel": "Guide",
+        "adm_guidePlaceholder": "What to install first, the steps, and where the settings live.",
+        "adm_guideHelp": "Optional. Fill this in and the download gets a page of its own, linked from the list.",
+        "adm_coverLabel": "Cover image",
+        "adm_coverHelp": "Shown at the top of that page. The list stays a list."
       },
       "admin": {
         "menu_downloads": "Downloads",
@@ -146,7 +167,16 @@
         "empty": "İndirilecek dosya yok",
         "unknownSize": "Bilinmiyor",
         "downloadsCount": "{count, plural, one {# indirme} other {# indirme}}",
-        "downloadAction": "İndir"
+        "downloadAction": "İndir",
+        "readGuide": "Nasıl kullanılır",
+        "backToList": "Tüm dosyalar",
+        "guideMissing": "Bu dosyanın gösterecek bir anlatımı yok.",
+        "adm_field2Help": "Listede başlığın altındaki satır. Kısa tutun.",
+        "adm_guideLabel": "Anlatım",
+        "adm_guidePlaceholder": "Önce ne kurulmalı, adımlar, ve ayarların nerede olduğu.",
+        "adm_guideHelp": "İsteğe bağlı. Doldurursanız dosya kendi sayfasını alır ve listeden bağlanır.",
+        "adm_coverLabel": "Kapak görseli",
+        "adm_coverHelp": "O sayfanın başında görünür. Liste liste olarak kalır."
       },
       "admin": {
         "menu_downloads": "İndirmeler",

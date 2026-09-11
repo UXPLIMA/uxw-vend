@@ -11,4 +11,8 @@ export const downloadCreateSchema = z.object({
     fileName: z.string().trim().min(1, "Title, fileName and fileUrl required").max(255),
     fileUrl: z.string().trim().min(1, "Title, fileName and fileUrl required").max(2_000),
     fileSize: z.number().int().min(0).max(Number.MAX_SAFE_INTEGER).optional().nullable(),
+    // A page's worth rather than a line's. Still bounded: it is written by an
+    // admin, stored as HTML and rendered to every visitor.
+    details: z.string().max(50_000).optional().nullable(),
+    coverImage: z.string().max(500).optional().nullable(),
 });

@@ -5,8 +5,18 @@
 
 model Download {
   id          String   @id @default(cuid())
+  /// Stable number in the URL, so renaming a file does not break a link
+  /// somebody has already shared. The slug beside it is cosmetic.
+  number      Int      @unique @default(autoincrement())
+  slug        String   @default("")
   title       String
+  /// The line under the title in the list. Short on purpose.
   description String?
+  /// Install steps, requirements, screenshots - whatever a reader has to know
+  /// before the file is any use. Absent for most downloads, and one without it
+  /// behaves exactly as it did: a row with a button, and no page behind it.
+  details     String?  @db.Text
+  coverImage  String?
   fileName    String
   fileUrl     String
   fileSize    Int?
@@ -14,4 +24,6 @@ model Download {
   isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@index([slug])
 }
