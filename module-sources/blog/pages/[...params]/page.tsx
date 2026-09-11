@@ -194,7 +194,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
                         {article.category && (
                             <Link
                                 href={`/blog?category=${encodeURIComponent(article.category.slug)}`}
-                                className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium hover:bg-primary/10 transition-colors"
+                                className="px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-medium hover:bg-primary/20 transition-colors"
                             >
                                 {article.category.name}
                             </Link>
@@ -245,7 +245,7 @@ export default async function BlogArticlePage({ params }: PageProps) {
                                     <Link
                                         key={tag.slug}
                                         href={`/blog?tag=${encodeURIComponent(tag.slug)}`}
-                                        className="px-3 py-1 rounded-full bg-muted text-foreground text-sm hover:bg-muted transition-colors"
+                                        className="px-3 py-1 rounded-full bg-muted text-foreground text-sm hover:bg-muted/70 transition-colors"
                                     >
                                         #{tag.name}
                                     </Link>

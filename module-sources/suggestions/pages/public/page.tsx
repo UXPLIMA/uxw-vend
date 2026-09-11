@@ -197,7 +197,7 @@ export default function SuggestionsPage() {
                                         onClick={() => toggleVote(s.id)}
                                         aria-label={!session?.user ? t("loginToVote") : votedIds.has(s.id) ? t("removeVote") : t("upvote")}
                                         className={`flex flex-col items-center justify-center px-3 py-2 rounded-lg transition-colors min-w-[60px] cursor-pointer ${
-                                            votedIds.has(s.id) ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground hover:bg-primary/10 hover:text-primary"
+                                            votedIds.has(s.id) ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground hover:bg-primary/20 hover:text-primary"
                                         }`}
                                     >
                                         <ThumbsUp className={`w-4 h-4 ${votedIds.has(s.id) ? "fill-primary" : ""}`} />

@@ -162,15 +162,21 @@ export default function HelpArticlePage({ params }: PageProps) {
                                 <p className="text-success">{t("feedbackThanks")}</p>
                             ) : (
                                 <div className="flex gap-3">
+                                    {/*
+                                        Both of these asked for a hover colour
+                                        identical to the resting one, so the
+                                        only thing that moved when a pointer
+                                        crossed them was nothing at all.
+                                    */}
                                     <button
                                         onClick={() => submitFeedback(true)}
-                                        className="px-4 py-2 bg-success/10 text-success rounded-lg hover:bg-success/10 transition-colors inline-flex items-center gap-2"
+                                        className="px-4 py-2 bg-success/10 text-success rounded-lg hover:bg-success/20 transition-colors inline-flex items-center gap-2"
                                     >
                                         <ThumbsUp className="w-4 h-4" /> {t("helpfulYes")}
                                     </button>
                                     <button
                                         onClick={() => submitFeedback(false)}
-                                        className="px-4 py-2 bg-muted text-foreground rounded-lg hover:bg-muted transition-colors inline-flex items-center gap-2"
+                                        className="px-4 py-2 bg-muted text-foreground rounded-lg hover:bg-muted/70 transition-colors inline-flex items-center gap-2"
                                     >
                                         <ThumbsDown className="w-4 h-4" /> {t("helpfulNo")}
                                     </button>

@@ -2,7 +2,7 @@
   "id": "help-center",
   "name": "Help Center",
   "description": "Knowledge base with categories and searchable articles",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "coreVersion": "^2.0.0",
   "category": "management",
   "author": "Blysis Team",

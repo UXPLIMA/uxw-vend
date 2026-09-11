@@ -2,6 +2,27 @@
 @import "../core/generated/theme-tokens.css";
 @source "../../src/modules";
 
+@layer base {
+  /*
+   * A control that can be pressed says so with the pointer.
+   *
+   * Tailwind v4's preflight gives `button` a `cursor: default`. That is a
+   * defensible reset default - a button is not a link - and the wrong one
+   * here, where every button is something a visitor is meant to click. The
+   * shared Button component carries `cursor-pointer` in its own classes, so
+   * the gap was invisible in the places people look first and present on all
+   * 107 raw `<button>` tags everywhere else. Measured on a help article: the
+   * feedback buttons reported `default`.
+   *
+   * `:not(:disabled)` keeps the arrow where an arrow is honest. A control
+   * that cannot be pressed should not pretend it can.
+   */
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
+}
+
 /* Fallback root tokens so built-in styles work before a theme data-attr is applied. */
 :root {
   --blysis-color-primary: #2563eb;

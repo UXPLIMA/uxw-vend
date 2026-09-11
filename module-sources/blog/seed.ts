@@ -18,6 +18,27 @@ const CATEGORIES = [
 const TAGS = ["update", "guide", "event", "season", "economy", "pvp", "build", "staff"];
 
 /**
+ * Covers, so the card design is visible on a demo site.
+ *
+ * The card reserves the same space whether or not an article has one, so a
+ * seeded site without covers looks correct and shows nothing of what the
+ * layout does with a picture. These ship with the product as small SVGs
+ * rather than coming from a photo host: no network, no CSP origin to allow,
+ * and a clean install can show its own blog offline.
+ *
+ * Not every article gets one. A real blog has a few text-only posts, and the
+ * grid has to hold its rows level when it does.
+ */
+const COVERS = [
+    "/demo/cover-update.svg",
+    "/demo/cover-event.svg",
+    "/demo/cover-guide.svg",
+    "/demo/cover-notice.svg",
+    "/demo/cover-release.svg",
+    "/demo/cover-report.svg",
+];
+
+/**
  * Headlines a reader could believe. Filler words make a page that technically
  * has articles on it and still cannot be read, so the one part a visitor
  * actually reads is written rather than generated.
@@ -82,6 +103,7 @@ export const seed: ModuleSeed = {
                     title,
                     slug: `${title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}-${i + 1}`,
                     excerpt: ctx.sentence(),
+                    coverImage: ctx.chance(75) ? ctx.pick(COVERS) : null,
                     content: ctx.html(ctx.int(3, 8)),
                     status: status as "PUBLISHED",
                     publishedAt: status === "PUBLISHED" ? createdAt : null,

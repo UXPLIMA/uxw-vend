@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image from "next/image";
+import { NewsCard } from "./news-card";
 import { Link } from "@/core/sdk/navigation";
 import { Button } from "@/core/sdk/ui";
 import { useLocalDate } from "@/core/sdk/ui";
@@ -79,26 +79,7 @@ export function BlogNewsSection() {
       <h2 className="text-xl font-bold text-foreground mb-6">{t('title')}</h2>
       <div className="grid md:grid-cols-2 gap-6">
         {paginatedNews.map((post) => (
-          <Link key={post.id} href={`/blog/${post.number}/${post.slug}`}
-            className="bg-card rounded-lg border border-border overflow-hidden hover:shadow-md transition-all group">
-            <div className="h-44 bg-muted flex items-center justify-center overflow-hidden">
-              {post.coverImage ? (
-                <Image src={post.coverImage} alt={post.title} width={0} height={0} sizes="100vw" className="w-full h-full object-cover group-hover:scale-105 transition-transform" />
-              ) : (
-                <div className="text-muted-foreground text-sm">{t('noImage')}</div>
-              )}
-            </div>
-            <div className="p-4">
-              <p className="text-xs text-muted-foreground mb-1">
-                {formatLocalDate(post.publishedAt || post.createdAt)}
-              </p>
-              {/* Both blocks are clamped at two lines and hold two lines of
-                  room whether or not they fill it, so a short headline in one
-                  card cannot make its row shorter than the row above. */}
-              <h3 className="font-semibold text-foreground mb-1 line-clamp-2 min-h-[3rem]">{post.title}</h3>
-              <p className="text-sm text-muted-foreground line-clamp-2 min-h-[2.5rem]">{post.excerpt}</p>
-            </div>
-          </Link>
+          <NewsCard key={post.id} post={post} />
         ))}
       </div>
       {totalPages > 1 && (
