@@ -3,7 +3,7 @@
 
 import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
-import { Button, Card, CardContent, CardHeader, CardTitle, useConfirm } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Pagination, useConfirm } from "@/core/sdk/ui";
 import { Loader2, Pin, PinOff, Lock, Unlock, Trash2, Eye, MessageSquare } from "lucide-react";
 import { toast } from "sonner";
 import { useRelativeTime } from "@/core/sdk/ui";
@@ -208,15 +208,7 @@ export default function AdminForumTopicsPage() {
                         </div>
                     )}
 
-                    {totalPages > 1 && (
-                        <div className="flex items-center justify-between mt-4 pt-4 border-t">
-                            <p className="text-sm text-muted-foreground">{t("adm_pageOf", { page, totalPages })}</p>
-                            <div className="flex gap-2">
-                                <Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage(page - 1)}>{t("adm_previous")}</Button>
-                                <Button variant="outline" size="sm" disabled={page === totalPages} onClick={() => setPage(page + 1)}>{t("adm_next")}</Button>
-                            </div>
-                        </div>
-                    )}
+                    <Pagination page={page} pages={totalPages} onPageChange={setPage} />
                 </CardContent>
             </Card>
         </>

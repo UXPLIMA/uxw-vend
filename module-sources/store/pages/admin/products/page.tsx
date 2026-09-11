@@ -5,8 +5,8 @@ import { useTranslations } from "next-intl";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Link } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, CardHeader, CardTitle, useSiteCurrency, buttonClassName } from "@/core/sdk/ui";
-import { Loader2, ChevronLeft, ChevronRight, Copy, Package, Plus } from "lucide-react";
+import { Button, Card, CardContent, CardHeader, CardTitle, Pagination, buttonClassName, useSiteCurrency } from "@/core/sdk/ui";
+import { Loader2, Copy, Package, Plus } from "lucide-react";
 import { AdminPageHeader } from "@/core/sdk/admin";
 import { errorMessage } from "@/core/sdk";
 import { toast } from "sonner";
@@ -186,21 +186,7 @@ export default function AdminProductsPage() {
                                 </table>
                             </div>
 
-                            {totalPages > 1 && (
-                                <div className="flex items-center justify-between mt-4 pt-4 border-t">
-                                    <p className="text-sm text-muted-foreground">
-                                        {t("adm_pageOf", { page, totalPages })}
-                                    </p>
-                                    <div className="flex gap-2">
-                                        <Button aria-label={commonT("previousPage")} variant="outline" size="sm" disabled={page === 1} onClick={() => setPage(page - 1)}>
-                                            <ChevronLeft className="w-4 h-4" />
-                                        </Button>
-                                        <Button aria-label={commonT("nextPage")} variant="outline" size="sm" disabled={page === totalPages} onClick={() => setPage(page + 1)}>
-                                            <ChevronRight className="w-4 h-4" />
-                                        </Button>
-                                    </div>
-                                </div>
-                            )}
+                            <Pagination page={page} pages={totalPages} onPageChange={setPage} />
                         </>
                     )}
                 </CardContent>

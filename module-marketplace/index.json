@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-11",
-  "updatedAt": "2026-09-11T11:06:01Z",
+  "updatedAt": "2026-09-11T11:32:54Z",
   "modules": [
     {
       "id": "announcements",
@@ -158,13 +158,13 @@
           "description": "Haber ve duyuru sistemi"
         }
       },
-      "version": "1.4.0",
+      "version": "1.4.1",
       "coreVersion": "^2.0.0",
       "author": "Blysis",
       "icon": "Newspaper",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-11T09:22:56Z",
+      "updatedAt": "2026-09-11T11:32:54Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -611,13 +611,13 @@
           "description": "Gönderim takipli dinamik form oluşturucu"
         }
       },
-      "version": "1.2.0",
+      "version": "1.2.1",
       "coreVersion": "^2.0.0",
       "author": "Blysis",
       "icon": "FileEdit",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-11T11:06:01Z",
+      "updatedAt": "2026-09-11T11:32:54Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -1007,13 +1007,13 @@
           "description": "Kategoriler, konular ve yanıtlarla topluluk tartışma forumu"
         }
       },
-      "version": "1.3.0",
+      "version": "1.3.1",
       "coreVersion": "^2.0.0",
       "author": "Blysis Team",
       "icon": "MessageSquare",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-11T11:32:54Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -2238,13 +2238,13 @@
           "description": "Oyuncu ceza geçmişi ve yasaklama yönetimi"
         }
       },
-      "version": "1.2.0",
+      "version": "1.2.1",
       "coreVersion": "^2.0.0",
       "author": "Blysis",
       "icon": "Shield",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-11T11:32:54Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -2741,13 +2741,13 @@
           "description": "Ürün, kategori, sepet ve siparişleriyle eksiksiz e-ticaret"
         }
       },
-      "version": "2.25.0",
+      "version": "2.25.1",
       "coreVersion": "^2.0.0",
       "author": "Blysis Team",
       "icon": "ShoppingBag",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-11T11:32:54Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -3203,13 +3203,13 @@
           "description": "Webhook teslimat kayıtlarını görüntüleyin ve yönetin"
         }
       },
-      "version": "1.1.0",
+      "version": "1.1.1",
       "coreVersion": "^2.0.0",
       "author": "Blysis",
       "icon": "Webhook",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-11T11:32:54Z",
       "screenshots": [],
       "tags": [
         "integration"

@@ -2,7 +2,7 @@
   "id": "blog",
   "name": "Blog Module",
   "description": "News and announcements system",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "coreVersion": "^2.0.0",
   "category": "community",
   "author": "Blysis",
@@ -239,8 +239,6 @@
       },
       "news": {
         "empty": "No posts yet - check back soon.",
-        "next": "Next",
-        "previous": "Previous",
         "title": "News"
       },
       "admin": {
@@ -362,8 +360,6 @@
       },
       "news": {
         "empty": "Henüz gönderi yok - yakında tekrar bakın.",
-        "next": "Sonraki",
-        "previous": "Önceki",
         "title": "Haberler"
       },
       "admin": {

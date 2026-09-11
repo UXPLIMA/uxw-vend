@@ -4,7 +4,7 @@
 import { useTranslations, useLocale } from "next-intl";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
-import { Button, Card, CardContent, NativeSelect } from "@/core/sdk/ui";
+import { Card, CardContent, NativeSelect, Pagination } from "@/core/sdk/ui";
 import { Loader2, ChevronDown, ChevronUp, FileText } from "lucide-react";
 import { dateLocaleTag } from "@/core/sdk";
 import { AdminPageHeader } from "@/core/sdk/admin";
@@ -151,20 +151,7 @@ export default function SubmissionsPage() {
                         ))}
                     </div>
 
-                    {/* Pagination */}
-                    {totalPages > 1 && (
-                        <div className="flex justify-center gap-2 mt-4">
-                            <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage(page - 1)}>
-                                {t("adm_previous")}
-                            </Button>
-                            <span className="flex items-center text-sm text-muted-foreground">
-                                {t("adm_pageOf", { page, total: totalPages })}
-                            </span>
-                            <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage(page + 1)}>
-                                {t("adm_next")}
-                            </Button>
-                        </div>
-                    )}
+                    <Pagination page={page} pages={totalPages} onPageChange={setPage} />
                 </>
             )}
         </>

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { Button, Card, CardContent, Input, LoadFailed } from "@/core/sdk/ui";
+import { Button, Card, CardContent, Input, LoadFailed, Pagination } from "@/core/sdk/ui";
 import { PageFrame } from "@/core/sdk/layout";
 import { Loader2, Search, Ban, VolumeX, LogOut, AlertTriangle } from "lucide-react";
 import { dateLocaleTag } from "@/core/sdk";
@@ -154,13 +154,7 @@ export default function PunishmentsPage() {
                         </table>
                     </div>
 
-                    {totalPages > 1 && (
-                        <div className="flex justify-center gap-2 mt-4">
-                            <Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage(page - 1)}>&laquo;</Button>
-                            <span className="flex items-center px-3 text-sm text-muted-foreground">{page}/{totalPages}</span>
-                            <Button variant="outline" size="sm" disabled={page === totalPages} onClick={() => setPage(page + 1)}>&raquo;</Button>
-                        </div>
-                    )}
+                    <Pagination page={page} pages={totalPages} onPageChange={setPage} />
                 </>
             )}
         </PageFrame>

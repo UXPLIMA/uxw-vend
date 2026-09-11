@@ -7,9 +7,9 @@ import { useRouter } from "@/core/sdk/navigation";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { Link } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, RichContent, Textarea } from "@/core/sdk/ui";
+import { Button, Card, CardContent, Pagination, RichContent, Textarea } from "@/core/sdk/ui";
 import { PageFrame } from "@/core/sdk/layout";
-import { ChevronLeft, ChevronRight, Pin, Lock, Eye, ThumbsUp, Send, Loader2 } from "lucide-react";
+import { Pin, Lock, Eye, ThumbsUp, Send, Loader2 } from "lucide-react";
 import { useRelativeTime } from "@/core/sdk/ui";
 import { useTranslations } from "next-intl";
 
@@ -238,29 +238,7 @@ export default function TopicDetailPage() {
                     )}
 
                     {/* Reply pager - a long thread arrives a page at a time */}
-                    {postsPages > 1 && (
-                        <nav className="flex items-center justify-center gap-3 mb-6" aria-label={t('replies', { count: topic.posts.length })}>
-                            <Button
-                                variant="outline" size="icon"
-                                onClick={() => setPostsPage((p) => Math.max(1, p - 1))}
-                                disabled={postsPage <= 1}
-                                aria-label={t('previous')}
-                            >
-                                <ChevronLeft className="w-4 h-4" />
-                            </Button>
-                            <span className="text-sm text-muted-foreground">
-                                {t('pageOf', { page: postsPage, total: postsPages })}
-                            </span>
-                            <Button
-                                variant="outline" size="icon"
-                                onClick={() => setPostsPage((p) => Math.min(postsPages, p + 1))}
-                                disabled={postsPage >= postsPages}
-                                aria-label={t('next')}
-                            >
-                                <ChevronRight className="w-4 h-4" />
-                            </Button>
-                        </nav>
-                    )}
+                    <Pagination page={postsPage} pages={postsPages} onPageChange={setPostsPage} className="mb-6" />
 
                     {/* Reply Form */}
                     {!topic.isLocked ? (

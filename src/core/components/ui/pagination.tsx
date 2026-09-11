@@ -1,12 +1,7 @@
 "use client";
 
 import * as React from "react";
-import {
-    ChevronLeft,
-    ChevronRight,
-    ChevronsLeft,
-    ChevronsRight,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Button, buttonClassName } from "@/core/components/ui/button";
 import { Input } from "@/core/components/ui/input";
@@ -16,7 +11,7 @@ import { cn } from "@/core/lib/utils";
 import { pageWindow } from "@/core/lib/page-window";
 
 /**
- * Paging, once.
+ * Paging, once, and drawn the same way wherever it appears.
  *
  * Eight admin screens had written their own: two ghost buttons with a chevron
  * each, `disabled={page === 1}`, and a "Page 2 / 9" caption. Nine other lists
@@ -24,9 +19,19 @@ import { pageWindow } from "@/core/lib/page-window";
  * at all and rendered every row. And with only a previous and a next button,
  * reaching page 40 of a log takes thirty-nine clicks.
  *
- * So: numbered pages with an ellipsis where the middle is elided, first and
- * last, and a box to type a page number into when there are more pages than
- * fit.
+ * So: numbered pages with an ellipsis where the middle is elided, and a box to
+ * type a page number into when there are more pages than fit.
+ *
+ * The shape is the one the homepage news section had, because that is the
+ * pager a visitor meets first: a labelled previous and next around the page
+ * numbers, centred under what it pages. Eleven screens had drawn their own
+ * variation of it - text links, icon-only chevrons, the raw characters « and »
+ * - and a reader who learns where "next" is in one place found something else
+ * in the next. `a-pager-is-drawn-one-way.test.ts` keeps it to one.
+ *
+ * Below `sm` the numbers and the labels are too much for the width, so the
+ * chevrons stand alone with the page count between them. It is the same
+ * control, narrowed, not a second design.
  *
  * Two forms, because the callers come in two kinds. `onPageChange` renders
  * buttons, for a client component holding the page in state. `pageParam`
@@ -44,7 +49,7 @@ interface PaginationBase {
     page: number;
     /** Total number of pages, at least 1. */
     pages: number;
-    /** Total row count, shown in the summary when given. */
+    /** Total row count, shown under the controls when given. */
     total?: number;
     className?: string;
 }
@@ -138,18 +143,36 @@ function PaginationBar({
         else go(target);
     };
 
-    // One page is not a pager. The summary is still worth showing, so the
-    // caller keeps its own count line rather than getting an empty strip.
+    const summary = total === undefined ? null : (
+        <p className="text-xs text-muted-foreground">{t("paginationTotal", { total })}</p>
+    );
+
+    // One page is not a pager. The count is still worth showing, so the caller
+    // gets its line rather than an empty strip.
     if (pages <= 1) {
-        if (total === undefined) return null;
-        return (
-            <div className={cn("flex items-center justify-between gap-3 p-3 border-t border-border", className)}>
-                <span className="text-xs text-muted-foreground">{t("paginationTotal", { total })}</span>
-            </div>
-        );
+        if (!summary) return null;
+        return <div className={cn("flex justify-center py-3", className)}>{summary}</div>;
     }
 
-    const step = (target: number, label: string, icon: React.ReactNode, disabled: boolean) => {
+    /**
+     * Previous and next. The label is what makes the control readable; it is
+     * dropped below `sm` because at that width the row has to choose between
+     * the label and the page numbers, and the numbers are the thing a chevron
+     * cannot replace.
+     */
+    const step = (target: number, label: string, side: "prev" | "next") => {
+        const icon = side === "prev"
+            ? <ChevronLeft className="w-4 h-4" aria-hidden="true" />
+            : <ChevronRight className="w-4 h-4" aria-hidden="true" />;
+        const body = (
+            <>
+                {side === "prev" && icon}
+                <span className="hidden sm:inline">{label}</span>
+                {side === "next" && icon}
+            </>
+        );
+        const disabled = side === "prev" ? page === 1 : page === pages;
+
         if (hrefFor && !disabled) {
             return (
                 <Link
@@ -157,19 +180,13 @@ function PaginationBar({
                     aria-label={label}
                     className={buttonClassName("outline", "sm")}
                 >
-                    {icon}
+                    {body}
                 </Link>
             );
         }
         return (
-            <Button
-                variant="outline"
-                size="sm"
-                aria-label={label}
-                disabled={disabled}
-                onClick={() => go(target)}
-            >
-                {icon}
+            <Button variant="outline" size="sm" aria-label={label} disabled={disabled} onClick={() => go(target)}>
+                {body}
             </Button>
         );
     };
@@ -207,20 +224,14 @@ function PaginationBar({
     };
 
     return (
-        <div className={cn("flex flex-wrap items-center justify-between gap-3 p-3 border-t border-border", className)}>
-            <span className="text-xs text-muted-foreground">
-                {total !== undefined && `${t("paginationTotal", { total })} · `}
-                {t("paginationPageOf", { page, pages })}
-            </span>
+        <div className={cn("flex flex-col items-center gap-2 py-4", className)}>
+            <div className="flex items-center justify-center gap-2">
+                {step(page - 1, t("previousPage"), "prev")}
 
-            <div className="flex items-center gap-1">
-                {step(1, t("paginationFirstPage"), <ChevronsLeft className="w-3.5 h-3.5" />, page === 1)}
-                {step(page - 1, t("previousPage"), <ChevronLeft className="w-3.5 h-3.5" />, page === 1)}
-
-                <div className="hidden sm:flex items-center gap-1">
+                <div className="hidden sm:flex items-center gap-2">
                     {pageWindow(page, pages).map((n, i) =>
                         n === null ? (
-                            <span key={`gap-${i}`} aria-hidden="true" className="px-1 text-xs text-muted-foreground">
+                            <span key={`gap-${i}`} aria-hidden="true" className="px-1 text-sm text-muted-foreground">
                                 ...
                             </span>
                         ) : (
@@ -229,11 +240,17 @@ function PaginationBar({
                     )}
                 </div>
 
-                {step(page + 1, t("nextPage"), <ChevronRight className="w-3.5 h-3.5" />, page === pages)}
-                {step(pages, t("paginationLastPage"), <ChevronsRight className="w-3.5 h-3.5" />, page === pages)}
+                {/* The numbers do not fit a phone, so the reader is told where
+                    they are instead. Hidden from a screen reader on both
+                    sides: every number button already names itself. */}
+                <span className="sm:hidden px-2 text-sm text-muted-foreground">
+                    {t("paginationPageOf", { page, pages })}
+                </span>
+
+                {step(page + 1, t("nextPage"), "next")}
 
                 {pages > 7 && (
-                    <form onSubmit={submitJump} className="flex items-center gap-1 ml-2">
+                    <form onSubmit={submitJump} className="hidden sm:flex items-center gap-1 ml-2">
                         <Input
                             type="number"
                             min={1}
@@ -250,6 +267,8 @@ function PaginationBar({
                     </form>
                 )}
             </div>
+
+            {summary}
         </div>
     );
 }

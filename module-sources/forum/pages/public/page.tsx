@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { Link } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, Input, LoadFailed, NavIcon, Skeleton, buttonClassName } from "@/core/sdk/ui";
+import { Card, CardContent, Input, LoadFailed, NavIcon, Pagination, Skeleton, buttonClassName } from "@/core/sdk/ui";
 import { PageFrame } from "@/core/sdk/layout";
 import { MessageSquare, Eye, ThumbsUp, Pin, Lock, Plus, Search } from "lucide-react";
 import { useRelativeTime } from "@/core/sdk/ui";
@@ -236,20 +236,7 @@ export default function ForumPage() {
                                 </Link>
                             ))}
 
-                            {/* Pagination */}
-                            {totalPages > 1 && (
-                                <div className="flex justify-center gap-2 pt-4">
-                                    <Button variant="outline" size="sm" disabled={page === 1} onClick={() => setPage(page - 1)}>
-                                        {t('previous')}
-                                    </Button>
-                                    <span className="flex items-center px-3 text-sm text-muted-foreground">
-                                        {t('pageOf', { page, total: totalPages })}
-                                    </span>
-                                    <Button variant="outline" size="sm" disabled={page === totalPages} onClick={() => setPage(page + 1)}>
-                                        {t('next')}
-                                    </Button>
-                                </div>
-                            )}
+                            <Pagination page={page} pages={totalPages} onPageChange={setPage} />
                         </>
                     )}
                 </div>

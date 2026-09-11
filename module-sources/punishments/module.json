@@ -2,7 +2,7 @@
   "id": "punishments",
   "name": "Punishments",
   "description": "Player punishment history and ban management",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "coreVersion": "^2.0.0",
   "category": "gaming",
   "author": "Blysis",

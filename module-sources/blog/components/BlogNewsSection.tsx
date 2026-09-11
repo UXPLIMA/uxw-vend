@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { NewsCard } from "./news-card";
-import { Link } from "@/core/sdk/navigation";
-import { Button } from "@/core/sdk/ui";
+import { Pagination } from "@/core/sdk/ui";
 import { useLocalDate } from "@/core/sdk/ui";
-import { ChevronRight, ChevronLeft, Newspaper } from "lucide-react";
+import { Newspaper } from "lucide-react";
 import { SkeletonNewsGrid } from "../components/skeletons/blog-skeletons";
 import { useTranslations } from "next-intl";
 
@@ -82,21 +81,7 @@ export function BlogNewsSection() {
           <NewsCard key={post.id} post={post} />
         ))}
       </div>
-      {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 mt-6">
-          <Button variant="outline" size="sm" onClick={() => setCurrentPage(Math.max(1, currentPage - 1))} disabled={currentPage === 1}>
-            <ChevronLeft className="w-4 h-4" /> {t('previous')}
-          </Button>
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-            <Button key={page} variant={currentPage === page ? "default" : "outline"} size="sm" onClick={() => setCurrentPage(page)}>
-              {page}
-            </Button>
-          ))}
-          <Button variant="outline" size="sm" onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))} disabled={currentPage === totalPages}>
-            {t('next')} <ChevronRight className="w-4 h-4" />
-          </Button>
-        </div>
-      )}
+      <Pagination page={currentPage} pages={totalPages} onPageChange={setCurrentPage} className="mt-2" />
     </div>
   );
 }

@@ -3,7 +3,7 @@ import { redirect } from "@/core/sdk/navigation";
 import { formatDate } from "@/core/sdk";
 import { isAdmin, prisma } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
-import { Button, Card, CardContent, CardHeader, CardTitle, buttonClassName } from "@/core/sdk/ui";
+import { Card, CardContent, CardHeader, CardTitle, Pagination, buttonClassName } from "@/core/sdk/ui";
 import { getTranslations, getLocale } from "next-intl/server";
 import { dateLocaleTag } from "@/core/sdk";
 import { AdminPageHeader } from "@/core/sdk/admin";
@@ -54,7 +54,6 @@ export default async function AdminBlogArticlesPage({ searchParams }: AdminBlogA
         const key = ({ DRAFT: "adm_draft", PUBLISHED: "adm_published", SCHEDULED: "adm_scheduled", ARCHIVED: "adm_archived" } as Record<string, string>)[status];
         return key && t.has(key) ? t(key) : status;
     };
-    const commonT = await getTranslations("common");
     const locale = await getLocale();
     const dateTag = dateLocaleTag(locale);
     const session = await auth();
@@ -206,23 +205,7 @@ export default async function AdminBlogArticlesPage({ searchParams }: AdminBlogA
                         </div>
                     )}
 
-                    {totalPages > 1 && (
-                        <div className="flex items-center justify-between p-4 border-t">
-                            <span className="text-sm text-muted-foreground">{page} / {totalPages}</span>
-                            <div className="flex gap-3">
-                                {page > 1 && (
-                                    <Link href={`/admin/blog/articles?page=${page - 1}`} className="text-sm text-primary hover:underline">
-                                        {commonT("previous")}
-                                    </Link>
-                                )}
-                                {page < totalPages && (
-                                    <Link href={`/admin/blog/articles?page=${page + 1}`} className="text-sm text-primary hover:underline">
-                                        {commonT("next")}
-                                    </Link>
-                                )}
-                            </div>
-                        </div>
-                    )}
+                    <Pagination page={page} pages={totalPages} total={totalCount} pageParam="page" />
                 </CardContent>
             </Card>
         </>

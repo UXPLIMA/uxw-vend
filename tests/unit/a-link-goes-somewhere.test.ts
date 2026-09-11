@@ -189,8 +189,12 @@ describe("the blog's browsing", () => {
     });
 
     it("keeps the filter when paging", () => {
-        expect(index).toContain("blogHref(filter, page - 1)");
-        expect(index).toContain("blogHref(filter, page + 1)");
+        // The index used to build its own `?page=N` hrefs, which is how a
+        // filtered page two lost the filter. It hands the job to the shared
+        // pager now; what that pager keeps is proven in
+        // paging-keeps-the-query-it-found.test.tsx.
+        expect(index).toContain('<Pagination');
+        expect(index).toContain('pageParam="page"');
     });
 
     it("offers a way back to everything", () => {

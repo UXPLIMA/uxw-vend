@@ -2,6 +2,7 @@ import { formatDate } from "@/core/sdk";
 import { prisma } from "@/core/sdk/server";
 import { Link } from "@/core/sdk/navigation";
 import { PageFrame } from "@/core/sdk/layout";
+import { Pagination } from "@/core/sdk/ui";
 import { NewsGrid } from "../components/news-grid";
 import { getTranslations, getLocale } from "next-intl/server";
 import { dateLocaleTag } from "@/core/sdk";
@@ -84,12 +85,17 @@ async function getBlogArticles(page: number, filter: Filter) {
     };
 }
 
-/** `/blog`, with the filter and the page kept in the query string. */
-function blogHref(filter: Filter, page?: number): string {
+/**
+ * `/blog`, with the filter kept in the query string.
+ *
+ * It used to carry the page number too, for a pager written here by hand.
+ * `Pagination` builds its own hrefs from the live query, so a filtered page
+ * two keeps the filter without this having to know about it.
+ */
+function blogHref(filter: Filter): string {
     const query = new URLSearchParams();
     if (filter.category) query.set("category", filter.category);
     if (filter.tag) query.set("tag", filter.tag);
-    if (page && page > 1) query.set("page", String(page));
     const qs = query.toString();
     return qs ? `/blog?${qs}` : "/blog";
 }
@@ -112,7 +118,6 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
     const { articles, categories, recent, pages, activeName } = await getBlogArticles(page, filter);
     const t = await getTranslations('blog');
     const dateTag = dateLocaleTag(await getLocale());
-    const commonT = await getTranslations('common');
 
     return (
         <PageFrame
@@ -179,21 +184,7 @@ export default async function BlogPage({ searchParams }: BlogPageProps) {
             ) : (
                 <>
                     <NewsGrid posts={articles} />
-                    {pages > 1 && (
-                        <nav className="flex items-center justify-between mt-8" aria-label={t('title')}>
-                            {page > 1 ? (
-                                <Link href={blogHref(filter, page - 1)} className="text-sm text-primary hover:underline">
-                                    {commonT('previous')}
-                                </Link>
-                            ) : <span />}
-                            <span className="text-sm text-muted-foreground">{page} / {pages}</span>
-                            {page < pages ? (
-                                <Link href={blogHref(filter, page + 1)} className="text-sm text-primary hover:underline">
-                                    {commonT('next')}
-                                </Link>
-                            ) : <span />}
-                        </nav>
-                    )}
+                    <Pagination page={page} pages={pages} pageParam="page" className="mt-4" />
                 </>
             )}
         </PageFrame>
