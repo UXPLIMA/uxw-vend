@@ -444,13 +444,6 @@ async function installModuleFromLocalMarketplace(moduleId: string): Promise<Loca
     }
 
     const zipPath = path.join(MARKETPLACE_DIR, `${moduleId}.zip`);
-    const zipExists = await fs
-        .access(zipPath)
-        .then(() => true)
-        .catch(() => false);
-    if (!zipExists) {
-        throw new Error(`Module ${moduleId} not present in marketplace`);
-    }
 
     const targetDir = path.join(MODULES_DIR, moduleId);
     const targetExists = await fs
@@ -463,7 +456,15 @@ async function installModuleFromLocalMarketplace(moduleId: string): Promise<Loca
         return readLocalManifest(moduleId, path.join(targetDir, "module.json"));
     }
 
-    const buffer = await fs.readFile(zipPath);
+    // Read rather than asked about. Checking a path exists and then opening
+    // it leaves a window between the two, and the answer to "is it there" is
+    // the read itself.
+    let buffer: Buffer;
+    try {
+        buffer = await fs.readFile(zipPath);
+    } catch {
+        throw new Error(`Module ${moduleId} not present in marketplace`);
+    }
     if (buffer.length > MAX_MODULE_SIZE) {
         throw new Error("Module ZIP too large");
     }

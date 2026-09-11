@@ -25,8 +25,28 @@ const MODULES = path.resolve(__dirname, "../../module-sources");
 const DECLARES_A_VOCABULARY = () =>
     /export const (\w*(?:STATUSES|TYPES|STATES))\s*=\s*\[([^\]]*)\]\s*as const/g;
 
-/** A literal list of strings, the shape a screen's filter row is written in. */
-const STRING_LIST = () => /\[((?:\s*"[^"]*"\s*,?)+)\]/g;
+/**
+ * A literal list of strings, the shape a screen's filter row is written in.
+ *
+ * Matched in two steps, and deliberately.
+ *
+ * It used to be one pattern - `(?:\s*"[^"]*"\s*,?)+` - which nests three
+ * quantifiers over overlapping whitespace, so an unclosed bracket followed by
+ * a run of quoted words backtracked exponentially and hung the scanner rather
+ * than failing it. Widening it to "anything between brackets" removes the
+ * nesting and the narrowness with it: it then swept up arrays of objects,
+ * which is most of what a screen's source actually contains.
+ *
+ * So the bracket is found by a pattern that cannot backtrack, and whether the
+ * contents are a flat list of quoted strings is decided by a scan.
+ */
+const BRACKETED = () => /\[([^\]]*)\]/g;
+
+/** True when the text between brackets is only quoted strings and commas. */
+function isFlatStringList(body: string): boolean {
+    const withoutStrings = body.replace(/"[^"]*"/g, "");
+    return body.includes('"') && /^[\s,]*$/.test(withoutStrings);
+}
 
 /**
  * Sentinels that stand for the absence of a filter rather than for a value the
@@ -75,7 +95,8 @@ function straysIn(moduleId: string): Stray[] {
 
     const found: Stray[] = [];
     for (const [file, source] of sources) {
-        for (const [, body] of source.matchAll(STRING_LIST())) {
+        for (const [, body] of source.matchAll(BRACKETED())) {
+            if (!isFlatStringList(body)) continue;
             const values = [...body.matchAll(/"([^"]*)"/g)].map((m) => m[1]);
             const meaningful = values.filter((v) => !SENTINELS.has(fold(v)));
             // A list that shares nothing with the vocabulary is about

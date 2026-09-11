@@ -206,9 +206,14 @@ export async function POST(request: NextRequest) {
             }
 
             // Verify module.json
+            // Read rather than asked about: checking a path exists and then
+            // opening it leaves a window between the two, and the read is the
+            // answer to both questions at once.
             const manifestPath = path.join(targetDir, "module.json");
-            const hasManifest = await fs.access(manifestPath).then(() => true).catch(() => false);
-            if (!hasManifest) {
+            let manifestText: string;
+            try {
+                manifestText = await fs.readFile(manifestPath, "utf-8");
+            } catch {
                 await fs.rm(targetDir, { recursive: true, force: true });
                 results.push({ id, name: name || id, status: "failed", error: "No module.json" });
                 continue;
@@ -219,9 +224,7 @@ export async function POST(request: NextRequest) {
             // no file-ref check, no reserved-id check. Installing the same
             // module one at a time went through all three. Two doors into the
             // same directory with different locks is not a design.
-            const parsedManifest = moduleManifestSchema.safeParse(
-                JSON.parse(await fs.readFile(manifestPath, "utf-8")),
-            );
+            const parsedManifest = moduleManifestSchema.safeParse(JSON.parse(manifestText));
             if (!parsedManifest.success) {
                 await fs.rm(targetDir, { recursive: true, force: true });
                 const first = parsedManifest.error.issues[0];

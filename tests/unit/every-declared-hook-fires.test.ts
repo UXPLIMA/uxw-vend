@@ -54,11 +54,23 @@ function sourceFiles(): string[] {
 
 const FILES = sourceFiles().map((f) => ({ path: f, source: fs.readFileSync(f, "utf8") }));
 
+/**
+ * A hook name as a literal inside a pattern.
+ *
+ * This escaped the dot and nothing else. Every hook shipped today is
+ * `word.word`, so it worked - and it is a rule about somebody else's string
+ * that happens to hold. The first hook named with a `+` or a `(` would have
+ * built a pattern that matched something other than itself, or thrown.
+ */
+function escapeForRegex(value: string): string {
+    return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 /** Files that fire the given hook, by constant or by literal. */
 function emittersOf(constant: string, value: string): string[] {
     const byConstant = new RegExp(`\\bHookNames\\.${constant}\\b`);
     const byLiteral = new RegExp(
-        `(?:doAction|doActionAsync|applyFilters|applyFiltersAsync)\\s*(?:<[^>]*>)?\\(\\s*["']${value.replace(/\./g, "\\.")}["']`,
+        `(?:doAction|doActionAsync|applyFilters|applyFiltersAsync)\\s*(?:<[^>]*>)?\\(\\s*["']${escapeForRegex(value)}["']`,
     );
     return FILES.filter((f) => byConstant.test(f.source) || byLiteral.test(f.source)).map((f) =>
         path.relative(ROOT, f.path),

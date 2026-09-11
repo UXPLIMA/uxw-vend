@@ -71,7 +71,11 @@ function verifyScript(): string {
 /** The gate a command belongs to, ignoring how it is spelled. */
 function gateOf(command: string): string | null {
     const known: [RegExp, string][] = [
-        [/tsc --noEmit|run typecheck$/, "typecheck"],
+        // Grouped, because `$` bound to the second alternative alone: a
+        // command ending in `tsc --noEmit` matched anywhere in the string
+        // while `run typecheck` only matched at the end. The two halves are
+        // meant to be the same question.
+        [/(tsc --noEmit|run typecheck)$/, "typecheck"],
         [/typecheck:modules/, "typecheck:modules"],
         [/validate-module\.ts --all/, "validate-module"],
         [/check-marketplace-sync/, "check-marketplace-sync"],

@@ -90,7 +90,18 @@ function unnamedControls(): Unnamed[] {
                     const after = source.slice(end + 1, end + 2500);
                     const close = after.indexOf(`</${tag}>`);
                     const body = close === -1 ? after : after.slice(0, close);
-                    const text = body.replace(/<[^>]*>/g, "").replace(/\s/g, "");
+                    // Stripped until it stops changing. One pass can build a
+                    // tag out of the pieces around the one it removed -
+                    // `<a<b>c>` leaves `<a c>` behind - and the leftover
+                    // angle brackets then read as visible text, which is
+                    // exactly the thing this line is measuring.
+                    let stripped = body;
+                    for (;;) {
+                        const next = stripped.replace(/<[^>]*>/g, "");
+                        if (next === stripped) break;
+                        stripped = next;
+                    }
+                    const text = stripped.replace(/\s/g, "");
                     // A nested alt or sr-only span names the control too; so
                     // does any word of visible text, which is the usual case.
                     // A component whose job is to print words names the

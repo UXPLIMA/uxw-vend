@@ -181,8 +181,38 @@ function serverOnlyReach(entry: string): { module: string; spec: string; chain: 
     return found;
 }
 
-const isClientEntry = (src: string) =>
-    /^\s*(\/\/[^\n]*\n|\/\*[\s\S]*?\*\/\s*)*["']use client["']/.test(src);
+/**
+ * Does this file open with the client directive?
+ *
+ * Scanned rather than matched. The pattern was a starred alternation of
+ * comment shapes with `\s*` inside it, so a file with a long comment header
+ * and no directive after it backtracked exponentially - the scanner hung on
+ * the build instead of reporting one.
+ *
+ * The rule is the same as the bundler's: skip whitespace and leading comments,
+ * then the first thing must be the directive.
+ */
+function isClientEntry(src: string): boolean {
+    let i = 0;
+    while (i < src.length) {
+        const ch = src[i];
+        if (ch === " " || ch === "\t" || ch === "\r" || ch === "\n") { i += 1; continue; }
+        if (ch === "/" && src[i + 1] === "/") {
+            const end = src.indexOf("\n", i);
+            if (end === -1) return false;
+            i = end + 1;
+            continue;
+        }
+        if (ch === "/" && src[i + 1] === "*") {
+            const end = src.indexOf("*/", i + 2);
+            if (end === -1) return false;
+            i = end + 2;
+            continue;
+        }
+        return src.startsWith('"use client"', i) || src.startsWith("'use client'", i);
+    }
+    return false;
+}
 
 const CLIENT_ENTRIES = ALL.filter((f) => isClientEntry(read(f)));
 
