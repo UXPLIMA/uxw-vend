@@ -149,9 +149,14 @@ describe("the renderers", () => {
         expect(src).toContain("fl.labelKey && navT.has(fl.labelKey) ? navT(fl.labelKey) : fl.label");
     });
 
-    it("resolves the key in the mobile bar", () => {
-        const src = read("src/core/components/layout/MobileBottomNav.tsx");
-        expect(src).toContain("nl.labelKey && navT.has(nl.labelKey) ? navT(nl.labelKey) : nl.label");
+    it("hands the mobile menu labels that are already resolved", () => {
+        // The bottom bar resolved the key a second time, from its own copy of
+        // the list, which is how the two could disagree. The panel is given
+        // the bar's list instead, so there is one resolution.
+        const src = read("src/core/components/layout/Navbar.tsx");
+        expect(src).toContain("<MobileMenu links={navLinks}");
+        const menu = read("src/core/components/layout/MobileMenu.tsx");
+        expect(menu).not.toContain("labelKey");
     });
 
     it("keeps the key when the navbar editor seeds itself from the registry", () => {

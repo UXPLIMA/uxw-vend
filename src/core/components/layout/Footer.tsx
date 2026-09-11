@@ -11,6 +11,7 @@ import { ModuleFooterLinks, ModuleNavLinks, ModuleRoutes, ModuleFooterComponents
 import { FooterComponentRegistry } from "@/core/generated/module-components";
 import { ModuleErrorBoundary } from "@/core/components/ModuleErrorBoundary";
 import { FooterDropdown } from "@/core/components/ui/footer-dropdown";
+import { FooterColumn } from "@/core/components/layout/FooterColumn";
 import { Slot } from "@/core/components/Slot";
 import { NavIcon } from "@/core/components/ui/NavIcon";
 import { legacyColumns, parseFooterColumns, placeModuleLinks, withHomeLink, type FooterColumnLink } from "@/core/lib/footer-columns";
@@ -146,9 +147,11 @@ function DefaultFooter() {
                         <div className="flex items-center gap-3 mb-4">
                             <span className="text-foreground font-bold text-lg">{siteName}</span>
                         </div>
-                        <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-                            {siteDescription}
-                        </p>
+                        {siteDescription && (
+                            <p className="text-muted-foreground text-sm leading-relaxed mb-4">
+                                {siteDescription}
+                            </p>
+                        )}
                         <ul className="flex gap-3 list-none p-0" aria-label={navT('social')}>
                             {serverConfig.social.facebook && (
                                 <li><a href={serverConfig.social.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="w-8 h-8 rounded-full bg-white/10 hover:bg-blue-600 flex items-center justify-center transition-colors text-xs font-bold">
@@ -181,21 +184,20 @@ function DefaultFooter() {
                     {/* The operator's columns, plus whatever modules contributed
                         to each. Core names no page and no section of its own. */}
                     {filled.map((column, index) => (
-                        <div key={column.title ?? column.titleKey ?? index}>
-                            <h2 className="font-semibold text-foreground mb-4">
-                                {column.titleKey && t.has(column.titleKey) ? t(column.titleKey) : column.title}
-                            </h2>
+                        <FooterColumn
+                            key={column.title ?? column.titleKey ?? index}
+                            title={column.titleKey && t.has(column.titleKey) ? t(column.titleKey) : column.title}
+                        >
                             <ul className="space-y-2 text-sm">
                                 {column.links.map(fl => (
                                     <li key={fl.href}><FooterLinkItem link={fl} /></li>
                                 ))}
                             </ul>
-                        </div>
+                        </FooterColumn>
                     ))}
 
                     {/* Settings */}
-                    <div>
-                        <h2 className="font-semibold text-foreground mb-4">{commonT('settings')}</h2>
+                    <FooterColumn title={commonT('settings')}>
                         <div className="space-y-3">
                             <div className="flex items-center gap-2">
                                 <Globe className="w-4 h-4 text-muted-foreground" />
@@ -227,7 +229,7 @@ function DefaultFooter() {
                                 </p>
                             </div>
                         )}
-                    </div>
+                    </FooterColumn>
                 </div>
             </div>
 

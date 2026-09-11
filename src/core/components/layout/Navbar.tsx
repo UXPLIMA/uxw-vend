@@ -15,6 +15,7 @@ import { ModuleNavLinks, ModuleRoutes, ModuleNavbarComponents } from "@/core/gen
 import { NavbarComponentRegistry } from "@/core/generated/module-components";
 import { ModuleErrorBoundary } from "@/core/components/ModuleErrorBoundary";
 import { Slot } from "@/core/components/Slot";
+import { MobileMenu } from "@/core/components/layout/MobileMenu";
 
 /**
  * How many links the bar draws before it folds the rest away.
@@ -166,11 +167,15 @@ function DefaultNavbar() {
         <header className="bg-card border-b border-[var(--color-border)] sticky top-0 z-50">
             <div className="container mx-auto px-4">
                 <div className="flex items-center justify-between h-12 gap-2">
-                    {/* Mobile-only brand link (nav links live in MobileBottomNav) */}
-                    <Link href="/" className="sm:hidden flex items-center gap-2 px-2 py-1.5 rounded-md text-sm font-semibold text-foreground hover:bg-muted transition-colors">
-                        <Home className="w-4 h-4" />
-                        <span className="truncate">{t('home')}</span>
-                    </Link>
+                    {/* A phone gets the whole list through here, not the
+                        eight that fit the bar: see MobileMenu. */}
+                    <div className="sm:hidden flex items-center gap-1 min-w-0">
+                        <MobileMenu links={navLinks} />
+                        <Link href="/" className="flex items-center gap-2 px-1 py-1.5 rounded-md text-sm font-semibold text-foreground hover:bg-muted transition-colors">
+                            <Home className="w-4 h-4" aria-hidden="true" />
+                            <span className="truncate">{t('home')}</span>
+                        </Link>
+                    </div>
                     <nav className="hidden sm:flex items-center gap-1 min-w-0 flex-1 flex-wrap" aria-label={t('primary')}>
                         <Slot name="navbar.start" />
                         {shownLinks.map((link) => {

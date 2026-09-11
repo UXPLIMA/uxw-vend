@@ -36,7 +36,7 @@ const PAGES_WITHOUT_OWN_H1 = new Set([
 const SHARED_CHROME = [
     "src/core/components/layout/Footer.tsx",
     "src/core/components/layout/Navbar.tsx",
-    "src/core/components/layout/MobileBottomNav.tsx",
+    "src/core/components/layout/MobileMenu.tsx",
 ];
 
 function tsxFiles(dir: string, out: string[] = []): string[] {

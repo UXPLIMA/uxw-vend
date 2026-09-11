@@ -114,7 +114,9 @@
     "wheel": "Wheel",
     "referral": "Referrals",
     "marketplace": "Marketplace",
-    "showcase": "Showcase"
+    "showcase": "Showcase",
+    "menu": "Menu",
+    "close": "Close"
   },
   "hero": {},
   "admin": {

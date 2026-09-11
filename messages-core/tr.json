@@ -114,7 +114,9 @@
     "wheel": "Çark",
     "referral": "Davetler",
     "marketplace": "Pazar",
-    "showcase": "Vitrin"
+    "showcase": "Vitrin",
+    "menu": "Menü",
+    "close": "Kapat"
   },
   "hero": {},
   "admin": {

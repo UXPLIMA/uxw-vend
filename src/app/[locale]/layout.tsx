@@ -21,7 +21,6 @@ import { ModuleContextProviders } from "@/core/components/layout/ModuleContextPr
 import { SiteCurrencyProvider } from "@/core/components/currency/site-currency";
 import { ConfirmProvider } from "@/core/components/ui/confirm-dialog";
 import { ProgressBar } from "@/core/components/layout/ProgressBar";
-import { MobileBottomNav } from "@/core/components/layout/MobileBottomNav";
 import { Toaster } from "sonner";
 import { ErrorBoundary } from "@/core/components/ErrorBoundary";
 import { ImpersonationBanner } from "@/core/components/ImpersonationBanner";
@@ -159,7 +158,6 @@ export default async function RootLayout({
                   <Slot name="layout.beforeMain" />
                   {children}
                   <Slot name="layout.afterMain" />
-                  <MobileBottomNav />
                   </ErrorBoundary>
                   <div className="relative z-[9999]">
                     <Slot name="layout.overlay" />

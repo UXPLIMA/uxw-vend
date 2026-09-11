@@ -13,7 +13,7 @@
  *      • head.extra        - rendered inside the <head> element
  *
  *  - LAYOUT-POSITION slots (7): named injection points wired into the
- *    core layout chrome (Navbar, Footer, MobileBottomNav). Themes and
+ *    core layout chrome (Navbar, Footer, MobileMenu). Themes and
  *    modules contribute via `slotContents` to add content into a specific
  *    visual region without modifying core React.
  *      • layout.top      - top of the page, above the navbar (e.g. announcement bar)
@@ -22,7 +22,7 @@
  *      • navbar.start    - left side of the navbar (after logo, before menu)
  *      • navbar.end      - right side of the navbar (e.g. cart, notification bell)
  *      • footer.top      - top of the footer (e.g. CTA strip)
- *      • mobile.nav      - mobile bottom navigation bar
+ *      • mobile.nav      - the navigation panel a phone opens
  *
  * Every name below is rendered by core. `slot-contract.test.ts` fails if this
  * list and the <Slot name> calls in core ever drift apart again: three of these

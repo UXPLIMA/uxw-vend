@@ -68,7 +68,9 @@ function servedAttributes(): Record<string, string> {
 /** The same attributes once the component has mounted and read the mode. */
 function settledAttributes(): Record<string, string> {
     const { container } = render(tree);
-    const button = container.querySelector("button[aria-label]") as HTMLElement;
+    // By its own label, not by position: the bar grew a menu button to its
+    // left, and "the first labelled button" quietly became a different control.
+    const button = container.querySelector('button[aria-label^="Switch to"]') as HTMLElement;
     return Object.fromEntries([...button.attributes].map((a) => [a.name, a.value]));
 }
 
