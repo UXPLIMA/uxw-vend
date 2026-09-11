@@ -249,3 +249,8 @@ print(f"Index: {len(modules)} modules, {len(emitted_by)} hooks emitted, {len(lis
 print(f"Built {len(modules)} ZIPs")
 PYEOF
 
+
+# The grammar the catalogue's modules were checked against, published beside
+# them. Anything that accepts a module from an author needs it, and without a
+# published copy each of them writes its own guess.
+npx tsx scripts/emit-manifest-schema.ts
