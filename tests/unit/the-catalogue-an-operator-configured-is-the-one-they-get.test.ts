@@ -14,9 +14,7 @@ const fetchMock = vi.fn();
 const readFile = vi.fn();
 
 vi.mock("fs/promises", () => ({ default: { readFile }, readFile }));
-vi.mock("@/core/lib/marketplace-fetch", () => ({
-    marketplaceFetch: (url: string, init?: RequestInit) => fetchMock(url, init),
-}));
+vi.stubGlobal("fetch", (url: string, init?: RequestInit) => fetchMock(url, init));
 
 const REMOTE = {
     version: "1.0.0",

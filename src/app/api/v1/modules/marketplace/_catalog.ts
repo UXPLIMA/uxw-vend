@@ -12,7 +12,6 @@ import {
     setCachedMarketplace,
 } from "./_cache";
 import { marketplaceIsConfigured, moduleMarketplaceIndexUrl } from "@/core/lib/marketplace-source";
-import { marketplaceFetch } from "@/core/lib/marketplace-fetch";
 
 const LOCAL_INDEX_PATH = path.join(process.cwd(), "module-marketplace", "index.json");
 
@@ -22,7 +21,7 @@ async function fromDisk(): Promise<MarketplaceIndex> {
 }
 
 async function fromMarketplace(): Promise<MarketplaceIndex> {
-    const res = await marketplaceFetch(moduleMarketplaceIndexUrl(), { next: { revalidate: 300 } });
+    const res = await fetch(moduleMarketplaceIndexUrl(), { next: { revalidate: 300 } });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return (await res.json()) as MarketplaceIndex;
 }

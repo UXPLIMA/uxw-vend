@@ -4,7 +4,6 @@ import path from "path";
 import { auth } from "@/core/lib/auth";
 import { isAdmin } from "@/core/lib/permissions";
 import { moduleMarketplaceIndexUrl } from "@/core/lib/marketplace-source";
-import { marketplaceFetch } from "@/core/lib/marketplace-fetch";
 import { MODULES_DIR } from "@/core/lib/runtime-paths";
 import { devOnlyDetail } from "@/core/lib/api-utils";
 import { log } from "@/core/lib/logger";
@@ -62,7 +61,7 @@ export async function GET() {
 
     let marketplace: MarketplaceIndex;
     try {
-        const res = await marketplaceFetch(moduleMarketplaceIndexUrl(), { next: { revalidate: 300 } });
+        const res = await fetch(moduleMarketplaceIndexUrl(), { next: { revalidate: 300 } });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         marketplace = await res.json();
     } catch (err) {
