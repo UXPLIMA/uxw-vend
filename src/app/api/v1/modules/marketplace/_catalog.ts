@@ -11,20 +11,43 @@ import {
     getCachedMarketplace,
     setCachedMarketplace,
 } from "./_cache";
-import { moduleMarketplaceIndexUrl } from "@/core/lib/marketplace-source";
+import { marketplaceIsConfigured, moduleMarketplaceIndexUrl } from "@/core/lib/marketplace-source";
+import { marketplaceFetch } from "@/core/lib/marketplace-fetch";
 
 const LOCAL_INDEX_PATH = path.join(process.cwd(), "module-marketplace", "index.json");
 
+async function fromDisk(): Promise<MarketplaceIndex> {
+    const raw = await fs.readFile(LOCAL_INDEX_PATH, "utf-8");
+    return JSON.parse(raw) as MarketplaceIndex;
+}
+
+async function fromMarketplace(): Promise<MarketplaceIndex> {
+    const res = await marketplaceFetch(moduleMarketplaceIndexUrl(), { next: { revalidate: 300 } });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    return (await res.json()) as MarketplaceIndex;
+}
+
+/**
+ * Where the list of installable modules comes from.
+ *
+ * Which of the two leads depends on whether the operator configured a
+ * marketplace. This file shipped with the disk copy always first, which is
+ * right for a checkout serving its own catalogue and wrong for an install
+ * pointed elsewhere: the ZIPs came from the configured marketplace and the
+ * list of what could be installed came from the copy in the image, so
+ * everything the operator was paying for was invisible while installing
+ * appeared to work.
+ *
+ * The loser is still the fallback in both directions, so an install with no
+ * network reads its own catalogue and a stripped checkout reads the
+ * product's.
+ */
 async function loadBaseIndex(): Promise<MarketplaceIndex> {
-    // Prefer the local index.json (rebuilt by scripts/build-marketplace.sh);
-    // fall back to the GitHub copy when running in a stripped dev checkout.
+    const [first, second] = marketplaceIsConfigured() ? [fromMarketplace, fromDisk] : [fromDisk, fromMarketplace];
     try {
-        const raw = await fs.readFile(LOCAL_INDEX_PATH, "utf-8");
-        return JSON.parse(raw) as MarketplaceIndex;
+        return await first();
     } catch {
-        const res = await fetch(moduleMarketplaceIndexUrl(), { next: { revalidate: 300 } });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return (await res.json()) as MarketplaceIndex;
+        return await second();
     }
 }
 

@@ -14,6 +14,7 @@ import moduleSystem from "@/core/lib/modules";
 import { invalidateModuleCache } from "@/core/lib/module-cache";
 import path from "path";
 import { moduleMarketplaceIndexUrl } from "@/core/lib/marketplace-source";
+import { marketplaceFetch } from "@/core/lib/marketplace-fetch";
 import { readJsonBody } from "@/core/lib/api-body";
 import { resolveSettings, settingDeclarations, validateSettingsInput } from "@/core/lib/module-settings";
 import { z } from "zod";
@@ -43,7 +44,7 @@ async function fetchMarketplaceIndex(): Promise<Map<string, string>> {
         return new Map(marketplaceCache.modules.map(m => [m.id, m.version]));
     }
     try {
-        const res = await fetch(moduleMarketplaceIndexUrl(), { next: { revalidate: 300 } });
+        const res = await marketplaceFetch(moduleMarketplaceIndexUrl(), { next: { revalidate: 300 } });
         if (!res.ok) return new Map();
         const data = await res.json();
         marketplaceCache = data;
