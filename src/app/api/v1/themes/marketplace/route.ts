@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { themeMarketplaceIndexUrl } from "@/core/lib/marketplace-source";
+import { marketplaceFetch } from "@/core/lib/marketplace-fetch";
 
 
 let cached: Record<string, unknown> | null = null;
@@ -10,7 +11,7 @@ export async function GET() {
     if (cached && now - cacheTime < 300000) return NextResponse.json(cached);
 
     try {
-        const res = await fetch(themeMarketplaceIndexUrl(), { next: { revalidate: 300 } });
+        const res = await marketplaceFetch(themeMarketplaceIndexUrl(), { next: { revalidate: 300 } });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = await res.json();
         cached = data;

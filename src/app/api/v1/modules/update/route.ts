@@ -22,6 +22,7 @@ import { backupBeforeModuleChange } from "@/core/lib/module-backup";
 import { manifestHash } from "@/core/lib/module-install-audit";
 import { MODULES_DIR, TMP_DIR, PROJECT_ROOT, resolveWithin } from "@/core/lib/runtime-paths";
 import { moduleMarketplaceBase } from "@/core/lib/marketplace-source";
+import { marketplaceFetch } from "@/core/lib/marketplace-fetch";
 import { readJsonBody } from "@/core/lib/api-body";
 import { z } from "zod";
 import { devOnlyDetail } from "@/core/lib/api-utils";
@@ -87,7 +88,7 @@ export async function POST(request: NextRequest) {
         await backupBeforeModuleChange("update", moduleId);
 
         const zipUrl = `${moduleMarketplaceBase()}/${zipFile}`;
-        const res = await fetch(zipUrl);
+        const res = await marketplaceFetch(zipUrl);
         if (!res.ok) {
             return NextResponse.json({ error: `Failed to download module: HTTP ${res.status}` }, { status: 502 });
         }

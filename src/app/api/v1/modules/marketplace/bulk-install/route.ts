@@ -10,6 +10,7 @@ import AdmZip from "adm-zip";
 import { invalidateModuleCache } from "@/core/lib/module-cache";
 import { acquireInstallLock, scheduleBuild } from "@/core/lib/install-lock";
 import { moduleMarketplaceBase } from "@/core/lib/marketplace-source";
+import { marketplaceFetch } from "@/core/lib/marketplace-fetch";
 import { moduleManifestSchema } from "@/core/lib/module-manifest-schema";
 import { checkManifestFileRefs } from "@/core/lib/module-ref-resolver";
 import { validateZipEntries } from "@/core/lib/module-zip-validator";
@@ -172,7 +173,7 @@ export async function POST(request: NextRequest) {
         if (exists) { results.push({ id, name: name || id, status: "skipped", error: "Already installed" }); continue; }
 
         try {
-            const res = await fetch(`${moduleMarketplaceBase()}/${zip}`);
+            const res = await marketplaceFetch(`${moduleMarketplaceBase()}/${zip}`);
             if (!res.ok) { results.push({ id, name: name || id, status: "failed", error: `Download failed: ${res.status}` }); continue; }
 
             // What the server says it is sending, before the body is read.

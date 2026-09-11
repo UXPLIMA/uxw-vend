@@ -20,6 +20,7 @@ import { checkModuleDependencies, dependencyErrorMessage, installedVersionsFrom 
 import moduleSystem from "@/core/lib/modules";
 import { MODULES_DIR, PROJECT_ROOT, resolveWithin } from "@/core/lib/runtime-paths";
 import { moduleMarketplaceBase } from "@/core/lib/marketplace-source";
+import { marketplaceFetch } from "@/core/lib/marketplace-fetch";
 import { readJsonBody } from "@/core/lib/api-body";
 import { z } from "zod";
 import { devOnlyDetail } from "@/core/lib/api-utils";
@@ -105,7 +106,7 @@ export async function POST(request: NextRequest) {
 
         // Download ZIP from GitHub with size limit
         const zipUrl = `${moduleMarketplaceBase()}/${zipFile}`;
-        const res = await fetch(zipUrl);
+        const res = await marketplaceFetch(zipUrl);
         if (!res.ok) {
             return NextResponse.json({ error: `Failed to download module: HTTP ${res.status}` }, { status: 502 });
         }

@@ -12,6 +12,7 @@ import {
     setCachedMarketplace,
 } from "./_cache";
 import { moduleMarketplaceIndexUrl } from "@/core/lib/marketplace-source";
+import { marketplaceFetch } from "@/core/lib/marketplace-fetch";
 
 const LOCAL_INDEX_PATH = path.join(process.cwd(), "module-marketplace", "index.json");
 
@@ -22,7 +23,7 @@ async function loadBaseIndex(): Promise<MarketplaceIndex> {
         const raw = await fs.readFile(LOCAL_INDEX_PATH, "utf-8");
         return JSON.parse(raw) as MarketplaceIndex;
     } catch {
-        const res = await fetch(moduleMarketplaceIndexUrl(), { next: { revalidate: 300 } });
+        const res = await marketplaceFetch(moduleMarketplaceIndexUrl(), { next: { revalidate: 300 } });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         return (await res.json()) as MarketplaceIndex;
     }
