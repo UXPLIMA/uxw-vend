@@ -1,0 +1,1643 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 100
+    },
+    "description": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "version": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 32,
+      "pattern": "^\\d+\\.\\d+\\.\\d+"
+    },
+    "author": {
+      "type": "string",
+      "maxLength": 100
+    },
+    "icon": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64,
+      "pattern": "^[A-Za-z0-9_-]+$"
+    },
+    "permissions": {
+      "maxItems": 100,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^[a-z0-9._-]+$"
+      }
+    },
+    "settings": {
+      "maxItems": 50,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 48,
+            "pattern": "^[a-z][A-Za-z0-9]*$"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "boolean",
+              "number",
+              "string"
+            ]
+          },
+          "default": {
+            "type": [
+              "boolean",
+              "number",
+              "string"
+            ]
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 80
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 200
+          },
+          "min": {
+            "type": "number"
+          },
+          "max": {
+            "type": "number"
+          },
+          "step": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "maxLength": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10000
+          }
+        },
+        "required": [
+          "key",
+          "type",
+          "default",
+          "label"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "emailProvider": {
+      "type": "object",
+      "properties": {
+        "apiKeySetting": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[a-z][a-z0-9_]*$"
+        },
+        "envVar": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 64,
+          "pattern": "^[A-Z][A-Z0-9_]*$"
+        }
+      },
+      "required": [
+        "apiKeySetting"
+      ],
+      "additionalProperties": false
+    },
+    "secretSettings": {
+      "maxItems": 50,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96,
+        "pattern": "^[a-z][a-z0-9_]*(\\.[a-zA-Z][a-zA-Z0-9]*)?$"
+      }
+    },
+    "dependencies": {
+      "maxItems": 50,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96
+      }
+    },
+    "conflicts": {
+      "maxItems": 50,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 96
+      }
+    },
+    "coreVersion": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 64
+    },
+    "category": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 32,
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "tags": {
+      "maxItems": 10,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 32
+      }
+    },
+    "translations": {
+      "type": "object",
+      "propertyNames": {
+        "type": "string"
+      },
+      "additionalProperties": {
+        "type": "object",
+        "propertyNames": {
+          "type": "string"
+        },
+        "additionalProperties": {
+          "$ref": "#/$defs/__schema0"
+        }
+      }
+    },
+    "hooks": {
+      "type": "object",
+      "properties": {
+        "onEnable": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "onDisable": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      }
+    },
+    "menu": {
+      "maxItems": 100,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512,
+            "pattern": "^\\/[A-Za-z0-9/_\\-:.\\[\\]*]*$"
+          },
+          "icon": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "group": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[a-z][a-z0-9-]*$"
+          },
+          "section": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[a-z][a-z0-9-]*$"
+          }
+        },
+        "required": [
+          "label",
+          "path"
+        ]
+      }
+    },
+    "routes": {
+      "maxItems": 200,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512,
+            "pattern": "^\\/[A-Za-z0-9/_\\-:.\\[\\]*]*$"
+          },
+          "component": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "layout": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "noindex": {
+            "type": "boolean"
+          },
+          "titleKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[a-zA-Z][a-zA-Z0-9]*(?:\\.[a-zA-Z0-9_-]+)+$"
+          },
+          "titleFromPath": {
+            "type": "boolean"
+          },
+          "resolver": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "userProfile": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "path",
+          "component"
+        ]
+      }
+    },
+    "adminRoutes": {
+      "maxItems": 200,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512,
+            "pattern": "^\\/[A-Za-z0-9/_\\-:.\\[\\]*]*$"
+          },
+          "component": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "required": [
+          "path",
+          "component"
+        ]
+      }
+    },
+    "api": {
+      "maxItems": 500,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512,
+            "pattern": "^\\/[A-Za-z0-9/_\\-:.\\[\\]*]*$"
+          },
+          "handler": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "method": {
+            "type": "string",
+            "enum": [
+              "GET",
+              "POST",
+              "PUT",
+              "DELETE",
+              "PATCH",
+              "ALL"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "providerCallback": {
+            "type": "boolean"
+          },
+          "rateLimit": {
+            "type": "object",
+            "properties": {
+              "maxRequests": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 10000
+              },
+              "windowMs": {
+                "type": "integer",
+                "minimum": 1000,
+                "maximum": 3600000
+              }
+            },
+            "required": [
+              "maxRequests",
+              "windowMs"
+            ]
+          }
+        },
+        "required": [
+          "path",
+          "handler"
+        ]
+      }
+    },
+    "widgets": {
+      "maxItems": 50,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "labelKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[a-zA-Z0-9._-]+$"
+          },
+          "component": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "defaultOrder": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "defaultVisible": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "id",
+          "component",
+          "defaultOrder",
+          "defaultVisible"
+        ]
+      }
+    },
+    "navLinks": {
+      "maxItems": 50,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "labelKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[a-zA-Z0-9._-]+$"
+          },
+          "href": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512,
+            "pattern": "^\\/[A-Za-z0-9/_\\-:.\\[\\]*]*$"
+          },
+          "icon": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "position": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "label",
+          "href"
+        ]
+      }
+    },
+    "footerLinks": {
+      "maxItems": 50,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "labelKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[a-zA-Z0-9._-]+$"
+          },
+          "href": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512,
+            "pattern": "^\\/[A-Za-z0-9/_\\-:.\\[\\]*]*$"
+          },
+          "section": {
+            "type": "string",
+            "enum": [
+              "quick",
+              "legal"
+            ]
+          }
+        },
+        "required": [
+          "label",
+          "href"
+        ]
+      }
+    },
+    "profileTabs": {
+      "maxItems": 50,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "component": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "order": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "component",
+          "order"
+        ]
+      }
+    },
+    "oauthButtons": {
+      "maxItems": 20,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "provider": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "color": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32
+          },
+          "svgIcon": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 8192
+          },
+          "href": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200,
+            "pattern": "^\\/(?![/\\\\])[A-Za-z0-9\\-._~!$&'()*+,;=:@%/]*$"
+          }
+        },
+        "required": [
+          "id",
+          "provider",
+          "label",
+          "color",
+          "svgIcon"
+        ]
+      }
+    },
+    "navGroups": {
+      "maxItems": 20,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[a-z0-9][a-z0-9-]*$"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "icon": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "order": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9999
+          }
+        },
+        "required": [
+          "id",
+          "label"
+        ]
+      }
+    },
+    "authProviders": {
+      "maxItems": 20,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[a-z0-9][a-z0-9-]*$"
+          },
+          "envIdVar": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Z][A-Z0-9_]*$"
+          },
+          "envSecretVar": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[A-Z][A-Z0-9_]*$"
+          },
+          "factory": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "standardCallback": {
+            "type": "boolean"
+          },
+          "envVars": {
+            "minItems": 1,
+            "maxItems": 10,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 128,
+              "pattern": "^[A-Z][A-Z0-9_]*$"
+            }
+          }
+        },
+        "required": [
+          "id"
+        ]
+      }
+    },
+    "webhookChannels": {
+      "maxItems": 20,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[a-z0-9][a-z0-9-]*$"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "layout": {
+            "type": "string",
+            "enum": [
+              "json",
+              "embed",
+              "attachment"
+            ]
+          },
+          "hosts": {
+            "maxItems": 10,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 253
+            }
+          },
+          "urlPlaceholder": {
+            "type": "string",
+            "maxLength": 300
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "layout"
+        ]
+      }
+    },
+    "navbarComponents": {
+      "maxItems": 30,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "component": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "order": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "id",
+          "component",
+          "order"
+        ]
+      }
+    },
+    "footerComponents": {
+      "maxItems": 30,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "component": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "section": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "order": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "id",
+          "component"
+        ]
+      }
+    },
+    "storageProviders": {
+      "maxItems": 10,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "handler": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "handler"
+        ]
+      }
+    },
+    "contextProviders": {
+      "maxItems": 20,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "component": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "order": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "id",
+          "component"
+        ]
+      }
+    },
+    "hookListeners": {
+      "maxItems": 200,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "hook": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[a-zA-Z0-9._-]+$"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "action",
+              "filter"
+            ]
+          },
+          "handler": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "priority": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "hook",
+          "type",
+          "handler"
+        ]
+      }
+    },
+    "hooksEmitted": {
+      "maxItems": 200,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "hook": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[a-zA-Z0-9._-]+$"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "action",
+              "filter"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 200
+          }
+        },
+        "required": [
+          "hook",
+          "type"
+        ]
+      }
+    },
+    "slotContents": {
+      "maxItems": 100,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "slot": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[a-zA-Z0-9._-]+$"
+          },
+          "component": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "order": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "id",
+          "slot",
+          "component"
+        ]
+      }
+    },
+    "slots": {
+      "maxItems": 200,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[a-zA-Z0-9.-]+$"
+          },
+          "component": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "order": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          }
+        },
+        "required": [
+          "name",
+          "component"
+        ]
+      }
+    },
+    "pageBlocks": {
+      "maxItems": 100,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "category": {
+            "type": "string",
+            "maxLength": 64
+          },
+          "component": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "required": [
+          "id",
+          "component"
+        ]
+      }
+    },
+    "cronJobs": {
+      "maxItems": 50,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "schedule": {
+            "type": "string",
+            "enum": [
+              "every-minute",
+              "every-5-minutes",
+              "every-15-minutes",
+              "every-hour",
+              "every-day",
+              "every-week",
+              "every-month"
+            ]
+          },
+          "handler": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "required": [
+          "id",
+          "schedule",
+          "handler"
+        ]
+      }
+    },
+    "searchProviders": {
+      "maxItems": 20,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "handler": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "icon": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "indexes": {
+            "maxItems": 5,
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "table": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 63,
+                  "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+                },
+                "columns": {
+                  "minItems": 1,
+                  "maxItems": 10,
+                  "type": "array",
+                  "items": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 63,
+                    "pattern": "^[A-Za-z][A-Za-z0-9_]*$"
+                  }
+                }
+              },
+              "required": [
+                "table",
+                "columns"
+              ]
+            }
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "handler"
+        ]
+      }
+    },
+    "activityTitles": {
+      "maxItems": 50,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[a-zA-Z0-9._-]+$"
+          },
+          "prefix": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[a-zA-Z0-9._-]+$"
+          }
+        },
+        "required": [
+          "type",
+          "prefix",
+          "key"
+        ]
+      }
+    },
+    "permissionResources": {
+      "maxItems": 100,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 128,
+        "pattern": "^[a-z0-9._-]+$"
+      }
+    },
+    "webhookReceivers": {
+      "maxItems": 50,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "provider": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "handler": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "signatureHeader": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "secretEnv": {
+            "type": "string",
+            "maxLength": 128,
+            "pattern": "^[A-Z0-9_]+$"
+          },
+          "verifiesInHandler": {
+            "type": "boolean"
+          },
+          "timestampHeader": {
+            "type": "string",
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "provider",
+          "handler"
+        ]
+      }
+    },
+    "notificationTypes": {
+      "maxItems": 100,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "eventType": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[a-zA-Z0-9._-]+$"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "channels": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 32
+            }
+          }
+        },
+        "required": [
+          "eventType",
+          "label"
+        ]
+      }
+    },
+    "layoutComponents": {
+      "maxItems": 50,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "component": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "include": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 256
+            }
+          },
+          "exclude": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "maxLength": 256
+            }
+          }
+        },
+        "required": [
+          "id",
+          "component"
+        ]
+      }
+    },
+    "settingsCards": {
+      "maxItems": 50,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 500
+          },
+          "href": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512,
+            "pattern": "^\\/[A-Za-z0-9/_\\-:.\\[\\]*]*$"
+          },
+          "icon": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "color": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          }
+        },
+        "required": [
+          "title",
+          "description",
+          "href",
+          "icon",
+          "color"
+        ]
+      }
+    },
+    "homepageSections": {
+      "maxItems": 50,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "content",
+              "widget"
+            ]
+          },
+          "component": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          },
+          "order": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          }
+        },
+        "required": [
+          "id",
+          "type",
+          "component",
+          "order"
+        ]
+      }
+    },
+    "dashboardCards": {
+      "maxItems": 50,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "labelKey": {
+            "type": "string",
+            "maxLength": 128
+          },
+          "icon": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "href": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 512,
+            "pattern": "^\\/[A-Za-z0-9/_\\-:.\\[\\]*]*$"
+          },
+          "color": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64
+          },
+          "statKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "icon",
+          "href",
+          "color",
+          "statKey"
+        ]
+      }
+    },
+    "dashboardSections": {
+      "maxItems": 20,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[A-Za-z0-9_-]+$"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "labelKey": {
+            "type": "string",
+            "maxLength": 128
+          }
+        },
+        "required": [
+          "id",
+          "label"
+        ]
+      }
+    },
+    "statsApi": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "pattern": "^\\/[A-Za-z0-9/_\\-:.\\[\\]*]*$"
+    },
+    "seoRoutes": {
+      "type": "object",
+      "properties": {
+        "handler": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        }
+      },
+      "required": [
+        "handler"
+      ]
+    },
+    "userDataExport": {
+      "maxItems": 50,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "model": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[a-zA-Z][a-zA-Z0-9]*$"
+          },
+          "key": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[a-zA-Z0-9._-]+$"
+          },
+          "column": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[a-zA-Z][a-zA-Z0-9]*$"
+          },
+          "erasure": {
+            "type": "string",
+            "enum": [
+              "purge",
+              "retain"
+            ]
+          }
+        },
+        "required": [
+          "model",
+          "key",
+          "column"
+        ]
+      }
+    },
+    "moderationProviders": {
+      "maxItems": 20,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[a-z0-9][a-z0-9-]*$"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "labelKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[a-zA-Z0-9._-]+$"
+          },
+          "settingKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "settingLabelKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[a-zA-Z0-9._-]+$"
+          },
+          "settingDescKey": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 128,
+            "pattern": "^[a-zA-Z0-9._-]+$"
+          },
+          "handler": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 256
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "handler"
+        ]
+      }
+    },
+    "csp": {
+      "type": "object",
+      "properties": {
+        "script-src": {
+          "maxItems": 10,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 253,
+            "pattern": "^https:\\/\\/[a-z0-9-]+(\\.[a-z0-9-]+)+$"
+          }
+        },
+        "frame-src": {
+          "maxItems": 10,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 253,
+            "pattern": "^https:\\/\\/[a-z0-9-]+(\\.[a-z0-9-]+)+$"
+          }
+        },
+        "connect-src": {
+          "maxItems": 10,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 253,
+            "pattern": "^(https|wss):\\/\\/[a-z0-9-]+(\\.[a-z0-9-]+)+$"
+          }
+        },
+        "img-src": {
+          "maxItems": 10,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 253,
+            "pattern": "^https:\\/\\/[a-z0-9-]+(\\.[a-z0-9-]+)+$"
+          }
+        },
+        "style-src": {
+          "maxItems": 10,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 253,
+            "pattern": "^https:\\/\\/[a-z0-9-]+(\\.[a-z0-9-]+)+$"
+          }
+        },
+        "font-src": {
+          "maxItems": 10,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 253,
+            "pattern": "^https:\\/\\/[a-z0-9-]+(\\.[a-z0-9-]+)+$"
+          }
+        },
+        "media-src": {
+          "maxItems": 10,
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 253,
+            "pattern": "^https:\\/\\/[a-z0-9-]+(\\.[a-z0-9-]+)+$"
+          }
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "description",
+    "version",
+    "coreVersion"
+  ],
+  "additionalProperties": false,
+  "$defs": {
+    "__schema0": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "object",
+          "propertyNames": {
+            "type": "string"
+          },
+          "additionalProperties": {
+            "$ref": "#/$defs/__schema0"
+          }
+        }
+      ]
+    }
+  }
+}
