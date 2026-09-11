@@ -18,6 +18,11 @@ export default function Page() {
                 { key: "version", label: t("adm_field1Label"), required: true, placeholder: t("adm_field1Placeholder") },
                 { key: "title", label: t("adm_field2Label"), required: true, placeholder: t("adm_field2Placeholder") },
                 { key: "content", label: t("adm_field3Label"), type: "richtext", required: true, placeholder: t("adm_field3Placeholder") },
+                // The long form and its picture. Both optional: most releases
+                // are one line, and an entry without them keeps its old
+                // behaviour - no page, and no link on the timeline.
+                { key: "details", label: t("adm_detailsLabel"), type: "richtext", placeholder: t("adm_detailsPlaceholder"), description: t("adm_detailsHelp") },
+                { key: "coverImage", label: t("adm_coverLabel"), type: "urlOrFile", description: t("adm_coverHelp") },
                 {
                     key: "type",
                     label: t("adm_field4Label"),

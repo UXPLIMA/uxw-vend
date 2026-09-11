@@ -85,10 +85,27 @@ describe("dynamic public routes", () => {
             if (!/Promise<boolean>/.test(body)) {
                 problems.push(`${module} ${route.resolver} does not answer a boolean`);
             }
-            // A resolver runs on every request for the route, so it reads one
-            // column, not a whole row with its relations.
-            if (!/select:\s*\{\s*id:\s*true\s*\}/.test(body)) {
-                problems.push(`${module} ${route.resolver} selects more than it needs`);
+            // A resolver runs on every request for the route, so it reads the
+            // columns it needs and no relations.
+            //
+            // This used to demand `select: { id: true }` exactly, which is the
+            // right answer for a resolver asking "is there a row" and the
+            // wrong one for a resolver asking anything else. The changelog's
+            // asks whether a release has a page, which is three scalars - and
+            // narrowing it to `id` would have meant answering a different
+            // question from the one the page answers, which is how a soft 404
+            // comes back.
+            const select = /select:\s*\{([^}]*)\}/.exec(body);
+            if (!select) {
+                problems.push(`${module} ${route.resolver} reads whole rows`);
+            } else {
+                const columns = select[1].split(",").map((c) => c.trim()).filter(Boolean);
+                if (columns.length > 4) {
+                    problems.push(`${module} ${route.resolver} selects ${columns.length} columns`);
+                }
+                if (/include:/.test(body)) {
+                    problems.push(`${module} ${route.resolver} pulls a relation`);
+                }
             }
         }
         expect(problems).toEqual([]);

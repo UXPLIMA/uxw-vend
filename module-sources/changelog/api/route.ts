@@ -2,16 +2,29 @@ import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, prisma, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { z } from "zod";
+import { entrySlug } from "../lib/entry-page";
 
 export async function GET() {
     const now = new Date();
-    const entries = await prisma.changelogEntry.findMany({
+    // The long form is deliberately not in this response. It is a page's worth
+    // of markup per entry and the timeline renders none of it; what the list
+    // needs to know is whether there is a page to link to.
+    const rows = await prisma.changelogEntry.findMany({
         where: {
             isActive: true,
             OR: [{ publishAt: null }, { publishAt: { lte: now } }],
         },
         orderBy: { createdAt: "desc" },
+        select: {
+            id: true, number: true, slug: true, version: true, title: true,
+            content: true, type: true, color: true, createdAt: true,
+            coverImage: true, details: true,
+        },
     });
+    const entries = rows.map(({ details, ...entry }) => ({
+        ...entry,
+        hasDetails: typeof details === "string" && details.trim() !== "",
+    }));
     return NextResponse.json({ entries });
 }
 
@@ -26,6 +39,10 @@ export async function POST(request: NextRequest) {
         version: z.string().min(1).max(50),
         title: z.string().min(1).max(200),
         content: z.string().min(1).max(10000),
+        // A page's worth rather than a line's. Still bounded: it is written by
+        // an admin, stored as HTML and rendered to every visitor.
+        details: z.string().max(50000).optional().nullable(),
+        coverImage: z.string().max(500).optional().nullable(),
         type: z.string().max(50).optional(),
         color: z.string().regex(/^#[0-9a-fA-F]{6}$/).optional(),
         publishAt: z.string().datetime().optional().nullable(),
@@ -33,13 +50,19 @@ export async function POST(request: NextRequest) {
     const validation = schema.safeParse(body);
     if (!validation.success) return NextResponse.json({ error: validation.error.issues[0].message }, { status: 400 });
 
-    const { version, title, content, type, color, publishAt } = validation.data;
+    const { version, title, content, details, coverImage, type, color, publishAt } = validation.data;
 
     const entry = await prisma.changelogEntry.create({
         data: {
             version,
             title,
+            slug: entrySlug(title),
             content: sanitizeHtml(content),
+            // Sanitised like any other HTML an admin writes: it is rendered to
+            // every visitor, and an admin account is a trust boundary, not a
+            // guarantee.
+            details: details ? sanitizeHtml(details) : null,
+            coverImage: coverImage || null,
             type: type || "update",
             color: color || "#3b82f6",
             publishAt: publishAt ? new Date(publishAt) : null,

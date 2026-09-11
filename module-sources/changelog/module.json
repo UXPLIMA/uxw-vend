@@ -2,7 +2,7 @@
   "id": "changelog",
   "name": "Changelog",
   "description": "Release notes and update history",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "coreVersion": "^2.0.0",
   "category": "community",
   "author": "Blysis",
@@ -23,6 +23,12 @@
       "path": "/changelog",
       "component": "pages/public/page.tsx",
       "titleKey": "pageTitles.changelog"
+    },
+    {
+      "path": "/changelog/[...slug]",
+      "component": "pages/public/entry/[number]/page.tsx",
+      "resolver": "lib/entry-exists.ts",
+      "titleKey": "pageTitles.changelog"
     }
   ],
   "adminRoutes": [
@@ -41,6 +47,12 @@
       "path": "/changelog/[id]",
       "handler": "api/[id]/route.ts",
       "description": "Update or delete a single changelog entry (admin)."
+    },
+    {
+      "path": "/changelog/entry/[number]",
+      "handler": "api/entry/[number]/route.ts",
+      "method": "GET",
+      "description": "One published release entry in full, for its own page."
     }
   ],
   "hooksEmitted": [
@@ -93,7 +105,15 @@
         "type_fix": "Fixed",
         "type_security": "Security",
         "type_removed": "Removed",
-        "type_breaking": "Breaking"
+        "type_breaking": "Breaking",
+        "readMore": "Read the full note",
+        "backToList": "All releases",
+        "entryMissing": "That release note has nothing more to show.",
+        "adm_detailsLabel": "Full note",
+        "adm_detailsPlaceholder": "What changed, why, and anything a reader has to do about it.",
+        "adm_detailsHelp": "Optional. Fill this in and the release gets a page of its own, linked from the timeline.",
+        "adm_coverLabel": "Cover image",
+        "adm_coverHelp": "Shown at the top of the release's own page. The timeline stays a list."
       },
       "admin": {
         "menu_changelog": "Changelog",
@@ -148,7 +168,15 @@
         "type_fix": "Düzeltme",
         "type_security": "Güvenlik",
         "type_removed": "Kaldırıldı",
-        "type_breaking": "Kırıcı"
+        "type_breaking": "Kırıcı",
+        "readMore": "Notun tamamını oku",
+        "backToList": "Tüm sürümler",
+        "entryMissing": "Bu sürüm notunun gösterecek başka bir şeyi yok.",
+        "adm_detailsLabel": "Tam not",
+        "adm_detailsPlaceholder": "Ne değişti, neden, ve okuyanın yapması gereken bir şey varsa o.",
+        "adm_detailsHelp": "İsteğe bağlı. Doldurursanız sürüm kendi sayfasını alır ve zaman çizelgesinden bağlanır.",
+        "adm_coverLabel": "Kapak görseli",
+        "adm_coverHelp": "Sürümün kendi sayfasının başında görünür. Zaman çizelgesi liste olarak kalır."
       },
       "admin": {
         "menu_changelog": "Değişiklik Günlüğü",

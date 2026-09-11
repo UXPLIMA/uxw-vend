@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, prisma, sanitizeHtml, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { z } from "zod";
+import { entrySlug } from "../../lib/entry-page";
 
 type RouteParams = { params: Promise<{ id: string }> };
 
@@ -34,6 +35,8 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         version: z.string().min(1).max(50),
         title: z.string().min(1).max(200),
         content: z.string().min(1).max(10000),
+        details: z.string().max(50000).nullable(),
+        coverImage: z.string().max(500).nullable(),
         type: z.string().max(50),
         color: z.string().regex(/^#[0-9a-fA-F]{6}$/),
         isActive: z.boolean(),
@@ -45,10 +48,15 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         return NextResponse.json({ error: validation.error.issues[0].message }, { status: 400 });
     }
 
-    const { content, publishAt, ...rest } = validation.data;
+    const { content, details, publishAt, title, ...rest } = validation.data;
     const patchData = {
         ...rest,
+        ...(title !== undefined ? { title, slug: entrySlug(title) } : {}),
         ...(content !== undefined ? { content: sanitizeHtml(content) } : {}),
+        // Sanitised on the way in like the summary beside it. The slug follows
+        // the title so a renamed release reads correctly in a URL, while the
+        // number in front of it keeps every shared link working.
+        ...(details !== undefined ? { details: details ? sanitizeHtml(details) : null } : {}),
         ...(publishAt !== undefined ? { publishAt: publishAt ? new Date(publishAt) : null } : {}),
     };
     const entry = await prisma.changelogEntry.update({ where: { id }, data: patchData });

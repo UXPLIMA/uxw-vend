@@ -39,6 +39,15 @@ export interface CrudField {
     defaultValue?: string;
     required?: boolean;
     accept?: string;
+    /**
+     * A line under the field saying what it is for.
+     *
+     * A label names a field; it cannot say that filling this one in gives the
+     * row a page of its own, or that a picture here appears on that page and
+     * not in the list. Without somewhere to put that, the choice is between a
+     * label nobody understands and a feature nobody finds.
+     */
+    description?: string;
 }
 
 interface AdminCrudPageProps {
@@ -278,6 +287,9 @@ export function AdminCrudPage({ title, subtitle, apiPath, fields, listKey, displ
                                         <div key={field.key} className={fullWidth ? "md:col-span-2" : ""}>
                                             <Label>{field.label} {field.required && <span className="text-destructive">*</span>}</Label>
                                             {renderField(field)}
+                                            {field.description && (
+                                                <p className="text-xs text-muted-foreground mt-1">{field.description}</p>
+                                            )}
                                         </div>
                                     );
                                 })}
