@@ -24,7 +24,6 @@ const ACCOUNTED_FOR: Record<string, string> = {
     "src/core/lib/health-alerting.ts": "admin-typed webhook URL; validated, and refuses redirects",
     "src/core/lib/shared-request.ts": "caller-supplied; every caller passes an env-configured marketplace URL",
     "src/core/lib/password-breach.ts": "a constant vendor base plus a hex prefix of a hash",
-    "src/core/lib/marketplace-fetch.ts": "caller-supplied; every caller builds it from the env-configured marketplace base",
 };
 
 /**

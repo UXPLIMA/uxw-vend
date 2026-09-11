@@ -9,7 +9,6 @@ import AdmZip from "adm-zip";
 import { logActivity } from "@/core/lib/activity-log";
 import { validateZipEntries } from "@/core/lib/module-zip-validator";
 import { themeMarketplaceBase } from "@/core/lib/marketplace-source";
-import { marketplaceFetch } from "@/core/lib/marketplace-fetch";
 import { resolveWithin } from "@/core/lib/runtime-paths";
 import { readJsonBody } from "@/core/lib/api-body";
 import { z } from "zod";
@@ -53,7 +52,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Download ZIP with size limit
-        const res = await marketplaceFetch(`${themeMarketplaceBase()}/${zipFile}`);
+        const res = await fetch(`${themeMarketplaceBase()}/${zipFile}`);
         if (!res.ok) return NextResponse.json({ error: `Download failed: HTTP ${res.status}` }, { status: 502 });
 
         const contentLength = res.headers.get("content-length");
