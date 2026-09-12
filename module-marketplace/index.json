@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-12",
-  "updatedAt": "2026-09-12T10:31:24Z",
+  "updatedAt": "2026-09-12T10:51:46Z",
   "modules": [
     {
       "id": "announcements",
@@ -1007,13 +1007,13 @@
           "description": "Kategoriler, konular ve yanıtlarla topluluk tartışma forumu"
         }
       },
-      "version": "1.3.4",
+      "version": "1.3.5",
       "coreVersion": "^2.2.0",
       "author": "Blysis Team",
       "icon": "MessageSquare",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-12T10:31:24Z",
+      "updatedAt": "2026-09-12T10:51:46Z",
       "screenshots": [],
       "tags": [
         "community"

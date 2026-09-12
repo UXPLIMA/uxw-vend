@@ -7,7 +7,7 @@ import { useRouter } from "@/core/sdk/navigation";
 import { useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { Link } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, Pagination, RichContent, Textarea } from "@/core/sdk/ui";
+import { Badge, Button, Card, CardContent, Pagination, RichContent, Textarea } from "@/core/sdk/ui";
 import { PageFrame } from "@/core/sdk/layout";
 import { Pin, Lock, Eye, ThumbsUp, Send, Loader2 } from "lucide-react";
 import { useRelativeTime } from "@/core/sdk/ui";
@@ -211,9 +211,17 @@ export default function TopicDetailPage() {
                         </div>
                     </div>
 
-                    {/* Original Post */}
-                    <Card className="mb-4 border-l-4 border-l-blue-500">
-                        <CardContent className="p-5">
+                    {/* The opening post.
+                        It used to be marked with a four pixel blue rule down
+                        its left edge, in `blue-500` rather than a token, so a
+                        theme that is not blue got a blue stripe anyway. It is
+                        the first post above a heading that counts the
+                        replies, and its body is set at full size against
+                        their `text-sm`, which is the hierarchy a forum
+                        actually has. A coloured bar was decoration standing
+                        in for it. */}
+                    <Card className="mb-4">
+                        <CardContent className="p-6">
                             <div className="flex items-center gap-3 mb-4">
                                 {renderAvatar(topic.author)}
                                 <div>
@@ -232,7 +240,12 @@ export default function TopicDetailPage() {
                         <div className="space-y-3 mb-6">
                             <h2 className="text-sm font-medium text-muted-foreground">{t('repliesCount', { count: topic.posts.length })}</h2>
                             {topic.posts.map((post) => (
-                                <PostCard key={post.id} post={post} renderAvatar={renderAvatar} />
+                                <PostCard
+                                    key={post.id}
+                                    post={post}
+                                    renderAvatar={renderAvatar}
+                                    topicAuthor={topic.author.username}
+                                />
                             ))}
                         </div>
                     )}
@@ -272,7 +285,13 @@ export default function TopicDetailPage() {
     );
 }
 
-function PostCard({ post, renderAvatar }: { post: Post; renderAvatar: (user: { username: string; avatar: string | null }) => React.ReactNode }) {
+function PostCard({ post, renderAvatar, topicAuthor }: {
+    post: Post;
+    renderAvatar: (user: { username: string; avatar: string | null }) => React.ReactNode;
+    /** Who asked, so a reply from them can say so. */
+    topicAuthor: string;
+}) {
+    const t = useTranslations('forum');
     const relativeTime = useRelativeTime();
     const [postLiked, setPostLiked] = useState(false);
     const [postLikeCount, setPostLikeCount] = useState(post._count.likes);
@@ -296,7 +315,16 @@ function PostCard({ post, renderAvatar }: { post: Post; renderAvatar: (user: { u
                 <div className="flex items-center gap-3 mb-3">
                     {renderAvatar(post.author)}
                     <div>
-                        <p className="font-medium text-foreground text-sm">{post.author.username}</p>
+                        <div className="flex items-center gap-2">
+                            <p className="font-medium text-foreground text-sm">{post.author.username}</p>
+                            {/* Which of these replies is the person who asked.
+                                That is the thing a reader scanning a thread
+                                looks for, and it is worth more than a stripe
+                                marking the post they are already reading. */}
+                            {post.author.username === topicAuthor && (
+                                <Badge tone="neutral">{t('topicAuthor')}</Badge>
+                            )}
+                        </div>
                         <p className="text-xs text-muted-foreground">{relativeTime(new Date(post.createdAt))}</p>
                     </div>
                 </div>
