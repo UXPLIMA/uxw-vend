@@ -1,0 +1,46 @@
+{
+  "id": "minecraft-litebans",
+  "name": "Minecraft Punishments (LiteBans)",
+  "description": "Takes bans, mutes and kicks from a LiteBans server and records them against the member who owns the account",
+  "version": "1.0.0",
+  "coreVersion": "^2.2.0",
+  "category": "gaming",
+  "author": "Blysis",
+  "icon": "Gavel",
+  "dependencies": [
+    "punishments"
+  ],
+  "api": [
+    {
+      "path": "/minecraft-litebans/punishments",
+      "handler": "api/punishments/route.ts",
+      "method": "POST",
+      "description": "Receives one punishment from a LiteBans server and hands it to the punishments module.",
+      "providerCallback": true
+    }
+  ],
+  "hooksEmitted": [
+    {
+      "hook": "punishment.record",
+      "type": "filter"
+    },
+    {
+      "hook": "game-account.resolve",
+      "type": "filter"
+    }
+  ],
+  "translations": {
+    "en": {
+      "admin": {
+        "module_minecraft-litebans_name": "Minecraft Punishments (LiteBans)",
+        "module_minecraft-litebans_description": "Takes bans, mutes and kicks from a LiteBans server and records them against the member who owns the account"
+      }
+    },
+    "tr": {
+      "admin": {
+        "module_minecraft-litebans_name": "Minecraft Cezaları (LiteBans)",
+        "module_minecraft-litebans_description": "LiteBans sunucusundaki yasak, susturma ve atmaları alır ve hesabın sahibi olan üyenin kaydına yazar"
+      }
+    }
+  }
+}

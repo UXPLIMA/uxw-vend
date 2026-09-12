@@ -2,7 +2,7 @@
   "id": "punishments",
   "name": "Game Server Punishments",
   "description": "Bans and mutes your game server reports, listed on the site",
-  "version": "1.2.2",
+  "version": "1.3.0",
   "coreVersion": "^2.0.0",
   "category": "gaming",
   "author": "Blysis",
@@ -120,7 +120,9 @@
         "duration": "Duration",
         "noPunishments": "No punishments found",
         "details": "Punishment Details",
-        "server": "Server"
+        "server": "Server",
+        "adm_source": "Source",
+        "adm_sourceSite": "This site"
       },
       "nav": {
         "punishments": "Punishments"
@@ -189,7 +191,9 @@
         "duration": "Süre",
         "noPunishments": "Ceza bulunamadı",
         "details": "Ceza Detayları",
-        "server": "Sunucu"
+        "server": "Sunucu",
+        "adm_source": "Kaynak",
+        "adm_sourceSite": "Bu site"
       },
       "nav": {
         "punishments": "Cezalar"
@@ -209,6 +213,21 @@
       "channels": [
         "inapp"
       ]
+    }
+  ],
+  "hookListeners": [
+    {
+      "hook": "punishment.record",
+      "type": "filter",
+      "handler": "hooks/record.ts"
+    }
+  ],
+  "userDataExport": [
+    {
+      "model": "punishment",
+      "key": "punishments.punishments",
+      "column": "userId",
+      "erasure": "retain"
     }
   ]
 }

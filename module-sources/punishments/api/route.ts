@@ -1,24 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import crypto from "crypto";
 import { pageParams, isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { punishmentCreateSchema } from "../lib/validations";
 import { isPunishmentStatus, punishmentStatus, statusWhere } from "../lib/status";
 import { canonicalType, spellingsOf } from "../lib/punishment-types";
-
-/**
- * Constant-time API key comparison. Guards against undefined values and
- * length mismatches before timingSafeEqual (which throws on unequal-length
- * buffers) so an attacker can't learn the key length via a timing or error
- * signal.
- */
-function apiKeyMatches(provided: string | null | undefined, expected: string | undefined): boolean {
-    if (!provided || !expected) return false;
-    const a = Buffer.from(provided);
-    const b = Buffer.from(expected);
-    if (a.length !== b.length) return false;
-    return crypto.timingSafeEqual(a, b);
-}
 
 // GET - Public: list punishments
 export async function GET(request: NextRequest) {
@@ -57,19 +42,21 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ punishments: rows, total, pages: Math.ceil(total / limit) });
 }
 
-// POST - Admin or external plugin webhook
+/**
+ * An administrator issues a punishment on this site.
+ *
+ * This used to accept an API key as well, so a game server's plugin could
+ * post its bans here. That made a module about a member's record the owner of
+ * one plugin's payload shape, its spelling of a ban and its idea of who a
+ * player is. A module that watches such a server asks `punishment.record`
+ * now, and `hooks/record.ts` writes the row; what arrives here is a person
+ * with an admin session, and it is filed under the source `site`.
+ */
 export async function POST(request: NextRequest) {
-    // Check for API key (for external plugin integration) or admin session
-    const apiKey = request.headers.get("x-api-key");
-    const isPluginAuth = apiKeyMatches(apiKey, process.env.PUNISHMENTS_API_KEY);
-
-    let issuerUserId: string | null = null;
-    if (!isPluginAuth) {
-        const session = await auth();
-        if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-        if (!(await isAdmin(session.user.id))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
-        issuerUserId = session.user.id;
-    }
+    const session = await auth();
+    if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!(await isAdmin(session.user.id))) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    const issuerUserId: string = session.user.id;
 
     const jsonBody = await readJsonBody(request);
     if (jsonBody instanceof NextResponse) return jsonBody;
@@ -82,8 +69,18 @@ export async function POST(request: NextRequest) {
     // filters and the labels have one thing to match.
     const storedType = canonicalType(type) ?? type;
 
+    // The member this is against, when the name is one. A punishment issued
+    // here is about somebody with an account; one that arrives from a game
+    // server may not be, which is why the column is nullable.
+    const member = await prisma.user.findFirst({
+        where: { username: { equals: playerName, mode: "insensitive" } },
+        select: { id: true },
+    });
+
     const punishment = await prisma.punishment.create({
         data: {
+            userId: member?.id ?? null,
+            source: "site",
             playerName,
             playerUuid: playerUuid || null,
             type: storedType,
@@ -94,11 +91,7 @@ export async function POST(request: NextRequest) {
         },
     });
 
-    // Try to find a matching site user by username for warning/feed linkage
-    const targetUser = await prisma.user.findFirst({
-        where: { username: playerName },
-        select: { id: true },
-    }).catch(() => null);
+    const targetUser = member;
 
     // For warning-type punishments, also record a UserWarning row
     if (storedType === "warning") {

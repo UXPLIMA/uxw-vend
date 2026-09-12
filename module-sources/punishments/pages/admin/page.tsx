@@ -14,6 +14,8 @@ import { PUNISHMENT_TYPES, canonicalType } from "../../lib/punishment-types";
 interface Punishment {
     id: string;
     playerName: string;
+    /** The module that reported it, or "site" for one issued here. */
+    source: string;
     playerUuid: string | null;
     type: string;
     reason: string | null;
@@ -249,6 +251,7 @@ export default function AdminPunishmentsPage() {
                         <thead className="bg-muted/50">
                             <tr>
                                 <th className="px-4 py-2 text-left">{t("player")}</th>
+                                <th className="px-4 py-2 text-left">{t("adm_source")}</th>
                                 <th className="px-4 py-2 text-left">{t("type")}</th>
                                 <th className="px-4 py-2 text-left">{t("reason")}</th>
                                 <th className="px-4 py-2 text-left">{t("date")}</th>
@@ -262,6 +265,13 @@ export default function AdminPunishmentsPage() {
                                 return (
                                 <tr key={p.id} className="border-t">
                                     <td className="px-4 py-2 font-medium">{p.playerName}</td>
+                                    {/* Where it came from, because a row an
+                                        administrator wrote here and one a
+                                        game server reported are answerable to
+                                        different people. */}
+                                    <td className="px-4 py-2 text-muted-foreground">
+                                        {p.source === "site" ? t("adm_sourceSite") : p.source}
+                                    </td>
                                     <td className="px-4 py-2">{typeLabel(p.type)}</td>
                                     <td className="px-4 py-2 text-muted-foreground">{p.reason || "-"}</td>
                                     <td className="px-4 py-2 text-muted-foreground">{new Date(p.createdAt).toLocaleString(__dateTag)}</td>

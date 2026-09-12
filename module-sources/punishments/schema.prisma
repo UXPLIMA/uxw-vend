@@ -1,12 +1,33 @@
 // Punishments Module - Database Models
 // These models are merged into prisma/schema.prisma by merge-schemas.ts
 
+// The other side of `Punishment.userId`. Core's `User` may not name a
+// module's model, so the merge collects the field from here.
+// @@user-relations-start
+//   punishments      Punishment[]       @relation("MemberPunishments")
+// @@user-relations-end
+
 // ==================== PUNISHMENTS ====================
 
 model Punishment {
   id         String    @id @default(cuid())
+  /**
+   * The member this was issued against, when anybody knows which member that
+   * is. A punishment written on this site always has one; one that arrived
+   * from a game server has one only if the account was linked and proved.
+   */
+  userId     String?
+  user       User?     @relation("MemberPunishments", fields: [userId], references: [id], onDelete: SetNull)
+  /** The in-game name, for a punishment that came from a game server. */
   playerName String
   playerUuid String?
+  /**
+   * Who recorded it. "site" is an administrator here; anything else is the id
+   * of the module that brought it in, and `externalRef` is that system's own
+   * identifier, so a webhook delivered twice updates one row.
+   */
+  source     String    @default("site")
+  externalRef String?
   type       String
   reason     String?
   duration   String?
@@ -15,6 +36,8 @@ model Punishment {
   createdAt  DateTime  @default(now())
   expiresAt  DateTime?
 
+  @@unique([source, externalRef])
+  @@index([userId])
   @@index([playerName])
   @@index([type])
   @@index([active])

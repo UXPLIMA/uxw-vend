@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-12",
-  "updatedAt": "2026-09-12T12:24:46Z",
+  "updatedAt": "2026-09-12T12:33:30Z",
   "modules": [
     {
       "id": "announcements",
@@ -1724,13 +1724,13 @@
           "description": "Oyuncuların sunucuda kendilerine fısıldanan bir kodu okuyarak Minecraft hesabının sahibi olduklarını kanıtlamasını sağlayın"
         }
       },
-      "version": "1.1.0",
+      "version": "1.2.0",
       "coreVersion": "^2.0.0",
       "author": "Blysis",
       "icon": "Link2",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-12T12:33:30Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -1746,12 +1746,54 @@
           "minecraft.account.unlinked",
           "server.command"
         ],
-        "listens": []
+        "listens": [
+          "game-account.resolve"
+        ]
       },
       "stats": {
         "publicRoutes": 0,
         "adminRoutes": 1,
         "apiRoutes": 2,
+        "widgets": 0
+      }
+    },
+    {
+      "id": "minecraft-litebans",
+      "name": "Minecraft Punishments (LiteBans)",
+      "description": "Takes bans, mutes and kicks from a LiteBans server and records them against the member who owns the account",
+      "i18n": {
+        "tr": {
+          "name": "Minecraft Cezaları (LiteBans)",
+          "description": "LiteBans sunucusundaki yasak, susturma ve atmaları alır ve hesabın sahibi olan üyenin kaydına yazar"
+        }
+      },
+      "version": "1.0.0",
+      "coreVersion": "^2.2.0",
+      "author": "Blysis",
+      "icon": "Gavel",
+      "category": "gaming",
+      "verified": true,
+      "updatedAt": "2026-09-12T12:33:30Z",
+      "screenshots": [],
+      "tags": [
+        "gaming"
+      ],
+      "zip": "minecraft-litebans.zip",
+      "dependencies": [
+        "punishments"
+      ],
+      "conflicts": [],
+      "hooks": {
+        "emits": [
+          "punishment.record",
+          "game-account.resolve"
+        ],
+        "listens": []
+      },
+      "stats": {
+        "publicRoutes": 0,
+        "adminRoutes": 0,
+        "apiRoutes": 1,
         "widgets": 0
       }
     },
@@ -2242,13 +2284,13 @@
           "description": "Oyun sunucunuzun bildirdiği yasak ve susturmalar, sitede listelenir"
         }
       },
-      "version": "1.2.2",
+      "version": "1.3.0",
       "coreVersion": "^2.0.0",
       "author": "Blysis",
       "icon": "Shield",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-12T12:00:12Z",
+      "updatedAt": "2026-09-12T12:33:30Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -2261,7 +2303,9 @@
           "punishments.punishment.issued",
           "punishments.punishment.revoked"
         ],
-        "listens": []
+        "listens": [
+          "punishment.record"
+        ]
       },
       "stats": {
         "publicRoutes": 1,
