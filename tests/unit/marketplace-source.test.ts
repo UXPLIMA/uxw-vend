@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach } from "vitest";
 
 const ENV_KEY = "BLYSIS_MARKETPLACE_BASE";
-const DEFAULT_HOST = "https://raw.githubusercontent.com/UXPLIMA/blysis/main";
+const DEFAULT_HOST = "https://raw.githubusercontent.com/INOVIXI/blysis/main";
 
 /**
  * The module resolves the base on every call rather than at import time, so a

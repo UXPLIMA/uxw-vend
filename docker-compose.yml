@@ -2,7 +2,7 @@
 #
 # You should not need to read this file. Run the installer instead:
 #
-#   curl -fsSL https://raw.githubusercontent.com/UXPLIMA/blysis/main/install.sh | sudo bash
+#   curl -fsSL https://raw.githubusercontent.com/INOVIXI/blysis/main/install.sh | sudo bash
 #
 # It writes the .env this file needs, picks the ports, and starts everything.
 # To drive compose by hand, copy .env.example to .env and set at minimum
@@ -57,7 +57,7 @@ services:
   # then exits. No-op once the DB is initialized, so it is safe on every
   # `up`. The app waits for this to finish successfully before starting.
   migrate:
-    image: ${BLYSIS_IMAGE:-ghcr.io/uxplima/blysis}:${BLYSIS_VERSION:-latest}
+    image: ${BLYSIS_IMAGE:-ghcr.io/inovixi/blysis}:${BLYSIS_VERSION:-latest}
     depends_on:
       db:
         condition: service_healthy
@@ -76,7 +76,7 @@ services:
     restart: "no"
 
   app:
-    image: ${BLYSIS_IMAGE:-ghcr.io/uxplima/blysis}:${BLYSIS_VERSION:-latest}
+    image: ${BLYSIS_IMAGE:-ghcr.io/inovixi/blysis}:${BLYSIS_VERSION:-latest}
     restart: unless-stopped
     depends_on:
       db:

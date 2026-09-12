@@ -1,8 +1,8 @@
 blank_issues_enabled: false
 contact_links:
   - name: Security vulnerability
-    url: https://github.com/UXPLIMA/blysis/security/advisories/new
+    url: https://github.com/INOVIXI/blysis/security/advisories/new
     about: Please report security issues privately, not as a public issue.
   - name: Question / discussion
-    url: https://github.com/UXPLIMA/blysis/discussions
+    url: https://github.com/INOVIXI/blysis/discussions
     about: Ask questions and discuss ideas in Discussions.

@@ -2,7 +2,7 @@
 #
 # Blysis one-command installer.
 #
-#   curl -fsSL https://raw.githubusercontent.com/UXPLIMA/blysis/main/install.sh | sudo bash
+#   curl -fsSL https://raw.githubusercontent.com/INOVIXI/blysis/main/install.sh | sudo bash
 #
 # Installs Docker if it is missing, generates every secret, writes .env,
 # pulls the prebuilt image, starts the stack, waits until the app answers,
@@ -24,11 +24,11 @@
 #   --help
 set -euo pipefail
 
-REPO_SLUG="UXPLIMA/blysis"
+REPO_SLUG="INOVIXI/blysis"
 # Overridable so a fork can serve its own copies, and so the piped
 # (`curl | bash`) path can be exercised against a local checkout in tests.
 RAW_BASE="${BLYSIS_RAW_BASE:-https://raw.githubusercontent.com/${REPO_SLUG}/main}"
-IMAGE_DEFAULT="ghcr.io/uxplima/blysis"
+IMAGE_DEFAULT="ghcr.io/inovixi/blysis"
 COMPOSE_FILES=(docker-compose.yml docker-compose.build.yml docker-compose.debug.yml Caddyfile updater.sh)
 
 INSTALL_DIR="/opt/blysis"

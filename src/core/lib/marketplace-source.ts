@@ -17,7 +17,7 @@
  * server's own disk through the module installer.
  */
 
-const DEFAULT_BASE = "https://raw.githubusercontent.com/UXPLIMA/blysis/main";
+const DEFAULT_BASE = "https://raw.githubusercontent.com/INOVIXI/blysis/main";
 
 function resolveBase(): string {
     const raw = process.env.BLYSIS_MARKETPLACE_BASE?.trim().replace(/\/+$/, "");

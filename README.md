@@ -4,8 +4,8 @@
   <p><strong>A plugin-first platform whose core ships empty.</strong></p>
   <p>Game-server websites, digital storefronts and community portals. Every feature is a module installed at runtime from a built-in marketplace, or uploaded as a ZIP.</p>
 
-  [![CI](https://github.com/UXPLIMA/blysis/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/UXPLIMA/blysis/actions/workflows/build-and-test.yml)
-  [![Release](https://img.shields.io/github/v/release/UXPLIMA/blysis?display_name=tag&sort=semver)](https://github.com/UXPLIMA/blysis/releases)
+  [![CI](https://github.com/INOVIXI/blysis/actions/workflows/build-and-test.yml/badge.svg)](https://github.com/INOVIXI/blysis/actions/workflows/build-and-test.yml)
+  [![Release](https://img.shields.io/github/v/release/INOVIXI/blysis?display_name=tag&sort=semver)](https://github.com/INOVIXI/blysis/releases)
   [![License](https://img.shields.io/badge/License-MIT-green)](LICENSE)
 
   ![Next.js](https://img.shields.io/badge/Next.js-16.3-black?logo=next.js)
@@ -21,7 +21,7 @@
 ## Install
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/UXPLIMA/blysis/main/install.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/INOVIXI/blysis/main/install.sh | sudo bash
 ```
 
 One command on a fresh VPS. It installs Docker if the machine does not have it,
@@ -198,7 +198,7 @@ Requires Node.js 24+ and PostgreSQL 14+. Redis is optional locally and required
 in production, where the rate limiter fails closed without it.
 
 ```bash
-git clone https://github.com/UXPLIMA/blysis.git
+git clone https://github.com/INOVIXI/blysis.git
 cd blysis
 npm install                            # postinstall runs db:merge + generate-themes + generate-registry
 

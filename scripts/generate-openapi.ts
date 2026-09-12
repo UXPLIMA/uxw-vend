@@ -714,7 +714,7 @@ function generate() {
             version: "1.0.0",
             contact: {
                 name: "Blysis",
-                url: "https://github.com/UXPLIMA/blysis",
+                url: "https://github.com/INOVIXI/blysis",
             },
         },
         servers: [{ url: "/", description: "Current server" }],
