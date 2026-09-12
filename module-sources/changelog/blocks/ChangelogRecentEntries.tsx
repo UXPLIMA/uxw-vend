@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { dateLocaleTag } from "@/core/sdk";
 import type { ComponentConfig } from "@measured/puck";
-import { LoadFailed } from "@/core/sdk/ui";
+import { LoadFailed, Waiting } from "@/core/sdk/ui";
 
 /**
  * Puck page-builder block: ChangelogRecentEntries
@@ -31,6 +31,7 @@ interface ChangelogEntry {
 function ChangelogRecentEntriesRender({ count, heading, showDate }: ChangelogRecentEntriesProps): React.ReactElement {
     const __dateTag = dateLocaleTag(useLocale());
     const t = useTranslations("changelog");
+    const commonT = useTranslations("common");
     const [entries, setEntries] = useState<ChangelogEntry[]>([]);
     const [failed, setFailed] = useState(false);
     const [reloadKey, setReloadKey] = useState(0);
@@ -62,11 +63,7 @@ function ChangelogRecentEntriesRender({ count, heading, showDate }: ChangelogRec
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-6">{heading}</h2>
             ) : null}
             {loading ? (
-                <div className="space-y-3">
-                    {Array.from({ length: count || 5 }).map((_, i) => (
-                        <div key={i} className="h-16 rounded-lg bg-muted animate-pulse" />
-                    ))}
-                </div>
+                <Waiting label={commonT("loading")} className="h-24" />
             ) : failed ? (
                 <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
             ) : entries.length === 0 ? (

@@ -2,10 +2,9 @@
 
 import { useState, useEffect } from "react";
 import { NewsCard } from "./news-card";
-import { Pagination } from "@/core/sdk/ui";
+import { Pagination, Waiting } from "@/core/sdk/ui";
 import { useLocalDate } from "@/core/sdk/ui";
 import { Newspaper } from "lucide-react";
-import { SkeletonNewsGrid } from "../components/skeletons/blog-skeletons";
 import { useTranslations } from "next-intl";
 
 interface BlogPost {
@@ -32,6 +31,7 @@ export function BlogNewsSection() {
   const [isLoading, setIsLoading] = useState(true);
   const [blogPosts, setBlogPosts] = useState<BlogPost[]>([]);
   const t = useTranslations('news');
+  const commonT = useTranslations('common');
     const formatLocalDate = useLocalDate();
 
   useEffect(() => {
@@ -48,15 +48,16 @@ export function BlogNewsSection() {
   const totalPages = Math.ceil(blogPosts.length / newsPerPage);
   const paginatedNews = blogPosts.slice((currentPage - 1) * newsPerPage, currentPage * newsPerPage);
 
-  // The skeleton stands in for what settles here, heading included. Drawing
-  // the grid alone left it 52px short of the article state and 48px over the
-  // empty one, so whichever answer came back moved the footer and everything
-  // under it. The heading needs no data, so it is drawn from the first paint.
+  // The section keeps its height while it waits, heading included. Leaving
+  // the area to size itself left it 52px short of the article state and 48px
+  // over the empty one, so whichever answer came back moved the footer and
+  // everything under it. The heading needs no data, so it is drawn from the
+  // first paint.
   if (isLoading) {
     return (
       <div className={NEWS_SECTION_HEIGHT}>
         <h2 className="text-xl font-bold text-foreground mb-6">{t('title')}</h2>
-        <SkeletonNewsGrid count={4} />
+        <Waiting label={commonT("loading")} />
       </div>
     );
   }

@@ -5,7 +5,7 @@ import { BillingFields, EMPTY_BILLING } from "./BillingFields";
 import type { BillingDetails } from "../../../lib/billing";
 import Image from "next/image";
 import { Link, useRouter } from "@/core/sdk/navigation";
-import { Button, Card, CardContent, CardHeader, CardTitle, Input, Skeleton, useConfirm, useSiteCurrency, buttonClassName } from "@/core/sdk/ui";
+import { Button, Card, CardContent, CardHeader, CardTitle, Input, useConfirm, useSiteCurrency, buttonClassName, Waiting } from "@/core/sdk/ui";
 import { PageFrame } from "@/core/sdk/layout";
 import * as LucideIcons from "lucide-react";
 import { Loader2, Check, X, CreditCard, Coins, ShoppingCart } from "lucide-react";
@@ -274,17 +274,17 @@ export default function CartPage() {
             trail={[{ label: t('title'), href: '/store' }]}
         >
             {loading ? (
-                // Drawn to the measurements of the card below, which is
-                // what a visitor with nothing in their cart gets: a mark,
-                // a heading, a line of explanation and a button. A bare
-                // spinner stood 128px tall against that card's 300px, so
-                // the answer arriving pushed the footer down by 174px.
+                // The minimum height is the card below it, which is what a
+                // visitor with nothing in their cart gets: a mark, a heading,
+                // a line of explanation and a button. Left to itself the
+                // waiting box stood 128px tall against that card's 300px, so
+                // the answer arriving pushed the footer down by 174px. The
+                // number is measured rather than reasoned: `a-waiting-page-is
+                // -the-size-of-its-answer` reads the page length either side
+                // of the answer and wants the difference to be zero.
                 <Card>
-                    <CardContent className="py-12 text-center" aria-busy="true">
-                        <Skeleton className="w-16 h-16 rounded-full mx-auto mb-4" />
-                        <Skeleton className="h-7 w-48 mx-auto mb-2" />
-                        <Skeleton className="h-6 w-72 mx-auto mb-6" />
-                        <Skeleton className="h-10 w-36 mx-auto" />
+                    <CardContent className="py-12 text-center">
+                        <Waiting label={commonT("loading")} className="min-h-[204px]" />
                     </CardContent>
                 </Card>
             ) : !cart || cart.items.length === 0 ? (

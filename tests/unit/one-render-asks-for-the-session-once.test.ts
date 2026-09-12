@@ -56,7 +56,10 @@ describe("a rendered page", () => {
     });
 
     it("finds the server-rendered files to check", () => {
-        expect(rendered.length).toBeGreaterThan(50);
+        // Was 50, when thirty-four of them were `loading.tsx` files drawing a
+        // placeholder page. Those are gone; what is left is the pages
+        // themselves, and they are what this is about.
+        expect(rendered.length).toBeGreaterThan(35);
     });
 
     it("asks through the cached helper, so one render is one round trip", () => {

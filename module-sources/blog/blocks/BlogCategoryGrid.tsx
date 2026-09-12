@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import type { ComponentConfig } from "@measured/puck";
-import { LoadFailed } from "@/core/sdk/ui";
+import { LoadFailed, Waiting } from "@/core/sdk/ui";
 
 /**
  * Puck page-builder block: BlogCategoryGrid
@@ -26,6 +26,7 @@ interface BlogCategory {
 
 function BlogCategoryGridRender({ heading, columns }: BlogCategoryGridProps): React.ReactElement {
     const t = useTranslations("blog");
+    const commonT = useTranslations("common");
     const [categories, setCategories] = useState<BlogCategory[]>([]);
     const [failed, setFailed] = useState(false);
     const [reloadKey, setReloadKey] = useState(0);
@@ -63,11 +64,7 @@ function BlogCategoryGridRender({ heading, columns }: BlogCategoryGridProps): Re
                 <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-6">{heading}</h2>
             ) : null}
             {loading ? (
-                <div className={`grid grid-cols-2 ${colClass} gap-4`}>
-                    {Array.from({ length: columns || 3 }).map((_, i) => (
-                        <div key={i} className="h-24 rounded-lg bg-muted animate-pulse" />
-                    ))}
-                </div>
+                <Waiting label={commonT("loading")} className="h-24" />
             ) : failed ? (
                 <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
             ) : categories.length === 0 ? (

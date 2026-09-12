@@ -1,7 +1,7 @@
 /**
  * A section that reserves room keeps it.
  *
- * The news section draws a skeleton while it waits for
+ * The news section says it is waiting while it waits for
  * `/api/v1/blog/articles`, and the room it holds is a minimum height. A
  * minimum is a floor, not a size, and here it was a floor nobody stood on.
  * Measured at 1280px, the same section rendered three different heights:
@@ -63,15 +63,16 @@ async function pageMovementWhenNewsArrives(
 
     await page.goto('/tr', { waitUntil: 'load' });
 
-    // Waiting for the skeleton rather than for a stopwatch. A fixed delay
-    // reads the page before the skeleton is up on a slow machine, and a
-    // section that never drew one would pass by having nothing to say.
-    const skeleton = page.locator('.animate-pulse').first();
-    await skeleton.waitFor({ state: 'visible', timeout: 20_000 });
+    // Waiting for the waiting region rather than for a stopwatch. A fixed
+    // delay reads the page before it is up on a slow machine, and a section
+    // that never said it was waiting would pass by having nothing to say.
+    // `aria-busy` is what says it now; it used to be a pulsing grey block.
+    const waiting = page.locator('[aria-busy="true"]').first();
+    await waiting.waitFor({ state: 'visible', timeout: 20_000 });
     await page.waitForTimeout(SETTLE_MS);
     const before = await page.evaluate(() => document.body.scrollHeight);
 
-    await skeleton.waitFor({ state: 'detached', timeout: 20_000 });
+    await waiting.waitFor({ state: 'detached', timeout: 20_000 });
     await page.waitForTimeout(SETTLE_MS);
     const after = await page.evaluate(() => document.body.scrollHeight);
     return { before, after };

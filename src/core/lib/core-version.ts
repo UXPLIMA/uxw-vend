@@ -12,6 +12,13 @@
  * symbol changes shape or is removed - that is the signal a module's declared
  * range is meant to catch.
  *
+ * 2.2.0 - `Waiting` is how a module says a region is still fetching. The
+ * product stopped drawing page shaped placeholders: they were a second copy
+ * of a layout nothing kept in step with the first, and the generic ones were
+ * already wrong by twelve table rows and 24 pixels of card. `Skeleton` is
+ * still exported, because removing a name modules are written against is a
+ * major bump rather than a tidy up, but nothing here draws one any more.
+ *
  * 2.1.0 - `menu[].section` lets a module say which section of a group its
  * admin page belongs to, and a group declares its own `order` rather than
  * being appended after everything core ships. Without the first, a module with
@@ -338,4 +345,4 @@
  * installs, and a module that declared none had no range for a major to
  * protect.
  */
-export const CORE_API_VERSION = "2.1.0";
+export const CORE_API_VERSION = "2.2.0";

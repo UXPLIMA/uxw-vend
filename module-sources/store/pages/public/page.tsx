@@ -4,11 +4,10 @@ import { useState, useEffect } from "react";
 
 import { PageFrame } from "@/core/sdk/layout";
 import { Coins, Box, ChevronRight, Search, X } from "lucide-react";
-import { SkeletonServerModes, SkeletonProductGrid } from "../../components/skeletons/store-skeletons";
 import { type AvailabilityInfo } from "../../components/AvailabilityNote";
 import { ProductCard } from "../../components/ProductCard";
 import { useTranslations } from "next-intl";
-import { LoadFailed, NativeSelect, Pagination, RichContent } from "@/core/sdk/ui";
+import { LoadFailed, NativeSelect, Pagination, RichContent, Waiting } from "@/core/sdk/ui";
 
 interface Category {
     id: string;
@@ -241,7 +240,7 @@ export default function StorePage() {
                 <section>
                     <h2 className="text-xl font-bold text-foreground mb-6">{t('title')}</h2>
                     {loadingCategories ? (
-                        <SkeletonServerModes />
+                        <Waiting label={commonT("loading")} />
                     ) : failed ? (
                         <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
                     ) : rootCategories.length === 0 ? (
@@ -330,7 +329,7 @@ export default function StorePage() {
                         </NativeSelect>
                     </div>
                     {loadingProducts ? (
-                        <SkeletonProductGrid count={4} />
+                        <Waiting label={commonT("loading")} />
                     ) : failed ? (
                         <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
                     ) : products.length === 0 ? (

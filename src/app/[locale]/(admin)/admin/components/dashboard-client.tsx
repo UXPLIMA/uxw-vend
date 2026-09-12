@@ -12,9 +12,20 @@ import dynamic from "next/dynamic";
 import { isEnabledIn } from "@/core/lib/module-enabled";
 import { useSiteCurrency } from "@/core/components/currency/site-currency";
 import { badgeClassName, type BadgeTone } from "@/core/components/ui/badge";
+import { Waiting } from "@/core/components/ui/waiting";
+
+/**
+ * The chart's own chunk is fetched on demand, and this holds its place while
+ * it arrives. The height is the chart's, so nothing under it moves when it
+ * lands. It is rendered inside the tree, so it may translate its own line.
+ */
+function ChartWaiting() {
+    const commonT = useTranslations("common");
+    return <Waiting label={commonT("loading")} className="h-[300px]" />;
+}
 
 const DashboardCharts = dynamic(() => import("./dashboard-charts").then(m => ({ default: m.DashboardCharts })), {
-    loading: () => <div className="h-[300px] bg-muted animate-pulse rounded-lg" />,
+    loading: ChartWaiting,
 });
 
 interface ModuleManifest {
@@ -153,17 +164,6 @@ function widgetId(kind: "card" | "section", moduleId: string, id: string): strin
     return kind === "section" ? `mod:${moduleId}:section:${id}` : `mod:${moduleId}:${id}`;
 }
 
-function StatCardSkeleton() {
-    return (
-        <Card className="animate-pulse">
-            <CardContent className="p-4">
-                <div className="h-4 bg-muted rounded w-20 mb-2" />
-                <div className="h-8 bg-muted rounded w-16" />
-            </CardContent>
-        </Card>
-    );
-}
-
 /**
  * The KPI row.
  *
@@ -197,7 +197,12 @@ export function DashboardKpiRow({ order, coreSlots }: {
                 if (coreSlots[id]) return <div key={id}>{coreSlots[id]}</div>;
                 if (!id.startsWith("mod:")) return null;
                 const card = byId.get(id);
-                if (!card) return loading ? <StatCardSkeleton key={id} /> : null;
+                // The row knows how many cards it will have before they
+                // arrive, so an empty one holds the place rather than letting
+                // the grid reflow when the numbers land. It draws nothing
+                // inside: four spinners in a row of four boxes says less than
+                // the four boxes already say.
+                if (!card) return loading ? <Card key={id} aria-busy="true" className="h-full" /> : null;
                 return (
                     <Link key={id} href={card.href} className="block">
                         <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">

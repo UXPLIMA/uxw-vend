@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import type { ComponentConfig } from "@measured/puck";
 import { Crown, Medal, Trophy } from "lucide-react";
-import { LoadFailed } from "@/core/sdk/ui";
+import { LoadFailed, Waiting } from "@/core/sdk/ui";
 
 /**
  * Puck page-builder block: LeaderboardTop
@@ -35,6 +35,7 @@ function iconFor(type: LeaderboardTopProps["type"]) {
 
 function LeaderboardTopRender({ limit, type, heading }: LeaderboardTopProps): React.ReactElement {
     const t = useTranslations("leaderboard");
+    const commonT = useTranslations("common");
     const [entries, setEntries] = useState<LeaderEntry[]>([]);
     const [failed, setFailed] = useState(false);
     const [reloadKey, setReloadKey] = useState(0);
@@ -72,11 +73,7 @@ function LeaderboardTopRender({ limit, type, heading }: LeaderboardTopProps): Re
             ) : null}
             <div className="bg-card border border-border rounded-lg overflow-hidden">
                 {loading ? (
-                    <div className="divide-y divide-border">
-                        {Array.from({ length: limit || 5 }).map((_, i) => (
-                            <div key={i} className="h-14 bg-muted animate-pulse" />
-                        ))}
-                    </div>
+                    <Waiting label={commonT("loading")} className="h-24" />
                 ) : failed ? (
                     <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
                 ) : entries.length === 0 ? (

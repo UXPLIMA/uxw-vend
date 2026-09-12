@@ -86,7 +86,7 @@ export default function AdminModulesPage() {
                                 <h2 className="font-semibold text-lg mb-1">{installProgress.name}</h2>
                                 <p className="text-sm text-muted-foreground">{installProgress.step}</p>
                                 <div className="mt-4 w-full bg-muted rounded-full h-2 overflow-hidden">
-                                    <div className="bg-primary h-full rounded-full animate-pulse" style={{ width: installProgress.step === "Done!" ? "100%" : "60%" }} />
+                                    <div className="bg-primary h-full rounded-full transition-[width] duration-500" style={{ width: installProgress.step === "Done!" ? "100%" : "60%" }} />
                                 </div>
                             </>
                         ) : null}
