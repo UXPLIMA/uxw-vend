@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-12",
-  "updatedAt": "2026-09-12T13:06:14Z",
+  "updatedAt": "2026-09-12T13:14:29Z",
   "modules": [
     {
       "id": "announcements",
@@ -117,13 +117,13 @@
       "name": "BirFatura Invoicing",
       "description": "Publishes this shop's paid orders for BirFatura to pull and invoice. The integrator calls in with a shared secret; nothing is sent out.",
       "i18n": {},
-      "version": "1.2.0",
+      "version": "1.3.0",
       "coreVersion": "^2.0.0",
       "author": "Blysis",
       "icon": "FileText",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-12T13:14:29Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -135,7 +135,8 @@
       "conflicts": [],
       "hooks": {
         "emits": [
-          "payment.providers"
+          "payment.providers",
+          "store.orders.collect"
         ],
         "listens": [
           "store.billing.required"
@@ -2792,13 +2793,13 @@
           "description": "Ürün, kategori, sepet ve siparişleriyle eksiksiz e-ticaret"
         }
       },
-      "version": "2.26.0",
+      "version": "2.27.0",
       "coreVersion": "^2.2.0",
       "author": "Blysis Team",
       "icon": "ShoppingBag",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-12T13:06:14Z",
+      "updatedAt": "2026-09-12T13:14:29Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -2830,7 +2831,8 @@
           "subscription.changed",
           "admin.customer.panels",
           "leaderboard.boards",
-          "coupon.issue"
+          "coupon.issue",
+          "store.orders.collect"
         ]
       },
       "stats": {

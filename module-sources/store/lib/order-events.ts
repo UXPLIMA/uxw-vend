@@ -14,14 +14,21 @@ import { prisma } from "@/core/sdk/server";
 import { doActionAsync } from "@/core/sdk";
 
 async function loadOrder(orderId: string) {
-    return prisma.order.findUnique({
+    const order = await prisma.order.findUnique({
         where: { id: orderId },
         include: {
             items: {
                 select: { id: true, productId: true, name: true, quantity: true, price: true },
             },
+            user: { select: { email: true } },
         },
     });
+    if (!order) return null;
+    // The buyer's address comes out flat: a listener that files an invoice
+    // needs it, and reading it back out of this table is how two invoicing
+    // modules ended up knowing the shop's schema.
+    const { user, ...rest } = order;
+    return { ...rest, buyerEmail: user?.email ?? null };
 }
 
 /** Fired once when an order row is created, whether or not it is paid yet. */

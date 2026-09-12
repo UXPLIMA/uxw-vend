@@ -35,15 +35,14 @@ async function taxRate(): Promise<number> {
 const onOrderCompleted: HookHandlerFor<"store.order.completed", "action"> = async (payload) => {
     if (!(await isConfigured())) return;
 
-    const order = await prisma.order.findUnique({
-        where: { id: payload.id },
-        include: { items: true, user: { select: { email: true } } },
-    });
-    if (!order) return;
+    // The event carries the order, the buyer's address and their email. It
+    // used to be read back out of the shop's own table here, which is a
+    // module reaching into another module's data for what it was handed.
+    const order = payload;
 
     const existing = await prisma.issuedInvoice.findUnique({ where: { orderId: order.id } });
     const decision = whatToDoWith(
-        { id: order.id, status: order.status, billingDetails: order.billingDetails, total: order.total },
+        { id: order.id, status: order.status ?? "", billingDetails: order.billingDetails, total: order.total },
         existing ? { status: existing.status as InvoiceStatus } : null,
     );
 
@@ -79,7 +78,7 @@ const onOrderCompleted: HookHandlerFor<"store.order.completed", "action"> = asyn
                 config,
                 token,
                 "contacts",
-                contactPayload(decision.billing, order.user?.email ?? ""),
+                contactPayload(decision.billing, order.buyerEmail ?? ""),
             );
             return createRecord(
                 config,
@@ -89,7 +88,7 @@ const onOrderCompleted: HookHandlerFor<"store.order.completed", "action"> = asyn
                     contactId: contact.id,
                     order: {
                         orderNumber: order.orderNumber,
-                        currency: order.currency,
+                        currency: order.currency ?? "",
                         taxRate: await taxRate(),
                         lines: order.items.map((item) => ({
                             name: item.name,

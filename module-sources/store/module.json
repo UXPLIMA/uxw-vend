@@ -2,7 +2,7 @@
   "id": "store",
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
-  "version": "2.26.0",
+  "version": "2.27.0",
   "coreVersion": "^2.2.0",
   "category": "commerce",
   "author": "Blysis Team",
@@ -56,6 +56,11 @@
       "hook": "coupon.issue",
       "type": "filter",
       "handler": "hooks/issue-coupon.ts"
+    },
+    {
+      "hook": "store.orders.collect",
+      "type": "filter",
+      "handler": "hooks/collect-orders.ts"
     }
   ],
   "settings": [

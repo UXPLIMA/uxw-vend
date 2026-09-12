@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { applyFiltersAsync } from "@/core/sdk";
 import { prisma, readJsonBody } from "@/core/sdk/server";
 import { z } from "zod";
 import { PRIVATE, refuseUnlessInvited } from "../../lib/request";
@@ -73,19 +74,14 @@ export async function POST(request: NextRequest) {
     // not a sale, and invoicing one is a document to cancel later.
     const status = parsed.data.orderStatusId ?? "COMPLETED";
 
-    const orders = await prisma.order.findMany({
-        where: {
-            status,
-            ...(from || until
-                ? { createdAt: { ...(from ? { gte: from } : {}), ...(until ? { lte: until } : {}) } }
-                : {}),
-        },
-        include: {
-            items: { select: { productId: true, name: true, quantity: true, price: true } },
-            user: { select: { email: true } },
-        },
-        orderBy: { createdAt: "asc" },
-        take: MAX_ORDERS,
+    // The shop answers for its own sales. This used to be a query against
+    // `Order` written here, which is an invoicing module knowing the shop's
+    // status vocabulary, its line items and where a buyer's email lives.
+    const orders = await applyFiltersAsync("store.orders.collect", [], {
+        status,
+        from,
+        until,
+        limit: MAX_ORDERS,
     });
 
     const tax = await taxSetup();
@@ -95,12 +91,12 @@ export async function POST(request: NextRequest) {
                 {
                     id: order.id,
                     orderNumber: order.orderNumber,
-                    createdAt: order.createdAt,
-                    currency: order.currency,
+                    createdAt: order.createdAt ? new Date(order.createdAt) : new Date(),
+                    currency: order.currency ?? "",
                     total: order.total,
                     userId: order.userId,
-                    email: order.user?.email ?? null,
-                    paymentMethod: order.paymentMethod,
+                    email: order.buyerEmail ?? null,
+                    paymentMethod: order.paymentMethod ?? null,
                     billingDetails: order.billingDetails,
                     items: order.items,
                 },

@@ -51,6 +51,8 @@ declare global {
     interface BlysisFilterPayloads {
         /** Whether a coupon was created for the code the caller minted. */
         "coupon.issue": CouponIssued;
+        /** The sales somebody is collecting, oldest first. */
+        "store.orders.collect": StoreOrderHookPayload[];
         /** Which gateways can take this currency right now. */
         "payment.providers": PaymentProviderSummary[];
         /** Where to send the buyer, once a gateway has started the payment. */
@@ -88,6 +90,21 @@ declare global {
 
     /** The other half of the same six filters: what each one is asked about. */
     interface BlysisFilterContexts {
+        /**
+         * A window of sales, for something that files them.
+         *
+         * An accounting integrator asks this site for what it sold between
+         * two dates. It used to read the shop's `Order` table itself, which
+         * meant an invoicing module knew the shop's status vocabulary and the
+         * shape of its line items. The shop answers instead.
+         */
+        "store.orders.collect": {
+            /** The shop's own word for it. Paid, unless the caller says otherwise. */
+            status?: string;
+            from?: Date | null;
+            until?: Date | null;
+            limit: number;
+        };
         /**
          * A coupon somebody won.
          *
@@ -242,6 +259,16 @@ interface StoreOrderItemHookPayload {
 
 interface StoreOrderHookPayload {
     id: string;
+    /**
+     * When the order was placed, and who to send a document to.
+     *
+     * Both arrived for the invoicing modules, which were reading the order
+     * back out of the shop's own table to get them - a module reaching into
+     * another module's data for two fields the event could have carried.
+     */
+    createdAt?: Date | string;
+    billingDetails?: unknown;
+    buyerEmail?: string | null;
     /** Null once the buyer deletes their account - Order.userId is SetNull. */
     userId: string | null;
     orderNumber: string;

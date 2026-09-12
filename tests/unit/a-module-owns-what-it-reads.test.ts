@@ -33,14 +33,13 @@ const MODULES = "module-sources";
 /**
  * Reads still to be turned into a hook, with the plan for each.
  *
- * This list only shrinks. An addition to it is a module reaching into another
- * one, which is the thing this test exists to stop.
+ * It is empty. It held seven when this was written - the leaderboard's three,
+ * the credit ledger's two and an order each for two invoicing modules - and
+ * every one of them became a question the owning module answers. An addition
+ * to it is a module reaching into another one, which is the thing this test
+ * exists to stop.
  */
-const STILL_REACHING: Record<string, string[]> = {
-    /** Both take the paid order from the hook payload rather than re-reading it. */
-    "birfatura-invoicing": ["Order"],
-    "parasut-invoicing": ["Order"],
-};
+const STILL_REACHING: Record<string, string[]> = {};
 
 function modelOwners(): Map<string, string> {
     const owners = new Map<string, string>();
