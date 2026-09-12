@@ -13,8 +13,16 @@ interface LinkedAccount {
     username: string | null;
 }
 
-/** Game account provider owned by this module. */
-const GAME_PROVIDER = "minecraft";
+/**
+ * What this module files a self-declared game account under.
+ *
+ * It was "minecraft". The tab says "Link Game Account" and asks for a "Game
+ * username" in every locale, and this module knows nothing about which game a
+ * site runs - the one that does ships its own profile tab and proves the
+ * account is yours before it writes anything down. Rows written under the old
+ * name are moved by `migrations/001_a_linked_game_account_names_no_game.sql`.
+ */
+const GAME_PROVIDER = "game";
 
 /**
  * Profile tab for connected accounts.

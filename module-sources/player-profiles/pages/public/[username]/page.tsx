@@ -7,7 +7,6 @@ import { Link } from "@/core/sdk/navigation";
 import { Card, CardContent, CardHeader, CardTitle, RoleBadge } from "@/core/sdk/ui";
 import { PageFrame } from "@/core/sdk/layout";
 import { Loader2, MessageSquare, FileText, ShoppingCart, ThumbsUp, Calendar } from "lucide-react";
-import { getMinecraftAvatar } from "../../../lib/minecraft";
 import { dateLocaleTag } from "@/core/sdk";
 
 interface Player {
@@ -27,7 +26,7 @@ interface Player {
     // not installed contributes no key at all, so nothing renders a zero for it.
     _count: Record<string, number | undefined>;
     recentTopics: { id: string; title: string; slug: string; createdAt: string }[];
-    linkedAccounts: { provider: string; username: string | null }[];
+    linkedAccounts: { provider: string; username: string | null; avatar: string | null }[];
 }
 
 interface PageProps {
@@ -71,14 +70,16 @@ export default function PlayerProfilePage({ params }: PageProps) {
                     {/* Profile Header */}
                     <div className="flex items-center gap-5 mb-8">
                         {(() => {
-                            // Only call mc-heads.net when we know this user has a linked
-                            // Minecraft account - otherwise the service 301s an HTML page
-                            // that Next/Image rejects with a 400.
-                            const mcAccount = player.linkedAccounts.find(
-                                (a) => (a.provider || "").toLowerCase() === "minecraft" && a.username,
-                            );
-                            const avatarSrc = player.avatar
-                                || (mcAccount?.username ? getMinecraftAvatar(mcAccount.username, 80) : null);
+                            // The member's own picture, then whatever a linked
+                            // account brought with it. This used to build a
+                            // URL at mc-heads.net out of a linked Minecraft
+                            // name, which is a third party this module has no
+                            // business knowing about and a game this site may
+                            // have nothing to do with. `LinkedAccount.avatar`
+                            // is where a picture that came with an identity
+                            // belongs, and whoever links the account fills it.
+                            const linked = player.linkedAccounts.find((a) => a.avatar);
+                            const avatarSrc = player.avatar || linked?.avatar || null;
                             if (avatarSrc) {
                                 return (
                                     <Image

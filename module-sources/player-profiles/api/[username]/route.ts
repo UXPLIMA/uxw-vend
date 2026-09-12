@@ -106,7 +106,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         recentForumTopics(user.id),
         prisma.linkedAccount.findMany({
             where: { userId: user.id },
-            select: { provider: true, username: true },
+            // `avatar` because the profile draws it: a picture that came
+            // with an identity is the identity's to carry, and the page used
+            // to build one out of a linked name and a third party's URL.
+            select: { provider: true, username: true, avatar: true },
         }),
     ]);
 

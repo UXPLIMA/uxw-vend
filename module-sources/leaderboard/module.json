@@ -2,7 +2,7 @@
   "id": "leaderboard",
   "name": "Leaderboard",
   "description": "Player rankings by purchases, votes, and activity",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "coreVersion": "^2.2.0",
   "category": "commerce",
   "author": "Blysis",

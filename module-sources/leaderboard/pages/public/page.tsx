@@ -6,9 +6,6 @@ import { useTranslations } from "next-intl";
 import { Button, Card, CardContent, LoadFailed, useSiteCurrency } from "@/core/sdk/ui";
 import { PageFrame } from "@/core/sdk/layout";
 import { Loader2, Trophy, Crown, Medal } from "lucide-react";
-// Minecraft avatar helper - inline
-function getMinecraftAvatar(username: string, size = 64) { return `https://mc-heads.net/avatar/${username}/${size}`; }
-
 interface LeaderEntry {
     username: string;
     avatar: string | null;
@@ -89,14 +86,24 @@ export default function LeaderboardPage() {
                                         #{i + 1}
                                     </div>
                                     <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center font-bold text-sm overflow-hidden">
-                                        <Image
-                                            src={entry.avatar || getMinecraftAvatar(entry.username, 40)}
-                                            alt={entry.username}
-                                            width={40}
-                                            height={40}
-                                            className="w-full h-full object-cover"
-                                            onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }}
-                                        />
+                                        {/* The member's own picture, or the
+                                            initial every other list in the
+                                            product falls back to. It used to
+                                            ask mc-heads.net for a Minecraft
+                                            skin, which sent every name on
+                                            this page to a third party and
+                                            assumed the site was a game. */}
+                                        {entry.avatar ? (
+                                            <Image
+                                                src={entry.avatar}
+                                                alt={entry.username}
+                                                width={40}
+                                                height={40}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        ) : (
+                                            entry.username.charAt(0).toUpperCase()
+                                        )}
                                     </div>
                                     <div className="flex-1">
                                         <p className="font-medium">{entry.username}</p>

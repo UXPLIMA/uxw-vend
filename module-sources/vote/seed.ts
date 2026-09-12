@@ -7,10 +7,10 @@ import type { ModuleSeed } from "@/core/sdk/seed";
  * unevenly across people and days rather than one each.
  */
 const SITES: [string, string][] = [
-    ["Minecraft Server List", "https://minecraft-server-list.example.invalid/vote"],
+    ["Server List", "https://server-list.example.invalid/vote"],
     ["TopG", "https://topg.example.invalid/vote"],
-    ["Planet Minecraft", "https://planetminecraft.example.invalid/vote"],
-    ["Minecraft MP", "https://minecraft-mp.example.invalid/vote"],
+    ["Planet Servers", "https://planet-servers.example.invalid/vote"],
+    ["Top Communities", "https://top-communities.example.invalid/vote"],
 ];
 
 export const seed: ModuleSeed = {
