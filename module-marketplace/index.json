@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-12",
-  "updatedAt": "2026-09-12T11:44:35Z",
+  "updatedAt": "2026-09-12T12:00:12Z",
   "modules": [
     {
       "id": "announcements",
@@ -276,16 +276,16 @@
           "description": "Cloudflare tarafından sağlanan, gizliliğe saygılı CAPTCHA alternatifi"
         }
       },
-      "version": "1.6.2",
+      "version": "1.6.3",
       "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "Shield",
-      "category": "integration",
+      "category": "security",
       "verified": true,
-      "updatedAt": "2026-09-12T09:10:00Z",
+      "updatedAt": "2026-09-12T12:00:12Z",
       "screenshots": [],
       "tags": [
-        "integration"
+        "security"
       ],
       "zip": "cloudflare-turnstile.zip",
       "dependencies": [],
@@ -537,16 +537,16 @@
           "description": "Veri yedeklemesi için CSV dışa ve içe aktarma araçları"
         }
       },
-      "version": "1.1.2",
+      "version": "1.1.3",
       "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "Download",
-      "category": "integration",
+      "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-12T09:10:00Z",
+      "updatedAt": "2026-09-12T12:00:12Z",
       "screenshots": [],
       "tags": [
-        "integration"
+        "management"
       ],
       "zip": "csv-import-export.zip",
       "dependencies": [
@@ -793,23 +793,23 @@
     {
       "id": "downloads",
       "name": "Downloads",
-      "description": "File download center for resources and mods",
+      "description": "A file library: releases, guides and anything else worth handing out",
       "i18n": {
         "tr": {
           "name": "İndirmeler",
-          "description": "Kaynaklar ve modlar için dosya indirme merkezi"
+          "description": "Dosya kitaplığı: sürümler, rehberler ve paylaşmaya değer her şey"
         }
       },
-      "version": "1.2.1",
+      "version": "1.2.2",
       "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "Download",
-      "category": "gaming",
+      "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-11T13:12:03Z",
+      "updatedAt": "2026-09-12T12:00:12Z",
       "screenshots": [],
       "tags": [
-        "gaming"
+        "content"
       ],
       "zip": "downloads.zip",
       "dependencies": [],
@@ -837,16 +837,16 @@
           "description": "E-posta servisi yapılandırması ve şablonları"
         }
       },
-      "version": "1.2.1",
+      "version": "1.2.2",
       "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "Mail",
-      "category": "content",
+      "category": "management",
       "verified": true,
-      "updatedAt": "2026-09-11T13:04:50Z",
+      "updatedAt": "2026-09-12T12:00:12Z",
       "screenshots": [],
       "tags": [
-        "content"
+        "management"
       ],
       "zip": "email-templates.zip",
       "dependencies": [],
@@ -1374,23 +1374,23 @@
     {
       "id": "leaderboard",
       "name": "Leaderboard",
-      "description": "Player rankings by purchases, votes, and activity",
+      "description": "Member rankings by purchases, votes and activity",
       "i18n": {
         "tr": {
           "name": "Liderlik Tablosu",
-          "description": "Satın alma, oy ve etkinliğe göre oyuncu sıralamaları"
+          "description": "Satın alma, oy ve etkinliğe göre üye sıralamaları"
         }
       },
-      "version": "1.2.2",
+      "version": "1.2.3",
       "coreVersion": "^2.2.0",
       "author": "Blysis",
       "icon": "Trophy",
-      "category": "commerce",
+      "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-12T11:44:35Z",
+      "updatedAt": "2026-09-12T12:00:12Z",
       "screenshots": [],
       "tags": [
-        "commerce"
+        "community"
       ],
       "zip": "leaderboard.zip",
       "dependencies": [
@@ -1492,16 +1492,16 @@
           "description": "Giriş sınırlaması: kaç başarısız denemenin hesabı kilitleyeceği"
         }
       },
-      "version": "1.1.1",
+      "version": "1.1.2",
       "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "Shield",
-      "category": "management",
+      "category": "security",
       "verified": true,
-      "updatedAt": "2026-09-11T13:04:50Z",
+      "updatedAt": "2026-09-12T12:00:12Z",
       "screenshots": [],
       "tags": [
-        "management"
+        "security"
       ],
       "zip": "login-protection.zip",
       "dependencies": [],
@@ -2160,21 +2160,21 @@
     },
     {
       "id": "player-profiles",
-      "name": "Player Profiles",
-      "description": "Public player profile pages",
+      "name": "Member Profiles",
+      "description": "Public profile pages, with what every installed module knows about a member",
       "i18n": {
         "tr": {
-          "name": "Oyuncu Profilleri",
-          "description": "Herkese açık oyuncu profil sayfaları"
+          "name": "Üye Profilleri",
+          "description": "Herkese açık profil sayfaları; kurulu her modülün üye hakkında bildiği ile"
         }
       },
-      "version": "1.2.1",
+      "version": "1.2.2",
       "coreVersion": "^2.0.0",
       "author": "Blysis",
       "icon": "Users",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-12T11:44:35Z",
+      "updatedAt": "2026-09-12T12:00:12Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -2230,21 +2230,21 @@
     },
     {
       "id": "punishments",
-      "name": "Punishments",
-      "description": "Player punishment history and ban management",
+      "name": "Game Server Punishments",
+      "description": "Bans and mutes your game server reports, listed on the site",
       "i18n": {
         "tr": {
-          "name": "Cezalar",
-          "description": "Oyuncu ceza geçmişi ve yasaklama yönetimi"
+          "name": "Oyun Sunucusu Cezaları",
+          "description": "Oyun sunucunuzun bildirdiği yasak ve susturmalar, sitede listelenir"
         }
       },
-      "version": "1.2.1",
+      "version": "1.2.2",
       "coreVersion": "^2.0.0",
       "author": "Blysis",
       "icon": "Shield",
       "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-11T11:32:54Z",
+      "updatedAt": "2026-09-12T12:00:12Z",
       "screenshots": [],
       "tags": [
         "gaming"
@@ -2461,16 +2461,16 @@
       "name": "Rank Delivery",
       "description": "Lets members sell a rank for a number of days in the market. The first thing anything here can hand over.",
       "i18n": {},
-      "version": "1.1.0",
+      "version": "1.1.1",
       "coreVersion": "^2.0.0",
       "author": "Blysis",
       "icon": "ShieldCheck",
-      "category": "integration",
+      "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-12T12:00:12Z",
       "screenshots": [],
       "tags": [
-        "integration"
+        "commerce"
       ],
       "zip": "role-delivery.zip",
       "dependencies": [],
@@ -3059,16 +3059,16 @@
           "description": "Hesap güvenliğini artırmak için yedek kodlu, TOTP tabanlı iki adımlı doğrulama"
         }
       },
-      "version": "1.2.0",
+      "version": "1.2.1",
       "coreVersion": "^2.0.0",
       "author": "Blysis",
       "icon": "Shield",
-      "category": "management",
+      "category": "security",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-12T12:00:12Z",
       "screenshots": [],
       "tags": [
-        "management"
+        "security"
       ],
       "zip": "two-factor-auth.zip",
       "dependencies": [],
@@ -3166,16 +3166,16 @@
           "description": "Oyuncuları sıralamada yer aldığınız sunucu listelerine yönlendirin ve kimin oy verdiğini sayın"
         }
       },
-      "version": "1.3.1",
+      "version": "1.3.2",
       "coreVersion": "^2.0.0",
       "author": "Blysis",
       "icon": "Vote",
-      "category": "commerce",
+      "category": "gaming",
       "verified": true,
-      "updatedAt": "2026-09-12T11:44:35Z",
+      "updatedAt": "2026-09-12T12:00:12Z",
       "screenshots": [],
       "tags": [
-        "commerce"
+        "gaming"
       ],
       "zip": "vote.zip",
       "dependencies": [],

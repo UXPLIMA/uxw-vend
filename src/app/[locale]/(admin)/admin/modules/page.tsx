@@ -9,7 +9,7 @@ import {
     Search as SearchIcon, ArrowUp, X, Tag as TagIcon,
 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { categoryColors, resolveDependencyBadge } from "./module-display";
+import { categoryClassName, resolveDependencyBadge } from "./module-display";
 import { moduleDescription, moduleName } from "./module-name";
 import type { SortKey } from "./types";
 import { useAdminModules } from "./useAdminModules";
@@ -398,7 +398,7 @@ export default function AdminModulesPage() {
                                                 </p>
                                             </div>
                                         </div>
-                                        <span className={`text-xs px-2 py-0.5 rounded font-medium capitalize ${categoryColors[mod.category] || "bg-muted text-foreground"}`}>
+                                        <span className={`text-xs px-2 py-0.5 rounded font-medium capitalize ${categoryClassName(mod.category)}`}>
                                             {mod.category}
                                         </span>
                                     </div>

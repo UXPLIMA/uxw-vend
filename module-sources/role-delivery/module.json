@@ -2,9 +2,9 @@
   "id": "role-delivery",
   "name": "Rank Delivery",
   "description": "Lets members sell a rank for a number of days in the market. The first thing anything here can hand over.",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "coreVersion": "^2.0.0",
-  "category": "integration",
+  "category": "commerce",
   "author": "Blysis",
   "icon": "ShieldCheck",
   "hookListeners": [

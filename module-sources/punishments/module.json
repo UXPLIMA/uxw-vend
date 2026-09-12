@@ -1,8 +1,8 @@
 {
   "id": "punishments",
-  "name": "Punishments",
-  "description": "Player punishment history and ban management",
-  "version": "1.2.1",
+  "name": "Game Server Punishments",
+  "description": "Bans and mutes your game server reports, listed on the site",
+  "version": "1.2.2",
   "coreVersion": "^2.0.0",
   "category": "gaming",
   "author": "Blysis",
@@ -65,10 +65,10 @@
   "translations": {
     "en": {
       "admin": {
-        "menu_punishments": "Punishments",
+        "menu_punishments": "Game Server Punishments",
         "menu_punishments_punishments": "All Punishments",
-        "module_punishments_name": "Punishments",
-        "module_punishments_description": "Player punishment history and ban management"
+        "module_punishments_name": "Game Server Punishments",
+        "module_punishments_description": "Bans and mutes your game server reports, listed on the site"
       },
       "punishments": {
         "adm_title": "Punishments",
@@ -134,10 +134,10 @@
     },
     "tr": {
       "admin": {
-        "menu_punishments": "Cezalar",
+        "menu_punishments": "Oyun Sunucusu Cezaları",
         "menu_punishments_punishments": "Tüm Cezalar",
-        "module_punishments_name": "Cezalar",
-        "module_punishments_description": "Oyuncu ceza geçmişi ve yasaklama yönetimi"
+        "module_punishments_name": "Oyun Sunucusu Cezaları",
+        "module_punishments_description": "Oyun sunucunuzun bildirdiği yasak ve susturmalar, sitede listelenir"
       },
       "punishments": {
         "adm_title": "Cezalar",

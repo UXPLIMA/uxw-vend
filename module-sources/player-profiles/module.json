@@ -1,8 +1,8 @@
 {
   "id": "player-profiles",
-  "name": "Player Profiles",
-  "description": "Public player profile pages",
-  "version": "1.2.1",
+  "name": "Member Profiles",
+  "description": "Public profile pages, with what every installed module knows about a member",
+  "version": "1.2.2",
   "coreVersion": "^2.0.0",
   "category": "gaming",
   "author": "Blysis",
@@ -76,8 +76,8 @@
         "player": "Player Profile"
       },
       "admin": {
-        "module_player-profiles_name": "Player Profiles",
-        "module_player-profiles_description": "Public player profile pages"
+        "module_player-profiles_name": "Member Profiles",
+        "module_player-profiles_description": "Public profile pages, with what every installed module knows about a member"
       }
     },
     "tr": {
@@ -114,8 +114,8 @@
         "player": "Oyuncu Profili"
       },
       "admin": {
-        "module_player-profiles_name": "Oyuncu Profilleri",
-        "module_player-profiles_description": "Herkese açık oyuncu profil sayfaları"
+        "module_player-profiles_name": "Üye Profilleri",
+        "module_player-profiles_description": "Herkese açık profil sayfaları; kurulu her modülün üye hakkında bildiği ile"
       }
     }
   },

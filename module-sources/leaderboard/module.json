@@ -1,10 +1,10 @@
 {
   "id": "leaderboard",
   "name": "Leaderboard",
-  "description": "Player rankings by purchases, votes, and activity",
-  "version": "1.2.2",
+  "description": "Member rankings by purchases, votes and activity",
+  "version": "1.2.3",
   "coreVersion": "^2.2.0",
-  "category": "commerce",
+  "category": "community",
   "author": "Blysis",
   "icon": "Trophy",
   "dependencies": [
@@ -33,7 +33,7 @@
         "mostActive": "Most Active",
         "noData": "No leaderboard data available",
         "period": "Period",
-        "player": "Player",
+        "player": "Member",
         "purchases": "Purchases",
         "rank": "Rank",
         "score": "Score",
@@ -51,7 +51,7 @@
       },
       "admin": {
         "module_leaderboard_name": "Leaderboard",
-        "module_leaderboard_description": "Player rankings by purchases, votes, and activity"
+        "module_leaderboard_description": "Member rankings by purchases, votes and activity"
       },
       "nav": {
         "leaderboard": "Leaderboard"
@@ -65,7 +65,7 @@
         "mostActive": "En Aktifler",
         "noData": "Sıralama verisi bulunamadı",
         "period": "Dönem",
-        "player": "Oyuncu",
+        "player": "Üye",
         "purchases": "Satın Almalar",
         "rank": "Sıra",
         "score": "Puan",
@@ -83,7 +83,7 @@
       },
       "admin": {
         "module_leaderboard_name": "Liderlik Tablosu",
-        "module_leaderboard_description": "Satın alma, oy ve etkinliğe göre oyuncu sıralamaları"
+        "module_leaderboard_description": "Satın alma, oy ve etkinliğe göre üye sıralamaları"
       },
       "nav": {
         "leaderboard": "Sıralama"

@@ -3,13 +3,41 @@
 import { parseDependency } from "@/core/lib/install-plan";
 import { satisfiesRange } from "@/core/lib/semver-range";
 
-export const categoryColors: Record<string, string> = {
-    commerce: "bg-primary/10 text-primary",
-    community: "bg-success/10 text-success",
-    management: "bg-secondary/10 text-secondary",
-    gaming: "bg-warning/10 text-warning",
-    content: "bg-muted text-foreground",
+/**
+ * A chip colour for a category the panel has never heard of.
+ *
+ * The manifest schema says `category` is free text "so core owns no category
+ * vocabulary - the catalog groups by whatever values are present". This file
+ * then kept a map of the five it did know and fell through to grey for the
+ * rest: forty modules declare one that was not on the list, so the largest
+ * group in the catalogue was the one with no colour, and a module inventing
+ * its own could never have one. It also put core in the position of naming a
+ * sector, which is a position this product does not take.
+ *
+ * The name decides its own tone. The same category is always the same colour,
+ * and none of them is written down here.
+ */
+export type CategoryTone = "neutral" | "success" | "warning" | "info" | "secondary";
+
+const TONES: CategoryTone[] = ["info", "success", "warning", "secondary", "neutral"];
+
+export function categoryTone(category: string): CategoryTone {
+    let sum = 0;
+    for (const char of category.toLowerCase()) sum = (sum * 31 + char.charCodeAt(0)) % 100_003;
+    return TONES[sum % TONES.length];
+}
+
+const TONE_CLASS: Record<CategoryTone, string> = {
+    info: "bg-primary/10 text-primary",
+    success: "bg-success/10 text-success",
+    warning: "bg-warning/10 text-warning",
+    secondary: "bg-secondary/10 text-secondary",
+    neutral: "bg-muted text-foreground",
 };
+
+export function categoryClassName(category: string): string {
+    return TONE_CLASS[categoryTone(category)];
+}
 
 /** Simple semver comparison. Returns positive when a > b. */
 export function compareVersions(a: string, b: string): number {

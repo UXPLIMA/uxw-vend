@@ -1,10 +1,10 @@
 {
   "id": "downloads",
   "name": "Downloads",
-  "description": "File download center for resources and mods",
-  "version": "1.2.1",
+  "description": "A file library: releases, guides and anything else worth handing out",
+  "version": "1.2.2",
   "coreVersion": "^2.1.0",
-  "category": "gaming",
+  "category": "content",
   "author": "Blysis",
   "icon": "Download",
   "permissions": [
@@ -118,7 +118,7 @@
         "subtitle": "Manage your platform settings and content",
         "menu_downloads_downloads": "Downloads",
         "module_downloads_name": "Downloads",
-        "module_downloads_description": "File download center for resources and mods"
+        "module_downloads_description": "A file library: releases, guides and anything else worth handing out"
       },
       "activity": {
         "fileDownloaded": "downloaded"
@@ -185,7 +185,7 @@
         "subtitle": "Platform ayarlarınızı ve içeriklerinizi yönetin",
         "menu_downloads_downloads": "İndirmeler",
         "module_downloads_name": "İndirmeler",
-        "module_downloads_description": "Kaynaklar ve modlar için dosya indirme merkezi"
+        "module_downloads_description": "Dosya kitaplığı: sürümler, rehberler ve paylaşmaya değer her şey"
       },
       "activity": {
         "fileDownloaded": "indirdi:"
