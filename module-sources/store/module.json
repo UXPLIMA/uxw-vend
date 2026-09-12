@@ -2,7 +2,7 @@
   "id": "store",
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
-  "version": "2.25.6",
+  "version": "2.26.0",
   "coreVersion": "^2.2.0",
   "category": "commerce",
   "author": "Blysis Team",
@@ -51,6 +51,11 @@
       "hook": "leaderboard.boards",
       "type": "filter",
       "handler": "hooks/leaderboard-board.ts"
+    },
+    {
+      "hook": "coupon.issue",
+      "type": "filter",
+      "handler": "hooks/issue-coupon.ts"
     }
   ],
   "settings": [
@@ -602,7 +607,8 @@
     }
   ],
   "dependencies": [
-    "currency"
+    "currency",
+    "credits@^1.4.0"
   ],
   "hooksEmitted": [
     {
@@ -635,6 +641,10 @@
     },
     {
       "hook": "store.billing.required",
+      "type": "filter"
+    },
+    {
+      "hook": "credit.change",
       "type": "filter"
     }
   ],
@@ -2139,12 +2149,6 @@
     {
       "model": "subscription",
       "key": "store.subscriptions",
-      "column": "userId",
-      "erasure": "retain"
-    },
-    {
-      "model": "creditTransaction",
-      "key": "store.creditTransactions",
       "column": "userId",
       "erasure": "retain"
     },

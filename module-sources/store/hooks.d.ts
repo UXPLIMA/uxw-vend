@@ -6,6 +6,22 @@
  * it is typed `unknown` deliberately so a listener has to convert it (with
  * `Number(...)`) instead of formatting an object into a message.
  */
+interface CouponRequest {
+    /** The caller's transaction; the coupon joins whatever else it is doing. */
+    tx: import("@/core/sdk/server").PrismaTransaction;
+    /** Unique. The caller mints it because it usually has to show it first. */
+    code: string;
+    description?: string | null;
+    /** A fixed amount off. Percentages are the shop's own business. */
+    amount: number;
+    /** How many times it may be used, once being the usual answer. */
+    usageLimit?: number;
+}
+
+interface CouponIssued {
+    issued: boolean;
+}
+
 declare global {
     interface BlysisHookPayloads {
         "store.order.created": StoreOrderHookPayload;
@@ -33,6 +49,8 @@ declare global {
      * and one published contract beats each gateway inventing its own.
      */
     interface BlysisFilterPayloads {
+        /** Whether a coupon was created for the code the caller minted. */
+        "coupon.issue": CouponIssued;
         /** Which gateways can take this currency right now. */
         "payment.providers": PaymentProviderSummary[];
         /** Where to send the buyer, once a gateway has started the payment. */
@@ -70,6 +88,17 @@ declare global {
 
     /** The other half of the same six filters: what each one is asked about. */
     interface BlysisFilterContexts {
+        /**
+         * A coupon somebody won.
+         *
+         * The wheel used to write the shop's `Coupon` table itself, which
+         * meant a module about prizes knew the shop's discount vocabulary -
+         * `FIXED` against `PERCENT`, `usageLimit`, `isActive`. It mints the
+         * code, because the winner is told it before the row exists, and the
+         * shop makes it a coupon. The caller's transaction comes with it, so
+         * a prize and the coupon it promised commit together.
+         */
+        "coupon.issue": CouponRequest;
         "payment.providers": { currency: string };
         "payment.session": PaymentSessionRequest;
         "payment.settled": PaymentSettlement;

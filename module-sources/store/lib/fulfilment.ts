@@ -10,6 +10,7 @@
 import { Prisma } from "@prisma/client";
 import { prisma, log } from "@/core/sdk/server";
 import { sendOrderConfirmationEmail } from "./order-email";
+import { applyFiltersAsync } from "@/core/sdk";
 import { deliverProduct } from "./delivery";
 import { announceOrderCompleted } from "./order-events";
 import { claimStock, releaseStock, stockClaims } from "./stock";
@@ -355,24 +356,25 @@ export async function settleCredits(settlement: PaymentSettlement): Promise<Paym
     // row - the search was `description: { contains: … }`, a scan of the whole
     // ledger at that - and both credited the account. Giving the row a
     // deterministic id makes the second insert a duplicate key, and the
-    // transaction takes the balance increment down with it.
+    // transaction takes the balance increment down with it. There is no read
+    // before it either: the ledger belongs to the module that keeps it, and
+    // the duplicate is the answer rather than a second opinion about it.
     const ledgerId = creditLedgerId(settlement.provider, settlement.providerRef);
-    const already = await prisma.creditTransaction.findUnique({ where: { id: ledgerId } });
-    if (already) return ALREADY;
 
     try {
-        await prisma.$transaction([
-            prisma.user.update({ where: { id: userId }, data: { creditBalance: { increment: credits } } }),
-            prisma.creditTransaction.create({
-                data: {
-                    id: ledgerId,
-                    userId,
-                    amount: credits,
-                    type: "credit_purchase",
-                    description: `Purchased ${credits} credits via ${settlement.provider} (${settlement.providerRef})`,
-                },
-            }),
-        ]);
+        // The wallet is another module's; the transaction is this one's, and
+        // the deterministic id goes with the request so the duplicate key
+        // still aborts it.
+        await prisma.$transaction(async (tx) => {
+            await applyFiltersAsync("credit.change", { applied: false }, {
+                tx,
+                userId,
+                amount: credits,
+                type: "credit_purchase",
+                description: `Purchased ${credits} credits via ${settlement.provider} (${settlement.providerRef})`,
+                ledgerId,
+            });
+        });
     } catch (error) {
         // P2002 is the unique constraint: the other delivery won the race.
         if (error && typeof error === "object" && "code" in error && (error as { code: unknown }).code === "P2002") {

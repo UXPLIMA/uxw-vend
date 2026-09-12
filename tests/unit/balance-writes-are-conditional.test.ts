@@ -73,12 +73,16 @@ function creditDebits(source: string): { call: string; isConditional: boolean }[
 }
 
 describe("spending a credit balance", () => {
-    it("finds the routes that spend credits", () => {
+    it("finds the one place that spends credits", () => {
+        // It used to be four: checkout, a paid spin, a marketplace purchase
+        // and a transfer, each with its own copy of the guard. The wallet
+        // belongs to one module now and it is the only thing that decrements
+        // a balance; the others ask, and are refused when the money is not
+        // there. If this list grows, the guard has been copied again.
         const spenders = SOURCES.flatMap(tsFiles)
             .filter((f) => creditDebits(fs.readFileSync(f, "utf8")).length > 0)
             .map((f) => path.relative(ROOT, f));
-        expect(spenders).toContain("module-sources/store/api/checkout/route.ts");
-        expect(spenders).toContain("module-sources/wheel/api/spin/route.ts");
+        expect(spenders).toEqual(["module-sources/credits/hooks/change.ts"]);
     });
 
     it("every debit is conditional on the balance covering it", () => {
@@ -92,9 +96,20 @@ describe("spending a credit balance", () => {
     });
 
     it("and the losing debit is answered, not ignored", () => {
-        for (const name of ["module-sources/store/api/checkout/route.ts", "module-sources/wheel/api/spin/route.ts"]) {
+        // The wallet answers `applied: false` when the row it tried to update
+        // was not there, and every caller has to read that: a spin that took
+        // no credits and turned anyway is the bug this whole file is about.
+        const wallet = fs.readFileSync(path.join(ROOT, "module-sources/credits/hooks/change.ts"), "utf8");
+        expect(wallet, "the wallet must check whether the debit landed").toMatch(/\.count === 0/);
+
+        for (const name of [
+            "module-sources/store/api/checkout/route.ts",
+            "module-sources/store/api/credits/transfer/route.ts",
+            "module-sources/wheel/api/spin/route.ts",
+            "module-sources/marketplace/api/listings/[id]/buy/route.ts",
+        ]) {
             const source = fs.readFileSync(path.join(ROOT, name), "utf8");
-            expect(source, `${name} must check whether the debit landed`).toMatch(/\.count === 0/);
+            expect(source, `${name} must read the answer`).toMatch(/!\w*\.applied|applied\s*\)/);
         }
     });
 });

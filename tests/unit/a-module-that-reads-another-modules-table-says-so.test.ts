@@ -168,9 +168,13 @@ describe("the scan itself", () => {
         expect(CORE_MODELS.size).toBeGreaterThan(20);
     });
 
-    it("knows the store owns the credit ledger and the user's balance", () => {
-        expect(OWNERS.get("CreditTransaction")).toBe("store");
-        expect(CONTRIBUTED.get("creditBalance")).toBe("store");
+    it("knows who owns the credit ledger and the user's balance", () => {
+        // Both moved to the module named after them, and four modules stopped
+        // writing either: they ask `credit.change` and hand over their
+        // transaction. See `a-module-owns-what-it-reads`, which is the
+        // stricter rule this one grew into.
+        expect(OWNERS.get("CreditTransaction")).toBe("credits");
+        expect(CONTRIBUTED.get("creditBalance")).toBe("credits");
     });
 });
 
@@ -191,8 +195,10 @@ describe("the modules this gate was written for", () => {
         expect([...declaredClosure("wheel")]).toContain("store");
     });
 
-    it("the credits module declares the store, whose ledger it reads", () => {
-        expect([...declaredClosure("credits")]).toContain("store");
+    it("the shop declares the credits module, whose wallet it spends", () => {
+        // The dependency turned round with the ledger: the shop sells things
+        // for credits, and the module that keeps them is what it needs.
+        expect([...declaredClosure("store")]).toContain("credits");
     });
 
     it("the CSV export declares the store, whose column it writes into a row", () => {

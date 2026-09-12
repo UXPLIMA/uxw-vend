@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { moduleSettings, prisma, rateLimitStrict, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { giftCodeRedeemSchema } from "../../../lib/validations";
+import { applyFiltersAsync } from "@/core/sdk";
 
 // POST /api/v1/gift-codes/redeem - Redeem a gift code
 export async function POST(request: NextRequest) {
@@ -64,22 +65,22 @@ export async function POST(request: NextRequest) {
 
     const creditAmount = Number(giftCode.value);
 
-    // Add credits to user balance and create transaction
-    const [user] = await prisma.$transaction([
-        prisma.user.update({
+    // The code is already marked redeemed above, so the credits have to
+    // arrive: the movement runs on this transaction, and a failure takes the
+    // redemption with it.
+    const user = await prisma.$transaction(async (tx) => {
+        await applyFiltersAsync("credit.change", { applied: false }, {
+            tx,
+            userId: session.user.id as string,
+            amount: creditAmount,
+            type: "gift_redeem",
+            description: `Redeemed gift code ${giftCode.code} for ${creditAmount} credits`,
+        });
+        return tx.user.findUniqueOrThrow({
             where: { id: session.user.id },
-            data: { creditBalance: { increment: creditAmount } },
             select: { creditBalance: true },
-        }),
-        prisma.creditTransaction.create({
-            data: {
-                userId: session.user.id,
-                amount: creditAmount,
-                type: "gift_redeem",
-                description: `Redeemed gift code ${giftCode.code} for ${creditAmount} credits`,
-            },
-        }),
-    ]);
+        });
+    });
 
     return NextResponse.json({
         message: `Gift code redeemed! ${creditAmount.toFixed(2)} credits added to your balance.`,

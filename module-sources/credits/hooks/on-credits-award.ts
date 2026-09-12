@@ -14,6 +14,7 @@
 import type { HookHandlerFor } from "@/core/sdk";
 import { log, prisma } from "@/core/sdk/server";
 import { awardLedgerId, awardRefusal } from "../lib/award";
+import { moveCredits } from "./change";
 
 const onCreditsAward: HookHandlerFor<"credits.award", "filter"> = async (outcome, request) => {
     if (outcome.handled) return outcome;
@@ -26,21 +27,17 @@ const onCreditsAward: HookHandlerFor<"credits.award", "filter"> = async (outcome
     const id = awardLedgerId(request.reason, request.key);
 
     try {
-        await prisma.$transaction([
-            prisma.user.update({
-                where: { id: request.userId },
-                data: { creditBalance: { increment: decision.award } },
-            }),
-            prisma.creditTransaction.create({
-                data: {
-                    id,
-                    userId: request.userId,
-                    amount: decision.award,
-                    type: request.reason,
-                    description: request.description ?? null,
-                },
-            }),
-        ]);
+        // The same movement the in-transaction door makes, in a transaction
+        // of its own: one balance, one ledger row, one implementation.
+        await prisma.$transaction(async (tx) => {
+            await moveCredits(tx, {
+                userId: request.userId,
+                amount: decision.award,
+                type: request.reason,
+                description: request.description ?? null,
+                ledgerId: id,
+            });
+        });
     } catch (err) {
         // P2002 is the unique constraint: this award had already been made,
         // and the increment rolled back with it.

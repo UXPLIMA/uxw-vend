@@ -98,6 +98,17 @@ vi.mock("@/core/sdk/server", () => ({
     log: { error: vi.fn(), warn: vi.fn(), info: vi.fn() },
 }));
 
+/**
+ * The wallet belongs to the credits module now, so what the shop does here is
+ * ask. The request is what these tests can see, and what the wallet does with
+ * it is tested where it is written.
+ */
+const applyFiltersAsync = vi.fn(async (_hook: string, value: unknown) => value);
+vi.mock("@/core/sdk", async (importOriginal) => ({
+    ...(await importOriginal<Record<string, unknown>>()),
+    applyFiltersAsync,
+}));
+
 const sendOrderConfirmationEmail = vi.fn(async () => {});
 vi.mock("@/modules/store/lib/email", () => ({ sendOrderConfirmationEmail }));
 const deliverProduct = vi.fn(async () => ({}));
@@ -340,27 +351,15 @@ describe("settleCredits", () => {
         metadata: { userId: "user-1", creditAmount: "25" },
     };
 
-    it("grants the credits the store asked the gateway to carry", async () => {
+    it("asks for the credits the store told the gateway to carry", async () => {
         const outcome = await settleCredits(topUp);
 
         expect(outcome).toEqual({ handled: true, duplicate: false, error: null });
-        expect(db.user.update).toHaveBeenCalledWith(
-            expect.objectContaining({ where: { id: "user-1" }, data: { creditBalance: { increment: 25 } } }),
+        expect(applyFiltersAsync).toHaveBeenCalledWith(
+            "credit.change",
+            expect.anything(),
+            expect.objectContaining({ userId: "user-1", amount: 25, type: "credit_purchase" }),
         );
-        expect(db.creditTransaction.create).toHaveBeenCalledWith(
-            expect.objectContaining({
-                data: expect.objectContaining({ userId: "user-1", amount: 25, type: "credit_purchase" }),
-            }),
-        );
-    });
-
-    it("does not grant twice when the same payment is reported again", async () => {
-        db.creditTransaction.findUnique.mockResolvedValueOnce({ id: "credit:stripe:pi_credit" });
-
-        const outcome = await settleCredits(topUp);
-
-        expect(outcome).toEqual({ handled: true, duplicate: true, error: null });
-        expect(db.user.update).not.toHaveBeenCalled();
     });
 
     /**
@@ -373,16 +372,19 @@ describe("settleCredits", () => {
     it("keys the ledger row on the gateway's own reference", async () => {
         await settleCredits(topUp);
 
-        expect(db.creditTransaction.findUnique).toHaveBeenCalledWith({
-            where: { id: "credit:stripe:pi_credit" },
-        });
-        expect(db.creditTransaction.create).toHaveBeenCalledWith(
-            expect.objectContaining({ data: expect.objectContaining({ id: "credit:stripe:pi_credit" }) }),
+        // There is no read before the write any more: the ledger belongs to
+        // another module, and the duplicate key is the answer rather than a
+        // second opinion about it.
+        expect(db.creditTransaction.findUnique).not.toHaveBeenCalled();
+        expect(applyFiltersAsync).toHaveBeenCalledWith(
+            "credit.change",
+            expect.anything(),
+            expect.objectContaining({ ledgerId: "credit:stripe:pi_credit" }),
         );
     });
 
     it("treats a duplicate key from a concurrent delivery as already settled", async () => {
-        db.creditTransaction.create.mockRejectedValueOnce(
+        applyFiltersAsync.mockRejectedValueOnce(
             Object.assign(new Error("Unique constraint failed"), { code: "P2002" }),
         );
 
@@ -390,7 +392,7 @@ describe("settleCredits", () => {
     });
 
     it("does not swallow a failure that is not a duplicate", async () => {
-        db.creditTransaction.create.mockRejectedValueOnce(
+        applyFiltersAsync.mockRejectedValueOnce(
             Object.assign(new Error("connection lost"), { code: "P1001" }),
         );
 

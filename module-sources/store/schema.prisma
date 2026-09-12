@@ -5,8 +5,6 @@
 //   orders Order[]
 //   cart   CartItem[]
 //   redeemedGifts GiftCode[] @relation("RedeemedGifts")
-//   creditBalance    Decimal            @default(0) @db.Decimal(10, 2)
-//   creditHistory    CreditTransaction[]
 //   creatorCodes     CreatorCode[]      @relation("CreatorCodes")
 //   ownedProducts    OwnedProduct[]     @relation("OwnedProducts")
 //   chestItems       ChestItem[]        @relation("ChestItems")
@@ -409,21 +407,6 @@ model ChestItem {
   createdAt   DateTime @default(now())
 
   @@index([userId])
-}
-
-model CreditTransaction {
-  id          String   @id @default(cuid())
-  userId      String?
-  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
-  amount      Decimal  @db.Decimal(10, 2)
-  type        String
-  description String?
-  createdAt   DateTime @default(now())
-
-  // Read as "this member's ledger, newest first, twenty at a time". The
-  // leading column still answers a plain userId lookup, so this replaces the
-  // single column index rather than joining it.
-  @@index([userId, createdAt])
 }
 
 model CreatorCode {

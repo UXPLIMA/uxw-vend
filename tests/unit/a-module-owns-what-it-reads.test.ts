@@ -37,9 +37,6 @@ const MODULES = "module-sources";
  * one, which is the thing this test exists to stop.
  */
 const STILL_REACHING: Record<string, string[]> = {
-    /** The wallet moves to the module named after it, behind `credit.change`. */
-    credits: ["CreditTransaction"],
-    referral: ["CreditTransaction"],
     /** Both take the paid order from the hook payload rather than re-reading it. */
     "birfatura-invoicing": ["Order"],
     "parasut-invoicing": ["Order"],
@@ -99,8 +96,11 @@ describe("a module owns what it reads", () => {
                 // Nothing looser: `t("category")` is a translation key, and a
                 // gate that reads it as the shop's Category table is a gate
                 // nobody can trust.
+                // `tx.` as well as `prisma.`: a write inside a transaction
+                // reaches the same table by another name, and three modules
+                // wrote to the shop's ledger that way without being seen.
                 const named = [
-                    ...src.matchAll(/prisma\.(\w+)\./g),
+                    ...src.matchAll(/\b(?:prisma|tx)\.(\w+)\./g),
                     ...src.matchAll(/\bprisma\s*(?:as[^)]*)?\)?\s*\[\s*["'](\w+)["']\s*\]/g),
                     ...src.matchAll(/\boptionalModel\s*[<(][^("']*["'](\w+)["']/g),
                 ].map((m) => m[1]);

@@ -17,6 +17,19 @@ export { sanitizeHtml } from "@/core/lib/sanitize";
 
 // --- Database ---
 export { prisma } from "@/core/lib/db";
+/**
+ * The client inside `prisma.$transaction(async (tx) => ...)`.
+ *
+ * Exported because money moves in one transaction or not at all, and the
+ * module that owns a ledger is not the module that decides when to write to
+ * it. A caller hands its transaction to the owner through a filter's context;
+ * without a name for the type, the shape of that context could not be
+ * declared.
+ */
+export type PrismaTransaction = Omit<
+    import("@prisma/client").PrismaClient,
+    "$connect" | "$disconnect" | "$on" | "$transaction" | "$extends"
+>;
 
 /**
  * Checking a member's password against the hash on their row.

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { isAdmin, prisma, readJsonBody } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
+import { moveCredits } from "../../../hooks/change";
 import { creditPurchaseSchema } from "../../../lib/validations";
 
 // POST /api/v1/credits/purchase - Admin only: add credits to a user
@@ -20,17 +21,17 @@ export async function POST(request: NextRequest) {
     // The balance and the row that explains it are written together. They
     // used to be two calls, so a ledger write that failed left an operator
     // looking at a balance nothing accounts for - the one thing a credit
-    // history exists to prevent.
-    const [user] = await prisma.$transaction([
-        prisma.user.update({
-            where: { id: userId },
-            data: { creditBalance: { increment: amount } },
-            select: { creditBalance: true },
-        }),
-        prisma.creditTransaction.create({
-            data: { userId, amount, type: "admin_grant", description: `Admin granted ${amount} credits` },
-        }),
-    ]);
+    // history exists to prevent. It goes through this module's own movement
+    // now, the same one every other module asks for.
+    const user = await prisma.$transaction(async (tx) => {
+        await moveCredits(tx, {
+            userId,
+            amount,
+            type: "admin_grant",
+            description: `Admin granted ${amount} credits`,
+        });
+        return tx.user.findUniqueOrThrow({ where: { id: userId }, select: { creditBalance: true } });
+    });
 
     // Fire hook + activity feed entry
     const { doActionAsync } = await import("@/core/sdk");

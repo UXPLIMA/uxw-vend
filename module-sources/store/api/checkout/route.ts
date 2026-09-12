@@ -38,24 +38,19 @@ async function payCreatorCommission(
     orderNumber: string,
 ) {
     const commission = computeCreatorCommission(total, code.commissionPercent);
-    await prisma.$transaction([
-        prisma.creatorCode.update({
+    await prisma.$transaction(async (tx) => {
+        await tx.creatorCode.update({
             where: { id: code.id },
             data: { usageCount: { increment: 1 }, totalRevenue: { increment: total } },
-        }),
-        prisma.user.update({
-            where: { id: code.creatorId },
-            data: { creditBalance: { increment: commission } },
-        }),
-        prisma.creditTransaction.create({
-            data: {
-                userId: code.creatorId,
-                amount: commission,
-                type: "creator_commission",
-                description: `Commission for order ${orderNumber} via code ${code.code}`,
-            },
-        }),
-    ]);
+        });
+        await applyFiltersAsync("credit.change", { applied: false }, {
+            tx,
+            userId: code.creatorId,
+            amount: commission,
+            type: "creator_commission",
+            description: `Commission for order ${orderNumber} via code ${code.code}`,
+        });
+    });
 }
 
 const checkoutSchema = z.object({
@@ -359,19 +354,26 @@ export async function POST(request: NextRequest) {
             // Atomic transaction: deduct credits, create order, grant ownership
             const buyerId = session.user.id;
             const order = await prisma.$transaction(async (tx) => {
-                // Deduct credits, conditional on the balance still covering it.
+                // Deduct credits, conditional on the balance still covering
+                // it, and on this transaction.
                 //
                 // The read above is a snapshot: two checkouts submitted
                 // together both saw the same balance, both passed the check,
                 // and both got their goods while the balance went negative.
                 // A transaction alone does not close that - under read
                 // committed both decrements apply. The condition is what makes
-                // the second one find nothing to update.
-                const debited = await tx.user.updateMany({
-                    where: { id: session.user.id, creditBalance: { gte: total } },
-                    data: { creditBalance: { decrement: total } },
+                // the second one find nothing to update, and it lives with the
+                // wallet now: every debit is conditional there, written once
+                // by the module that owns the balance rather than three times
+                // by the modules that spend it.
+                const debited = await applyFiltersAsync("credit.change", { applied: false }, {
+                    tx,
+                    userId: buyerId,
+                    amount: -total,
+                    type: "purchase",
+                    description: `Store purchase (${orderItems.map((i) => i.name).join(", ")})`,
                 });
-                if (debited.count === 0) {
+                if (!debited.applied) {
                     throw new Error("INSUFFICIENT_CREDITS");
                 }
 
@@ -387,16 +389,6 @@ export async function POST(request: NextRequest) {
                 // This path completes the order here rather than at a
                 // gateway's word, so the sale is counted here too.
                 await countSales(tx, claims);
-
-                // Create credit transaction
-                await tx.creditTransaction.create({
-                    data: {
-                        userId: session.user.id,
-                        amount: -total,
-                        type: "purchase",
-                        description: `Store purchase (${orderItems.map((i) => i.name).join(", ")})`,
-                    },
-                });
 
                 // Create order
                 const ord = await tx.order.create({

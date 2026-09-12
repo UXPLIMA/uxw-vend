@@ -31,7 +31,7 @@ const ROOT = path.resolve(import.meta.dirname, "../..");
 /** How a growing list is read, and the index that answers it in one pass. */
 const READ_NEWEST_FIRST = [
     {
-        schema: "module-sources/store/schema.prisma",
+        schema: "module-sources/credits/schema.prisma",
         model: "CreditTransaction",
         reads: "a member's credit ledger, newest twenty",
         index: ["userId", "createdAt"],

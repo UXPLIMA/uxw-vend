@@ -1,0 +1,27 @@
+// Credits Module - Database Models
+// These models are merged into prisma/schema.prisma by merge-schemas.ts
+
+// The wallet: a balance on the member and the history behind it. Both lived
+// in the store, which meant the module called "Credit System" owned nothing
+// of the sort and five modules wrote the shop's ledger directly. A module
+// that needs to move credits asks `credit.change` now, and hands over its own
+// transaction so the money and whatever it paid for commit together.
+// @@user-relations-start
+//   creditBalance    Decimal            @default(0) @db.Decimal(10, 2)
+//   creditHistory    CreditTransaction[]
+// @@user-relations-end
+
+model CreditTransaction {
+  id          String   @id @default(cuid())
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  amount      Decimal  @db.Decimal(10, 2)
+  type        String
+  description String?
+  createdAt   DateTime @default(now())
+
+  // Read as "this member's ledger, newest first, twenty at a time". The
+  // leading column still answers a plain userId lookup, so this replaces the
+  // single column index rather than joining it.
+  @@index([userId, createdAt])
+}

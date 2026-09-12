@@ -3,6 +3,7 @@ import { log, logActivity, prisma, rateLimitForRole, readJsonBody } from "@/core
 import { auth } from "@/core/sdk/auth";
 import { z } from "zod";
 import { transferRefusal } from "../../../lib/credit-transfer";
+import { applyFiltersAsync } from "@/core/sdk";
 
 /**
  * POST /api/v1/store/credits/transfer - one member sends credits to another.
@@ -81,31 +82,22 @@ export async function POST(request: NextRequest) {
         const moved = await prisma.$transaction(async (tx) => {
             // The condition is the whole protection: no row matches when the
             // balance has moved since it was read, and the rest never runs.
-            const taken = await tx.user.updateMany({
-                where: { id: session.user.id, creditBalance: { gte: sent } },
-                data: { creditBalance: { decrement: sent } },
+            // It lives with the wallet now: every debit there is conditional.
+            const taken = await applyFiltersAsync("credit.change", { applied: false }, {
+                tx,
+                userId: session.user.id as string,
+                amount: -sent,
+                type: "transfer_out",
+                description: `Sent ${sent} credits to ${recipient.username}`,
             });
-            if (taken.count === 0) return false;
+            if (!taken.applied) return false;
 
-            await tx.user.update({
-                where: { id: recipient.id },
-                data: { creditBalance: { increment: sent } },
-            });
-            await tx.creditTransaction.createMany({
-                data: [
-                    {
-                        userId: session.user.id,
-                        amount: -sent,
-                        type: "transfer_out",
-                        description: `Sent ${sent} credits to ${recipient.username}`,
-                    },
-                    {
-                        userId: recipient.id,
-                        amount: sent,
-                        type: "transfer_in",
-                        description: `Received ${sent} credits from ${sender?.username ?? "a member"}`,
-                    },
-                ],
+            await applyFiltersAsync("credit.change", { applied: false }, {
+                tx,
+                userId: recipient.id,
+                amount: sent,
+                type: "transfer_in",
+                description: `Received ${sent} credits from ${sender?.username ?? "a member"}`,
             });
             return true;
         });

@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { applyFiltersAsync } from "@/core/sdk";
 import { prisma, rateLimitForRoleAsync } from "@/core/sdk/server";
 import { auth } from "@/core/sdk/auth";
 import { randomInt } from "crypto";
@@ -117,22 +118,17 @@ export async function POST(request: NextRequest) {
         if (wheel.cost > 0) {
             // The balance read above is a snapshot: two turns submitted
             // together both saw enough credits, both turned, and the balance
-            // went negative. The condition is what makes the second deduction
-            // find nothing to update.
-            const debited = await tx.user.updateMany({
-                where: { id: session.user.id, creditBalance: { gte: wheel.cost } },
-                data: { creditBalance: { decrement: wheel.cost } },
+            // went negative. The guard lives with the wallet now: the module
+            // that owns it refuses a spend the balance cannot cover, on this
+            // transaction, so a second request still finds nothing to take.
+            const paid = await applyFiltersAsync("credit.change", { applied: false }, {
+                tx,
+                userId: session.user.id,
+                amount: -wheel.cost,
+                type: "wheel_spin",
+                description: `${wheel.name}: paid turn (${wheel.cost} credits)`,
             });
-            if (debited.count === 0) return false;
-
-            await tx.creditTransaction.create({
-                data: {
-                    userId: session.user.id,
-                    amount: -wheel.cost,
-                    type: "wheel_spin",
-                    description: `${wheel.name}: paid turn (${wheel.cost} credits)`,
-                },
-            });
+            if (!paid.applied) return false;
         }
 
         await tx.wheelSpin.create({
@@ -146,28 +142,22 @@ export async function POST(request: NextRequest) {
         });
 
         if (selectedPrize.type === "credits" && selectedPrize.value > 0) {
-            await tx.user.update({
-                where: { id: session.user.id },
-                data: { creditBalance: { increment: selectedPrize.value } },
-            });
-            await tx.creditTransaction.create({
-                data: {
-                    userId: session.user.id,
-                    amount: selectedPrize.value,
-                    type: "wheel_prize",
-                    description: `${wheel.name}: ${selectedPrize.name}`,
-                },
+            await applyFiltersAsync("credit.change", { applied: false }, {
+                tx,
+                userId: session.user.id,
+                amount: selectedPrize.value,
+                type: "wheel_prize",
+                description: `${wheel.name}: ${selectedPrize.name}`,
             });
         } else if (couponCode) {
-            await tx.coupon.create({
-                data: {
-                    code: couponCode,
-                    description: `${wheel.name} prize: ${selectedPrize.name}`,
-                    type: "FIXED",
-                    value: selectedPrize.value,
-                    usageLimit: 1,
-                    isActive: true,
-                },
+            // What a discount is belongs to the shop: this module knew its
+            // table, its `FIXED` against `PERCENT` and its usage limit.
+            await applyFiltersAsync("coupon.issue", { issued: false }, {
+                tx,
+                code: couponCode,
+                description: `${wheel.name} prize: ${selectedPrize.name}`,
+                amount: selectedPrize.value,
+                usageLimit: 1,
             });
         }
 

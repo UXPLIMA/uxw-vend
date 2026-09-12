@@ -24,6 +24,15 @@ const SOURCES = path.join(ROOT, "module-sources");
  * So the rule is structural rather than case-by-case: a change to
  * `creditBalance` happens inside a transaction, and that same transaction
  * writes the ledger row.
+ *
+ * There is one place left that moves a balance. The wallet belongs to the
+ * credits module, and the four modules that used to move it - checkout, a
+ * paid spin, a marketplace sale, a member transfer - ask it through
+ * `credit.change` and hand over the transaction they already have open. So
+ * the rule is now checked where it is implemented, and the second half of it,
+ * that the caller's transaction is the one used, is what keeps the guarantee
+ * these tests were written for: a failure anywhere in a spin still undoes the
+ * payment for it.
  */
 
 function sourceFiles(dir: string, out: string[] = []): string[] {
@@ -84,36 +93,48 @@ function balanceMoves(): Move[] {
 describe("a credit balance never moves on its own", () => {
     const moves = balanceMoves();
 
-    it("finds the places that move one", () => {
-        // A floor rather than a count: a module added tomorrow that pays
-        // someone should raise this, not be waved through by it.
-        expect(moves.length).toBeGreaterThanOrEqual(8);
+    it("finds the one place that moves one", () => {
+        // It used to be eight places in four modules, each with its own copy
+        // of the rule. A module added tomorrow that pays somebody must ask
+        // rather than move it, so this list staying at one file is the point.
+        const files = [...new Set(moves.map((m) => m.where.split(":")[0]))];
+        expect(files).toEqual(["module-sources/credits/hooks/change.ts"]);
+        expect(moves.length).toBeGreaterThanOrEqual(2);
     });
 
-    it("every one of them is inside a transaction", () => {
-        expect(moves.filter((m) => !m.inTransaction).map((m) => m.where)).toEqual([]);
+    it("moves it on the caller's transaction, never on the client", () => {
+        // `tx.user.update` rather than `prisma.user.update`: the movement
+        // joins whatever the caller is already doing, so their rollback takes
+        // it with them.
+        const wallet = fs.readFileSync(path.join(SOURCES, "credits/hooks/change.ts"), "utf8");
+        expect(wallet).not.toMatch(/prisma\.user\.(update|updateMany)/);
+        expect(wallet).toMatch(/tx\.user\.updateMany/);
     });
 
-    it("and that transaction writes the ledger row too", () => {
-        expect(moves.filter((m) => !m.withLedger).map((m) => m.where)).toEqual([]);
+    it("and writes the ledger row in the same breath", () => {
+        const wallet = fs.readFileSync(path.join(SOURCES, "credits/hooks/change.ts"), "utf8");
+        expect(wallet).toMatch(/tx\.creditTransaction\.create/);
+        expect(wallet).not.toMatch(/prisma\.creditTransaction/);
     });
 });
 
 describe("a spin is one event", () => {
     const spin = fs.readFileSync(path.join(SOURCES, "wheel/api/spin/route.ts"), "utf8");
 
-    it("debits, records and pays out in a single transaction", () => {
+    it("pays, records and hands over the prize in a single transaction", () => {
+        // The payment and both prizes are asked for now rather than written
+        // here, and every ask carries `tx`: the turn is still one event.
         const spans = transactionSpans(spin);
         expect(spans.length).toBe(1);
         const body = spin.slice(spans[0][0], spans[0][1]);
-        expect(body).toContain("creditBalance: { decrement: wheel.cost }");
+        expect(body).toContain('"credit.change"');
         expect(body).toContain("wheelSpin.create");
-        expect(body).toContain("creditBalance: { increment: selectedPrize.value }");
-        expect(body).toContain("coupon.create");
+        expect(body).toContain('"coupon.issue"');
+        expect(body.match(/\btx,/g)?.length ?? 0).toBeGreaterThanOrEqual(3);
     });
 
     it("still refuses a spin the balance cannot cover, without spending it", () => {
-        expect(spin).toContain("creditBalance: { gte: wheel.cost }");
+        expect(spin).toContain("if (!paid.applied) return false;");
         expect(spin).toContain('code: "wheel_not_enough_credits"');
     });
 });

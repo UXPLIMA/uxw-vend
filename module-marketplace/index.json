@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-12",
-  "updatedAt": "2026-09-12T12:33:30Z",
+  "updatedAt": "2026-09-12T13:06:14Z",
   "modules": [
     {
       "id": "announcements",
@@ -464,21 +464,19 @@
           "description": "Kullanıcılar için sanal para cüzdanı"
         }
       },
-      "version": "1.3.0",
+      "version": "1.4.0",
       "coreVersion": "^2.0.0",
       "author": "Blysis",
       "icon": "Coins",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-12T13:06:14Z",
       "screenshots": [],
       "tags": [
         "commerce"
       ],
       "zip": "credits.zip",
-      "dependencies": [
-        "store@^2.21.0"
-      ],
+      "dependencies": [],
       "conflicts": [],
       "hooks": {
         "emits": [
@@ -487,7 +485,8 @@
         ],
         "listens": [
           "credits.award",
-          "store.order.completed"
+          "store.order.completed",
+          "credit.change"
         ]
       },
       "stats": {
@@ -1561,26 +1560,28 @@
       "name": "Marketplace",
       "description": "Members sell to each other for credits and the site takes a cut. What is handed over is decided by whatever integration is installed.",
       "i18n": {},
-      "version": "1.3.0",
+      "version": "1.4.0",
       "coreVersion": "^2.0.0",
       "author": "Blysis",
       "icon": "Store",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-11T11:06:01Z",
+      "updatedAt": "2026-09-12T13:06:14Z",
       "screenshots": [],
       "tags": [
         "commerce"
       ],
       "zip": "marketplace.zip",
       "dependencies": [
-        "store@^2.21.0"
+        "store@^2.21.0",
+        "credits@^1.4.0"
       ],
       "conflicts": [],
       "hooks": {
         "emits": [
           "marketplace.delivery.kinds",
-          "marketplace.deliver"
+          "marketplace.deliver",
+          "credit.change"
         ],
         "listens": []
       },
@@ -2403,25 +2404,27 @@
           "description": "Yeni kullanıcı davet ederek kredi kazanın"
         }
       },
-      "version": "1.2.0",
+      "version": "1.3.0",
       "coreVersion": "^2.0.0",
       "author": "Blysis",
       "icon": "UserPlus",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-12T13:06:14Z",
       "screenshots": [],
       "tags": [
         "community"
       ],
       "zip": "referral.zip",
       "dependencies": [
-        "store"
+        "store",
+        "credits@^1.4.0"
       ],
       "conflicts": [],
       "hooks": {
         "emits": [
-          "referral.referral.used"
+          "referral.referral.used",
+          "credit.change"
         ],
         "listens": []
       },
@@ -2789,20 +2792,21 @@
           "description": "Ürün, kategori, sepet ve siparişleriyle eksiksiz e-ticaret"
         }
       },
-      "version": "2.25.6",
+      "version": "2.26.0",
       "coreVersion": "^2.2.0",
       "author": "Blysis Team",
       "icon": "ShoppingBag",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-12T12:24:46Z",
+      "updatedAt": "2026-09-12T13:06:14Z",
       "screenshots": [],
       "tags": [
         "commerce"
       ],
       "zip": "store.zip",
       "dependencies": [
-        "currency"
+        "currency",
+        "credits@^1.4.0"
       ],
       "conflicts": [],
       "hooks": {
@@ -2814,7 +2818,8 @@
           "payment.providers",
           "payment.session",
           "currency.rate",
-          "store.billing.required"
+          "store.billing.required",
+          "credit.change"
         ],
         "listens": [
           "user.registered",
@@ -2824,7 +2829,8 @@
           "payment.refunded",
           "subscription.changed",
           "admin.customer.panels",
-          "leaderboard.boards"
+          "leaderboard.boards",
+          "coupon.issue"
         ]
       },
       "stats": {
@@ -3289,13 +3295,13 @@
           "description": "Yapılandırılabilir ödüller ve bekleme süreleriyle çevir-kazan oyunu"
         }
       },
-      "version": "1.5.0",
+      "version": "1.6.0",
       "coreVersion": "^2.0.0",
       "author": "Blysis",
       "icon": "Dices",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-12T13:06:14Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -3309,7 +3315,9 @@
       "hooks": {
         "emits": [
           "wheel.prize.won",
-          "wheel.spin.completed"
+          "wheel.spin.completed",
+          "credit.change",
+          "coupon.issue"
         ],
         "listens": []
       },

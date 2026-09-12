@@ -32,10 +32,14 @@ function typesWritten(): string[] {
                 if (entry.name !== "node_modules") walk(full);
             } else if (entry.name.endsWith(".ts")) {
                 const source = fs.readFileSync(full, "utf8");
-                // A creditTransaction write, and the type on it.
-                for (const block of source.split("creditTransaction").slice(1)) {
-                    const head = block.slice(0, 600);
-                    for (const match of head.matchAll(/\btype:\s*"([a-z_]+)"/g)) found.add(match[1]);
+                // A row is written by the wallet and asked for by everybody
+                // else, so both shapes count: the `creditTransaction` write
+                // itself, and the request that carries the word to it.
+                for (const anchor of ["creditTransaction", '"credit.change"', "moveCredits"]) {
+                    for (const block of source.split(anchor).slice(1)) {
+                        const head = block.slice(0, 600);
+                        for (const match of head.matchAll(/\btype:\s*"([a-z_]+)"/g)) found.add(match[1]);
+                    }
                 }
             }
         }

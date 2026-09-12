@@ -78,48 +78,38 @@ export async function POST(_request: NextRequest, { params }: RouteParams) {
             });
             if (claimed.count === 0) return null;
 
-            const paid = await tx.user.updateMany({
-                where: { id: session.user.id, creditBalance: { gte: split.price } },
-                data: { creditBalance: { decrement: split.price } },
+            // Three movements, all on this transaction: the buyer pays, the
+            // seller is credited, and the site's cut leaves circulation. The
+            // module that owns the wallet writes each one; this one used to
+            // update two balances and write three ledger rows itself.
+            const paid = await applyFiltersAsync("credit.change", { applied: false }, {
+                tx,
+                userId: session.user.id,
+                amount: -split.price,
+                type: "market_purchase",
+                description: `Bought ${listing.title}`,
             });
-            if (paid.count === 0) throw new Error("balance moved");
+            if (!paid.applied) throw new Error("balance moved");
 
             if (split.toSeller > 0) {
-                await tx.user.update({
-                    where: { id: listing.sellerId },
-                    data: { creditBalance: { increment: split.toSeller } },
+                await applyFiltersAsync("credit.change", { applied: false }, {
+                    tx,
+                    userId: listing.sellerId,
+                    amount: split.toSeller,
+                    type: "market_sale",
+                    description: `Sold ${listing.title}`,
                 });
             }
 
-            await tx.creditTransaction.createMany({
-                data: [
-                    {
-                        userId: session.user.id,
-                        amount: -split.price,
-                        type: "market_purchase",
-                        description: `Bought ${listing.title}`,
-                    },
-                    ...(split.toSeller > 0
-                        ? [{
-                            userId: listing.sellerId,
-                            amount: split.toSeller,
-                            type: "market_sale",
-                            description: `Sold ${listing.title}`,
-                        }]
-                        : []),
-                    ...(split.commission > 0
-                        ? [{
-                            // No account holds the cut: the site issues this
-                            // currency, so its share leaves circulation. The
-                            // row exists so it can still be counted.
-                            userId: null,
-                            amount: -split.commission,
-                            type: "market_commission",
-                            description: `Commission on ${listing.title}`,
-                        }]
-                        : []),
-                ],
-            });
+            if (split.commission > 0) {
+                await applyFiltersAsync("credit.change", { applied: false }, {
+                    tx,
+                    userId: null,
+                    amount: -split.commission,
+                    type: "market_commission",
+                    description: `Commission on ${listing.title}`,
+                });
+            }
 
             const sale = await tx.marketSale.create({
                 data: {
