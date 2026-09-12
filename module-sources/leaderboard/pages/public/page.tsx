@@ -3,116 +3,133 @@
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { Button, Card, CardContent, LoadFailed, useSiteCurrency } from "@/core/sdk/ui";
+import { Button, Card, CardContent, LoadFailed, NavIcon, Waiting, useSiteCurrency } from "@/core/sdk/ui";
 import { PageFrame } from "@/core/sdk/layout";
-import { Loader2, Trophy, Crown, Medal } from "lucide-react";
-interface LeaderEntry {
+
+interface Row {
     username: string;
     avatar: string | null;
     value: number;
-    count?: number;
 }
 
-const rankColors = ["text-warning", "text-muted-foreground", "text-warning"];
+interface Board {
+    id: string;
+    labelKey: string;
+    icon: string;
+    unit: "currency" | "count";
+    rows: Row[];
+}
 
+/** Gold, silver, bronze, then nothing. */
+const rankColours = ["text-warning", "text-muted-foreground", "text-warning"];
+
+/**
+ * The page shows the boards the install offers, whatever they are.
+ *
+ * It used to name three of them - buyers, voters, forum - and ask the
+ * endpoint which of the three were available. The modules that own that data
+ * now offer their own board, so a fourth arrives with its module and this file
+ * does not change. The label comes with the board, as a full message key,
+ * because it belongs to whoever offered it.
+ */
 export default function LeaderboardPage() {
     const t = useTranslations("leaderboard");
-    const [activeTab, setActiveTab] = useState("buyers");
-    const [failed, setFailed] = useState(false);
-    const [reloadKey, setReloadKey] = useState(0);
-    const [entries, setEntries] = useState<LeaderEntry[]>([]);
-    const [loading, setLoading] = useState(true);
-    // Which boards this site can fill. Votes and forum posts come from other
-    // modules, so a site without them would otherwise show a tab that is
-    // permanently empty. The API reports what it has; until it answers, only
-    // the board every install has is offered.
-    const [sources, setSources] = useState<string[]>(["buyers"]);
+    const everything = useTranslations();
     const { format: formatPrice } = useSiteCurrency();
 
-    const allTabs = [
-        { id: "buyers", label: t("topBuyers"), icon: Crown },
-        { id: "voters", label: t("topVoters"), icon: Medal },
-        { id: "forum", label: t("mostActive"), icon: Trophy },
-    ];
-    const tabs = allTabs.filter((tab) => sources.includes(tab.id));
+    const [boards, setBoards] = useState<Board[]>([]);
+    const [activeId, setActiveId] = useState<string | null>(null);
+    const [rows, setRows] = useState<Row[]>([]);
+    const [loading, setLoading] = useState(true);
+    const [failed, setFailed] = useState(false);
+    const [reloadKey, setReloadKey] = useState(0);
 
+    // Which tabs there are. Asked once, and with no board named, so a module
+    // answers with its heading rather than with a query.
     useEffect(() => {
         let cancelled = false;
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setLoading(true);
-        fetch(`/api/v1/leaderboard?type=${activeTab}&limit=20`)
+        fetch("/api/v1/leaderboard")
             .then((r) => { if (!r.ok) throw new Error("load failed"); return r.json(); })
-            .then((d) => {
+            .then((d: { boards?: Board[] }) => {
                 if (cancelled) return;
-                setEntries(d.leaderboard || []);
-                if (Array.isArray(d.sources)) setSources(d.sources);
+                const offered = d.boards ?? [];
+                setBoards(offered);
+                setActiveId((current) => current ?? offered[0]?.id ?? null);
+                if (offered.length === 0) setLoading(false);
+            })
+            .catch(() => { if (!cancelled) { setFailed(true); setLoading(false); } });
+        return () => { cancelled = true; };
+    }, [reloadKey]);
+
+    // And the rows of the one being looked at.
+    useEffect(() => {
+        if (!activeId) return;
+        let cancelled = false;
+        setLoading(true);
+        fetch(`/api/v1/leaderboard?board=${encodeURIComponent(activeId)}&limit=20`)
+            .then((r) => { if (!r.ok) throw new Error("load failed"); return r.json(); })
+            .then((d: { boards?: Board[] }) => {
+                if (cancelled) return;
+                setRows((d.boards ?? []).find((b) => b.id === activeId)?.rows ?? []);
                 setFailed(false);
                 setLoading(false);
             })
-            .catch(() => {
-                if (cancelled) return;
-                setFailed(true);
-                setLoading(false);
-            });
+            .catch(() => { if (!cancelled) { setFailed(true); setLoading(false); } });
         return () => { cancelled = true; };
-    }, [activeTab, reloadKey]);
+    }, [activeId, reloadKey]);
+
+    const active = boards.find((b) => b.id === activeId) ?? null;
 
     return (
-        <PageFrame
-            title={t("title")}
-            description={t("subtitle")}
-        >
-            <div className="flex flex-wrap gap-2 mb-6">
-                {tabs.map((tab) => (
-                    <Button key={tab.id} variant={activeTab === tab.id ? "default" : "outline"} onClick={() => setActiveTab(tab.id)}>
-                        <tab.icon className="w-4 h-4" /> {tab.label}
-                    </Button>
-                ))}
-            </div>
+        <PageFrame title={t("title")} description={t("subtitle")}>
+            {boards.length > 1 && (
+                <div className="flex flex-wrap gap-2 mb-6">
+                    {boards.map((board) => (
+                        <Button
+                            key={board.id}
+                            variant={board.id === activeId ? "default" : "outline"}
+                            onClick={() => setActiveId(board.id)}
+                        >
+                            <NavIcon name={board.icon} className="w-4 h-4" />
+                            {everything(board.labelKey)}
+                        </Button>
+                    ))}
+                </div>
+            )}
 
             <Card>
                 <CardContent className="p-0">
                     {loading ? (
-                        <div className="flex justify-center py-12"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
+                        <Waiting label={t("title")} />
                     ) : failed ? (
                         <LoadFailed onRetry={() => setReloadKey((k) => k + 1)} />
-                    ) : entries.length === 0 ? (
+                    ) : rows.length === 0 ? (
                         <p className="text-muted-foreground text-center py-12">{t("noData")}</p>
                     ) : (
                         <div className="divide-y">
-                            {entries.map((entry, i) => (
-                                <div key={i} className="flex items-center gap-4 p-4">
-                                    <div className={`w-8 text-center font-bold text-lg ${rankColors[i] || "text-muted-foreground"}`}>
+                            {rows.map((row, i) => (
+                                <div key={`${row.username}-${i}`} className="flex items-center gap-4 p-4">
+                                    <div className={`w-8 text-center font-bold text-lg ${rankColours[i] || "text-muted-foreground"}`}>
                                         #{i + 1}
                                     </div>
                                     <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center font-bold text-sm overflow-hidden">
-                                        {/* The member's own picture, or the
-                                            initial every other list in the
-                                            product falls back to. It used to
-                                            ask mc-heads.net for a Minecraft
-                                            skin, which sent every name on
-                                            this page to a third party and
-                                            assumed the site was a game. */}
-                                        {entry.avatar ? (
+                                        {row.avatar ? (
                                             <Image
-                                                src={entry.avatar}
-                                                alt={entry.username}
+                                                src={row.avatar}
+                                                alt={row.username}
                                                 width={40}
                                                 height={40}
                                                 className="w-full h-full object-cover"
                                             />
                                         ) : (
-                                            entry.username.charAt(0).toUpperCase()
+                                            row.username.charAt(0).toUpperCase()
                                         )}
                                     </div>
                                     <div className="flex-1">
-                                        <p className="font-medium">{entry.username}</p>
+                                        <p className="font-medium">{row.username}</p>
                                     </div>
                                     <div className="text-right font-bold">
-                                        {activeTab === "buyers" ? formatPrice(entry.value) : entry.value}
-                                        <span className="text-xs text-muted-foreground ml-1">
-                                            {activeTab === "buyers" ? t("totalSpent").toLowerCase() : activeTab === "voters" ? t("votes").toLowerCase() : t("activity").toLowerCase()}
-                                        </span>
+                                        {active?.unit === "currency" ? formatPrice(row.value) : row.value}
                                     </div>
                                 </div>
                             ))}

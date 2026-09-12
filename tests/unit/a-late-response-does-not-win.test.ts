@@ -174,7 +174,9 @@ describe("the pages this was found on", () => {
 
     it("cancels on the leaderboard, where the tabs raced", () => {
         const effects = byFile("module-sources/leaderboard/pages/public/page.tsx");
-        expect(effects.some((e) => e.deps.includes("activeTab"))).toBe(true);
+        // The tab is `activeId` since the boards became whatever the
+        // installed modules offer; the race it guards is the same one.
+        expect(effects.some((e) => e.deps.includes("activeId"))).toBe(true);
         expect(effects.every(cancels)).toBe(true);
     });
 

@@ -2,7 +2,7 @@
   "id": "leaderboard",
   "name": "Leaderboard",
   "description": "Member rankings by purchases, votes and activity",
-  "version": "1.2.3",
+  "version": "1.2.4",
   "coreVersion": "^2.2.0",
   "category": "community",
   "author": "Blysis",
@@ -27,10 +27,8 @@
   "translations": {
     "en": {
       "leaderboard": {
-        "activity": "Activity",
         "allTime": "All Time",
         "loading": "Loading leaderboard...",
-        "mostActive": "Most Active",
         "noData": "No leaderboard data available",
         "period": "Period",
         "player": "Member",
@@ -40,10 +38,6 @@
         "thisWeek": "This Week",
         "title": "Leaderboard",
         "today": "Today",
-        "topBuyers": "Top Buyers",
-        "topVoters": "Top Voters",
-        "totalSpent": "Total Spent",
-        "votes": "Votes",
         "subtitle": "The members who buy, vote and post the most."
       },
       "pageTitles": {
@@ -59,10 +53,8 @@
     },
     "tr": {
       "leaderboard": {
-        "activity": "Aktivite",
         "allTime": "Tüm Zamanlar",
         "loading": "Sıralama yükleniyor...",
-        "mostActive": "En Aktifler",
         "noData": "Sıralama verisi bulunamadı",
         "period": "Dönem",
         "player": "Üye",
@@ -72,10 +64,6 @@
         "thisWeek": "Bu Hafta",
         "title": "Sıralama",
         "today": "Bugün",
-        "topBuyers": "En Çok Satın Alanlar",
-        "topVoters": "En Çok Oy Verenler",
-        "totalSpent": "Toplam Harcama",
-        "votes": "Oylar",
         "subtitle": "En çok satın alan, oy veren ve en aktif üyeler."
       },
       "pageTitles": {
@@ -104,6 +92,12 @@
       "href": "/leaderboard",
       "icon": "Medal",
       "position": 90
+    }
+  ],
+  "hooksEmitted": [
+    {
+      "hook": "leaderboard.boards",
+      "type": "filter"
     }
   ]
 }

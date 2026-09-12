@@ -133,14 +133,22 @@ describe("a module's translation catalogue", () => {
             const { translations, ...rest } = manifest;
             const outsideCatalogue = JSON.stringify(rest);
             const derived = derivedKeys(id, manifest);
-            const keys = new Set<string>();
+            // The namespace travels with the key, because a module may offer
+            // a string another module renders: a leaderboard board carries
+            // `labelKey: "store.leaderboardBuyers"`, and the page that draws
+            // the tab resolves it from the root of the catalogue. Without the
+            // qualified form those strings read as dead here.
+            const keys = new Map<string, string>();
             for (const catalogue of Object.values(translations ?? {})) {
-                for (const entries of Object.values(catalogue)) {
-                    if (entries && typeof entries === "object") for (const key of Object.keys(entries)) keys.add(key);
+                for (const [namespace, entries] of Object.entries(catalogue)) {
+                    if (entries && typeof entries === "object") {
+                        for (const key of Object.keys(entries)) keys.set(key, `${namespace}.${key}`);
+                    }
                 }
             }
-            for (const key of keys) {
+            for (const [key, qualified] of keys) {
                 if (WORDS.has(key)) continue;
+                if (WORDS.has(qualified)) continue;
                 if (outsideCatalogue.includes(key)) continue;
                 if (derived.has(key)) continue;
                 if (CONSTRUCTED.some((pattern) => pattern.test(key))) continue;

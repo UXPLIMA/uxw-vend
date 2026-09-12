@@ -2,7 +2,7 @@
   "id": "store",
   "name": "Store Module",
   "description": "Complete e-commerce functionality with products, categories, cart and orders",
-  "version": "2.25.5",
+  "version": "2.25.6",
   "coreVersion": "^2.2.0",
   "category": "commerce",
   "author": "Blysis Team",
@@ -46,6 +46,11 @@
       "hook": "admin.customer.panels",
       "type": "filter",
       "handler": "hooks/on-customer-panels.ts"
+    },
+    {
+      "hook": "leaderboard.boards",
+      "type": "filter",
+      "handler": "hooks/leaderboard-board.ts"
     }
   ],
   "settings": [
@@ -1129,7 +1134,8 @@
         "adm_customerPanel": "In the shop",
         "adm_customerOrders": "Orders",
         "adm_customerSpent": "Paid in total",
-        "adm_customerCredits": "Credit balance"
+        "adm_customerCredits": "Credit balance",
+        "leaderboardBuyers": "Top buyers"
       },
       "cart": {
         "title": "Shopping Cart",
@@ -1850,7 +1856,8 @@
         "adm_customerPanel": "Mağazada",
         "adm_customerOrders": "Sipariş",
         "adm_customerSpent": "Toplam ödediği",
-        "adm_customerCredits": "Kredi bakiyesi"
+        "adm_customerCredits": "Kredi bakiyesi",
+        "leaderboardBuyers": "En çok alışveriş yapanlar"
       },
       "cart": {
         "title": "Alışveriş Sepeti",

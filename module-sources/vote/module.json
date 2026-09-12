@@ -2,7 +2,7 @@
   "id": "vote",
   "name": "Vote Sites",
   "description": "Send players to the server listings you are ranked on, and count who voted",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "coreVersion": "^2.0.0",
   "category": "gaming",
   "author": "Blysis",
@@ -90,7 +90,8 @@
         "voteFailed": "Your vote could not be recorded. Try again.",
         "adm_field3Label": "Icon",
         "adm_field3Placeholder": "Choose an icon",
-        "adm_field4Label": "Active"
+        "adm_field4Label": "Active",
+        "leaderboardVoters": "Top voters"
       },
       "admin": {
         "menu_vote": "Vote",
@@ -137,7 +138,8 @@
         "voteFailed": "Oyunuz kaydedilemedi. Tekrar deneyin.",
         "adm_field3Label": "İkon",
         "adm_field3Placeholder": "Bir simge seçin",
-        "adm_field4Label": "Aktif"
+        "adm_field4Label": "Aktif",
+        "leaderboardVoters": "En çok oy verenler"
       },
       "admin": {
         "menu_vote": "Oylama Siteleri",
@@ -170,6 +172,13 @@
       "href": "/vote",
       "icon": "Vote",
       "position": 120
+    }
+  ],
+  "hookListeners": [
+    {
+      "hook": "leaderboard.boards",
+      "type": "filter",
+      "handler": "hooks/leaderboard-board.ts"
     }
   ]
 }
