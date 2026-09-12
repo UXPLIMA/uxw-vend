@@ -1,7 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { isVisibleOnPage } from "../lib/visible-on";
 import type { ComponentConfig } from "@measured/puck";
 import { Info, AlertTriangle, CheckCircle, AlertCircle, X } from "lucide-react";
 
@@ -23,6 +25,9 @@ interface Announcement {
     type: string;
     dismissible?: boolean;
     pinned?: boolean;
+    /** Where the operator said this may appear. */
+    includePages?: string | null;
+    excludePages?: string | null;
 }
 
 const styleConfig: Record<string, { Icon: typeof Info; color: string }> = {
@@ -34,6 +39,7 @@ const styleConfig: Record<string, { Icon: typeof Info; color: string }> = {
 
 function AnnouncementBannerBlockRender({ style, dismissible }: AnnouncementBannerProps): React.ReactElement {
     const t = useTranslations("announcements");
+    const pathname = usePathname();
     const [announcement, setAnnouncement] = useState<Announcement | null>(null);
     const [dismissed, setDismissed] = useState(false);
 
@@ -43,14 +49,17 @@ function AnnouncementBannerBlockRender({ style, dismissible }: AnnouncementBanne
             .then((r) => r.json())
             .then((d) => {
                 if (cancelled) return;
-                const list: Announcement[] = Array.isArray(d) ? d : d.announcements || d.data || [];
+                const all: Announcement[] = Array.isArray(d) ? d : d.announcements || d.data || [];
+                // A block sits on a page, and an announcement says which
+                // pages it is for.
+                const list = all.filter((a) => isVisibleOnPage(a, pathname ?? "/"));
                 const pinned = list.find((a) => a.pinned);
                 setAnnouncement(pinned || list[0] || null);
             })
             .catch(() => {});
 
         return () => { cancelled = true; };
-    }, []);
+    }, [pathname]);
 
     if (!announcement || dismissed) return <></>;
 

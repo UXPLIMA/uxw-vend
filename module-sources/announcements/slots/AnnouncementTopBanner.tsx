@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Megaphone, X } from "lucide-react";
+import { isVisibleOnPage } from "../lib/visible-on";
 
 interface Announcement {
     id: string;
@@ -10,6 +12,9 @@ interface Announcement {
     content: string;
     type?: string;
     dismissible?: boolean;
+    /** Where the operator said this may appear. */
+    includePages?: string | null;
+    excludePages?: string | null;
 }
 
 /**
@@ -19,6 +24,7 @@ interface Announcement {
  */
 export default function AnnouncementTopBanner() {
     const t = useTranslations("announcements");
+    const pathname = usePathname();
     const [announcement, setAnnouncement] = useState<Announcement | null>(null);
 
     useEffect(() => {
@@ -29,17 +35,20 @@ export default function AnnouncementTopBanner() {
                 if (!active) return;
                 // Endpoint already filters isActive + time bounds; take the
                 // most recent one that the user hasn't yet dismissed.
-                const items = d.announcements || [];
+                // The operator's own rule about where this may appear. It
+                // was read by nothing, so a notice limited to the store was
+                // drawn on every screen including the admin panel.
+                const items = (d.announcements || []).filter((a) => isVisibleOnPage(a, pathname ?? "/"));
                 if (typeof window === "undefined") {
                     if (items[0]) setAnnouncement(items[0]);
                     return;
                 }
                 const first = items.find((a) => !localStorage.getItem(`announcement-dismissed:${a.id}`));
-                if (first) setAnnouncement(first);
+                setAnnouncement(first ?? null);
             })
             .catch(() => undefined);
         return () => { active = false; };
-    }, []);
+    }, [pathname]);
 
     if (!announcement) return null;
 
