@@ -173,6 +173,12 @@ export default function AdminPunishmentsPage() {
                             <div>
                                 <Label>{t("adm_playerName")}</Label>
                                 <Input aria-label={t("adm_playerName")} value={form.playerName} onChange={e => setForm(f => ({ ...f, playerName: e.target.value }))} />
+                                {/* A member's username links the punishment
+                                    to their account; anything else is
+                                    recorded as the name it was reported
+                                    under. The field takes both because both
+                                    happen. */}
+                                <p className="mt-1 text-xs text-muted-foreground">{t("adm_playerNameHelp")}</p>
                             </div>
                             <div>
                                 <Label>{t("adm_type")}</Label>

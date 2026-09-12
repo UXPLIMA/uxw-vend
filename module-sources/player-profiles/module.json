@@ -2,7 +2,7 @@
   "id": "player-profiles",
   "name": "Member Profiles",
   "description": "Public profile pages, with what every installed module knows about a member",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "coreVersion": "^2.0.0",
   "category": "gaming",
   "author": "Blysis",
@@ -44,7 +44,7 @@
   "translations": {
     "en": {
       "playerProfiles": {
-        "title": "Player Profile",
+        "title": "Member Profile",
         "username": "Username",
         "joinDate": "Join Date",
         "online": "Online",
@@ -52,7 +52,7 @@
         "linkedAccounts": "Linked Accounts",
         "noLinkedAccounts": "No linked accounts",
         "statistics": "Statistics",
-        "playerNotFound": "Player not found",
+        "playerNotFound": "Member not found",
         "searchPlaceholder": "Enter username...",
         "rank": "Rank",
         "badges": "Badges",
@@ -73,7 +73,7 @@
         "unlinkConfirm": "This account will be disconnected. You will have to link it again to use it."
       },
       "pageTitles": {
-        "player": "Player Profile"
+        "player": "Member Profile"
       },
       "admin": {
         "module_player-profiles_name": "Member Profiles",
@@ -82,7 +82,7 @@
     },
     "tr": {
       "playerProfiles": {
-        "title": "Oyuncu Profili",
+        "title": "Üye Profili",
         "username": "Kullanıcı Adı",
         "joinDate": "Katılma Tarihi",
         "online": "Çevrimiçi",
@@ -90,7 +90,7 @@
         "linkedAccounts": "Bağlı Hesaplar",
         "noLinkedAccounts": "Bağlı hesap yok",
         "statistics": "İstatistikler",
-        "playerNotFound": "Oyuncu bulunamadı",
+        "playerNotFound": "Üye bulunamadı",
         "searchPlaceholder": "Kullanıcı adı girin...",
         "rank": "Rütbe",
         "badges": "Rozetler",
@@ -111,7 +111,7 @@
         "unlinkConfirm": "Bu hesabın bağlantısı kesilecek. Tekrar kullanmak için yeniden bağlamanız gerekir."
       },
       "pageTitles": {
-        "player": "Oyuncu Profili"
+        "player": "Üye Profili"
       },
       "admin": {
         "module_player-profiles_name": "Üye Profilleri",
