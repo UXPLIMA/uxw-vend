@@ -286,6 +286,20 @@ const NAMES = [
 ];
 
 /**
+ * The twelve faces in `public/demo`, handed out in order.
+ *
+ * A community site draws an avatar beside every post, comment, profile and
+ * staff card. Left null they all fall back to the same initial, which makes a
+ * seeded forum look like one person talking to themselves and hides the one
+ * thing a reader checks first: whether two rows are two people.
+ */
+const AVATARS = [
+    "/demo/avatar-01.svg", "/demo/avatar-02.svg", "/demo/avatar-03.svg", "/demo/avatar-04.svg",
+    "/demo/avatar-05.svg", "/demo/avatar-06.svg", "/demo/avatar-07.svg", "/demo/avatar-08.svg",
+    "/demo/avatar-09.svg", "/demo/avatar-10.svg", "/demo/avatar-11.svg", "/demo/avatar-12.svg",
+];
+
+/**
  * The people the rest of the data belongs to.
  *
  * Every module hangs its rows on a user, so this runs first and is the one
@@ -314,11 +328,12 @@ async function seedUsers(
         const existing = await prisma.user.findUnique({ where: { email }, select: { id: true } });
         const user = await prisma.user.upsert({
             where: { email },
-            update: { roleId: role.id },
+            update: { roleId: role.id, avatar: AVATARS[i % AVATARS.length] },
             create: {
                 email,
                 username,
                 password,
+                avatar: AVATARS[i % AVATARS.length],
                 roleId: role.id,
                 emailVerified: new Date(),
                 createdAt: new Date(Date.now() - (wanted - i) * 86_400_000),
@@ -442,10 +457,32 @@ async function main(): Promise<void> {
     }
 }
 
+/**
+ * End the process, once what has been printed is actually out.
+ *
+ * This tool imports arbitrary module code, and a module's seed may reach a
+ * helper that imports the app's own Prisma client, which opens a connection
+ * pool the moment it is imported. That pool is nobody's to close from here,
+ * and it kept the command alive after its work was done: `--list` printed its
+ * list and sat there, and a seeding run left a process behind that was still
+ * running a day later. The tool owns its own exit rather than depending on
+ * ninety modules importing nothing that holds a socket.
+ *
+ * Draining first because a write to a pipe is asynchronous, and `process.exit`
+ * drops whatever is still queued - which is the whole output when the command
+ * is being read by another program.
+ */
+function exitWhenWritten(code: number): void {
+    process.stdout.write("", () => process.exit(code));
+}
+
 // Imported by its test for `inOrder`; only the command line runs the rest.
 if (process.argv[1] && process.argv[1].endsWith("seed-demo.ts")) {
-    main().catch((err) => {
-        console.error(err instanceof Error ? err.message : err);
-        process.exit(1);
-    });
+    main().then(
+        () => exitWhenWritten(0),
+        (err) => {
+            console.error(err instanceof Error ? err.message : err);
+            exitWhenWritten(1);
+        },
+    );
 }
