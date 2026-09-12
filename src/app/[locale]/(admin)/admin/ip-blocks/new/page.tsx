@@ -68,49 +68,55 @@ export default function NewIpBlockPage() {
 
             <Card>
                 <CardContent className="p-6">
-                    <form onSubmit={submit} className="space-y-4 max-w-xl">
-                        <div>
-                            <Label htmlFor="ip-block-ip">{t("ipBlocks_ipLabel")}</Label>
-                            <Input
-                                id="ip-block-ip"
-                                value={ip}
-                                onChange={(e) => setIp(e.target.value)}
-                                placeholder="1.2.3.4 or 192.168.0.0/24"
-                                autoComplete="off"
-                                required
-                            />
-                            <p className="text-xs text-muted-foreground mt-1">{t("ipBlocks_ipHint")}</p>
-                        </div>
-                        <div>
-                            <Label htmlFor="ip-block-scope">{t("ipBlocks_scope")}</Label>
-                            <NativeSelect
-                                id="ip-block-scope"
-                                value={scope}
-                                onChange={(e) => setScope(e.target.value as "all" | "admin" | "api")}
-                            >
-                                <option value="all">{t("ipBlocks_scopeAll")}</option>
-                                <option value="admin">{t("ipBlocks_scopeAdmin")}</option>
-                                <option value="api">{t("ipBlocks_scopeApi")}</option>
-                            </NativeSelect>
-                        </div>
-                        <div>
-                            <Label htmlFor="ip-block-reason">{t("ipBlocks_reason")}</Label>
-                            <Input
-                                id="ip-block-reason"
-                                value={reason}
-                                onChange={(e) => setReason(e.target.value)}
-                                placeholder={t("ipBlocks_reasonPlaceholder")}
-                            />
-                        </div>
-                        <div>
-                            <Label htmlFor="ip-block-expires">{t("ipBlocks_expiresAt")}</Label>
-                            <Input
-                                id="ip-block-expires"
-                                type="datetime-local"
-                                value={expiresAt}
-                                onChange={(e) => setExpiresAt(e.target.value)}
-                            />
-                            <p className="text-xs text-muted-foreground mt-1">{t("ipBlocks_expiresHint")}</p>
+                    {/* Four fields in two columns. The form used to be
+                        capped at `max-w-xl` inside a card that stretched
+                        anyway, so the card drew a border around an empty
+                        right half of the panel. */}
+                    <form onSubmit={submit} className="space-y-4">
+                        <div className="grid gap-4 md:grid-cols-2">
+                            <div>
+                                <Label htmlFor="ip-block-ip">{t("ipBlocks_ipLabel")}</Label>
+                                <Input
+                                    id="ip-block-ip"
+                                    value={ip}
+                                    onChange={(e) => setIp(e.target.value)}
+                                    placeholder="1.2.3.4 or 192.168.0.0/24"
+                                    autoComplete="off"
+                                    required
+                                />
+                                <p className="text-xs text-muted-foreground mt-1">{t("ipBlocks_ipHint")}</p>
+                            </div>
+                            <div>
+                                <Label htmlFor="ip-block-scope">{t("ipBlocks_scope")}</Label>
+                                <NativeSelect
+                                    id="ip-block-scope"
+                                    value={scope}
+                                    onChange={(e) => setScope(e.target.value as "all" | "admin" | "api")}
+                                >
+                                    <option value="all">{t("ipBlocks_scopeAll")}</option>
+                                    <option value="admin">{t("ipBlocks_scopeAdmin")}</option>
+                                    <option value="api">{t("ipBlocks_scopeApi")}</option>
+                                </NativeSelect>
+                            </div>
+                            <div>
+                                <Label htmlFor="ip-block-reason">{t("ipBlocks_reason")}</Label>
+                                <Input
+                                    id="ip-block-reason"
+                                    value={reason}
+                                    onChange={(e) => setReason(e.target.value)}
+                                    placeholder={t("ipBlocks_reasonPlaceholder")}
+                                />
+                            </div>
+                            <div>
+                                <Label htmlFor="ip-block-expires">{t("ipBlocks_expiresAt")}</Label>
+                                <Input
+                                    id="ip-block-expires"
+                                    type="datetime-local"
+                                    value={expiresAt}
+                                    onChange={(e) => setExpiresAt(e.target.value)}
+                                />
+                                <p className="text-xs text-muted-foreground mt-1">{t("ipBlocks_expiresHint")}</p>
+                            </div>
                         </div>
                         <div className="flex gap-2">
                             <Button type="submit" disabled={saving}>

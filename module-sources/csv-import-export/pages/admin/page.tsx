@@ -19,26 +19,27 @@ export default function ExportImportPage() {
                 description={t("adm_exportImportSubtitle")}
             />
 
-            <div className="max-w-md">
-                <Card>
-                    <CardHeader>
-                        <CardTitle className="flex items-center gap-2 text-base">
-                            <Download className="w-4 h-4" /> {t("adm_export")}
-                        </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                        <Button variant="outline" className="w-full justify-start" onClick={() => exportData("products")}>
-                            <Download className="w-4 h-4" /> {t("adm_exportProducts")}
-                        </Button>
-                        <Button variant="outline" className="w-full justify-start" onClick={() => exportData("orders")}>
-                            <Download className="w-4 h-4" /> {t("adm_exportOrders")}
-                        </Button>
-                        <Button variant="outline" className="w-full justify-start" onClick={() => exportData("users")}>
-                            <Download className="w-4 h-4" /> {t("adm_exportUsers")}
-                        </Button>
-                    </CardContent>
-                </Card>
-            </div>
+            {/* Three exports across the card rather than stacked in a
+                28rem column: the screen offers one kind of thing three
+                times, and a row says that better than a list does. */}
+            <Card>
+                <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-base">
+                        <Download className="w-4 h-4" /> {t("adm_export")}
+                    </CardTitle>
+                </CardHeader>
+                <CardContent className="grid gap-3 sm:grid-cols-3">
+                    <Button variant="outline" className="w-full justify-start" onClick={() => exportData("products")}>
+                        <Download className="w-4 h-4" /> {t("adm_exportProducts")}
+                    </Button>
+                    <Button variant="outline" className="w-full justify-start" onClick={() => exportData("orders")}>
+                        <Download className="w-4 h-4" /> {t("adm_exportOrders")}
+                    </Button>
+                    <Button variant="outline" className="w-full justify-start" onClick={() => exportData("users")}>
+                        <Download className="w-4 h-4" /> {t("adm_exportUsers")}
+                    </Button>
+                </CardContent>
+            </Card>
         </>
     );
 }

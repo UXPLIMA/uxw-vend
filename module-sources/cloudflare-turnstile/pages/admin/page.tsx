@@ -82,7 +82,7 @@ export default function CloudflareTurnstileAdminPage() {
     }
 
     return (
-        <div className="max-w-2xl">
+        <>
             {/* The save is a header action, the same control in the same
                 place as every other settings screen, rather than a full-width
                 button pinned to the bottom of the card. */}
@@ -97,34 +97,46 @@ export default function CloudflareTurnstileAdminPage() {
                 }
             />
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>{t("title")}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div>
-                        <Label>{t("siteKey")}</Label>
-                        <Input
-                            aria-label={t("siteKey")}
-                            value={config.siteKey}
-                            onChange={(e) => setConfig({ ...config, siteKey: e.target.value })}
-                            placeholder="0x..."
-                        />
-                    </div>
-                    <div>
-                        <Label>{t("secretKey")}</Label>
-                        <Input
-                            aria-label={t("secretKey")}
-                            type="password"
-                            value={config.secretKey}
-                            onChange={(e) => setConfig({ ...config, secretKey: e.target.value })}
-                            placeholder="0x..."
-                        />
-                        <p className="text-xs text-muted-foreground mt-1">
-                            {secretStored ? t("secretKeyStored") : t("secretKeyNotSet")}
-                        </p>
-                    </div>
-                    <div className="space-y-3 pt-2 border-t border-border">
+            {/* Two cards across the panel rather than one narrow column down
+                its left edge. The screen has two subjects - the pair of keys
+                Cloudflare issues, and the pages that ask for a challenge -
+                and they are what the cards are. */}
+            <div className="grid gap-6 lg:grid-cols-2">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>{t("keysTitle")}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div>
+                            <Label>{t("siteKey")}</Label>
+                            <Input
+                                aria-label={t("siteKey")}
+                                value={config.siteKey}
+                                onChange={(e) => setConfig({ ...config, siteKey: e.target.value })}
+                                placeholder="0x..."
+                            />
+                        </div>
+                        <div>
+                            <Label>{t("secretKey")}</Label>
+                            <Input
+                                aria-label={t("secretKey")}
+                                type="password"
+                                value={config.secretKey}
+                                onChange={(e) => setConfig({ ...config, secretKey: e.target.value })}
+                                placeholder="0x..."
+                            />
+                            <p className="text-xs text-muted-foreground mt-1">
+                                {secretStored ? t("secretKeyStored") : t("secretKeyNotSet")}
+                            </p>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle>{t("challengeTitle")}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
                         <CheckboxField
                             checked={config.enableOnLogin}
                             onChange={(e) => setConfig({ ...config, enableOnLogin: e.target.checked })}
@@ -137,9 +149,9 @@ export default function CloudflareTurnstileAdminPage() {
                             label={<span className="font-medium">{t("enableOnRegister")}</span>}
                             description={t("enableOnRegisterDesc")}
                         />
-                    </div>
-                </CardContent>
-            </Card>
-        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        </>
     );
 }

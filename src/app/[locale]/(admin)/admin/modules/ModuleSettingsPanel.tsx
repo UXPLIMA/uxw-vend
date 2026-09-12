@@ -56,57 +56,60 @@ export function ModuleSettingsPanel({
         }
     };
 
+    // A module that declares eight settings used to list them down a
+    // 36rem column with the rest of the panel blank beside it.
     return (
-        <div className="space-y-4 max-w-xl">
-
-            {declarations.map((setting) => {
-                const id = `module-setting-${mod.id}-${setting.key}`;
-                const value = values[setting.key];
-                return (
-                    <div key={setting.key} className="text-sm">
-                        {setting.type === "boolean" ? (
-                            <CheckboxField
-                                id={id}
-                                checked={value === true}
-                                onChange={(e) =>
-                                    setValues((v) => ({ ...v, [setting.key]: e.target.checked }))
-                                }
-                                label={<span className="font-medium">{setting.label}</span>}
-                                description={setting.description}
-                            />
-                        ) : (
-                            <div className="space-y-1">
-                                <label htmlFor={id} className="font-medium block">{setting.label}</label>
-                                {setting.description && (
-                                    <span className="block text-muted-foreground">{setting.description}</span>
-                                )}
-                                <Input
+        <div className="space-y-4">
+            <div className="grid gap-4 md:grid-cols-2">
+                {declarations.map((setting) => {
+                    const id = `module-setting-${mod.id}-${setting.key}`;
+                    const value = values[setting.key];
+                    return (
+                        <div key={setting.key} className="text-sm">
+                            {setting.type === "boolean" ? (
+                                <CheckboxField
                                     id={id}
-                                    className="text-sm"
-                                    type={setting.type === "number" ? "number" : "text"}
-                                    min={setting.min}
-                                    max={setting.max}
-                                    step={setting.step}
-                                    maxLength={setting.maxLength}
-                                    value={String(value ?? "")}
+                                    checked={value === true}
                                     onChange={(e) =>
-                                        setValues((v) => ({
-                                            ...v,
-                                            [setting.key]:
-                                                setting.type === "number"
-                                                    // An empty box is not a number. Keep the declared
-                                                    // default rather than sending NaN, which the server
-                                                    // would reject as "must be a finite number".
-                                                    ? (e.target.value === "" ? setting.default : Number(e.target.value))
-                                                    : e.target.value,
-                                        }))
+                                        setValues((v) => ({ ...v, [setting.key]: e.target.checked }))
                                     }
+                                    label={<span className="font-medium">{setting.label}</span>}
+                                    description={setting.description}
                                 />
-                            </div>
-                        )}
-                    </div>
-                );
-            })}
+                            ) : (
+                                <div className="space-y-1">
+                                    <label htmlFor={id} className="font-medium block">{setting.label}</label>
+                                    {setting.description && (
+                                        <span className="block text-muted-foreground">{setting.description}</span>
+                                    )}
+                                    <Input
+                                        id={id}
+                                        className="text-sm"
+                                        type={setting.type === "number" ? "number" : "text"}
+                                        min={setting.min}
+                                        max={setting.max}
+                                        step={setting.step}
+                                        maxLength={setting.maxLength}
+                                        value={String(value ?? "")}
+                                        onChange={(e) =>
+                                            setValues((v) => ({
+                                                ...v,
+                                                [setting.key]:
+                                                    setting.type === "number"
+                                                        // An empty box is not a number. Keep the declared
+                                                        // default rather than sending NaN, which the server
+                                                        // would reject as "must be a finite number".
+                                                        ? (e.target.value === "" ? setting.default : Number(e.target.value))
+                                                        : e.target.value,
+                                            }))
+                                        }
+                                    />
+                                </div>
+                            )}
+                        </div>
+                    );
+                })}
+            </div>
 
             <Button disabled={!dirty || saving} onClick={save}>
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : t("modules_settingsSave")}

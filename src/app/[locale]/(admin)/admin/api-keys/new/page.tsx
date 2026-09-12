@@ -70,7 +70,11 @@ export default function NewApiKeyPage() {
                 backLabel={commonT("back")}
             />
 
-            <Card>
+            {/* A key has one field, so there is nothing to lay across the
+                panel. The measure goes on the card, which is the whole of
+                what this screen shows: capping the form inside a card that
+                stretched anyway drew a border around an empty right half. */}
+            <Card className="w-full max-w-lg">
                 <CardContent className="p-6">
                     {created ? (
                         <div className="space-y-4">
@@ -88,7 +92,7 @@ export default function NewApiKeyPage() {
                             </Button>
                         </div>
                     ) : (
-                        <form onSubmit={submit} className="space-y-4 max-w-lg">
+                        <form onSubmit={submit} className="space-y-4">
                             <div>
                                 <Label htmlFor="api-key-name">{t("apiKeys_keyName")}</Label>
                                 <Input

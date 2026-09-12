@@ -84,7 +84,7 @@ export default function CloudflareR2AdminPage() {
     }
 
     return (
-        <div className="max-w-2xl">
+        <>
             {/* A title is words: the icon this one drew belongs to the
                 sidebar entry, and no other admin screen puts one here. The
                 save is a header action too, rather than a full-width button
@@ -107,68 +107,82 @@ export default function CloudflareR2AdminPage() {
                 }
             />
 
-            <Card>
-                <CardHeader>
-                    <CardTitle>{t("title")}</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                    <div>
-                        <Label>{t("accountId")}</Label>
-                        <Input
-                            aria-label={t("accountId")}
-                            value={config.accountId}
-                            onChange={(e) => setConfig({ ...config, accountId: e.target.value })}
-                            placeholder="abc123def456..."
+            {/* What Cloudflare issues and what the bucket is called are two
+                different jobs, done on two different Cloudflare screens, so
+                they are two cards side by side instead of one column of five
+                fields against the left edge of the panel. */}
+            <div className="grid gap-6 lg:grid-cols-2">
+                <Card>
+                    <CardHeader>
+                        <CardTitle>{t("credentialsTitle")}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div>
+                            <Label>{t("accountId")}</Label>
+                            <Input
+                                aria-label={t("accountId")}
+                                value={config.accountId}
+                                onChange={(e) => setConfig({ ...config, accountId: e.target.value })}
+                                placeholder="abc123def456..."
+                            />
+                        </div>
+                        <div>
+                            <Label>{t("accessKey")}</Label>
+                            <Input
+                                aria-label={t("accessKey")}
+                                value={config.accessKey}
+                                onChange={(e) => setConfig({ ...config, accessKey: e.target.value })}
+                                placeholder="..."
+                            />
+                        </div>
+                        <div>
+                            <Label>{t("secretKey")}</Label>
+                            <Input
+                                aria-label={t("secretKey")}
+                                type="password"
+                                value={config.secretKey}
+                                onChange={(e) => setConfig({ ...config, secretKey: e.target.value })}
+                                placeholder="..."
+                            />
+                            <p className="text-xs text-muted-foreground mt-1">
+                                {secretStored ? t("secretKeyStored") : t("secretKeyNotSet")}
+                            </p>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle>{t("bucketTitle")}</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        <div>
+                            <Label>{t("bucket")}</Label>
+                            <Input
+                                aria-label={t("bucket")}
+                                value={config.bucket}
+                                onChange={(e) => setConfig({ ...config, bucket: e.target.value })}
+                                placeholder="my-bucket"
+                            />
+                        </div>
+                        <div>
+                            <Label>{t("publicUrl")}</Label>
+                            <Input
+                                aria-label={t("publicUrl")}
+                                value={config.publicUrl}
+                                onChange={(e) => setConfig({ ...config, publicUrl: e.target.value })}
+                                placeholder="https://pub-xxx.r2.dev"
+                            />
+                            <p className="text-xs text-muted-foreground mt-1">{t("publicUrlHint")}</p>
+                        </div>
+                        <CheckboxField
+                            checked={setActive}
+                            onChange={(e) => setSetActive(e.target.checked)}
+                            label={t("active")}
                         />
-                    </div>
-                    <div>
-                        <Label>{t("bucket")}</Label>
-                        <Input
-                            aria-label={t("bucket")}
-                            value={config.bucket}
-                            onChange={(e) => setConfig({ ...config, bucket: e.target.value })}
-                            placeholder="my-bucket"
-                        />
-                    </div>
-                    <div>
-                        <Label>{t("accessKey")}</Label>
-                        <Input
-                            aria-label={t("accessKey")}
-                            value={config.accessKey}
-                            onChange={(e) => setConfig({ ...config, accessKey: e.target.value })}
-                            placeholder="..."
-                        />
-                    </div>
-                    <div>
-                        <Label>{t("secretKey")}</Label>
-                        <Input
-                            aria-label={t("secretKey")}
-                            type="password"
-                            value={config.secretKey}
-                            onChange={(e) => setConfig({ ...config, secretKey: e.target.value })}
-                            placeholder="..."
-                        />
-                        <p className="text-xs text-muted-foreground mt-1">
-                            {secretStored ? t("secretKeyStored") : t("secretKeyNotSet")}
-                        </p>
-                    </div>
-                    <div>
-                        <Label>{t("publicUrl")}</Label>
-                        <Input
-                            aria-label={t("publicUrl")}
-                            value={config.publicUrl}
-                            onChange={(e) => setConfig({ ...config, publicUrl: e.target.value })}
-                            placeholder="https://pub-xxx.r2.dev"
-                        />
-                        <p className="text-xs text-muted-foreground mt-1">{t("publicUrlHint")}</p>
-                    </div>
-                    <CheckboxField
-                        checked={setActive}
-                        onChange={(e) => setSetActive(e.target.checked)}
-                        label={t("active")}
-                    />
-                </CardContent>
-            </Card>
-        </div>
+                    </CardContent>
+                </Card>
+            </div>
+        </>
     );
 }

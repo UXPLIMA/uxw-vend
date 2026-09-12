@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
-  "updated": "2026-09-11",
-  "updatedAt": "2026-09-11T13:12:03Z",
+  "updated": "2026-09-12",
+  "updatedAt": "2026-09-12T09:10:00Z",
   "modules": [
     {
       "id": "announcements",
@@ -241,13 +241,13 @@
           "description": "Cloudflare R2 üzerinde çalışan S3 uyumlu nesne depolama (çıkış ücreti yok)"
         }
       },
-      "version": "1.4.1",
+      "version": "1.4.2",
       "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "Cloud",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-11T13:04:50Z",
+      "updatedAt": "2026-09-12T09:10:00Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -276,13 +276,13 @@
           "description": "Cloudflare tarafından sağlanan, gizliliğe saygılı CAPTCHA alternatifi"
         }
       },
-      "version": "1.6.1",
+      "version": "1.6.2",
       "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "Shield",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-11T13:04:50Z",
+      "updatedAt": "2026-09-12T09:10:00Z",
       "screenshots": [],
       "tags": [
         "integration"
@@ -537,13 +537,13 @@
           "description": "Veri yedeklemesi için CSV dışa ve içe aktarma araçları"
         }
       },
-      "version": "1.1.1",
+      "version": "1.1.2",
       "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "Download",
       "category": "integration",
       "verified": true,
-      "updatedAt": "2026-09-11T13:04:50Z",
+      "updatedAt": "2026-09-12T09:10:00Z",
       "screenshots": [],
       "tags": [
         "integration"

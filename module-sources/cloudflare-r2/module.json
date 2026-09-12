@@ -2,7 +2,7 @@
   "id": "cloudflare-r2",
   "name": "Cloudflare R2 Storage",
   "description": "S3-compatible object storage backed by Cloudflare R2 (zero egress fees)",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "coreVersion": "^2.1.0",
   "secretSettings": [
     "cloudflare_r2_config.secretKey"
@@ -56,6 +56,8 @@
       "cloudflareR2": {
         "title": "Cloudflare R2 Storage",
         "subtitle": "S3-compatible object storage with zero egress fees",
+        "credentialsTitle": "Credentials",
+        "bucketTitle": "Bucket",
         "accountId": "Account ID",
         "bucket": "Bucket Name",
         "accessKey": "Access Key ID",
@@ -84,6 +86,8 @@
       "cloudflareR2": {
         "title": "Cloudflare R2 Depolama",
         "subtitle": "Sıfır çıkış ücretli S3 uyumlu nesne depolama",
+        "credentialsTitle": "Kimlik Bilgileri",
+        "bucketTitle": "Bucket",
         "accountId": "Hesap ID",
         "bucket": "Bucket Adı",
         "accessKey": "Erişim Anahtarı",

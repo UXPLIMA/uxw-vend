@@ -2,7 +2,7 @@
   "id": "cloudflare-turnstile",
   "name": "Cloudflare Turnstile",
   "description": "Privacy-focused CAPTCHA alternative powered by Cloudflare",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "coreVersion": "^2.1.0",
   "secretSettings": [
     "cloudflare_turnstile_config.secretKey"
@@ -51,6 +51,8 @@
       "cloudflareTurnstile": {
         "title": "Cloudflare Turnstile",
         "subtitle": "Privacy-focused CAPTCHA",
+        "keysTitle": "Keys",
+        "challengeTitle": "Challenge",
         "siteKey": "Site Key",
         "secretKey": "Secret Key",
         "enableOnLogin": "Enable on Login",
@@ -78,6 +80,8 @@
       "cloudflareTurnstile": {
         "title": "Cloudflare Turnstile",
         "subtitle": "Gizlilik odaklı CAPTCHA",
+        "keysTitle": "Anahtarlar",
+        "challengeTitle": "Doğrulama",
         "siteKey": "Site Anahtarı",
         "secretKey": "Gizli Anahtar",
         "enableOnLogin": "Girişte Etkinleştir",

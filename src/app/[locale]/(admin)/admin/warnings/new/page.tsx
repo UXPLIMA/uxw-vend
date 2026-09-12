@@ -73,26 +73,20 @@ export default function NewWarningPage() {
 
             <Card>
                 <CardContent className="p-6">
-                    <form onSubmit={submit} className="space-y-4 max-w-xl">
-                        <UserPicker
-                            id="warning-user"
-                            value={user}
-                            onChange={setUser}
-                            label={t("warnings_user")}
-                            placeholder={t("warnings_userPlaceholder")}
-                            required
-                        />
-                        <div>
-                            <Label htmlFor="warning-reason">{t("warnings_reason")}</Label>
-                            <Textarea
-                                id="warning-reason"
-                                value={reason}
-                                onChange={(e) => setReason(e.target.value)}
-                                rows={3}
+                    {/* Three short answers on one row, the long one under
+                        them. Capping the form at `max-w-xl` inside a card
+                        that still stretched drew a border around an empty
+                        right half of the panel. */}
+                    <form onSubmit={submit} className="space-y-4">
+                        <div className="grid gap-4 md:grid-cols-3">
+                            <UserPicker
+                                id="warning-user"
+                                value={user}
+                                onChange={setUser}
+                                label={t("warnings_user")}
+                                placeholder={t("warnings_userPlaceholder")}
                                 required
                             />
-                        </div>
-                        <div className="grid md:grid-cols-2 gap-4">
                             <div>
                                 <Label htmlFor="warning-points">{t("warnings_points")}</Label>
                                 <Input
@@ -113,6 +107,16 @@ export default function NewWarningPage() {
                                     onChange={(e) => setExpiresAt(e.target.value)}
                                 />
                             </div>
+                        </div>
+                        <div>
+                            <Label htmlFor="warning-reason">{t("warnings_reason")}</Label>
+                            <Textarea
+                                id="warning-reason"
+                                value={reason}
+                                onChange={(e) => setReason(e.target.value)}
+                                rows={3}
+                                required
+                            />
                         </div>
                         <div className="flex gap-2">
                             <Button type="submit" disabled={saving}>

@@ -2,7 +2,7 @@
   "id": "csv-import-export",
   "name": "CSV Import/Export",
   "description": "CSV export and import utilities for data backup",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "coreVersion": "^2.1.0",
   "category": "integration",
   "author": "Blysis",
