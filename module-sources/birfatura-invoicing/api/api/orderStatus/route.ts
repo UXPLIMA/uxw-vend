@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { PRIVATE, refuseUnlessInvited } from "../../lib/request";
+import { PRIVATE, refuseUnlessInvited } from "../../../lib/request";
 
 
 /*

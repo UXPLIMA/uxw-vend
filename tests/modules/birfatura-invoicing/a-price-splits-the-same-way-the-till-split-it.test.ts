@@ -65,7 +65,7 @@ describe("one order, as the integrator asks for it", () => {
         items: [{ productId: "vip", name: "VIP", quantity: 2, price: 59.7 }],
     };
 
-    const answer = orderAnswer(order, { taxRate: 20, taxIncluded: true });
+    const answer = orderAnswer(order, { taxRate: 20, taxIncluded: true, timeZone: "Europe/Istanbul" });
 
     it("is named by the number the buyer sees, not by a row id", () => {
         expect(answer.OrderCode).toBe("ORD-MHK2X9Q-A3F1");
@@ -103,8 +103,11 @@ describe("one order, as the integrator asks for it", () => {
         expect(answer.Currency).toBe("TRY");
     });
 
-    it("dates the order the day it was placed", () => {
-        expect(answer.OrderDate).toBe("2026-09-09T09:30:00.000Z");
+    it("dates the order the way the integrator reads a date", () => {
+        // Its documentation asks for `dd.MM.yyyy HH:mm:ss`, in the shop's own
+        // time zone. This answered with an ISO stamp, which is not that
+        // format and not that clock: 09:30 UTC is half past noon in Istanbul.
+        expect(answer.OrderDate).toBe("09.09.2026 12:30:00");
     });
 });
 
@@ -124,6 +127,6 @@ describe("an order with nobody on it", () => {
             billingDetails: null,
             items: [],
         };
-        expect(orderAnswer(nameless, { taxRate: 20, taxIncluded: true })).toBeNull();
+        expect(orderAnswer(nameless, { taxRate: 20, taxIncluded: true, timeZone: "Europe/Istanbul" })).toBeNull();
     });
 });

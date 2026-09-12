@@ -6,21 +6,18 @@
  * obliged to issue invoices, and `issued` is the word that says the
  * obligation is met.
  *
- * It is not what happened. Turning that record into a legal e-document is a
- * second call the module does not make - the provider's documentation was not
- * reachable when this was built, and guessing the shape of a call that puts a
- * document in somebody's tax filing is not something to do from memory. So
- * the call is still missing, and that is a known gap.
+ * It was not what happened. Turning that record into a legal e-document is a
+ * second call, and the module did not make it: the provider's documentation
+ * was not reachable when this was built, and guessing the shape of a call
+ * that puts a document in somebody's tax filing is not something to do from
+ * memory.
  *
- * A known gap an operator can see is a task. A known gap dressed up as
- * `issued` is a shop that believes its invoicing is done, finds out at an
- * audit, and cannot tell which orders were affected because every row says
- * the same reassuring word.
- *
- * So nothing here claims a legal document. The row says what was actually
- * done - a sales invoice exists in the service - and says separately that the
- * e-document step has not been taken. When the second call lands, the second
- * field starts moving and nothing else has to change.
+ * It makes the call now, and the two fields still say two different things,
+ * which is the part worth keeping. `status` is what this module did with the
+ * sale. `legalDocument` is what the tax authority did with the document, and
+ * only `approved` means the obligation is met - a document that was refused,
+ * or that nobody asked for, is a task rather than a finished sale. Collapsing
+ * the two into one reassuring word is what hid the gap in the first place.
  */
 import { describe, it, expect } from "vitest";
 import fs from "node:fs";
@@ -41,8 +38,15 @@ describe("the states this module can write", () => {
         expect(INVOICE_STATUSES).not.toContain("issued");
     });
 
-    it("says the e-document step has not been taken, because it has not", () => {
-        expect([...LEGAL_STATES]).toEqual(["not_requested"]);
+    it("has a state for every answer the authority can give", () => {
+        expect([...LEGAL_STATES]).toEqual([
+            "not_requested",
+            "submitted",
+            "waiting",
+            "approved",
+            "refused",
+            "failed",
+        ]);
     });
 });
 
@@ -53,10 +57,12 @@ describe("what an operator is shown", () => {
         expect(said.legallyIssued).toBe(false);
     });
 
-    it("never says a document was legally issued, whatever the row holds", () => {
+    it("says a document is issued only when the authority approved it", () => {
         for (const status of INVOICE_STATUSES) {
             for (const legalDocument of LEGAL_STATES) {
-                expect(operatorSummary({ status, legalDocument }).legallyIssued).toBe(false);
+                expect(operatorSummary({ status, legalDocument }).legallyIssued).toBe(
+                    legalDocument === "approved",
+                );
             }
         }
     });
@@ -65,9 +71,22 @@ describe("what an operator is shown", () => {
         expect(needsAttention({ status: "failed", legalDocument: "not_requested" })).toBe(true);
     });
 
-    it("wants attention for one that recorded, because the document is still owed", () => {
+    it("wants attention for one that recorded and never asked for a document", () => {
         // This is the row that used to read `issued` and look finished.
         expect(needsAttention({ status: "recorded", legalDocument: "not_requested" })).toBe(true);
+    });
+
+    it("wants attention for a document the authority refused", () => {
+        expect(needsAttention({ status: "recorded", legalDocument: "refused" })).toBe(true);
+        expect(needsAttention({ status: "recorded", legalDocument: "failed" })).toBe(true);
+    });
+
+    it("wants nothing for one the authority is still thinking about, or approved", () => {
+        // Nobody can do anything about a document in a queue, and an approved
+        // one is the whole obligation met.
+        expect(needsAttention({ status: "recorded", legalDocument: "waiting" })).toBe(false);
+        expect(needsAttention({ status: "recorded", legalDocument: "submitted" })).toBe(false);
+        expect(needsAttention({ status: "recorded", legalDocument: "approved" })).toBe(false);
     });
 
     it("wants nothing for one still in flight", () => {

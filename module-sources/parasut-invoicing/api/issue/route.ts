@@ -12,14 +12,15 @@ import { needsAttention, operatorSummary, type InvoiceStatus, type LegalState } 
  *
  * The ones that failed, which have always been here.
  *
- * And the ones that recorded. A sales invoice exists in the accounting
- * service and the legal e-document does not, because the second call that
- * makes one is not a call this module makes. Those rows read `issued` and
- * looked finished; they were the shop's whole invoicing obligation half done,
- * invisibly. See lib/invoice-state.ts.
+ * And the ones that recorded but have no document the authority approved:
+ * nobody asked for one, the call failed, or the authority refused it. Those
+ * rows used to read `issued` and look finished; they were the shop's whole
+ * invoicing obligation half done, invisibly. See lib/invoice-state.ts.
  *
- * Reading the list is all this does: a retry happens on the order's next
- * completion, which is the one path that holds the claim.
+ * Reading the list is all this does. A failed sale is retried on the order's
+ * next completion, which is the one path that holds the claim; a document is
+ * asked for through `POST /document`, which is a decision rather than a
+ * retry.
  */
 export async function GET() {
     const session = await auth();
@@ -57,7 +58,7 @@ export async function GET() {
             awaitingDocument: owing.filter((row) => row.recorded),
             // Said in the answer rather than left for a screen to know: any
             // caller reading this endpoint is entitled to the same warning.
-            note: "A recorded sale is in the accounting service. The legal e-document is a separate step this module does not take yet.",
+            note: "A recorded sale is in the accounting service. A document the tax authority has is a second step, and `legalDocument` on each row says where that got to.",
         },
         { headers: { "Cache-Control": "private, no-store" } },
     );

@@ -120,6 +120,36 @@ export async function createRecord(
     };
 }
 
+/** GET one JSON:API collection and answer with the rows in it. */
+export async function readRecords(
+    config: ProviderConfig,
+    token: string,
+    path: string,
+): Promise<Array<{ id: string; attributes: Record<string, unknown> }>> {
+    const res = await fetch(`${HOST}/v4/${encodeURIComponent(config.companyId)}/${path}`, {
+        headers: { Accept: "application/json", Authorization: `Bearer ${token}` },
+    });
+
+    // An empty answer is an answer: a tax number with no inbox at the
+    // authority is the normal case for a consumer, not a failure.
+    if (res.status === 404) return [];
+    if (!res.ok) {
+        const detail = await res.text().catch(() => "");
+        throw new ProviderError(
+            `The accounting service refused a read (${res.status})${detail ? `: ${detail.slice(0, 300)}` : ""}`,
+        );
+    }
+
+    const body = (await res.json()) as { data?: unknown };
+    const rows = Array.isArray(body.data) ? body.data : body.data ? [body.data] : [];
+    return rows
+        .filter((row): row is { id: unknown; attributes?: unknown } => typeof row === "object" && row !== null)
+        .map((row) => ({
+            id: String((row as { id?: unknown }).id ?? ""),
+            attributes: ((row as { attributes?: unknown }).attributes ?? {}) as Record<string, unknown>,
+        }));
+}
+
 /** Sign in once, then run the calls that need the token. */
 export async function withProvider<T>(
     run: (config: ProviderConfig, token: string) => Promise<T>,

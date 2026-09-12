@@ -21,12 +21,15 @@ export async function isConfigured(): Promise<boolean> {
 }
 
 /** How the shop charges tax, as the store settings hold it. */
-export async function taxSetup(): Promise<{ taxRate: number; taxIncluded: boolean }> {
-    const { moduleSettings } = await import("@/core/sdk/server");
+export async function taxSetup(): Promise<{ taxRate: number; taxIncluded: boolean; timeZone: string }> {
+    const { moduleSettings, siteTimeZone } = await import("@/core/sdk/server");
     const settings = await moduleSettings<{ taxRate?: number; taxIncluded?: boolean }>("store");
     const rate = Number(settings.taxRate);
     return {
         taxRate: Number.isFinite(rate) && rate > 0 ? rate : 0,
         taxIncluded: settings.taxIncluded === true,
+        // Every date crossing this boundary is written in the shop's own time
+        // zone, which is what the integrator's `dd.MM.yyyy HH:mm:ss` means.
+        timeZone: await siteTimeZone(),
     };
 }

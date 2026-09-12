@@ -13,11 +13,12 @@
  * an order they cannot is the one thing they need to be shown.
  */
 import type { HookHandlerFor } from "@/core/sdk";
-import { log, moduleSettings, prisma } from "@/core/sdk/server";
+import { log, moduleSettings, prisma, readSettingStrings } from "@/core/sdk/server";
 import { whatToDoWith } from "../lib/decide";
 import type { InvoiceStatus } from "../lib/invoice-state";
 import { contactPayload, invoicePayload } from "../lib/invoice-payload";
 import { createRecord, isConfigured, ProviderError, withProvider } from "../lib/client";
+import { sendLegalDocument } from "../lib/send-document";
 
 /**
  * The shop's tax rate, read where the store keeps it.
@@ -26,6 +27,23 @@ import { createRecord, isConfigured, ProviderError, withProvider } from "../lib/
  * payments screen stopped owning it, and reading the old key would have put
  * zero percent on every invoice - a legally wrong document that looks fine.
  */
+/**
+ * Whether the operator wants the document sent without being asked.
+ *
+ * Off unless they say so. Recording a sale is reversible here; putting a
+ * document in front of the tax authority is not.
+ */
+async function sendsDocumentAutomatically(): Promise<boolean> {
+    const settings = await moduleSettings<{ sendEDocument?: boolean }>("parasut-invoicing");
+    return settings.sendEDocument === true;
+}
+
+/** Where the sale happened, which an e-Arşiv has to carry. */
+async function shopUrl(): Promise<string> {
+    const values = await readSettingStrings(["site_url"]);
+    return values.site_url ?? "";
+}
+
 async function taxRate(): Promise<number> {
     const settings = await moduleSettings<{ taxRate?: number }>("store");
     const rate = Number(settings.taxRate);
@@ -101,21 +119,42 @@ const onOrderCompleted: HookHandlerFor<"store.order.completed", "action"> = asyn
             );
         });
 
+        const invoiceNumber = typeof remote.attributes.invoice_no === "string" ? remote.attributes.invoice_no : null;
         await prisma.issuedInvoice.update({
             where: { orderId: order.id },
             data: {
-                // What was done, not what it means: a sales invoice exists
-                // in the accounting service. The legal document is a second
-                // call this module does not make, and `legalDocument` says so
-                // rather than this word implying otherwise.
+                // What was done, not what it means: a sales invoice exists in
+                // the accounting service. Whether the tax authority has a
+                // document for it is a second question, and `legalDocument`
+                // is where that one is answered.
                 status: "recorded",
                 remoteId: remote.id,
-                remoteNumber: typeof remote.attributes.invoice_no === "string" ? remote.attributes.invoice_no : null,
+                remoteNumber: invoiceNumber,
+                // What a document will need if it is asked for later.
+                buyerTaxNumber: decision.billing.taxNumber,
+                paymentMethod: order.paymentMethod ?? null,
+                paidAt: new Date(),
                 issuedAt: new Date(),
                 reason: null,
                 attempts: { increment: 1 },
             },
         });
+
+        // And the document, if the operator has asked for that to happen by
+        // itself. Off by default: a document in front of the tax authority is
+        // cancelled by a procedure rather than a delete, so an operator turns
+        // this on knowing what it does, or presses the button per sale.
+        if (await sendsDocumentAutomatically()) {
+            await sendLegalDocument({
+                orderId: order.id,
+                salesInvoiceId: remote.id,
+                taxNumber: decision.billing.taxNumber,
+                shopUrl: await shopUrl(),
+                paymentMethod: order.paymentMethod ?? null,
+                paidAt: new Date(),
+                invoiceNumber,
+            });
+        }
     } catch (err) {
         const reason = err instanceof ProviderError ? err.message : "The invoice could not be issued";
         // The order id, never the payload: it carries the buyer's address and

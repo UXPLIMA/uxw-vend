@@ -25,8 +25,8 @@ const ROOT = join(__dirname, "../..");
 const SCANNED = ["src/app", "src/core", "module-sources"];
 
 /**
- * The helper's own home, plus the hook that wraps it - and one file that
- * formats nothing anybody reads.
+ * The helper's own home, plus the hook that wraps it - and two files that
+ * format nothing anybody reads.
  *
  * `site-time.ts` asks `Intl` what the wall clock says in a named zone, and
  * parses the answer. The tag there is a parsing device, not a rendering
@@ -34,8 +34,18 @@ const SCANNED = ["src/app", "src/core", "module-sources"];
  * and a 24-hour option, and its output never reaches a page. Handing it the
  * reader's locale would break the parse in any locale that spells Friday
  * differently, which is all of them.
+ *
+ * `turkish-date.ts` is the same kind of thing at a module's boundary. An
+ * accounting integrator specifies `dd.MM.yyyy HH:mm:ss` on the wire in both
+ * directions, so the shape is the other system's and not the reader's: a
+ * date rendered in the visitor's locale there is a request that system
+ * rejects, or worse, misreads.
  */
-const HELPER_FILES = ["src/core/lib/utils.ts", "src/core/lib/site-time.ts"];
+const HELPER_FILES = [
+    "src/core/lib/utils.ts",
+    "src/core/lib/site-time.ts",
+    "module-sources/birfatura-invoicing/lib/turkish-date.ts",
+];
 
 function sourceFiles(dir: string, out: string[] = []): string[] {
     if (!statSync(dir, { throwIfNoEntry: false })?.isDirectory()) return out;

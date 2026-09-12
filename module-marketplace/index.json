@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-12",
-  "updatedAt": "2026-09-12T13:14:29Z",
+  "updatedAt": "2026-09-12T14:19:32Z",
   "modules": [
     {
       "id": "announcements",
@@ -117,13 +117,13 @@
       "name": "BirFatura Invoicing",
       "description": "Publishes this shop's paid orders for BirFatura to pull and invoice. The integrator calls in with a shared secret; nothing is sent out.",
       "i18n": {},
-      "version": "1.3.0",
+      "version": "1.4.0",
       "coreVersion": "^2.0.0",
       "author": "Blysis",
       "icon": "FileText",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-12T13:14:29Z",
+      "updatedAt": "2026-09-12T14:19:32Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -145,7 +145,7 @@
       "stats": {
         "publicRoutes": 0,
         "adminRoutes": 1,
-        "apiRoutes": 3,
+        "apiRoutes": 4,
         "widgets": 0
       }
     },
@@ -1970,13 +1970,13 @@
       "name": "Parasut Invoicing",
       "description": "Issues a sales invoice in Parasut for every paid order, using the invoice details the checkout collected.",
       "i18n": {},
-      "version": "1.3.0",
+      "version": "1.4.0",
       "coreVersion": "^2.0.0",
       "author": "Blysis",
       "icon": "FileText",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-11T08:20:12Z",
+      "updatedAt": "2026-09-12T14:19:32Z",
       "screenshots": [],
       "tags": [
         "commerce"
@@ -1996,7 +1996,7 @@
       "stats": {
         "publicRoutes": 0,
         "adminRoutes": 1,
-        "apiRoutes": 1,
+        "apiRoutes": 2,
         "widgets": 0
       }
     },

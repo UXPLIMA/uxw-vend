@@ -1,0 +1,28 @@
+// BirFatura Invoicing - Database Models
+// These models are merged into prisma/schema.prisma by merge-schemas.ts
+
+/// The invoice the integrator issued for one order.
+///
+/// This module had no table at all: it answered questions about orders and
+/// forgot everything. So an operator could see that BirFatura had pulled a
+/// sale and never that it had invoiced one, and the link to the document a
+/// customer is entitled to ask for lived only in somebody else's system.
+///
+/// The integrator sends it here (`/api/invoiceLinkUpdate`), keyed on the
+/// order, and repeats the call when it reissues: one row per order, updated,
+/// because a second row would be a second invoice that does not exist.
+model ShopInvoice {
+  id        String   @id @default(cuid())
+  orderId   String   @unique
+  /// Where the document is. Shown to an operator, and to the buyer if the
+  /// shop chooses to: it is a link into the integrator's own storage.
+  url       String
+  /// The number on the document, which is what an accountant asks for.
+  number    String?
+  /// When it was issued, as the integrator reports it.
+  issuedAt  DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([createdAt])
+}

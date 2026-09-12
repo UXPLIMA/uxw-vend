@@ -17,6 +17,8 @@
  * so the split on the document is the split the till used.
  */
 
+import { writeTurkishDateTime } from "./turkish-date";
+
 /** Money, as it goes on a document. */
 function money(amount: number): number {
     return Math.round((Number(amount) + Number.EPSILON) * 100) / 100;
@@ -69,6 +71,8 @@ export interface SoldOrder {
 
 /** How the shop charges tax, as the store settings hold it. */
 export interface TaxSetup {
+    /** The shop's own zone: what `dd.MM.yyyy HH:mm:ss` means. */
+    timeZone: string;
     taxRate: number;
     taxIncluded: boolean;
 }
@@ -123,7 +127,7 @@ export function orderAnswer(order: SoldOrder, tax: TaxSetup): Record<string, unk
         // The number the buyer sees on their confirmation, so an accountant
         // looking at either side can find the other.
         OrderCode: order.orderNumber,
-        OrderDate: order.createdAt.toISOString(),
+        OrderDate: writeTurkishDateTime(order.createdAt, tax.timeZone),
         CustomerId: order.userId ?? "",
         BillingName: billing.name,
         BillingAddress: billing.address,

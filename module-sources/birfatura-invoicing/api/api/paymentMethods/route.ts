@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { applyFiltersAsync } from "@/core/sdk";
-import { PRIVATE, refuseUnlessInvited } from "../../lib/request";
+import { PRIVATE, refuseUnlessInvited } from "../../../lib/request";
 
 /*
  * @provider-callback: this integrator signs in with a shared secret in a

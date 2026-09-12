@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { applyFiltersAsync } from "@/core/sdk";
-import { prisma, readJsonBody } from "@/core/sdk/server";
+import { readJsonBody, siteTimeZone } from "@/core/sdk/server";
 import { z } from "zod";
-import { PRIVATE, refuseUnlessInvited } from "../../lib/request";
-import { orderAnswer } from "../../lib/order-answer";
-import { taxSetup } from "../../lib/setup";
+import { PRIVATE, refuseUnlessInvited } from "../../../lib/request";
+import { orderAnswer } from "../../../lib/order-answer";
+import { taxSetup } from "../../../lib/setup";
+import { readTurkishDateTime } from "../../../lib/turkish-date";
 
 
 /*
@@ -51,11 +52,7 @@ const askSchema = z.object({
 /** A window this endpoint will answer for. */
 const MAX_ORDERS = 500;
 
-function asDate(value: string | undefined): Date | null {
-    if (!value) return null;
-    const at = new Date(value);
-    return Number.isNaN(at.getTime()) ? null : at;
-}
+
 
 export async function POST(request: NextRequest) {
     const refused = await refuseUnlessInvited(request);
@@ -68,8 +65,19 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: parsed.error.issues[0].message }, { status: 400, headers: PRIVATE });
     }
 
-    const from = asDate(parsed.data.startDateTime);
-    const until = asDate(parsed.data.endDateTime);
+    // `dd.MM.yyyy HH:mm:ss`, in the shop's own time zone, because that is
+    // what the integrator sends and what midnight means to the shop.
+    // `new Date(...)` read the first of July as the seventh of January and
+    // the sixteenth as nothing at all.
+    const zone = await siteTimeZone();
+    const from = readTurkishDateTime(parsed.data.startDateTime, zone);
+    const until = readTurkishDateTime(parsed.data.endDateTime, zone);
+    if (!from || !until) {
+        return NextResponse.json(
+            { Success: false, Message: "startDateTime and endDateTime must be dd.MM.yyyy HH:mm:ss" },
+            { status: 400, headers: PRIVATE },
+        );
+    }
     // Paid unless the integrator asked for another state. An unpaid order is
     // not a sale, and invoicing one is a document to cancel later.
     const status = parsed.data.orderStatusId ?? "COMPLETED";

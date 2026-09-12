@@ -19,11 +19,30 @@ model IssuedInvoice {
   /// `issued`, which told an operator their invoicing obligation was met when
   /// only half of it had been; see lib/invoice-state.ts.
   status    String   @default("pending")
-  /// Where the legal e-document stands. One value today, because nothing here
-  /// asks for one: the second call that turns a sales invoice into an
-  /// e-archive or an e-invoice is not made. Kept apart from `status` so the
-  /// day it is made, the answer has somewhere true to live.
+  /// Where the legal e-document stands: not_requested, submitted, waiting,
+  /// approved, refused or failed. Kept apart from `status` because they are
+  /// different questions - a sale can be recorded here and its document
+  /// refused by the authority - and one word for both is what hid the gap
+  /// while this module could not ask for a document at all.
   legalDocument String @default("not_requested")
+  /// Which document the buyer was owed: e_invoice for a tax number
+  /// registered at the authority, e_archive for everybody else.
+  legalKind     String?
+  /// The job the service is doing it under, and the document once it exists.
+  legalJobId    String?
+  legalRemoteId String?
+  /// The official number, which is what an accountant asks for.
+  legalNumber   String?
+  /// Why the document was refused, or why the call could not be made.
+  legalReason   String?
+  legalAt       DateTime?
+  /// What the document needs and the sale is the only source of: whose tax
+  /// number it is made out to, how it was paid for and when. Kept here so
+  /// asking for a document later reads this module's own row rather than
+  /// reaching into the shop's orders for three fields.
+  buyerTaxNumber String?
+  paymentMethod  String?
+  paidAt         DateTime?
   /// The service's own id and number, once it has answered.
   remoteId     String?
   remoteNumber String?

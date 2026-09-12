@@ -7,20 +7,17 @@
  * being met.
  *
  * That is not what happened. Turning the record into a legal e-document is a
- * second call this module does not make: the provider's documentation was not
- * reachable when it was built, and guessing the shape of a call that puts a
- * document into somebody's tax filing is not a thing to do from memory. The
- * call is still missing, and that is a known gap.
+ * second call, and for a while this module did not make it: the provider's
+ * documentation was not reachable when it was built, and guessing the shape
+ * of a call that puts a document into somebody's tax filing is not a thing to
+ * do from memory.
  *
- * A known gap an operator can see is a task. A known gap dressed as `issued`
- * is a shop that believes its invoicing is finished, finds out at an audit,
- * and cannot tell which orders were affected because every row says the same
- * reassuring word.
- *
- * So the two things are recorded apart. `status` says what this module did to
- * the sale. `legalDocument` says where the e-document stands, and it has one
- * value today because there is one thing that is true today. When the second
- * call lands it gains values and nothing else here has to change.
+ * It makes it now. The two things are still recorded apart, and that is the
+ * part worth keeping: `status` says what this module did to the sale, and
+ * `legalDocument` says where the document stands with the authority. They are
+ * different questions - a sale can be recorded and its document refused - and
+ * collapsing them into one reassuring word is what hid the gap in the first
+ * place.
  */
 
 /** What this module did with the sale. */
@@ -30,12 +27,17 @@ export type InvoiceStatus = (typeof INVOICE_STATUSES)[number];
 /**
  * Where the legal document stands.
  *
- * One value, because one thing is true: nothing here asks for one. A second
- * value would be a state this module cannot produce, which is the shape the
- * status field was already in.
+ * It had one value for as long as this module could not ask for a document.
+ * It asks now - an e-Fatura to a buyer registered for one, an e-Arşiv to
+ * everybody else - so the states are the ones that can actually happen:
+ * nobody asked yet, the service has it, the authority has it, it was
+ * approved, it was refused, or the call itself failed. The two that need a
+ * person are `refused` and `failed`; see `e-document.ts`.
  */
-export const LEGAL_STATES = ["not_requested"] as const;
-export type LegalState = (typeof LEGAL_STATES)[number];
+export { LEGAL_STATES } from "./e-document";
+export type { LegalState } from "./e-document";
+
+import { documentNeedsAttention, type LegalState } from "./e-document";
 
 export interface InvoiceRow {
     status: InvoiceStatus;
@@ -45,7 +47,7 @@ export interface InvoiceRow {
 export interface OperatorSummary {
     /** The sale is in the accounting service. */
     recorded: boolean;
-    /** Always false while this module cannot ask for a document. */
+    /** The authority approved the document. Nothing less counts. */
     legallyIssued: boolean;
 }
 
@@ -53,8 +55,9 @@ export function operatorSummary(row: InvoiceRow): OperatorSummary {
     return {
         recorded: row.status === "recorded",
         // Not derived from the status on purpose. Deriving it is how the two
-        // came to mean the same thing in the first place.
-        legallyIssued: false,
+        // came to mean the same thing in the first place, and a document that
+        // is waiting or refused is not an issued one.
+        legallyIssued: row.legalDocument === "approved",
     };
 }
 
@@ -68,5 +71,8 @@ export function operatorSummary(row: InvoiceRow): OperatorSummary {
 export function needsAttention(row: InvoiceRow): boolean {
     if (row.status === "pending") return false;
     if (row.status === "failed") return true;
-    return !operatorSummary(row).legallyIssued;
+    // A document the authority is still thinking about is nobody's task; a
+    // refused one, a failed call and a sale nobody has asked for a document
+    // for are all somebody's.
+    return documentNeedsAttention(row.legalDocument);
 }

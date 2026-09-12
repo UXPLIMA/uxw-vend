@@ -160,11 +160,13 @@ describe("every gateway callback", () => {
         // integrator that collects orders rather than being sent them: it
         // reads, it does not report, and it signs in with a shared secret.
         // The sixteenth is a game server's ban plugin, which posts what it
-        // punished somebody for and proves itself with a shared key.
-        expect(declared.length).toBe(16);
+        // punished somebody for and proves itself with a shared key. The
+        // seventeenth is the invoice the same integrator sends back once it
+        // has issued one.
+        expect(declared.length).toBe(17);
         expect(declared).toContain("stripe-gateway");
         expect(declared).toContain("mollie-gateway");
-        expect(declared.filter((name) => name === "birfatura-invoicing")).toHaveLength(3);
+        expect(declared.filter((name) => name === "birfatura-invoicing")).toHaveLength(4);
         expect(declared).toContain("minecraft-litebans");
     });
 });

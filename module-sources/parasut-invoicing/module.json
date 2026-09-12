@@ -2,7 +2,7 @@
   "id": "parasut-invoicing",
   "name": "Parasut Invoicing",
   "description": "Issues a sales invoice in Parasut for every paid order, using the invoice details the checkout collected.",
-  "version": "1.3.0",
+  "version": "1.4.0",
   "coreVersion": "^2.0.0",
   "secretSettings": [
     "parasut_client_secret",
@@ -47,6 +47,12 @@
       "handler": "api/issue/route.ts",
       "method": "GET",
       "description": "The sales that could not be invoiced, and why (admin)."
+    },
+    {
+      "path": "/parasut-invoicing/document",
+      "handler": "api/document/route.ts",
+      "method": "POST",
+      "description": "Send the e-document for one recorded sale, or read where it got to."
     }
   ],
   "translations": {
@@ -60,7 +66,24 @@
         "adm_clientSecret": "Application secret",
         "adm_username": "Account email",
         "adm_usernameDesc": "The account the invoices are issued by.",
-        "adm_password": "Account password"
+        "adm_password": "Account password",
+        "adm_owingTitle": "Sales still owing a document",
+        "adm_owingNone": "Every recorded sale has an approved document.",
+        "adm_send": "Send",
+        "adm_refresh": "Check again",
+        "adm_sendConfirmTitle": "Send this to the tax authority?",
+        "adm_sendConfirm": "A document the authority accepts is cancelled by a procedure, not by deleting it here.",
+        "adm_state_not_requested": "No document asked for",
+        "adm_state_submitted": "Sent to the service",
+        "adm_state_waiting": "With the authority",
+        "adm_state_approved": "Approved",
+        "adm_state_refused": "Refused",
+        "adm_state_failed": "Could not be sent",
+        "adm_error_not_configured": "The accounting service is not set up yet.",
+        "adm_error_not_found": "There is no invoice record for that order.",
+        "adm_error_not_recorded": "That sale is not in the accounting service yet.",
+        "adm_error_already_requested": "A document has already been asked for.",
+        "adm_error_unknown": "That did not work."
       }
     },
     "tr": {
@@ -73,8 +96,34 @@
         "adm_clientSecret": "Uygulama gizli anahtarı",
         "adm_username": "Hesap e-postası",
         "adm_usernameDesc": "Faturaların kesileceği hesap.",
-        "adm_password": "Hesap parolası"
+        "adm_password": "Hesap parolası",
+        "adm_owingTitle": "Belgesi eksik satışlar",
+        "adm_owingNone": "Kaydedilen her satışın onaylanmış bir belgesi var.",
+        "adm_send": "Gönder",
+        "adm_refresh": "Yeniden sor",
+        "adm_sendConfirmTitle": "Bu belge vergi idaresine gönderilsin mi?",
+        "adm_sendConfirm": "İdarenin kabul ettiği bir belge, burada silinerek değil bir işlemle iptal edilir.",
+        "adm_state_not_requested": "Belge istenmedi",
+        "adm_state_submitted": "Servise gönderildi",
+        "adm_state_waiting": "İdarede bekliyor",
+        "adm_state_approved": "Onaylandı",
+        "adm_state_refused": "Reddedildi",
+        "adm_state_failed": "Gönderilemedi",
+        "adm_error_not_configured": "Muhasebe servisi henüz kurulmamış.",
+        "adm_error_not_found": "O siparişin fatura kaydı yok.",
+        "adm_error_not_recorded": "O satış henüz muhasebe servisinde değil.",
+        "adm_error_already_requested": "Bu satış için zaten belge istendi.",
+        "adm_error_unknown": "Bu işlem sonuçlanmadı."
       }
     }
-  }
+  },
+  "settings": [
+    {
+      "key": "sendEDocument",
+      "type": "boolean",
+      "default": false,
+      "label": "Send the e-document automatically",
+      "description": "Ask the tax authority for the e-Fatura or e-Arsiv a recorded sale is owed. Off until you turn it on: such a document is cancelled by a procedure, not deleted."
+    }
+  ]
 }
