@@ -21,7 +21,16 @@ interface Product {
     isActive: boolean;
     isFeatured: boolean;
     category: { name: string } | null;
-    _count: { orderItems: number };
+    /**
+     * What the shop has sold, not how many order lines mention it.
+     *
+     * This column used to print `_count.orderItems`, which the endpoint
+     * behind it has never sent, so it drew a zero for every product in every
+     * install. `unitsSold` is incremented where a claim is paid for and
+     * decremented on a refund, and it is the same column the public "most
+     * popular" ordering reads.
+     */
+    unitsSold: number;
 }
 
 export default function AdminProductsPage() {
@@ -151,7 +160,7 @@ export default function AdminProductsPage() {
                                                     {product.stock === null ? "∞" : product.stock}
                                                 </td>
                                                 <td className="py-3 px-4 text-muted-foreground">
-                                                    {product._count?.orderItems || 0}
+                                                    {product.unitsSold}
                                                 </td>
                                                 <td className="py-3 px-4">
                                                     <span className={`text-xs px-2 py-1 rounded ${product.isActive

@@ -32,6 +32,21 @@ const TOPICS = [
     "New player here, where do I start?",
     "Feature request: search inside the forum",
     "Anyone else missing items after the update?",
+    "Show us your best build of the month",
+    "How do I report someone for griefing?",
+    "The wiki is out of date in three places",
+    "Voting rewards did not arrive, anyone else?",
+    "Can we have a second creative world?",
+    "Weekly event thread: what would you run?",
+    "Is there a way to sort the shop by price?",
+    "Lost my inventory after a disconnect",
+    "Name suggestions for the new region",
+    "Ping went up last night for everyone I know",
+    "What is the policy on alt accounts?",
+    "Idea: a channel for build contests",
+    "My rank did not apply after checkout",
+    "Where do I find the old changelog?",
+    "Thanks to whoever fixed the spawn lag",
 ];
 
 const REPLIES = [

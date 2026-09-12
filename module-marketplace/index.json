@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-12",
-  "updatedAt": "2026-09-12T09:10:00Z",
+  "updatedAt": "2026-09-12T10:04:21Z",
   "modules": [
     {
       "id": "announcements",
@@ -1007,13 +1007,13 @@
           "description": "Kategoriler, konular ve yanıtlarla topluluk tartışma forumu"
         }
       },
-      "version": "1.3.2",
+      "version": "1.3.3",
       "coreVersion": "^2.0.0",
       "author": "Blysis Team",
       "icon": "MessageSquare",
       "category": "community",
       "verified": true,
-      "updatedAt": "2026-09-11T13:04:50Z",
+      "updatedAt": "2026-09-12T10:04:21Z",
       "screenshots": [],
       "tags": [
         "community"
@@ -2601,13 +2601,13 @@
           "description": "Ana sayfa görsel galerisi ve bantları"
         }
       },
-      "version": "1.1.1",
+      "version": "1.1.2",
       "coreVersion": "^2.1.0",
       "author": "Blysis",
       "icon": "Image",
       "category": "content",
       "verified": true,
-      "updatedAt": "2026-09-11T13:12:03Z",
+      "updatedAt": "2026-09-12T10:04:21Z",
       "screenshots": [],
       "tags": [
         "content"
@@ -2741,13 +2741,13 @@
           "description": "Ürün, kategori, sepet ve siparişleriyle eksiksiz e-ticaret"
         }
       },
-      "version": "2.25.2",
+      "version": "2.25.3",
       "coreVersion": "^2.0.0",
       "author": "Blysis Team",
       "icon": "ShoppingBag",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-11T13:04:50Z",
+      "updatedAt": "2026-09-12T10:04:21Z",
       "screenshots": [],
       "tags": [
         "commerce"

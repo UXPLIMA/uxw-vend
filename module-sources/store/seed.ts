@@ -58,6 +58,24 @@ const SCHEDULES: Record<string, Record<string, unknown>> = {
 /** Products the seed leaves nearly gone, so the urgency badge has a subject. */
 const NEARLY_GONE = new Set(["Pet: baby dragon"]);
 
+/**
+ * A name to a slug.
+ *
+ * The `+` tiers are the reason this is a named function with a rule of its
+ * own: stripping every character that is not a letter or a digit turned
+ * "VIP+" into "vip", which the tier below it already answers to, and the seed
+ * skips a slug that exists because an existing slug is the operator's
+ * product. Two tiers were dropped on every run under a log line that said
+ * fifteen.
+ */
+export function productSlug(name: string): string {
+    return name
+        .toLowerCase()
+        .replace(/\+/g, "-plus")
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-|-$/g, "");
+}
+
 const PRODUCTS: [string, string, number, number | null][] = [
     ["VIP", "Ranks", 9.99, null],
     ["VIP+", "Ranks", 19.99, 24.99],
@@ -74,6 +92,21 @@ const PRODUCTS: [string, string, number, number | null][] = [
     ["2x XP for an hour", "Boosters", 2.99, null],
     ["2x money for an hour", "Boosters", 2.99, null],
     ["Weekend booster pack", "Boosters", 9.99, 14.99],
+];
+
+/**
+ * The shipped artwork, handed out in order.
+ *
+ * A shop is the most picture-shaped screen the product has: the card is a
+ * 2:1 image with a price under it, and the product page opens on a 16:9
+ * gallery. With the column null every card drew the same grey box, so
+ * nothing about the layout could be judged - and the gallery's arrows, which
+ * only appear on a product with more than one picture, never appeared at all.
+ * A third of them get a second and third view for that reason.
+ */
+const ART = [
+    "/demo/product-01.svg", "/demo/product-02.svg", "/demo/product-03.svg", "/demo/product-04.svg",
+    "/demo/product-05.svg", "/demo/product-06.svg", "/demo/product-07.svg", "/demo/product-08.svg",
 ];
 
 const STATUSES = ["COMPLETED", "COMPLETED", "COMPLETED", "PENDING", "PROCESSING", "CANCELLED", "REFUNDED"] as const;
@@ -93,13 +126,13 @@ export const seed: ModuleSeed = {
             categories.set(name, await ctx.create("category", () => ctx.prisma.category.upsert({
                 where: { slug },
                 update: {},
-                create: { name, slug, description, order: index },
+                create: { name, slug, description, order: index, image: ART[index % ART.length] },
             })));
         }
 
         const products: { id: string; price: number; name: string }[] = [];
         for (const [index, [name, category, price, comparePrice]] of PRODUCTS.entries()) {
-            const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+            const slug = productSlug(name);
             const limited = index % 5 === 4;
             // A shop that already sells something keeps what it sells: an
             // existing slug is the operator's product, not this tool's.
@@ -122,6 +155,10 @@ export const seed: ModuleSeed = {
                     stock: NEARLY_GONE.has(name)
                         ? 2
                         : limited ? (index === 4 ? 0 : ctx.int(1, 25)) : null,
+                    image: ART[index % ART.length],
+                    images: index % 3 === 0
+                        ? [ART[index % ART.length], ART[(index + 3) % ART.length], ART[(index + 5) % ART.length]]
+                        : [],
                     isFeatured: index < 3,
                     createdAt: ctx.daysAgo(365),
                     categoryId: categories.get(category)?.id ?? null,
