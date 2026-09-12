@@ -13,6 +13,7 @@
  * cannot be exercised without a live account.
  */
 import { readSettingStrings } from "@/core/sdk/server";
+import { refusalMessage } from "./refusal";
 
 const HOST = "https://api.parasut.com";
 
@@ -102,11 +103,9 @@ export async function createRecord(
     if (!res.ok) {
         // The service reports validation failures as a list of messages, and
         // those are the whole value of the error to an operator: "tax number
-        // is invalid" is actionable, "422" is not.
-        const detail = await res.text().catch(() => "");
-        throw new ProviderError(
-            `The accounting service refused the request (${res.status})${detail ? `: ${detail.slice(0, 300)}` : ""}`,
-        );
+        // is invalid" is actionable, "422" is not. `refusal.ts` reads them
+        // out of the documented shape rather than slicing the raw body.
+        throw new ProviderError(refusalMessage(res.status, await res.text().catch(() => "")));
     }
 
     const body = (await res.json()) as { data?: { id?: unknown; attributes?: unknown } };
@@ -134,10 +133,7 @@ export async function readRecords(
     // authority is the normal case for a consumer, not a failure.
     if (res.status === 404) return [];
     if (!res.ok) {
-        const detail = await res.text().catch(() => "");
-        throw new ProviderError(
-            `The accounting service refused a read (${res.status})${detail ? `: ${detail.slice(0, 300)}` : ""}`,
-        );
+        throw new ProviderError(refusalMessage(res.status, await res.text().catch(() => "")));
     }
 
     const body = (await res.json()) as { data?: unknown };

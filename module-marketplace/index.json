@@ -1,7 +1,7 @@
 {
   "version": "1.0.0",
   "updated": "2026-09-12",
-  "updatedAt": "2026-09-12T14:19:32Z",
+  "updatedAt": "2026-09-12T16:01:54Z",
   "modules": [
     {
       "id": "announcements",
@@ -1970,13 +1970,13 @@
       "name": "Parasut Invoicing",
       "description": "Issues a sales invoice in Parasut for every paid order, using the invoice details the checkout collected.",
       "i18n": {},
-      "version": "1.4.0",
+      "version": "1.4.1",
       "coreVersion": "^2.0.0",
       "author": "Blysis",
       "icon": "FileText",
       "category": "commerce",
       "verified": true,
-      "updatedAt": "2026-09-12T14:19:32Z",
+      "updatedAt": "2026-09-12T16:01:54Z",
       "screenshots": [],
       "tags": [
         "commerce"
