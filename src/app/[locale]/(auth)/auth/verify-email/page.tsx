@@ -53,7 +53,7 @@ export default function VerifyEmailPage() {
             <Link
                 href="/"
                 aria-label={t('backToHome')}
-                className="absolute top-6 left-6 w-10 h-10 rounded-full bg-card border border-border shadow-sm flex items-center justify-center text-muted-foreground hover:text-blue-600 hover:border-blue-300 transition-all"
+                className="absolute top-6 left-6 w-10 h-10 rounded-full bg-card border border-border shadow-sm flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/40 transition-all"
             >
                 <Home className="w-5 h-5" aria-hidden="true" />
             </Link>
@@ -73,13 +73,13 @@ export default function VerifyEmailPage() {
                     <div className="p-6 text-center">
                         {status === "verifying" && (
                             <>
-                                <Loader2 className="w-12 h-12 text-blue-500 mx-auto mb-3 animate-spin" />
+                                <Loader2 className="w-12 h-12 text-primary mx-auto mb-3 animate-spin" />
                                 <p className="text-muted-foreground">{t("verifyChecking")}</p>
                             </>
                         )}
                         {status === "success" && (
                             <>
-                                <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
+                                <CheckCircle className="w-12 h-12 text-success mx-auto mb-3" />
                                 <h2 className="font-semibold text-foreground mb-2">{t("verifySuccess")}</h2>
                                 <p className="text-muted-foreground text-sm mb-4">{t("verifySuccessBody")}</p>
                                 <Link href="/profile" className={buttonClassName("default", "default")}>{t("backToLogin")}</Link>
@@ -87,7 +87,7 @@ export default function VerifyEmailPage() {
                         )}
                         {status === "failed" && (
                             <>
-                                <XCircle className="w-12 h-12 text-red-500 mx-auto mb-3" />
+                                <XCircle className="w-12 h-12 text-destructive mx-auto mb-3" />
                                 <h2 className="font-semibold text-foreground mb-2">{t("verifyFailed")}</h2>
                                 <p className="text-muted-foreground text-sm mb-4">
                                     {errorMessage || t("verifyFailedBody")}

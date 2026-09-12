@@ -160,7 +160,7 @@ export default function LoginPage() {
             <Link
                 href="/"
                 aria-label={t('backToHome')}
-                className="absolute top-6 left-6 w-10 h-10 rounded-full bg-card border border-border shadow-sm flex items-center justify-center text-muted-foreground hover:text-blue-600 hover:border-blue-300 transition-all"
+                className="absolute top-6 left-6 w-10 h-10 rounded-full bg-card border border-border shadow-sm flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/40 transition-all"
             >
                 <Home className="w-5 h-5" aria-hidden="true" />
             </Link>
@@ -203,7 +203,7 @@ export default function LoginPage() {
                     <div className="p-6">
                         <form onSubmit={handleSubmit} className="space-y-4">
                             {error && (
-                                <div role="alert" className="p-3 rounded-lg bg-red-50 border border-red-100 text-red-600 text-sm">
+                                <div role="alert" className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm">
                                     {error}
                                 </div>
                             )}
@@ -244,8 +244,8 @@ export default function LoginPage() {
                             </div>
 
                             {needs2FA && (
-                                <div className="space-y-2 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                                    <label htmlFor="twoFactorCode" className="text-sm font-medium text-blue-700">
+                                <div className="space-y-2 p-3 bg-primary/10 border border-primary/25 rounded-lg">
+                                    <label htmlFor="twoFactorCode" className="text-sm font-medium text-primary">
                                         {t('twoFactorCode')}
                                     </label>
                                     <Input
@@ -255,7 +255,7 @@ export default function LoginPage() {
                                         value={twoFactorCode}
                                         onChange={(e) => setTwoFactorCode(e.target.value)}
                                         autoFocus
-                                        className="border-blue-200 bg-card text-center font-mono text-lg tracking-widest"
+                                        className="border-primary/25 bg-card text-center font-mono text-lg tracking-widest"
                                         maxLength={10}
                                     />
                                 </div>
@@ -269,7 +269,7 @@ export default function LoginPage() {
                                     />
                                     {t('rememberMe')}
                                 </label>
-                                <Link href="/auth/forgot-password" className="text-xs text-blue-600 hover:underline">
+                                <Link href="/auth/forgot-password" className="text-xs text-primary hover:underline">
                                     {t('forgotPassword')}
                                 </Link>
                             </div>
@@ -278,7 +278,7 @@ export default function LoginPage() {
 
                             <Button
                                 type="submit"
-                                className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-sm"
+                                className="w-full"
                                 disabled={loading}
                             >
                                 {loading ? t('signingIn') : t('signIn')}
@@ -328,7 +328,7 @@ export default function LoginPage() {
 
                         <p className="text-center text-sm text-muted-foreground mt-6">
                             {t('noAccount')}{" "}
-                            <Link href="/auth/register" className="text-blue-600 hover:underline font-medium">
+                            <Link href="/auth/register" className="text-primary hover:underline font-medium">
                                 {t('signUp')}
                             </Link>
                         </p>

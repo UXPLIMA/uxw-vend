@@ -12,7 +12,7 @@ export function DoneStep({ completed, result }: { completed: boolean; result: Se
     const failed = result?.failedModules ?? [];
     return (
         <div className="text-center space-y-4 py-6">
-            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-green-100 text-green-600">
+            <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-success/15 text-success">
                 <CheckCircle2 className="w-8 h-8" />
             </div>
             <h1 className="text-xl font-bold text-foreground">
@@ -31,7 +31,7 @@ export function DoneStep({ completed, result }: { completed: boolean; result: Se
                 </div>
             )}
             {completed && failed.length > 0 && (
-                <div className="text-xs text-red-700">
+                <div className="text-xs text-destructive">
                     {t("failed", { modules: failed.map((f) => f.id).join(", ") })}
                 </div>
             )}

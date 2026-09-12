@@ -49,7 +49,7 @@ export default function ForgotPasswordPage() {
             <Link
                 href="/"
                 aria-label={t('backToHome')}
-                className="absolute top-6 left-6 w-10 h-10 rounded-full bg-card border border-border shadow-sm flex items-center justify-center text-muted-foreground hover:text-blue-600 hover:border-blue-300 transition-all"
+                className="absolute top-6 left-6 w-10 h-10 rounded-full bg-card border border-border shadow-sm flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/40 transition-all"
             >
                 <Home className="w-5 h-5" aria-hidden="true" />
             </Link>
@@ -72,7 +72,7 @@ export default function ForgotPasswordPage() {
                     <div className="p-6">
                         {sent ? (
                             <div className="text-center py-4">
-                                <CheckCircle className="w-12 h-12 text-green-500 mx-auto mb-3" />
+                                <CheckCircle className="w-12 h-12 text-success mx-auto mb-3" />
                                 <h2 className="font-semibold text-foreground mb-1">{t('checkEmail')}</h2>
                                 <p className="text-muted-foreground text-sm mb-4">
                                     {t('resetLinkSent', { email })}
@@ -84,7 +84,7 @@ export default function ForgotPasswordPage() {
                         ) : (
                             <form onSubmit={handleSubmit} className="space-y-4">
                                 {error && (
-                                    <div role="alert" className="p-3 rounded-lg bg-red-50 border border-red-100 text-red-600 text-sm">
+                                    <div role="alert" className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm">
                                         {error}
                                     </div>
                                 )}
@@ -108,14 +108,14 @@ export default function ForgotPasswordPage() {
 
                                 <Button
                                     type="submit"
-                                    className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
                                     disabled={loading}
                                 >
                                     {loading ? t('sending') : t('sendResetLink')}
                                 </Button>
 
                                 <p className="text-center text-sm text-muted-foreground">
-                                    <Link href="/auth/login" className="text-blue-600 hover:underline">
+                                    <Link href="/auth/login" className="text-primary hover:underline">
                                         <ArrowLeft className="w-3 h-3 inline mr-1" />
                                         {t('backToLogin')}
                                     </Link>

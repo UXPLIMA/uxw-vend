@@ -154,22 +154,22 @@ function DefaultFooter() {
                         )}
                         <ul className="flex gap-3 list-none p-0" aria-label={navT('social')}>
                             {serverConfig.social.facebook && (
-                                <li><a href={serverConfig.social.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="w-8 h-8 rounded-full bg-white/10 hover:bg-blue-600 flex items-center justify-center transition-colors text-xs font-bold">
+                                <li><a href={serverConfig.social.facebook} target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/25 flex items-center justify-center transition-colors text-xs font-bold">
                                     <span aria-hidden="true">f</span>
                                 </a></li>
                             )}
                             {serverConfig.social.instagram && (
-                                <li><a href={serverConfig.social.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="w-8 h-8 rounded-full bg-white/10 hover:bg-pink-600 flex items-center justify-center transition-colors text-xs font-bold">
+                                <li><a href={serverConfig.social.instagram} target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/25 flex items-center justify-center transition-colors text-xs font-bold">
                                     <span aria-hidden="true">ig</span>
                                 </a></li>
                             )}
                             {serverConfig.social.twitter && (
-                                <li><a href={serverConfig.social.twitter} target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)" className="w-8 h-8 rounded-full bg-white/10 hover:bg-sky-500 flex items-center justify-center transition-colors text-xs font-bold">
+                                <li><a href={serverConfig.social.twitter} target="_blank" rel="noopener noreferrer" aria-label="X (Twitter)" className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/25 flex items-center justify-center transition-colors text-xs font-bold">
                                     <span aria-hidden="true">X</span>
                                 </a></li>
                             )}
                             {serverConfig.social.youtube && (
-                                <li><a href={serverConfig.social.youtube} target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="w-8 h-8 rounded-full bg-white/10 hover:bg-red-600 flex items-center justify-center transition-colors text-xs font-bold">
+                                <li><a href={serverConfig.social.youtube} target="_blank" rel="noopener noreferrer" aria-label="YouTube" className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/25 flex items-center justify-center transition-colors text-xs font-bold">
                                     <span aria-hidden="true">yt</span>
                                 </a></li>
                             )}

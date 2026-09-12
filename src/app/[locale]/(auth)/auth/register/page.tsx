@@ -70,7 +70,7 @@ export default function RegisterPage() {
             <Link
                 href="/"
                 aria-label={t('backToHome')}
-                className="absolute top-6 left-6 w-10 h-10 rounded-full bg-card border border-border shadow-sm flex items-center justify-center text-muted-foreground hover:text-blue-600 hover:border-blue-300 transition-all"
+                className="absolute top-6 left-6 w-10 h-10 rounded-full bg-card border border-border shadow-sm flex items-center justify-center text-muted-foreground hover:text-primary hover:border-primary/40 transition-all"
             >
                 <Home className="w-5 h-5" aria-hidden="true" />
             </Link>
@@ -91,7 +91,7 @@ export default function RegisterPage() {
                     <div className="p-6">
                         <form onSubmit={handleSubmit} className="space-y-4">
                             {error && (
-                                <div role="alert" className="p-3 rounded-lg bg-red-50 border border-red-100 text-red-600 text-sm">
+                                <div role="alert" className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-destructive text-sm">
                                     {error}
                                 </div>
                             )}
@@ -168,7 +168,7 @@ export default function RegisterPage() {
 
                             <Button
                                 type="submit"
-                                className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-sm"
+                                className="w-full"
                                 disabled={loading}
                             >
                                 {loading ? t('creatingAccount') : t('registerTitle')}
@@ -177,7 +177,7 @@ export default function RegisterPage() {
 
                         <p className="text-center text-sm text-muted-foreground mt-6">
                             {t('hasAccount')}{" "}
-                            <Link href="/auth/login" className="text-blue-600 hover:underline font-medium">
+                            <Link href="/auth/login" className="text-primary hover:underline font-medium">
                                 {t('signIn')}
                             </Link>
                         </p>

@@ -225,7 +225,7 @@ export default function SetupWizardPage() {
             <div className="w-full max-w-2xl">
                 <div className="text-center mb-8">
                     <div className="inline-flex items-center gap-2 mb-2">
-                        <Rocket className="w-6 h-6 text-blue-600" />
+                        <Rocket className="w-6 h-6 text-primary" />
                         <span className="font-bold text-2xl text-foreground">{t("title")}</span>
                     </div>
                     <p className="text-sm text-muted-foreground">{t("subtitle")}</p>

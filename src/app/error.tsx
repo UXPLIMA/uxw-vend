@@ -38,13 +38,13 @@ export default function RootError({
                     An unexpected error occurred. Please try again.
                 </p>
                 {process.env.NODE_ENV === "development" && (
-                    <pre className="mb-6 p-4 bg-gray-900 text-red-400 rounded-lg text-xs text-left overflow-auto font-mono">
+                    <pre className="mb-6 p-4 bg-muted text-destructive rounded-lg text-xs text-left overflow-auto font-mono">
                         {error.message}
                     </pre>
                 )}
                 <button
                     onClick={() => reset()}
-                    className="px-4 py-2 bg-primary text-white rounded-md hover:opacity-90 transition-opacity"
+                    className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:opacity-90 transition-opacity"
                 >
                     Retry
                 </button>

@@ -105,9 +105,9 @@ export function ModulesStep({ catalog, picked, plan, onToggle, onClear }: Module
                     </div>
 
                     {plan.errors.length > 0 && (
-                        <div className="rounded-md border border-red-300 bg-red-50 p-3 space-y-1">
+                        <div className="rounded-md border border-destructive/30 bg-destructive/10 p-3 space-y-1">
                             {plan.errors.map((e, i) => (
-                                <div key={i} className="flex items-start gap-2 text-xs text-red-800">
+                                <div key={i} className="flex items-start gap-2 text-xs text-destructive">
                                     <AlertTriangle className="w-3.5 h-3.5 mt-0.5 shrink-0" />
                                     <span>{installPlanErrorMessage(e)}</span>
                                 </div>

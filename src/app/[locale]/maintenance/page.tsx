@@ -19,7 +19,7 @@ export default async function MaintenancePage() {
     return (
         <div className="min-h-screen bg-background flex items-center justify-center px-4 py-12">
             <div className="w-full max-w-md text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-amber-100 text-amber-600 mb-6">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-warning/15 text-warning mb-6">
                     <Wrench className="w-8 h-8" />
                 </div>
                 <h1 className="text-3xl font-bold text-foreground mb-3">
@@ -31,7 +31,7 @@ export default async function MaintenancePage() {
                 <div className="pt-2">
                     <Link
                         href="/auth/login"
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-medium"
+                        className="inline-flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-md text-sm font-medium"
                     >
                         <LogIn className="w-4 h-4" aria-hidden="true" />
                         {commonT("login")}

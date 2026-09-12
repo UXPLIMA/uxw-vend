@@ -50,7 +50,7 @@ export function AdminStep({
                 <label className="block">
                     <span className="text-sm font-medium text-foreground">{t("passwordConfirm")}</span>
                     <PasswordInput value={passwordConfirm} onChange={(e) => setPasswordConfirm(e.target.value)} autoComplete="new-password" showLabel={authT("showPassword")} hideLabel={authT("hidePassword")} />
-                    {mismatch && <span className="text-xs text-red-600">{t("mismatch")}</span>}
+                    {mismatch && <span className="text-xs text-destructive">{t("mismatch")}</span>}
                 </label>
             </div>
         </div>
